@@ -163,4 +163,5 @@ Toda la documentación técnica vive en [`docs/`](./docs):
 
 ## Licencia y autoría
 
-Proyecto académico — Universidad EAN.
+Proyecto académico — Universidad Alexander Von Humboldt
+.

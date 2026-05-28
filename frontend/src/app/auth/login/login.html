@@ -1,0 +1,86 @@
+<div class="login-card">
+  <header class="head">
+    <h1>Bienvenido de nuevo</h1>
+    <p>Ingresa con tu cuenta de docente o administrador.</p>
+  </header>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="progress" />
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form" autocomplete="on">
+
+    <mat-form-field appearance="outline">
+      <mat-label>Usuario</mat-label>
+      <mat-icon matIconPrefix>person</mat-icon>
+      <input
+        matInput
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        required />
+      @if (form.controls.username.touched && form.controls.username.hasError('required')) {
+        <mat-error>El usuario es obligatorio.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <mat-icon matIconPrefix>lock</mat-icon>
+      <input
+        matInput
+        [type]="hidePassword() ? 'password' : 'text'"
+        formControlName="password"
+        autocomplete="current-password"
+        required />
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        (click)="togglePassword()"
+        [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+        <mat-error>La contraseña es obligatoria.</mat-error>
+      }
+    </mat-form-field>
+
+    @if (error()) {
+      <div class="server-error" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="form.invalid || loading()"
+      class="submit-btn">
+      <mat-icon>login</mat-icon>
+      <span>Iniciar sesión</span>
+    </button>
+  </form>
+
+  <p class="divider"><span>o</span></p>
+
+  <div class="alt-links">
+    <a routerLink="/auth/registro-docente" class="alt-link">
+      <mat-icon>person_add</mat-icon>
+      <div>
+        <strong>Crear cuenta de docente</strong>
+        <span>Empieza a diseñar casos en minutos.</span>
+      </div>
+    </a>
+
+    <a routerLink="/estudiante" class="alt-link">
+      <mat-icon>school</mat-icon>
+      <div>
+        <strong>Soy estudiante</strong>
+        <span>Acceso con correo + código de práctica.</span>
+      </div>
+    </a>
+  </div>
+</div>

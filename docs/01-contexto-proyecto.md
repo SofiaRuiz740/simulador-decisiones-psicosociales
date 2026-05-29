@@ -40,4 +40,4 @@ Ver [`08-plan-desarrollo.md`](./08-plan-desarrollo.md). En síntesis, la primera
 
 ## Contexto académico
 
-Proyecto de la Universidad EAN. Sirve como entregable académico y como prototipo funcional desplegable.
+Proyecto de la Universidad Alexander Von Humboldt. Sirve como entregable académico y como prototipo funcional desplegable.

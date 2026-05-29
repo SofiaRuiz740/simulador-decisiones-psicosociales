@@ -41,7 +41,7 @@ import { environment } from '../../environments/environment';
             </li>
           </ul>
 
-          <footer class="brand-foot">Universidad EAN · 2026</footer>
+          <footer class="brand-foot">Universidad Alexander Von Humboldt · 2026</footer>
         </div>
       </aside>
 

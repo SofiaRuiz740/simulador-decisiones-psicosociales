@@ -1,6 +1,8 @@
 """ViewSets de la app casos: Caso, Escenario, Pregunta, Respuesta, Rubrica."""
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
@@ -36,6 +38,25 @@ class CasoViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(docente_creador=self.request.user)
+
+    @action(detail=True, methods=['get', 'put', 'patch'], url_path='rubrica')
+    def rubrica(self, request, pk=None):
+        """Obtiene o reemplaza la rúbrica del caso (crea si no existe)."""
+        caso = self.get_object()
+        rub = getattr(caso, 'rubrica', None)
+        if request.method == 'GET':
+            if rub is None:
+                return Response(None, status=status.HTTP_204_NO_CONTENT)
+            return Response(RubricaSerializer(rub).data)
+
+        if rub is None:
+            data = {**request.data, 'caso': caso.id}
+            ser = RubricaSerializer(data=data)
+        else:
+            ser = RubricaSerializer(rub, data=request.data, partial=(request.method == 'PATCH'))
+        ser.is_valid(raise_exception=True)
+        ser.save(caso=caso)
+        return Response(ser.data, status=status.HTTP_200_OK)
 
 
 class EscenarioViewSet(viewsets.ModelViewSet):

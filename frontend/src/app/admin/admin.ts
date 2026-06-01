@@ -1,360 +1,102 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
 
-import { AuthService } from '../core/auth/auth.service';
 import { AdminMetricas, ExtrasService } from '../core/services/extras.service';
-
-interface KpiCard {
-  label: string;
-  value: number;
-  icon: string;
-  color: 'primary' | 'tertiary' | 'secondary' | 'success' | 'warn';
-  link?: string;
-  hint?: string;
-}
 
 @Component({
   selector: 'app-admin',
-  imports: [
-    CommonModule, DecimalPipe, RouterLink,
-    MatCardModule, MatIconModule, MatProgressBarModule, MatTooltipModule,
-  ],
+  imports: [CommonModule, DecimalPipe, MatCardModule, MatIconModule, MatProgressBarModule],
   template: `
     <section class="page">
-      <!-- HERO -->
-      <header class="hero anim-fade-up">
-        <div class="hero-text">
-          <span class="kicker">{{ saludo() }}</span>
-          <h1>Centro de control</h1>
-          <p>
-            Vista panorámica del simulador: docentes activos, estudiantes,
-            casos, prácticas en curso y rendimiento académico.
-          </p>
-        </div>
-        <div class="hero-grade">
-          <span class="grade-num">{{ (metricas()?.nota_promedio ?? 0) | number:'1.1-1' }}</span>
-          <span class="grade-label">Nota promedio del sistema</span>
-        </div>
+      <header>
+        <h1>Panel de Administrador</h1>
+        <p class="subtitle">Métricas globales del sistema.</p>
       </header>
 
       @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
 
-      <!-- KPIs -->
-      <div class="kpis">
-        @for (k of kpis(); track k.label) {
-          @if (k.link) {
-            <a [routerLink]="k.link" class="kpi" [attr.data-tone]="k.color"
-              [matTooltip]="k.hint || ''">
-              <div class="kpi-icon"><mat-icon>{{ k.icon }}</mat-icon></div>
-              <div class="kpi-body">
-                <strong>{{ k.value }}</strong>
-                <span>{{ k.label }}</span>
-              </div>
-              <mat-icon class="kpi-arrow">arrow_forward</mat-icon>
-            </a>
-          } @else {
-            <div class="kpi" [attr.data-tone]="k.color"
-              [matTooltip]="k.hint || ''">
-              <div class="kpi-icon"><mat-icon>{{ k.icon }}</mat-icon></div>
-              <div class="kpi-body">
-                <strong>{{ k.value }}</strong>
-                <span>{{ k.label }}</span>
-              </div>
-            </div>
-          }
-        }
-      </div>
+      @if (metricas(); as m) {
+        <div class="grid">
+          <mat-card class="stat-card">
+            <mat-icon>school</mat-icon>
+            <div class="num">{{ m.docentes }}</div>
+            <div class="label">Docentes registrados</div>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon>group</mat-icon>
+            <div class="num">{{ m.estudiantes }}</div>
+            <div class="label">Estudiantes</div>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon>workspaces</mat-icon>
+            <div class="num">{{ m.grupos }}</div>
+            <div class="label">Grupos</div>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon>menu_book</mat-icon>
+            <div class="num">{{ m.casos }}</div>
+            <div class="label">Casos de estudio</div>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon>event</mat-icon>
+            <div class="num">{{ m.practicas }}</div>
+            <div class="label">Prácticas</div>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon>assessment</mat-icon>
+            <div class="num">{{ m.resultados }}</div>
+            <div class="label">Resultados</div>
+          </mat-card>
+          <mat-card class="stat-card destacada">
+            <mat-icon>star</mat-icon>
+            <div class="num">{{ m.nota_promedio | number:'1.0-1' }}</div>
+            <div class="label">Nota promedio</div>
+          </mat-card>
+        </div>
 
-      <!-- Prácticas por estado: barras horizontales -->
-      <section class="panel anim-fade-up">
-        <header class="panel-head">
-          <div>
-            <h2>Prácticas por estado</h2>
-            <p>Distribución actual de las prácticas agendadas.</p>
-          </div>
-          <a routerLink="/practicas" class="link-mas">
-            Ver prácticas <mat-icon>arrow_forward</mat-icon>
-          </a>
-        </header>
-
-        @if (estadosLista().length === 0) {
-          <p class="empty-line">Aún no hay prácticas en el sistema.</p>
-        }
-
-        <div class="bars">
+        <h2>Prácticas por estado</h2>
+        <div class="estados">
           @for (e of estadosLista(); track e.key) {
-            <div class="bar-row" [attr.data-estado]="e.key">
-              <div class="bar-label">
-                <mat-icon>{{ iconoEstado(e.key) }}</mat-icon>
-                <span>{{ etiquetaEstado(e.key) }}</span>
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" [style.width.%]="pctEstado(e.value)"></div>
-              </div>
-              <strong class="bar-num">{{ e.value }}</strong>
+            <div class="estado-item">
+              <span class="num">{{ e.value }}</span>
+              <span class="label">{{ etiquetaEstado(e.key) }}</span>
             </div>
           }
         </div>
-      </section>
+      }
     </section>
   `,
   styles: [`
-    .page { display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 3rem; }
-
-    /* ========== HERO ========== */
-    .hero {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 1.5rem; flex-wrap: wrap;
-      padding: 2rem 2.25rem;
-      border-radius: 24px;
-      background:
-        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
-        radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 18%, transparent), transparent 55%),
-        var(--mat-sys-surface);
-      box-shadow: 0 12px 32px color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
-
-      .hero-text {
-        flex: 1 1 380px;
-        .kicker {
-          display: inline-block;
-          padding: 0.25rem 0.75rem;
-          background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
-          color: var(--mat-sys-primary);
-          border-radius: 999px;
-          font-size: 0.72rem; font-weight: 700;
-          text-transform: uppercase; letter-spacing: 0.08em;
-        }
-        h1 {
-          margin: 0.5rem 0 0.35rem;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 2.15rem; font-weight: 800;
-          background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          letter-spacing: -0.02em;
-        }
-        p { margin: 0; max-width: 580px; color: var(--mat-sys-on-surface-variant); line-height: 1.55; }
-      }
-
-      .hero-grade {
-        position: relative;
-        padding: 1.25rem 1.75rem;
-        border-radius: 22px;
-        background: var(--mat-sys-surface);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        text-align: center;
-        min-width: 200px;
-
-        .grade-num {
-          display: block;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 3rem; font-weight: 800;
-          line-height: 1;
-          background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .grade-label {
-          margin-top: 0.35rem;
-          font-size: 0.78rem; font-weight: 600;
-          color: var(--mat-sys-on-surface-variant);
-          text-transform: uppercase; letter-spacing: 0.05em;
-        }
-      }
+    .page { display: flex; flex-direction: column; gap: 1.5rem; }
+    h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
+    .subtitle { margin: 0.25rem 0 0; color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; }
+    h2 { margin: 0; font-size: 1.1rem; font-weight: 500; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
+    .stat-card {
+      padding: 1.25rem; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+      mat-icon { font-size: 2rem; width: 2rem; height: 2rem; color: var(--mat-sys-primary); }
+      .num { font-size: 2rem; font-weight: 600; color: var(--mat-sys-on-surface); }
+      .label { font-size: 0.85rem; color: var(--mat-sys-on-surface-variant); }
+      &.destacada { background: var(--mat-sys-primary-container); .num { color: var(--mat-sys-on-primary-container); } .label { color: var(--mat-sys-on-primary-container); } mat-icon { color: var(--mat-sys-on-primary-container); } }
     }
-
-    /* ========== KPIs ========== */
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 0.9rem;
-    }
-    .kpi {
-      display: flex; align-items: center; gap: 0.85rem;
-      padding: 1.05rem 1.15rem;
-      background: var(--mat-sys-surface);
-      border-radius: 18px;
-      border: 1px solid var(--mat-sys-outline-variant);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-      text-decoration: none; color: inherit;
-      transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
-      cursor: default;
-      position: relative; overflow: hidden;
-
-      &::before {
-        content: '';
-        position: absolute; left: 0; top: 0; bottom: 0;
-        width: 4px;
-        background: var(--mat-sys-primary);
-      }
-      &[data-tone="tertiary"]::before { background: var(--mat-sys-tertiary); }
-      &[data-tone="secondary"]::before { background: var(--mat-sys-secondary); }
-      &[data-tone="success"]::before { background: #43a047; }
-      &[data-tone="warn"]::before { background: var(--mat-sys-error); }
-
-      &[href] { cursor: pointer; }
-      &[href]:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-        border-color: var(--mat-sys-primary);
-        .kpi-arrow { opacity: 1; transform: translateX(0); }
-      }
-
-      .kpi-icon {
-        flex-shrink: 0;
-        width: 46px; height: 46px;
-        border-radius: 14px;
-        background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
-        color: var(--mat-sys-primary);
-        display: inline-flex; align-items: center; justify-content: center;
-        mat-icon { font-size: 24px; width: 24px; height: 24px; }
-      }
-      &[data-tone="tertiary"] .kpi-icon {
-        background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, transparent);
-        color: var(--mat-sys-tertiary);
-      }
-      &[data-tone="secondary"] .kpi-icon {
-        background: color-mix(in srgb, var(--mat-sys-secondary) 14%, transparent);
-        color: var(--mat-sys-secondary);
-      }
-      &[data-tone="success"] .kpi-icon {
-        background: color-mix(in srgb, #43a047 14%, transparent);
-        color: #43a047;
-      }
-      &[data-tone="warn"] .kpi-icon {
-        background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent);
-        color: var(--mat-sys-error);
-      }
-
-      .kpi-body {
-        flex: 1; min-width: 0;
-        display: flex; flex-direction: column;
-        strong {
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 1.8rem; font-weight: 800; line-height: 1;
-        }
-        span { font-size: 0.82rem; color: var(--mat-sys-on-surface-variant); margin-top: 2px; }
-      }
-
-      .kpi-arrow {
-        opacity: 0;
-        transform: translateX(-6px);
-        color: var(--mat-sys-primary);
-        transition: all 200ms ease;
-      }
-    }
-
-    /* ========== PANEL BARRAS ========== */
-    .panel {
-      padding: 1.5rem 1.75rem;
-      background: var(--mat-sys-surface);
-      border-radius: 22px;
-      border: 1px solid var(--mat-sys-outline-variant);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-
-      .panel-head {
-        display: flex; justify-content: space-between; align-items: flex-end;
-        gap: 1rem; flex-wrap: wrap;
-        margin-bottom: 1.25rem;
-
-        h2 {
-          margin: 0;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 1.2rem; font-weight: 700;
-        }
-        p { margin: 0.25rem 0 0; color: var(--mat-sys-on-surface-variant); font-size: 0.88rem; }
-      }
-      .link-mas {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        color: var(--mat-sys-primary);
-        font-weight: 600; font-size: 0.9rem;
-        text-decoration: none;
-        mat-icon { font-size: 18px; width: 18px; height: 18px; transition: transform 200ms; }
-        &:hover mat-icon { transform: translateX(3px); }
-      }
-
-      .empty-line { margin: 0; padding: 1rem; color: var(--mat-sys-on-surface-variant); text-align: center; }
-    }
-
-    .bars { display: flex; flex-direction: column; gap: 0.7rem; }
-    .bar-row {
-      display: grid;
-      grid-template-columns: 180px 1fr 60px;
-      align-items: center;
-      gap: 0.85rem;
-
-      .bar-label {
-        display: inline-flex; align-items: center; gap: 0.4rem;
-        font-weight: 600; font-size: 0.92rem;
-        mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--mat-sys-on-surface-variant); }
-      }
-      .bar-track {
-        height: 10px;
-        background: color-mix(in srgb, var(--mat-sys-on-surface) 6%, transparent);
-        border-radius: 999px;
-        overflow: hidden;
-      }
-      .bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-        transition: width 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
-      }
-      .bar-num {
-        text-align: right;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-weight: 800;
-        font-size: 1.05rem;
-        color: var(--mat-sys-primary);
-      }
-
-      &[data-estado="EN_CURSO"] .bar-fill { background: linear-gradient(90deg, #42a5f5, var(--mat-sys-primary)); }
-      &[data-estado="FINALIZADA"] .bar-fill { background: linear-gradient(90deg, #66bb6a, #43a047); }
-      &[data-estado="CANCELADA"] .bar-fill { background: linear-gradient(90deg, var(--mat-sys-error), #ef5350); }
-      &[data-estado="SIN_INICIAR"] .bar-fill { background: linear-gradient(90deg, #bdbdbd, #9e9e9e); }
-    }
-
-    @media (max-width: 720px) {
-      .hero { padding: 1.5rem; }
-      .hero h1 { font-size: 1.65rem !important; }
-      .hero .hero-grade .grade-num { font-size: 2.4rem; }
-      .panel { padding: 1.25rem; }
-      .bar-row { grid-template-columns: 130px 1fr 40px; gap: 0.5rem; }
+    .estados { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .estado-item {
+      padding: 0.75rem 1.25rem; background: var(--mat-sys-surface-container); border-radius: 8px;
+      display: flex; flex-direction: column; align-items: center;
+      .num { font-weight: 600; font-size: 1.2rem; }
+      .label { font-size: 0.8rem; color: var(--mat-sys-on-surface-variant); }
     }
   `],
 })
 export class Admin implements OnInit {
   private readonly servicio = inject(ExtrasService);
-  private readonly auth = inject(AuthService);
 
   readonly loading = signal(true);
   readonly metricas = signal<AdminMetricas | null>(null);
-
-  readonly saludo = computed(() => {
-    const u = this.auth.usuario();
-    const nombre = u?.first_name || u?.username || 'admin';
-    const h = new Date().getHours();
-    const sal = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
-    return `${sal}, ${nombre}`;
-  });
-
-  readonly kpis = computed<KpiCard[]>(() => {
-    const m = this.metricas();
-    return [
-      { label: 'Docentes', value: m?.docentes ?? 0, icon: 'school', color: 'primary', hint: 'Cuentas docentes registradas.' },
-      { label: 'Estudiantes', value: m?.estudiantes ?? 0, icon: 'group', color: 'tertiary', link: '/estudiantes' },
-      { label: 'Grupos', value: m?.grupos ?? 0, icon: 'workspaces', color: 'secondary', link: '/grupos' },
-      { label: 'Casos de estudio', value: m?.casos ?? 0, icon: 'menu_book', color: 'primary', link: '/casos' },
-      { label: 'Prácticas', value: m?.practicas ?? 0, icon: 'event', color: 'success', link: '/practicas' },
-      { label: 'Resultados', value: m?.resultados ?? 0, icon: 'assessment', color: 'tertiary', link: '/resultados' },
-    ];
-  });
 
   ngOnInit() {
     this.servicio.adminMetricas().subscribe({
@@ -369,13 +111,6 @@ export class Admin implements OnInit {
     return Object.entries(m.practicas_por_estado).map(([key, value]) => ({ key, value }));
   }
 
-  pctEstado(value: number): number {
-    const lista = this.estadosLista();
-    const max = Math.max(...lista.map((e) => e.value));
-    if (max <= 0) return 0;
-    return Math.round((value / max) * 100);
-  }
-
   etiquetaEstado(k: string): string {
     return ({
       SIN_INICIAR: 'Sin iniciar',
@@ -383,14 +118,5 @@ export class Admin implements OnInit {
       FINALIZADA: 'Finalizadas',
       CANCELADA: 'Canceladas',
     } as Record<string, string>)[k] || k;
-  }
-
-  iconoEstado(k: string): string {
-    return ({
-      SIN_INICIAR: 'schedule',
-      EN_CURSO: 'play_circle',
-      FINALIZADA: 'check_circle',
-      CANCELADA: 'cancel',
-    } as Record<string, string>)[k] || 'circle';
   }
 }

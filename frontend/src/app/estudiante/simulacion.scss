@@ -1,12 +1,70 @@
 .sim-shell {
+  position: relative;
   min-height: 100vh;
+  overflow: hidden;
   background:
     radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--mat-sys-primary) 14%, transparent), transparent 50%),
     radial-gradient(circle at 90% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 12%, transparent), transparent 50%),
     var(--mat-sys-surface-container-low);
   display: flex;
   flex-direction: column;
+  transition: background 700ms ease;
 }
+
+/* Decoración tipo escenario (orbs flotantes muy sutiles, dan profundidad) */
+.scene-deco {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    transition: all 900ms ease;
+  }
+  .orb-a {
+    width: 320px; height: 320px;
+    left: -80px; top: -60px;
+    background: var(--mat-sys-primary);
+  }
+  .orb-b {
+    width: 260px; height: 260px;
+    right: -60px; bottom: 10%;
+    background: var(--mat-sys-tertiary);
+  }
+  .orb-c {
+    width: 200px; height: 200px;
+    left: 60%; top: 40%;
+    background: var(--mat-sys-secondary);
+    opacity: 0.35;
+  }
+}
+
+/* Paletas por escena: cambian la mezcla de orbs para narrar progreso visual. */
+.sim-shell.scene-intro {
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--mat-sys-primary) 18%, transparent), transparent 60%),
+    var(--mat-sys-surface-container-low);
+}
+.sim-shell.scene-1 .orb-a { background: #7e57c2; }
+.sim-shell.scene-1 .orb-b { background: #ffb74d; }
+.sim-shell.scene-2 .orb-a { background: #26a69a; }
+.sim-shell.scene-2 .orb-b { background: #ec407a; }
+.sim-shell.scene-3 .orb-a { background: #ff7043; }
+.sim-shell.scene-3 .orb-b { background: #5c6bc0; }
+.sim-shell.scene-4 .orb-a { background: #66bb6a; }
+.sim-shell.scene-4 .orb-b { background: #8d6e63; }
+.sim-shell.scene-5 .orb-a { background: #42a5f5; }
+.sim-shell.scene-5 .orb-b { background: #ab47bc; }
+
+/* Asegura que el contenido quede encima de la decoración */
+.sim-shell > .topbar,
+.sim-shell > .dots,
+.sim-shell > .contenido,
+.sim-shell > .splash { position: relative; z-index: 1; }
 
 .splash {
   flex: 1;

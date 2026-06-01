@@ -52,4 +52,26 @@ export class CasosService {
   guardarRubrica(casoId: number, data: RubricaInput) {
     return this.http.put<Rubrica>(`${this.api}/casos/${casoId}/rubrica/`, data);
   }
+
+  // Acciones de gestión
+  validarCaso(id: number) {
+    return this.http.get<{ valido: boolean; problemas: ProblemaValidacion[] }>(
+      `${this.api}/casos/${id}/validar/`,
+    );
+  }
+  publicarCaso(id: number) {
+    return this.http.post<CasoDetalle>(`${this.api}/casos/${id}/publicar/`, {});
+  }
+  archivarCaso(id: number) {
+    return this.http.post<CasoDetalle>(`${this.api}/casos/${id}/archivar/`, {});
+  }
+  duplicarCaso(id: number) {
+    return this.http.post<CasoDetalle>(`${this.api}/casos/${id}/duplicar/`, {});
+  }
+}
+
+export interface ProblemaValidacion {
+  codigo: string;
+  mensaje: string;
+  ubicacion: string | null;
 }

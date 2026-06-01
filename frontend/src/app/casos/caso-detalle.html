@@ -19,8 +19,44 @@
           <mat-icon>checklist</mat-icon>
           {{ c.rubrica && c.rubrica.criterios.length > 0 ? 'Editar rúbrica' : 'Crear rúbrica' }}
         </a>
+        <button mat-stroked-button (click)="validar()" [disabled]="validando()">
+          <mat-icon>rule</mat-icon> Validar
+        </button>
+        <button mat-flat-button color="primary" (click)="publicar()">
+          <mat-icon>publish</mat-icon> Publicar
+        </button>
+        <button mat-stroked-button (click)="duplicar()">
+          <mat-icon>content_copy</mat-icon> Duplicar
+        </button>
+        <button mat-stroked-button color="warn" (click)="archivar()">
+          <mat-icon>inventory_2</mat-icon> Archivar
+        </button>
       </div>
     </header>
+
+    @if (problemas().length > 0) {
+      <mat-card class="problemas-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="warn">error_outline</mat-icon>
+            Problemas detectados
+          </mat-card-title>
+          <mat-card-subtitle>
+            Corrige estos puntos antes de publicar el caso.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="problemas-list">
+            @for (p of problemas(); track p.codigo + (p.ubicacion || '')) {
+              <li>
+                <mat-icon>warning</mat-icon>
+                <span>{{ p.mensaje }}</span>
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    }
 
     <!-- Historia / Contexto -->
     <mat-card class="seccion">

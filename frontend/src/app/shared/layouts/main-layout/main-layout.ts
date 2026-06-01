@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,15 +9,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  NavigationEnd,
-  Router,
-  RouterLink,
-  RouterLinkActive,
-  RouterOutlet,
-} from '@angular/router';
-import { Observable, filter, map, shareReplay } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Observable, map, shareReplay } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -35,20 +28,6 @@ interface NavGrupo {
   titulo: string;
   items: NavItem[];
 }
-
-const TITULOS_RUTA: Record<string, { titulo: string; icon: string }> = {
-  '/admin': { titulo: 'Panel administrador', icon: 'admin_panel_settings' },
-  '/docente': { titulo: 'Panel docente', icon: 'school' },
-  '/estudiantes': { titulo: 'Estudiantes', icon: 'group' },
-  '/grupos': { titulo: 'Grupos', icon: 'workspaces' },
-  '/casos': { titulo: 'Casos de estudio', icon: 'menu_book' },
-  '/ia-generativa': { titulo: 'IA generativa', icon: 'auto_awesome' },
-  '/importacion-documentos': { titulo: 'Importar documentos', icon: 'upload_file' },
-  '/practicas': { titulo: 'Prácticas', icon: 'event' },
-  '/participaciones': { titulo: 'Participaciones', icon: 'play_circle' },
-  '/resultados': { titulo: 'Resultados', icon: 'assessment' },
-  '/reportes': { titulo: 'Reportes', icon: 'description' },
-};
 
 @Component({
   selector: 'app-main-layout',
@@ -72,7 +51,6 @@ const TITULOS_RUTA: Record<string, { titulo: string; icon: string }> = {
 export class MainLayout {
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   @ViewChild(MatSidenav) sidenav?: MatSidenav;
 
@@ -86,15 +64,6 @@ export class MainLayout {
       map((result) => result.matches),
       shareReplay({ bufferSize: 1, refCount: true }),
     );
-
-  /** URL actual (signal) para derivar título y breadcrumb. */
-  readonly url = toSignal(
-    this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map((e) => e.urlAfterRedirects),
-    ),
-    { initialValue: this.router.url },
-  );
 
   /** Items agrupados por sección lógica. */
   private readonly grupos: NavGrupo[] = [
@@ -166,22 +135,6 @@ export class MainLayout {
     if (u.rol === 'ESTUDIANTE') return 'Estudiante';
     return u.rol;
   });
-
-  /** Título de la página actual derivado de la URL. */
-  readonly paginaTitulo = computed(() => {
-    const url = this.url();
-    const ruta = Object.keys(TITULOS_RUTA).find((r) => url.startsWith(r));
-    return ruta ? TITULOS_RUTA[ruta].titulo : this.appName;
-  });
-
-  readonly paginaIcono = computed(() => {
-    const url = this.url();
-    const ruta = Object.keys(TITULOS_RUTA).find((r) => url.startsWith(r));
-    return ruta ? TITULOS_RUTA[ruta].icon : 'apps';
-  });
-
-  /** Saludo según rol (estático, pero más cálido que "Menú"). */
-  readonly saludo = signal('Bienvenido al simulador');
 
   closeIfOverMode(): void {
     if (this.sidenav?.mode === 'over') {

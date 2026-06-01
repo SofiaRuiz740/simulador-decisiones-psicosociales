@@ -8,111 +8,61 @@
     [opened]="!(isHandset$ | async)"
     fixedInViewport>
 
-    <div class="sidenav-deco" aria-hidden="true">
-      <span class="orb a"></span>
-      <span class="orb b"></span>
-    </div>
+    <mat-toolbar class="sidenav-header">Menú</mat-toolbar>
 
-    <header class="brand">
-      <div class="logo">
-        <mat-icon class="logo-icon">psychology</mat-icon>
-      </div>
-      <div class="brand-text">
-        <strong>{{ appName }}</strong>
-        <span>Simulador psicosocial</span>
-      </div>
-    </header>
-
-    <nav class="nav">
-      @for (grupo of navGrupos(); track grupo.titulo) {
-        <div class="nav-group">
-          <div class="nav-title">{{ grupo.titulo }}</div>
-          @for (item of grupo.items; track item.route) {
-            <a
-              class="nav-item"
-              [routerLink]="item.route"
-              routerLinkActive="active-link"
-              [routerLinkActiveOptions]="{ exact: false }"
-              (click)="closeIfOverMode()">
-              <span class="nav-icon-wrap">
-                <mat-icon>{{ item.icon }}</mat-icon>
-              </span>
-              <span class="nav-label">{{ item.label }}</span>
-              <mat-icon class="nav-arrow">chevron_right</mat-icon>
-            </a>
-          }
-        </div>
+    <mat-nav-list>
+      @for (item of navItems(); track item.route) {
+        <a
+          mat-list-item
+          [routerLink]="item.route"
+          routerLinkActive="active-link"
+          (click)="closeIfOverMode()">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
       }
-    </nav>
-
-    @if (usuario(); as u) {
-      <footer class="sidenav-footer">
-        <div class="footer-card">
-          <span class="footer-avatar">{{ iniciales() }}</span>
-          <div class="footer-meta">
-            <strong>{{ u.nombre_completo || u.username }}</strong>
-            <span>{{ rolLabel() }}</span>
-          </div>
-          <button mat-icon-button matTooltip="Cerrar sesión" (click)="logout()">
-            <mat-icon>logout</mat-icon>
-          </button>
-        </div>
-      </footer>
-    }
+    </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content class="content">
-    <header class="topbar">
-      <div class="topbar-left">
-        @if (isHandset$ | async) {
-          <button
-            type="button"
-            mat-icon-button
-            aria-label="Abrir menú"
-            class="menu-btn"
-            (click)="sidenav.toggle()">
-            <mat-icon>menu</mat-icon>
-          </button>
-        }
-        <div class="crumb">
-          <span class="crumb-icon"><mat-icon>{{ paginaIcono() }}</mat-icon></span>
-          <div class="crumb-text">
-            <span class="crumb-section">{{ paginaTitulo() }}</span>
-            <small>{{ saludo() }}</small>
+    <mat-toolbar color="primary" class="topbar">
+      @if (isHandset$ | async) {
+        <button
+          type="button"
+          mat-icon-button
+          aria-label="Abrir menú"
+          (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <span class="app-name">{{ appName }}</span>
+      <span class="spacer"></span>
+
+      @if (usuario(); as u) {
+        <button
+          mat-button
+          class="user-btn"
+          [matMenuTriggerFor]="userMenu"
+          aria-label="Menú de usuario">
+          <span class="avatar">{{ iniciales() }}</span>
+          <span class="user-name">{{ u.nombre_completo }}</span>
+          <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <div class="menu-header">
+            <p class="menu-user">{{ u.nombre_completo }}</p>
+            <p class="menu-email">{{ u.email }}</p>
+            <p class="menu-rol">{{ u.rol }}</p>
           </div>
-        </div>
-      </div>
-
-      <div class="topbar-right">
-        @if (usuario(); as u) {
-          <button
-            mat-button
-            class="user-btn"
-            [matMenuTriggerFor]="userMenu"
-            aria-label="Menú de usuario">
-            <span class="avatar">{{ iniciales() }}</span>
-            <span class="user-name">{{ u.nombre_completo }}</span>
-            <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+          <mat-divider />
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar sesión</span>
           </button>
-
-          <mat-menu #userMenu="matMenu" class="user-menu">
-            <div class="menu-header">
-              <span class="menu-avatar">{{ iniciales() }}</span>
-              <div>
-                <p class="menu-user">{{ u.nombre_completo }}</p>
-                <p class="menu-email">{{ u.email }}</p>
-                <p class="menu-rol">{{ rolLabel() }}</p>
-              </div>
-            </div>
-            <mat-divider />
-            <button mat-menu-item (click)="logout()">
-              <mat-icon>logout</mat-icon>
-              <span>Cerrar sesión</span>
-            </button>
-          </mat-menu>
-        }
-      </div>
-    </header>
+        </mat-menu>
+      }
+    </mat-toolbar>
 
     <main class="main-content">
       <router-outlet />

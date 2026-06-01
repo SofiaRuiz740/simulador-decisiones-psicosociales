@@ -24,26 +24,37 @@ interface AccesoRapido {
     <section class="page">
 
       <!-- Hero -->
-      <header class="hero anim-fade-up">
+      <header class="hero bg-gradient anim-fade-up">
         <div class="hero-text">
-          <span class="kicker">{{ saludo() }}</span>
-          <h1>Hola, {{ nombre() }}</h1>
+          <span class="badge">{{ saludo() }}</span>
+          <h1 class="display">Hola, {{ nombre() }} 👋</h1>
           <p>
             Diseña casos, agenda prácticas y acompaña a tus estudiantes en
-            decisiones psicosociales con sentido. Empieza por las acciones de abajo.
+            decisiones psicosociales con sentido.
           </p>
         </div>
-        <div class="hero-stats">
-          <div class="stat">
+        <div class="hero-icon">
+          <mat-icon>psychology</mat-icon>
+        </div>
+      </header>
+
+      <!-- Stats rápidas -->
+      <div class="stats">
+        <div class="stat">
+          <mat-icon>group</mat-icon>
+          <div>
             <strong>{{ estudiantesCount() ?? '—' }}</strong>
             <span>Estudiantes</span>
           </div>
-          <div class="stat">
+        </div>
+        <div class="stat">
+          <mat-icon>workspaces</mat-icon>
+          <div>
             <strong>{{ gruposCount() ?? '—' }}</strong>
             <span>Grupos</span>
           </div>
         </div>
-      </header>
+      </div>
 
       <!-- Accesos rápidos -->
       <h2 class="seccion-titulo">Empieza por aquí</h2>
@@ -68,66 +79,63 @@ interface AccesoRapido {
     </section>
   `,
   styles: [`
-    .page { display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 3rem; }
+    .page { display: flex; flex-direction: column; gap: 1.5rem; }
 
     .hero {
-      display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
-      flex-wrap: wrap;
+      display: flex; gap: 2rem; align-items: center; justify-content: space-between;
       padding: 2rem 2.25rem;
       border-radius: 24px;
-      background:
-        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
-        radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 18%, transparent), transparent 55%),
-        var(--mat-sys-surface);
-      box-shadow: 0 12px 32px color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+      background-color: var(--mat-sys-surface);
+      position: relative; overflow: hidden;
 
-      .hero-text {
-        flex: 1 1 420px;
-        .kicker {
-          display: inline-block;
-          padding: 0.28rem 0.85rem;
-          background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
-          color: var(--mat-sys-primary);
-          border-radius: 999px;
-          font-size: 0.72rem; font-weight: 700;
-          text-transform: uppercase; letter-spacing: 0.08em;
-        }
-        h1 {
-          margin: 0.6rem 0 0.3rem;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 2.4rem; font-weight: 800;
-          line-height: 1.05;
-          letter-spacing: -0.025em;
-          background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-          -webkit-background-clip: text; background-clip: text; color: transparent;
-        }
-        p { margin: 0; color: var(--mat-sys-on-surface-variant); font-size: 1rem; max-width: 60ch; line-height: 1.55; }
+      .hero-text { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+      .badge {
+        align-self: flex-start;
+        padding: 0.25rem 0.75rem;
+        background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+        color: var(--mat-sys-primary);
+        border-radius: 999px;
+        font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
       }
+      .display {
+        margin: 0;
+        font-size: 2rem; font-weight: 700;
+        background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+      p { margin: 0; color: var(--mat-sys-on-surface-variant); font-size: 1.02rem; max-width: 60ch; }
 
-      .hero-stats {
-        display: flex; gap: 0.85rem; flex-wrap: wrap;
-        .stat {
-          padding: 1rem 1.4rem;
-          background: var(--mat-sys-surface);
-          border-radius: 18px;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-          min-width: 130px; text-align: center;
-          strong {
-            display: block;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2rem; font-weight: 800; line-height: 1;
-            background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-          }
-          span {
-            display: block;
-            margin-top: 0.35rem;
-            font-size: 0.74rem; color: var(--mat-sys-on-surface-variant);
-            text-transform: uppercase; letter-spacing: 0.05em;
-            font-weight: 600;
-          }
-        }
+      .hero-icon {
+        width: 96px; height: 96px;
+        border-radius: 24px;
+        background: var(--mat-sys-primary);
+        color: var(--mat-sys-on-primary);
+        display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 10px 30px color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
+        mat-icon { font-size: 48px; width: 48px; height: 48px; }
       }
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+    .stat {
+      padding: 1rem 1.25rem;
+      background: var(--mat-sys-surface);
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 0.75rem;
+      border: 1px solid var(--mat-sys-outline-variant);
+
+      mat-icon { color: var(--mat-sys-primary); font-size: 28px; width: 28px; height: 28px; }
+      strong {
+        display: block;
+        font-size: 1.6rem; font-weight: 700; line-height: 1;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      span { font-size: 0.85rem; color: var(--mat-sys-on-surface-variant); }
     }
 
     .seccion-titulo {
@@ -200,11 +208,10 @@ interface AccesoRapido {
       }
     }
 
-    @media (max-width: 720px) {
-      .hero { padding: 1.5rem; }
-      .hero h1 { font-size: 1.85rem !important; }
-      .hero .hero-stats .stat { min-width: 100px; padding: 0.85rem 1rem; }
-      .hero .hero-stats .stat strong { font-size: 1.55rem; }
+    @media (max-width: 600px) {
+      .hero { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1.5rem; }
+      .hero .hero-icon { width: 72px; height: 72px; mat-icon { font-size: 36px; width: 36px; height: 36px; } }
+      .display { font-size: 1.5rem !important; }
     }
   `],
 })

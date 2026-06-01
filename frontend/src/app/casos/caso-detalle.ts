@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -23,7 +24,7 @@ import { CasosService } from '../core/services/casos.service';
     CommonModule, FormsModule, RouterLink,
     MatCardModule, MatExpansionModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressBarModule,
-    MatSnackBarModule, MatTooltipModule, MatDividerModule,
+    MatSnackBarModule, MatTooltipModule, MatDividerModule, MatSelectModule,
   ],
   templateUrl: './caso-detalle.html',
   styleUrl: './caso-detalle.scss',
@@ -41,6 +42,9 @@ export class CasoDetallePage implements OnInit {
     if (!c || c.escenarios.length === 0) return 1;
     return Math.max(...c.escenarios.map((e) => e.orden)) + 1;
   });
+  readonly criteriosDisponibles = computed(() =>
+    this.caso()?.rubrica?.criterios ?? [],
+  );
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -116,6 +120,7 @@ export class CasoDetallePage implements OnInit {
   guardarPregunta(p: Pregunta): void {
     this.servicio.actualizarPregunta(p.id, {
       enunciado: p.enunciado, orden: p.orden, peso: p.peso,
+      criterio_rubrica_id: p.criterio_rubrica_id || '',
     }).subscribe({
       next: () => this.snackBar.open('Pregunta guardada.', 'OK', { duration: 2000 }),
       error: () => this.snackBar.open('No se pudo guardar.', 'OK', { duration: 3500 }),

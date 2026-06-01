@@ -7,6 +7,15 @@
 }
 
 .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .head-text { flex: 1 1 auto; min-width: 280px; }
+  .head-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
   h1 { margin: 0; font-size: 1.6rem; font-weight: 500; }
   .meta {
     display: flex; gap: 0.75rem; flex-wrap: wrap;
@@ -41,9 +50,10 @@
 }
 
 .esc-edit, .preg-edit, .resp-edit {
-  display: flex; gap: 0.5rem; align-items: flex-start;
-  .grow { flex: 1 1 auto; }
+  display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;
+  .grow { flex: 1 1 auto; min-width: 220px; }
   .peso { width: 100px; }
+  .criterio-sel { width: 220px; }
 }
 
 .esc-actions, .preg-actions, .resp-actions {

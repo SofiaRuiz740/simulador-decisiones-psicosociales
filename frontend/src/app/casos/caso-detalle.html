@@ -5,13 +5,21 @@
 
   @if (caso(); as c) {
     <header class="head">
-      <h1>{{ c.nombre }}</h1>
-      <div class="meta">
-        @if (c.area_psicosocial) { <span>{{ c.area_psicosocial }}</span> }
-        <span>{{ c.tiempo_estimado_min }} min</span>
-        <span class="estado">{{ c.estado_display }}</span>
+      <div class="head-text">
+        <h1>{{ c.nombre }}</h1>
+        <div class="meta">
+          @if (c.area_psicosocial) { <span>{{ c.area_psicosocial }}</span> }
+          <span>{{ c.tiempo_estimado_min }} min</span>
+          <span class="estado">{{ c.estado_display }}</span>
+        </div>
+        @if (c.descripcion) { <p class="desc">{{ c.descripcion }}</p> }
       </div>
-      @if (c.descripcion) { <p class="desc">{{ c.descripcion }}</p> }
+      <div class="head-actions">
+        <a mat-stroked-button color="primary" [routerLink]="['/casos', c.id, 'rubrica']">
+          <mat-icon>checklist</mat-icon>
+          {{ c.rubrica && c.rubrica.criterios.length > 0 ? 'Editar rúbrica' : 'Crear rúbrica' }}
+        </a>
+      </div>
     </header>
 
     <!-- Historia / Contexto -->
@@ -107,6 +115,17 @@
                     <mat-label>Peso</mat-label>
                     <input matInput type="number" [(ngModel)]="p.peso" min="1" />
                   </mat-form-field>
+                  @if (criteriosDisponibles().length > 0) {
+                    <mat-form-field appearance="outline" class="criterio-sel">
+                      <mat-label>Criterio de rúbrica</mat-label>
+                      <mat-select [(ngModel)]="p.criterio_rubrica_id">
+                        <mat-option value="">— Sin criterio —</mat-option>
+                        @for (cr of criteriosDisponibles(); track cr.id) {
+                          <mat-option [value]="cr.id">{{ cr.nombre || cr.id }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  }
                 </div>
                 <div class="preg-actions">
                   <button mat-icon-button color="primary" matTooltip="Guardar" (click)="guardarPregunta(p)">

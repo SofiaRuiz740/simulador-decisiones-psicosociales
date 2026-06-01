@@ -14,6 +14,8 @@ import {
   PreguntaInput,
   Respuesta,
   RespuestaInput,
+  Rubrica,
+  RubricaInput,
 } from '../models/casos.model';
 
 @Injectable({ providedIn: 'root' })
@@ -42,4 +44,12 @@ export class CasosService {
   crearRespuesta(data: RespuestaInput) { return this.http.post<Respuesta>(`${this.api}/respuestas/`, data); }
   actualizarRespuesta(id: number, data: Partial<RespuestaInput>) { return this.http.patch<Respuesta>(`${this.api}/respuestas/${id}/`, data); }
   eliminarRespuesta(id: number) { return this.http.delete<void>(`${this.api}/respuestas/${id}/`); }
+
+  // Rúbrica (anidada bajo /casos/{id}/rubrica/)
+  obtenerRubrica(casoId: number) {
+    return this.http.get<Rubrica | null>(`${this.api}/casos/${casoId}/rubrica/`);
+  }
+  guardarRubrica(casoId: number, data: RubricaInput) {
+    return this.http.put<Rubrica>(`${this.api}/casos/${casoId}/rubrica/`, data);
+  }
 }

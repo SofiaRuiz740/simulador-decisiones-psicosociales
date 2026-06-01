@@ -126,6 +126,20 @@ export interface DetallePreguntaResultado {
   respuestas_correctas: Respuesta[];
 }
 
+export interface DesgloseCriterio {
+  criterio_id: string;
+  nombre: string;
+  peso: number;
+  peso_total: number;
+  peso_obtenido: number;
+  porcentaje: number;
+  nivel_alcanzado: {
+    nivel: number;
+    nombre: string;
+    descriptor: string;
+  } | null;
+}
+
 export interface Resultado {
   id: number;
   participacion: number;
@@ -140,6 +154,10 @@ export interface Resultado {
   peso_obtenido: number;
   peso_total: number;
   nota_final: string;
+  aprobado: boolean;
+  nota_aprobacion: number;
+  rubrica_descripcion: string;
+  desglose_criterios: DesgloseCriterio[];
   feedback_docente: string;
   notificado_estudiante: boolean;
   fecha_calculo: string;

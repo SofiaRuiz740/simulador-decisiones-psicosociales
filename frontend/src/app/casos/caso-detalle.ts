@@ -10,12 +10,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CasoDetalle, Escenario, Pregunta, Respuesta } from '../core/models/casos.model';
-import { CasosService } from '../core/services/casos.service';
+import { CasosService, ProblemaValidacion } from '../core/services/casos.service';
 
 @Component({
   selector: 'app-caso-detalle',
@@ -23,7 +24,7 @@ import { CasosService } from '../core/services/casos.service';
     CommonModule, FormsModule, RouterLink,
     MatCardModule, MatExpansionModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressBarModule,
-    MatSnackBarModule, MatTooltipModule, MatDividerModule,
+    MatSnackBarModule, MatTooltipModule, MatDividerModule, MatSelectModule,
   ],
   templateUrl: './caso-detalle.html',
   styleUrl: './caso-detalle.scss',
@@ -36,11 +37,16 @@ export class CasoDetallePage implements OnInit {
 
   readonly loading = signal(true);
   readonly caso = signal<CasoDetalle | null>(null);
+  readonly problemas = signal<ProblemaValidacion[]>([]);
+  readonly validando = signal(false);
   readonly siguienteOrdenEscenario = computed(() => {
     const c = this.caso();
     if (!c || c.escenarios.length === 0) return 1;
     return Math.max(...c.escenarios.map((e) => e.orden)) + 1;
   });
+  readonly criteriosDisponibles = computed(() =>
+    this.caso()?.rubrica?.criterios ?? [],
+  );
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -116,6 +122,7 @@ export class CasoDetallePage implements OnInit {
   guardarPregunta(p: Pregunta): void {
     this.servicio.actualizarPregunta(p.id, {
       enunciado: p.enunciado, orden: p.orden, peso: p.peso,
+      criterio_rubrica_id: p.criterio_rubrica_id || '',
     }).subscribe({
       next: () => this.snackBar.open('Pregunta guardada.', 'OK', { duration: 2000 }),
       error: () => this.snackBar.open('No se pudo guardar.', 'OK', { duration: 3500 }),
@@ -150,5 +157,75 @@ export class CasoDetallePage implements OnInit {
   eliminarRespuesta(r: Respuesta): void {
     if (!confirm('¿Eliminar esta respuesta?')) return;
     this.servicio.eliminarRespuesta(r.id).subscribe(() => this.cargar(this.caso()!.id));
+  }
+
+  // ---------- Acciones de gestión ----------
+
+  validar(): void {
+    const c = this.caso();
+    if (!c) return;
+    this.validando.set(true);
+    this.servicio.validarCaso(c.id).subscribe({
+      next: (res) => {
+        this.problemas.set(res.problemas);
+        this.validando.set(false);
+        const msg = res.valido
+          ? 'El caso pasó la validación. Puedes publicarlo.'
+          : `Hay ${res.problemas.length} problema(s) por resolver.`;
+        this.snackBar.open(msg, 'OK', { duration: 3500 });
+      },
+      error: () => {
+        this.validando.set(false);
+        this.snackBar.open('No se pudo validar el caso.', 'OK', { duration: 3500 });
+      },
+    });
+  }
+
+  publicar(): void {
+    const c = this.caso();
+    if (!c) return;
+    if (!confirm('¿Publicar este caso? Quedará listo para asignarse a una práctica.')) return;
+    this.servicio.publicarCaso(c.id).subscribe({
+      next: (actualizado) => {
+        this.caso.set(actualizado);
+        this.problemas.set([]);
+        this.snackBar.open('Caso publicado correctamente.', 'OK', { duration: 3000 });
+      },
+      error: (err) => {
+        const problemas: ProblemaValidacion[] = err?.error?.problemas ?? [];
+        if (problemas.length) this.problemas.set(problemas);
+        this.snackBar.open(
+          err?.error?.detail || 'No se pudo publicar.',
+          'OK', { duration: 4000 },
+        );
+      },
+    });
+  }
+
+  archivar(): void {
+    const c = this.caso();
+    if (!c) return;
+    if (!confirm('¿Archivar el caso? Se ocultará de los listados activos.')) return;
+    this.servicio.archivarCaso(c.id).subscribe({
+      next: (actualizado) => {
+        this.caso.set(actualizado);
+        this.snackBar.open('Caso archivado.', 'OK', { duration: 2500 });
+      },
+      error: () => this.snackBar.open('No se pudo archivar.', 'OK', { duration: 3500 }),
+    });
+  }
+
+  duplicar(): void {
+    const c = this.caso();
+    if (!c) return;
+    if (!confirm('¿Duplicar el caso? Se creará una copia en estado BORRADOR.')) return;
+    this.servicio.duplicarCaso(c.id).subscribe({
+      next: (nuevo) => {
+        this.snackBar.open('Caso duplicado.', 'Abrir', { duration: 4000 })
+          .onAction().subscribe(() => this.router.navigate(['/casos', nuevo.id]));
+        this.router.navigate(['/casos', nuevo.id]);
+      },
+      error: () => this.snackBar.open('No se pudo duplicar.', 'OK', { duration: 3500 }),
+    });
   }
 }

@@ -1,6 +1,8 @@
 """ViewSets de la app casos: Caso, Escenario, Pregunta, Respuesta, Rubrica."""
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
@@ -36,6 +38,69 @@ class CasoViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(docente_creador=self.request.user)
+
+    @action(detail=True, methods=['get', 'put', 'patch'], url_path='rubrica')
+    def rubrica(self, request, pk=None):
+        """Obtiene o reemplaza la rúbrica del caso (crea si no existe)."""
+        caso = self.get_object()
+        rub = getattr(caso, 'rubrica', None)
+        if request.method == 'GET':
+            if rub is None:
+                return Response(None, status=status.HTTP_204_NO_CONTENT)
+            return Response(RubricaSerializer(rub).data)
+
+        if rub is None:
+            data = {**request.data, 'caso': caso.id}
+            ser = RubricaSerializer(data=data)
+        else:
+            ser = RubricaSerializer(rub, data=request.data, partial=(request.method == 'PATCH'))
+        ser.is_valid(raise_exception=True)
+        ser.save(caso=caso)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'], url_path='validar')
+    def validar(self, request, pk=None):
+        """Revisa la coherencia del caso para poder publicarlo. Devuelve lista de issues."""
+        from .services import problemas_de_validacion
+
+        caso = self.get_object()
+        problemas = problemas_de_validacion(caso)
+        return Response({
+            'valido': len(problemas) == 0,
+            'problemas': problemas,
+        })
+
+    @action(detail=True, methods=['post'], url_path='publicar')
+    def publicar(self, request, pk=None):
+        """Valida y, si está OK, marca el caso como VALIDADO (listo para prácticas)."""
+        from .services import problemas_de_validacion
+
+        caso = self.get_object()
+        problemas = problemas_de_validacion(caso)
+        if problemas:
+            return Response(
+                {'detail': 'El caso no puede publicarse aún.', 'problemas': problemas},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        caso.estado = Caso.Estado.VALIDADO
+        caso.save(update_fields=['estado', 'fecha_actualizacion'])
+        return Response(CasoDetalleSerializer(caso).data)
+
+    @action(detail=True, methods=['post'], url_path='archivar')
+    def archivar(self, request, pk=None):
+        caso = self.get_object()
+        caso.estado = Caso.Estado.ARCHIVADO
+        caso.save(update_fields=['estado', 'fecha_actualizacion'])
+        return Response(CasoDetalleSerializer(caso).data)
+
+    @action(detail=True, methods=['post'], url_path='duplicar')
+    def duplicar(self, request, pk=None):
+        """Duplica el caso completo (escenarios, preguntas, respuestas, rúbrica)."""
+        from .services import duplicar_caso
+
+        caso = self.get_object()
+        nuevo = duplicar_caso(caso, docente=request.user)
+        return Response(CasoDetalleSerializer(nuevo).data, status=status.HTTP_201_CREATED)
 
 
 class EscenarioViewSet(viewsets.ModelViewSet):

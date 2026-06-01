@@ -17,6 +17,16 @@ class Resultado(models.Model):
     peso_obtenido = models.PositiveIntegerField('peso obtenido', default=0)
     peso_total = models.PositiveIntegerField('peso total del caso', default=0)
     nota_final = models.DecimalField('nota final', max_digits=6, decimal_places=2, default=0)
+    aprobado = models.BooleanField('aprobado según rúbrica', default=False)
+    desglose_criterios = models.JSONField(
+        'desglose por criterio de rúbrica',
+        blank=True,
+        default=list,
+        help_text=(
+            'Lista de objetos {criterio_id, nombre, peso, peso_obtenido, peso_total, '
+            'porcentaje, nivel_alcanzado} calculados a partir de la rúbrica.'
+        ),
+    )
     feedback_docente = models.TextField('feedback general del docente', blank=True)
     notificado_estudiante = models.BooleanField('notificado al estudiante', default=False)
     fecha_calculo = models.DateTimeField('fecha del cálculo', auto_now_add=True)

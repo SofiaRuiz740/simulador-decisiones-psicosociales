@@ -25,6 +25,7 @@ export interface Pregunta {
   orden: number;
   enunciado: string;
   peso: number;
+  criterio_rubrica_id: string;
   respuestas: Respuesta[];
 }
 
@@ -38,14 +39,40 @@ export interface Escenario {
   preguntas: Pregunta[];
 }
 
+export interface NivelDesempeno {
+  nivel: number;
+  nombre: string;
+  descriptor: string;
+}
+
+export interface CriterioRubrica {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  peso: number;
+  niveles: NivelDesempeno[];
+}
+
 export interface Rubrica {
   id: number;
   caso: number;
   descripcion: string;
   escala_maxima: number;
-  criterios: { nombre: string; peso: number; descripcion?: string }[];
+  nota_aprobacion: number;
+  criterios: CriterioRubrica[];
+  niveles_globales: NivelDesempeno[];
+  suma_pesos_criterios: number;
+  es_consistente: boolean;
   fecha_creacion: string;
   fecha_actualizacion: string;
+}
+
+export interface RubricaInput {
+  descripcion?: string;
+  escala_maxima?: number;
+  nota_aprobacion?: number;
+  criterios?: CriterioRubrica[];
+  niveles_globales?: NivelDesempeno[];
 }
 
 export interface CasoListItem {
@@ -93,6 +120,7 @@ export interface PreguntaInput {
   orden: number;
   enunciado: string;
   peso?: number;
+  criterio_rubrica_id?: string;
 }
 
 export interface RespuestaInput {

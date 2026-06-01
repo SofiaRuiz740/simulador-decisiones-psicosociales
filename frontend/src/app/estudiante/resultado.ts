@@ -37,6 +37,14 @@ import { SimulacionService } from '../core/services/simulacion.service';
             <span class="max">/ 100</span>
           </div>
 
+          <div class="estado-aprob" [class.ok]="r.aprobado" [class.no]="!r.aprobado">
+            <mat-icon>{{ r.aprobado ? 'verified' : 'info' }}</mat-icon>
+            <span>
+              {{ r.aprobado ? 'Aprobado' : 'No aprobado' }}
+              · mínimo {{ r.nota_aprobacion }} / {{ escalaMax() }}
+            </span>
+          </div>
+
           <p class="caso-info">
             <mat-icon>menu_book</mat-icon> {{ r.caso_nombre }} · {{ r.practica_nombre }}
           </p>
@@ -66,6 +74,44 @@ import { SimulacionService } from '../core/services/simulacion.service';
             </div>
           </div>
         </section>
+
+        @if (r.desglose_criterios && r.desglose_criterios.length > 0) {
+          <section class="rubrica-card elevated-card anim-fade-up">
+            <header class="rub-head">
+              <mat-icon>checklist</mat-icon>
+              <div>
+                <h3>Desempeño por criterio</h3>
+                @if (r.rubrica_descripcion) {
+                  <p class="sub">{{ r.rubrica_descripcion }}</p>
+                }
+              </div>
+            </header>
+            <div class="criterios-list">
+              @for (cr of r.desglose_criterios; track cr.criterio_id) {
+                <div class="criterio">
+                  <div class="cr-head">
+                    <strong>{{ cr.nombre }}</strong>
+                    <span class="peso-tag">{{ cr.peso }}%</span>
+                  </div>
+                  <div class="cr-bar">
+                    <div class="cr-fill" [style.width.%]="cr.porcentaje"></div>
+                  </div>
+                  <div class="cr-foot">
+                    <span class="pct">{{ cr.porcentaje | number:'1.0-0' }}% de aciertos</span>
+                    @if (cr.nivel_alcanzado) {
+                      <span class="nivel">
+                        Nivel {{ cr.nivel_alcanzado.nivel }} · {{ cr.nivel_alcanzado.nombre }}
+                      </span>
+                    }
+                  </div>
+                  @if (cr.nivel_alcanzado?.descriptor) {
+                    <p class="descriptor">{{ cr.nivel_alcanzado!.descriptor }}</p>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
 
         @if (r.feedback_docente) {
           <mat-card class="feedback elevated-card anim-fade-up">
@@ -228,6 +274,91 @@ import { SimulacionService } from '../core/services/simulacion.service';
       mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--mat-sys-primary); }
     }
 
+    .estado-aprob {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-weight: 600; font-size: 0.9rem;
+      margin: 0 auto 0.75rem;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+      &.ok {
+        background: color-mix(in srgb, var(--mat-sys-primary) 16%, transparent);
+        color: var(--mat-sys-primary);
+      }
+      &.no {
+        background: color-mix(in srgb, var(--mat-sys-error) 16%, transparent);
+        color: var(--mat-sys-error);
+      }
+    }
+
+    .rubrica-card {
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+
+      .rub-head {
+        display: flex; gap: 0.6rem; align-items: flex-start;
+        mat-icon { color: var(--mat-sys-primary); margin-top: 2px; }
+        h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+        .sub { margin: 0.25rem 0 0; color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; }
+      }
+
+      .criterios-list {
+        display: flex; flex-direction: column; gap: 0.85rem;
+      }
+
+      .criterio {
+        background: var(--mat-sys-surface-container-low);
+        border-radius: 14px;
+        padding: 0.9rem 1rem;
+        display: flex; flex-direction: column; gap: 0.5rem;
+
+        .cr-head {
+          display: flex; justify-content: space-between; align-items: center;
+
+          strong { font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif; }
+          .peso-tag {
+            font-size: 0.78rem;
+            padding: 0.2rem 0.55rem;
+            background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+            color: var(--mat-sys-primary);
+            border-radius: 999px;
+            font-weight: 600;
+          }
+        }
+
+        .cr-bar {
+          width: 100%; height: 8px;
+          background: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+          border-radius: 999px;
+          overflow: hidden;
+        }
+        .cr-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+          transition: width 600ms ease;
+        }
+
+        .cr-foot {
+          display: flex; justify-content: space-between;
+          font-size: 0.82rem;
+          color: var(--mat-sys-on-surface-variant);
+          .nivel { color: var(--mat-sys-primary); font-weight: 600; }
+        }
+
+        .descriptor {
+          margin: 0;
+          padding: 0.55rem 0.75rem;
+          background: var(--mat-sys-surface);
+          border-left: 3px solid var(--mat-sys-primary);
+          border-radius: 8px;
+          font-size: 0.88rem;
+          color: var(--mat-sys-on-surface);
+          line-height: 1.45;
+        }
+      }
+    }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -386,6 +517,13 @@ export class ResultadoEstudiante implements OnInit {
     if (p >= 50) return 'Vas por buen camino, sigue practicando.';
     if (p > 0) return 'Revisa la retroalimentación para mejorar.';
     return 'Lee con detalle la retroalimentación abajo.';
+  });
+
+  readonly escalaMax = computed(() => {
+    const r = this.resultado();
+    if (!r) return 100;
+    // Usamos la nota_final + el peso para inferir escala: si nota está en 0-100, escala=100.
+    return 100;
   });
 
   ngOnInit() {

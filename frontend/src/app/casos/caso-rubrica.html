@@ -1,0 +1,150 @@
+<section class="page">
+  <a [routerLink]="['/casos', casoId()]" class="back-link">
+    <mat-icon>arrow_back</mat-icon> Volver al caso
+  </a>
+
+  @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
+
+  @if (!loading()) {
+    <header class="head">
+      <div class="head-text">
+        <h1>Rúbrica de calificación</h1>
+        <p class="sub">
+          Define los criterios pedagógicos, sus pesos y los niveles de desempeño.
+          La nota del estudiante se calculará combinando estos criterios.
+        </p>
+      </div>
+      <div class="head-actions">
+        <button
+          mat-flat-button color="primary"
+          (click)="guardar()"
+          [disabled]="guardando()"
+        >
+          <mat-icon>save</mat-icon>
+          {{ guardando() ? 'Guardando…' : 'Guardar rúbrica' }}
+        </button>
+      </div>
+    </header>
+
+    <mat-card class="seccion">
+      <mat-card-header>
+        <mat-card-title>Parámetros generales</mat-card-title>
+        <mat-card-subtitle>
+          Escala, nota mínima de aprobación y descripción que verá el estudiante.
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Puntaje máximo (escala)</mat-label>
+            <input matInput type="number" min="1" [(ngModel)]="rubrica().escala_maxima" />
+            <mat-hint>Ej. 100, 5, 10…</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Nota mínima de aprobación</mat-label>
+            <input matInput type="number" min="0" [(ngModel)]="rubrica().nota_aprobacion" />
+            <mat-hint>Por debajo de este valor el estudiante no aprueba.</mat-hint>
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Descripción de la rúbrica</mat-label>
+          <textarea matInput rows="3" [(ngModel)]="rubrica().descripcion"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <section class="criterios-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Criterios</h2>
+          <p class="sub">
+            Cada pregunta del caso puede asignarse a un criterio. La suma de pesos
+            debe ser 100 para que el cálculo use la rúbrica completa.
+          </p>
+        </div>
+        <div class="panel-actions">
+          <span
+            class="badge"
+            [class.ok]="pesosOk()"
+            [class.warn]="!pesosOk()"
+          >
+            Suma de pesos: {{ sumaPesos() }}/100
+          </span>
+          <button mat-stroked-button (click)="distribuirPesosUniformes()" [disabled]="rubrica().criterios.length === 0">
+            <mat-icon>balance</mat-icon> Distribuir uniforme
+          </button>
+          <button mat-flat-button color="primary" (click)="agregarCriterio()">
+            <mat-icon>add</mat-icon> Agregar criterio
+          </button>
+        </div>
+      </div>
+
+      @if (rubrica().criterios.length === 0) {
+        <div class="empty-card">
+          <mat-icon>checklist</mat-icon>
+          <p>Esta rúbrica aún no tiene criterios. Agrega el primero arriba.</p>
+        </div>
+      }
+
+      @for (cr of rubrica().criterios; track cr.id; let i = $index) {
+        <mat-card class="criterio">
+          <div class="cr-row">
+            <mat-form-field appearance="outline" class="grow">
+              <mat-label>Nombre del criterio</mat-label>
+              <input matInput [(ngModel)]="cr.nombre" placeholder="Ej. Empatía" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="peso">
+              <mat-label>Peso (%)</mat-label>
+              <input matInput type="number" min="0" max="100" [(ngModel)]="cr.peso" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="cid" matTooltip="Identificador interno usado para vincular preguntas.">
+              <mat-label>ID</mat-label>
+              <input matInput [(ngModel)]="cr.id" />
+            </mat-form-field>
+            <button mat-icon-button color="warn" matTooltip="Eliminar criterio" (click)="eliminarCriterio(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Descripción / qué evalúa</mat-label>
+            <textarea matInput rows="2" [(ngModel)]="cr.descripcion"></textarea>
+          </mat-form-field>
+
+          <mat-divider />
+
+          <div class="niveles-head">
+            <strong>Niveles de desempeño</strong>
+            <button mat-stroked-button (click)="agregarNivel(i)">
+              <mat-icon>add</mat-icon> Agregar nivel
+            </button>
+          </div>
+
+          <div class="niveles-grid">
+            @for (nv of cr.niveles; track $index; let j = $index) {
+              <div class="nivel">
+                <div class="nv-row">
+                  <mat-form-field appearance="outline" class="nv-num">
+                    <mat-label>Nivel</mat-label>
+                    <input matInput type="number" min="1" [(ngModel)]="nv.nivel" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="grow">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="nv.nombre" placeholder="Ej. Logrado" />
+                  </mat-form-field>
+                  <button mat-icon-button color="warn" (click)="eliminarNivel(i, j)">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+                <mat-form-field appearance="outline" class="full">
+                  <mat-label>Descriptor</mat-label>
+                  <textarea matInput rows="3" [(ngModel)]="nv.descriptor"
+                    placeholder="Describe qué hace el estudiante en este nivel."></textarea>
+                </mat-form-field>
+              </div>
+            }
+          </div>
+        </mat-card>
+      }
+    </section>
+  }
+</section>

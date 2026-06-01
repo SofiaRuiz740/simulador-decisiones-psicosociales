@@ -48,7 +48,34 @@ import { SimulacionService } from '../core/services/simulacion.service';
               </mat-panel-description>
             </mat-expansion-panel-header>
 
-            <p class="meta">Calculado: {{ r.fecha_calculo | date:'medium' }} · Peso obtenido: {{ r.peso_obtenido }}/{{ r.peso_total }}</p>
+            <p class="meta">
+              Calculado: {{ r.fecha_calculo | date:'medium' }} ·
+              Peso obtenido: {{ r.peso_obtenido }}/{{ r.peso_total }} ·
+              <span [class.aprob]="r.aprobado" [class.no-aprob]="!r.aprobado">
+                {{ r.aprobado ? 'Aprobado' : 'No aprobado' }} (mín {{ r.nota_aprobacion }})
+              </span>
+            </p>
+
+            @if (r.desglose_criterios && r.desglose_criterios.length > 0) {
+              <h3>Desempeño por criterio</h3>
+              <div class="criterios-mini">
+                @for (cr of r.desglose_criterios; track cr.criterio_id) {
+                  <div class="cr-row">
+                    <div class="cr-info">
+                      <strong>{{ cr.nombre }}</strong>
+                      <span>{{ cr.peso }}% · {{ cr.porcentaje | number:'1.0-0' }}% aciertos
+                        @if (cr.nivel_alcanzado) {
+                          · {{ cr.nivel_alcanzado.nombre }}
+                        }
+                      </span>
+                    </div>
+                    <div class="cr-bar">
+                      <div class="cr-fill" [style.width.%]="cr.porcentaje"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
 
             <h3>Detalle pregunta por pregunta</h3>
             <ul class="detalle">
@@ -87,6 +114,8 @@ import { SimulacionService } from '../core/services/simulacion.service';
     .empty { padding: 2rem; text-align: center; color: var(--mat-sys-on-surface-variant);
       background: var(--mat-sys-surface-container); border-radius: 12px; margin: 0; }
     .meta { color: var(--mat-sys-on-surface-variant); font-size: 0.85rem; margin: 0.5rem 0; }
+    .aprob { color: var(--mat-sys-primary); font-weight: 600; }
+    .no-aprob { color: var(--mat-sys-error); font-weight: 600; }
     h3 { font-size: 1rem; font-weight: 500; margin: 1rem 0 0.5rem; }
     .detalle { padding-left: 1.25rem; }
     .detalle li { margin-bottom: 0.5rem; }
@@ -95,6 +124,32 @@ import { SimulacionService } from '../core/services/simulacion.service';
     .ne { color: var(--mat-sys-on-surface-variant); font-style: italic; }
     .feedback { width: 100%; }
     button { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .criterios-mini {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      .cr-row {
+        background: var(--mat-sys-surface-container-low);
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        display: flex; flex-direction: column; gap: 0.35rem;
+      }
+      .cr-info {
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 0.5rem; flex-wrap: wrap;
+        strong { font-weight: 600; }
+        span { font-size: 0.82rem; color: var(--mat-sys-on-surface-variant); }
+      }
+      .cr-bar {
+        width: 100%; height: 6px;
+        background: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .cr-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+      }
+    }
   `],
 })
 export class Resultados implements OnInit {

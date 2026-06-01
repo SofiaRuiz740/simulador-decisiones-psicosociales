@@ -1,0 +1,213 @@
+<div class="game-shell" [class]="escenaClase()">
+  <div class="scene-deco" aria-hidden="true">
+    <span class="orb a"></span>
+    <span class="orb b"></span>
+    <span class="orb c"></span>
+  </div>
+
+  <!-- HUD superior -->
+  <header class="hud">
+    <div class="hud-left">
+      <span class="pill"><mat-icon>auto_awesome</mat-icon>Preview narrativo</span>
+      <span class="caso-titulo">{{ contenido().titulo }}</span>
+    </div>
+    <div class="hud-right">
+      <span class="paso-tag">
+        Paso {{ pasoIdx() + 1 }} / {{ totalPasos() }}
+      </span>
+      <mat-progress-bar mode="determinate" [value]="progreso()" />
+    </div>
+  </header>
+
+  <main class="contenido" [@stagger]="pasoIdx()">
+    <!-- INTRO -->
+    @if (esIntro()) {
+      <article class="card escena" [@escena]>
+        <div class="meta-row">
+          @if (contenido().area_psicologia_social) {
+            <span class="chip"><mat-icon>psychology</mat-icon>{{ contenido().area_psicologia_social }}</span>
+          }
+          @if (contenido().nivel_dificultad) {
+            <span class="chip"><mat-icon>tune</mat-icon>{{ contenido().nivel_dificultad }}</span>
+          }
+          @if (contenido().tiempo_estimado) {
+            <span class="chip"><mat-icon>schedule</mat-icon>{{ contenido().tiempo_estimado }} min</span>
+          }
+        </div>
+        <h1>{{ contenido().titulo }}</h1>
+        @if (contenido().descripcion) {
+          <p class="lead">{{ contenido().descripcion }}</p>
+        }
+
+        <div class="storytelling">
+          <h2><mat-icon>history_edu</mat-icon> Tu rol</h2>
+          @if (contenido().storytelling.personaje_principal) {
+            <p><strong>Personaje:</strong> {{ contenido().storytelling.personaje_principal }}</p>
+          }
+          @if (contenido().storytelling.contexto_general) {
+            <p><strong>Contexto:</strong> {{ contenido().storytelling.contexto_general }}</p>
+          }
+          @if (contenido().storytelling.conflicto_central) {
+            <p><strong>Conflicto:</strong> {{ contenido().storytelling.conflicto_central }}</p>
+          }
+          @if (contenido().storytelling.objetivo_del_estudiante) {
+            <p><strong>Lo que se espera de ti:</strong> {{ contenido().storytelling.objetivo_del_estudiante }}</p>
+          }
+        </div>
+
+        @if (contenido().storytelling.introduccion) {
+          <div class="narrativa">
+            <mat-icon class="quote">format_quote</mat-icon>
+            <p>{{ contenido().storytelling.introduccion }}</p>
+          </div>
+        }
+      </article>
+    }
+
+    <!-- ESCENARIOS -->
+    @if (escenarioActual(); as esc) {
+      <article class="card escena" [@escena]>
+        <div class="esc-head">
+          <span class="paso-num">Escenario {{ pasoIdx() }} de {{ totalEscenarios() }}</span>
+          @if (esc.emocion_principal) {
+            <span class="emocion"><mat-icon>mood</mat-icon>{{ esc.emocion_principal }}</span>
+          }
+        </div>
+        <h1>{{ esc.titulo }}</h1>
+        @if (esc.ambiente_visual_sugerido) {
+          <p class="ambiente"><mat-icon>landscape</mat-icon>{{ esc.ambiente_visual_sugerido }}</p>
+        }
+        @if (esc.contexto) { <p class="contexto">{{ esc.contexto }}</p> }
+        @if (esc.narrativa) {
+          <div class="narrativa">
+            <mat-icon class="quote">format_quote</mat-icon>
+            <p>{{ esc.narrativa }}</p>
+          </div>
+        }
+
+        @if (esc.decision_clave) {
+          <div class="banner-decision">
+            <mat-icon>flag</mat-icon>
+            <span>{{ esc.decision_clave }}</span>
+          </div>
+        }
+
+        @for (preg of esc.preguntas; track $index; let pi = $index) {
+          <section class="pregunta">
+            <h3 class="enunciado"><span class="num">P{{ pi + 1 }}</span> {{ preg.enunciado }}</h3>
+
+            <div class="opciones">
+              @for (op of preg.opciones; track $index; let oi = $index) {
+                <button
+                  type="button"
+                  class="opcion"
+                  [class.elegida]="elecciones()[pasoIdx()] === oi"
+                  [class.correcta]="permitirRevelarCorrecta && elecciones()[pasoIdx()] === oi && op.es_correcta"
+                  [class.incorrecta]="permitirRevelarCorrecta && elecciones()[pasoIdx()] === oi && !op.es_correcta"
+                  (click)="elegir(oi)">
+                  <span class="op-bullet">{{ ['A','B','C','D','E','F'][oi] }}</span>
+                  <span class="op-text">{{ op.texto }}</span>
+                  @if (permitirRevelarCorrecta && elecciones()[pasoIdx()] === oi) {
+                    <mat-icon class="op-icon">{{ op.es_correcta ? 'check_circle' : 'cancel' }}</mat-icon>
+                  }
+                </button>
+              }
+            </div>
+
+            @if (opcionElegida(); as eleg) {
+              <div class="feedback" [@escena]>
+                <div class="feedback-row">
+                  <mat-icon>tips_and_updates</mat-icon>
+                  <div>
+                    <strong>Retroalimentación</strong>
+                    <p>{{ eleg.retroalimentacion }}</p>
+                  </div>
+                </div>
+                @if (eleg.impacto_narrativo) {
+                  <div class="feedback-row impacto">
+                    <mat-icon>movie</mat-icon>
+                    <div>
+                      <strong>Impacto narrativo</strong>
+                      <p>{{ eleg.impacto_narrativo }}</p>
+                    </div>
+                  </div>
+                }
+                @if (eleg.justificacion) {
+                  <mat-expansion-panel class="teoria">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        <mat-icon>menu_book</mat-icon> Justificación teórica
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{ eleg.justificacion }}</p>
+                  </mat-expansion-panel>
+                }
+              </div>
+            }
+          </section>
+        }
+      </article>
+    }
+
+    <!-- CIERRE -->
+    @if (esCierre()) {
+      <article class="card escena cierre" [@escena]>
+        <mat-icon class="badge">workspace_premium</mat-icon>
+        <h1>Cierre del caso</h1>
+
+        @if (contenido().retroalimentacion_general) {
+          <div class="bloque">
+            <h2><mat-icon>insights</mat-icon> Retroalimentación general</h2>
+            <p>{{ contenido().retroalimentacion_general }}</p>
+          </div>
+        }
+
+        <div class="bloque">
+          <h2><mat-icon>checklist</mat-icon> Rúbrica</h2>
+          @for (cr of contenido().rubrica.criterios; track $index) {
+            <div class="criterio">
+              <div class="cr-head">
+                <strong>{{ cr.nombre }}</strong>
+                <span class="peso">{{ cr.puntaje_maximo }}%</span>
+              </div>
+              @if (cr.descripcion) { <p class="cr-desc">{{ cr.descripcion }}</p> }
+              <div class="niveles">
+                @for (nv of cr.niveles; track $index) {
+                  <div class="nivel">
+                    <span class="nv-tit">{{ nv.nivel }}</span>
+                    <span class="nv-pts">{{ nv.puntaje }} pts</span>
+                    @if (nv.descripcion) { <p>{{ nv.descripcion }}</p> }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (contenido().recomendaciones_docente) {
+          <div class="bloque">
+            <h2><mat-icon>school</mat-icon> Recomendaciones para el docente</h2>
+            <p>{{ contenido().recomendaciones_docente }}</p>
+          </div>
+        }
+      </article>
+    }
+
+    <!-- Navegación -->
+    <nav class="nav-bottom">
+      <button mat-stroked-button (click)="anterior()" [disabled]="pasoIdx() === 0">
+        <mat-icon>arrow_back</mat-icon> Anterior
+      </button>
+      <button mat-stroked-button (click)="reiniciar()">
+        <mat-icon>restart_alt</mat-icon> Reiniciar
+      </button>
+      @if (!esCierre()) {
+        <button mat-flat-button color="primary" (click)="siguiente()">
+          Siguiente <mat-icon>arrow_forward</mat-icon>
+        </button>
+      } @else {
+        <span class="fin"><mat-icon>flag</mat-icon> Fin del recorrido</span>
+      }
+    </nav>
+  </main>
+</div>

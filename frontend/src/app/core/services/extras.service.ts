@@ -38,14 +38,6 @@ export class ExtrasService {
     return this.http.get<AdminMetricas>(`${this.api}/reportes/admin/metricas/`);
   }
 
-  // ---- IA ----
-  generarCasoIA(tema: string, area: string, preguntas_por_escenario = 2) {
-    return this.http.post<{ caso_id: number; nombre: string }>(
-      `${this.api}/ia/generar-caso/`,
-      { tema, area, preguntas_por_escenario },
-    );
-  }
-
   // ---- Importación ----
   subirArchivo(file: File): Observable<ArchivoFuente> {
     const fd = new FormData();

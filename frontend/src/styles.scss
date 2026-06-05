@@ -1,4 +1,8 @@
-// Tema Material 3 — paleta violeta + ámbar para evocar introspección + calidez humana.
+// ============================================================
+// Theme Material 3 — Paleta académica
+// Azul profundo (azure) + Turquesa académico (cyan)
+// Evoca confianza, análisis, decisión, claridad.
+// ============================================================
 @use '@angular/material' as mat;
 
 html {
@@ -6,8 +10,8 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$violet-palette,
-        tertiary: mat.$orange-palette,
+        primary: mat.$azure-palette,    // azul profundo academico
+        tertiary: mat.$cyan-palette,    // turquesa
       ),
       typography: (
         plain-family: 'Inter, Roboto, system-ui, sans-serif',
@@ -18,6 +22,37 @@ html {
   );
 }
 
+// Variables CSS para acentos académicos.
+:root {
+  --app-deep: #1e3a8a;          // azul noche, autoridad academica
+  --app-deep-soft: #3b5bdb;     // azul medio, links y CTAs
+  --app-violet-soft: #818cf8;   // morado suave, decision/analisis
+  --app-teal: #0d9488;          // turquesa, exito/analitica
+  --app-teal-soft: #2dd4bf;     // turquesa claro
+  --app-slate: #475569;         // gris pizarra
+  --app-success: #16a34a;
+  --app-warn:    #f59e0b;
+  --app-danger:  #dc2626;
+
+  // Sombras unificadas
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.10);
+  --shadow-glow: 0 8px 24px rgba(30, 58, 138, 0.18);
+
+  // Radios
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  // Easing y duraciones
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-fast: 160ms;
+  --t-base: 220ms;
+  --t-slow: 360ms;
+}
+
 body {
   color-scheme: light;
   background-color: var(--mat-sys-surface);
@@ -25,11 +60,15 @@ body {
   font: var(--mat-sys-body-medium);
   margin: 0;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// ---------- Globals reutilizables ----------
+// ============================================================
+// Fondos / decoraciones
+// ============================================================
 
-// Gradiente de fondo para las pantallas "splash" (auth, estudiante acceso).
+// Gradiente de fondo para pantallas "splash" (auth, estudiante acceso).
 .bg-gradient {
   background:
     radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
@@ -37,101 +76,109 @@ body {
     var(--mat-sys-surface-container-low);
 }
 
-// Tarjeta con sombra suave y bordes generosos para sensación "premium".
+// Gradiente "académico" más sobrio (azul deep + turquesa + violet soft).
+.bg-gradient-academic {
+  background:
+    radial-gradient(circle at 8% 6%, rgba(30, 58, 138, 0.16), transparent 50%),
+    radial-gradient(circle at 95% 95%, rgba(13, 148, 136, 0.14), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.08), transparent 60%),
+    var(--mat-sys-surface);
+}
+
+// Tarjeta con sombra suave y bordes generosos.
 .elevated-card {
   background-color: var(--mat-sys-surface);
-  border-radius: 20px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 12px 32px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm), var(--shadow-lg);
 }
 
-// Heading display grande (para hero sections).
+// Heading display grande (hero).
 .display {
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
-// Animaciones reutilizables.
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes bounce-in {
-  0%   { opacity: 0; transform: scale(0.85); }
-  60%  { opacity: 1; transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
-.anim-fade-up   { animation: fade-up 0.4s ease both; }
-.anim-bounce-in { animation: bounce-in 0.5s ease both; }
+// ============================================================
+// Bloques visuales reutilizables
+// ============================================================
 
-// ---------- Bloques visuales reutilizables ----------
-
-// Bloque "hero" estándar de cualquier página: gradiente sutil con stats opcionales.
+// Hero block estándar.
 .hero-block {
   display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
   flex-wrap: wrap;
   padding: 1.75rem 2rem;
   border-radius: 22px;
   background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
-    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mat-sys-primary) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 14%, transparent), transparent 55%),
     var(--mat-sys-surface);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+  box-shadow: var(--shadow-md);
 
   .hero-text { flex: 1 1 380px; }
   .hero-text h1 {
     margin: 0.45rem 0 0.2rem;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 2rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
   .hero-text p { margin: 0; max-width: 560px; color: var(--mat-sys-on-surface-variant); line-height: 1.55; }
 }
 
-// Pequeña "categoría" arriba del título del hero.
+// Kicker estándar (azul primary).
 .kicker {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
   color: var(--mat-sys-primary);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.08em;
 }
 
-// Stats rápidas a la derecha del hero.
+// Variantes del kicker.
+.kicker-deep {
+  @extend .kicker;
+  background: color-mix(in srgb, var(--app-deep) 14%, transparent);
+  color: var(--app-deep);
+}
+.kicker-teal {
+  @extend .kicker;
+  background: color-mix(in srgb, var(--app-teal) 14%, transparent);
+  color: var(--app-teal);
+}
+
+// Stats arriba/derecha del hero.
 .hero-stats {
   display: flex; gap: 0.85rem; flex-wrap: wrap;
   .stat {
     padding: 0.9rem 1.2rem;
     background: var(--mat-sys-surface);
     border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-md);
     min-width: 110px; text-align: center;
     strong {
       display: block;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 1.8rem; font-weight: 800; line-height: 1;
-      background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+      background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     span { font-size: 0.74rem; color: var(--mat-sys-on-surface-variant); text-transform: uppercase; letter-spacing: 0.04em; }
   }
 }
 
-// Estado vacío unificado.
+// Estado vacío.
 .empty-state {
   padding: 3.5rem 1.5rem; text-align: center;
   border: 1.5px dashed var(--mat-sys-outline-variant);
   border-radius: 18px;
   background: var(--mat-sys-surface);
 
-  > mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--mat-sys-primary); opacity: 0.7; }
+  > mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--app-deep); opacity: 0.55; }
   h3 { margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', sans-serif; }
   p { margin: 0 auto 1.25rem; max-width: 440px; color: var(--mat-sys-on-surface-variant); }
   button, a { display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -144,14 +191,103 @@ body {
   gap: 1rem;
 }
 
-// Chip "meta" pequeña usada en tarjetas.
+// Chip "meta".
 .chip-meta {
   display: inline-flex; align-items: center; gap: 0.25rem;
   padding: 0.18rem 0.55rem;
   background: var(--mat-sys-surface-container-low);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.76rem;
   color: var(--mat-sys-on-surface-variant);
   mat-icon { font-size: 14px; width: 14px; height: 14px; }
   strong { color: var(--mat-sys-on-surface); font-weight: 600; }
+}
+
+// Superficie interactiva unificada.
+.interactive-surface {
+  transition: transform var(--t-base) var(--ease-out),
+              box-shadow var(--t-base) var(--ease-out),
+              border-color var(--t-base) var(--ease-out);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(30, 58, 138, 0.12);
+  }
+  &:active { transform: translateY(0); transition: transform 80ms; }
+}
+
+// Focus ring accesible.
+*:focus-visible {
+  outline: 2px solid var(--app-deep);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+// Skeleton con shimmer.
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--mat-sys-surface-container) 0%,
+    var(--mat-sys-surface-container-low) 50%,
+    var(--mat-sys-surface-container) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+// ============================================================
+// Animaciones
+// ============================================================
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounce-in {
+  0%   { opacity: 0; transform: scale(0.85); }
+  60%  { opacity: 1; transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scale-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.35); }
+  50%      { box-shadow: 0 0 0 10px rgba(30, 58, 138, 0); }
+}
+@keyframes expand-card {
+  from { opacity: 0; max-height: 0; }
+  to   { opacity: 1; max-height: 2000px; }
+}
+
+.anim-fade-up        { animation: fade-up        0.4s var(--ease-out) both; }
+.anim-bounce-in      { animation: bounce-in      0.5s ease both; }
+.anim-slide-in-left  { animation: slide-in-left  0.45s var(--ease-out) both; }
+.anim-slide-in-right { animation: slide-in-right 0.45s var(--ease-out) both; }
+.anim-scale-pop      { animation: scale-pop      0.32s var(--ease-out) both; }
+.anim-pulse-soft     { animation: pulse-soft     2s ease-in-out infinite; }
+
+// Respetar prefers-reduced-motion.
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-bounce-in,
+  .anim-slide-in-left,
+  .anim-slide-in-right,
+  .anim-scale-pop,
+  .anim-pulse-soft,
+  .skeleton {
+    animation: none !important;
+  }
+  .interactive-surface { transition: none !important; }
 }

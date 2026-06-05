@@ -7,110 +7,234 @@
   height: 100vh;
 }
 
+/* ==================================================================
+   SIDENAV — claro con gradiente sutil + items premium
+   Sin overrides peligrosos en mat-sidenav-content
+   ================================================================== */
+
 .sidenav {
-  width: 260px;
-  background-color: var(--mat-sys-surface-container);
+  width: 280px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mat-sys-primary) 10%, white) 0%,
+    white 60%);
+  border-right: 1px solid var(--mat-sys-outline-variant);
 }
 
-.sidenav-header {
-  font-weight: 500;
-  font-size: 1.1rem;
-}
+.sidenav-brand {
+  display: flex; align-items: center; gap: 0.85rem;
+  padding: 1.4rem 1.2rem 1.1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  margin-bottom: 0.5rem;
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  .app-name {
-    font-weight: 500;
-    font-size: 1.05rem;
-    margin-left: 0.25rem;
+  .logo {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    color: var(--mat-sys-on-primary);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow:
+      0 8px 24px color-mix(in srgb, var(--mat-sys-primary) 40%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    mat-icon { font-size: 26px; width: 26px; height: 26px; }
   }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-}
-
-.user-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.75rem;
-  height: 40px;
-
-  .avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: var(--mat-sys-primary-container);
-    color: var(--mat-sys-on-primary-container);
-    font-weight: 600;
-    font-size: 0.8rem;
-  }
-
-  .user-name {
-    @media (max-width: 599px) {
-      display: none;
+  .brand-text {
+    display: flex; flex-direction: column;
+    line-height: 1.2;
+    min-width: 0;
+    strong {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+    span {
+      font-size: 0.65rem;
+      color: var(--mat-sys-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-top: 2px;
+      font-weight: 600;
     }
   }
 }
 
+.nav-list {
+  padding: 0.5rem 0.6rem !important;
+
+  a[mat-list-item] {
+    border-radius: 14px;
+    margin-bottom: 4px;
+    transition: all 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    position: relative;
+
+    &:hover {
+      background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent) !important;
+      transform: translateX(3px);
+
+      mat-icon[matListItemIcon] {
+        background: color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
+        color: var(--mat-sys-primary);
+      }
+    }
+
+    mat-icon[matListItemIcon] {
+      background: var(--mat-sys-surface-container);
+      color: var(--mat-sys-on-surface-variant);
+      border-radius: 10px;
+      padding: 0.4rem;
+      width: 38px !important;
+      height: 38px !important;
+      font-size: 20px !important;
+      transition: all 220ms ease;
+      box-sizing: border-box;
+    }
+
+    span[matListItemTitle] {
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    &.active-link {
+      background: linear-gradient(90deg,
+        color-mix(in srgb, var(--mat-sys-primary) 20%, transparent),
+        color-mix(in srgb, var(--mat-sys-tertiary) 10%, transparent)) !important;
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
+
+      mat-icon[matListItemIcon] {
+        background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+        color: white;
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--mat-sys-primary) 45%, transparent);
+      }
+      span[matListItemTitle] { font-weight: 700; }
+
+      &::before {
+        content: '';
+        position: absolute; left: 0; top: 22%; bottom: 22%;
+        width: 3px;
+        border-radius: 0 4px 4px 0;
+        background: linear-gradient(180deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+      }
+    }
+  }
+}
+
+/* ==================================================================
+   TOPBAR — limpia con sombra suave
+   ================================================================== */
+
+.topbar {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; gap: 0.5rem;
+  background: white;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+  min-height: 64px;
+  padding: 0 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  .app-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .spacer { flex: 1 1 auto; }
+}
+
+.user-btn {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.4rem !important;
+  height: 46px;
+  border-radius: 999px !important;
+  background: white;
+  border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 200ms ease;
+
+  &:hover {
+    border-color: var(--mat-sys-primary);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    color: var(--mat-sys-on-primary);
+    font-weight: 800;
+    font-size: 0.82rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow:
+      0 4px 12px color-mix(in srgb, var(--mat-sys-primary) 40%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .user-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    @media (max-width: 599px) { display: none; }
+  }
+}
+
 .menu-header {
-  padding: 0.75rem 1rem;
-  min-width: 220px;
+  padding: 1rem 1.1rem;
+  min-width: 260px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mat-sys-primary) 16%, transparent),
+    color-mix(in srgb, var(--mat-sys-tertiary) 8%, transparent));
 
   .menu-user {
     margin: 0;
-    font-weight: 500;
+    font-weight: 800;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.98rem;
   }
-
   .menu-email {
-    margin: 0.15rem 0 0;
-    font-size: 0.85rem;
+    margin: 0.2rem 0 0;
+    font-size: 0.82rem;
     color: var(--mat-sys-on-surface-variant);
   }
-
   .menu-rol {
-    margin: 0.35rem 0 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    margin: 0.5rem 0 0;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     color: var(--mat-sys-primary);
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+    border-radius: 999px;
   }
 }
+
+/* ==================================================================
+   MAIN CONTENT — fondo lavanda suave, SIN orbs problemáticos
+   ================================================================== */
 
 .content {
   display: flex;
   flex-direction: column;
+  background: #f6f3fb;
 }
 
 .main-content {
   flex: 1 1 auto;
-  padding: 1.25rem;
+  padding: 1.75rem 2rem 2.5rem;
   overflow-y: auto;
+  background: #f6f3fb;
 }
 
-a.active-link {
-  background-color: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
-
-/* Responsive tweaks */
 @media (max-width: 599px) {
-  .sidenav {
-    width: 80vw;
-    max-width: 320px;
-  }
-
-  .main-content {
-    padding: 0.75rem;
-  }
+  .sidenav { width: 84vw; max-width: 320px; }
+  .main-content { padding: 1rem 0.9rem 2rem; }
+  .topbar { padding: 0 1rem; min-height: 56px; }
 }

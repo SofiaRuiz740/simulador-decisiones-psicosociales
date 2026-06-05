@@ -8,9 +8,15 @@
     [opened]="!(isHandset$ | async)"
     fixedInViewport>
 
-    <mat-toolbar class="sidenav-header">Menú</mat-toolbar>
+    <div class="sidenav-brand">
+      <div class="logo"><mat-icon>psychology</mat-icon></div>
+      <div class="brand-text">
+        <strong>{{ appName }}</strong>
+        <span>Simulador psicosocial</span>
+      </div>
+    </div>
 
-    <mat-nav-list>
+    <mat-nav-list class="nav-list">
       @for (item of navItems(); track item.route) {
         <a
           mat-list-item
@@ -25,7 +31,7 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="content">
-    <mat-toolbar color="primary" class="topbar">
+    <mat-toolbar class="topbar">
       @if (isHandset$ | async) {
         <button
           type="button"

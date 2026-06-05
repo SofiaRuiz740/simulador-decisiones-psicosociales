@@ -1,12 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Estudiante } from '../core/models/academico.model';
@@ -18,13 +16,11 @@ import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
   selector: 'app-estudiantes',
   imports: [
     CommonModule,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
     MatProgressBarModule,
     MatSnackBarModule,
-    MatToolbarModule,
     MatTooltipModule,
   ],
   templateUrl: './estudiantes.html',
@@ -38,7 +34,14 @@ export class Estudiantes implements OnInit {
   readonly loading = signal(true);
   readonly estudiantes = signal<Estudiante[]>([]);
   readonly total = signal(0);
-  readonly columnas = ['nombre_completo', 'correo', 'estado', 'creado_por', 'acciones'];
+  readonly activos = computed(() => this.estudiantes().filter((e) => e.activo).length);
+
+  inicialesDe(nombre: string, correo: string): string {
+    const partes = (nombre || correo).split(/\s+/);
+    const a = partes[0]?.charAt(0) || '';
+    const b = partes[partes.length - 1]?.charAt(0) || '';
+    return (a + (partes.length > 1 ? b : '')).toUpperCase() || '?';
+  }
 
   ngOnInit(): void {
     this.cargar();

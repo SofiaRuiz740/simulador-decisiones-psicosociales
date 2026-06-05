@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -17,7 +16,6 @@ import { GrupoFormDialog } from './dialogs/grupo-form-dialog';
   imports: [
     CommonModule,
     MatButtonModule,
-    MatCardModule,
     MatDialogModule,
     MatIconModule,
     MatProgressBarModule,
@@ -36,6 +34,26 @@ export class Grupos implements OnInit {
   readonly grupos = signal<Grupo[]>([]);
   readonly grupoExpandidoId = signal<number | null>(null);
   readonly detalle = signal<import('../core/models/academico.model').GrupoDetalle | null>(null);
+
+  readonly totalEstudiantes = computed(() =>
+    this.grupos().reduce((acc, g) => acc + (g.estudiantes_count || 0), 0),
+  );
+
+  readonly gruposVacios = computed(() => this.grupos().filter((g) => !g.estudiantes_count).length);
+
+  /** Variant del ribbon según cantidad de estudiantes. */
+  variantPor(count: number): 'empty' | 'small' | 'big' {
+    if (!count) return 'empty';
+    if (count < 10) return 'small';
+    return 'big';
+  }
+
+  inicialesDe(nombre: string, correo: string): string {
+    const partes = (nombre || correo).split(/\s+/);
+    const a = partes[0]?.charAt(0) || '';
+    const b = partes[partes.length - 1]?.charAt(0) || '';
+    return (a + (partes.length > 1 ? b : '')).toUpperCase() || '?';
+  }
 
   ngOnInit(): void {
     this.cargar();

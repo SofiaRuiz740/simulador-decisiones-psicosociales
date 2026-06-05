@@ -31,6 +31,7 @@ class AIConfig:
     temperature: float
     openai_key: str
     anthropic_key: str
+    groq_key: str
 
     @property
     def hay_key(self) -> bool:
@@ -38,6 +39,8 @@ class AIConfig:
             return bool(self.openai_key)
         if self.provider == 'anthropic':
             return bool(self.anthropic_key)
+        if self.provider == 'groq':
+            return bool(self.groq_key)
         return False
 
 
@@ -48,6 +51,7 @@ def _cargar_config() -> AIConfig:
         temperature=float(config('AI_TEMPERATURE', default='0.7')),
         openai_key=config('OPENAI_API_KEY', default='').strip(),
         anthropic_key=config('ANTHROPIC_API_KEY', default='').strip(),
+        groq_key=config('GROQ_API_KEY', default='').strip(),
     )
 
 
@@ -73,6 +77,9 @@ def complete_json(system_prompt: str, user_prompt: str) -> tuple[dict[str, Any],
 
     if cfg.provider == 'anthropic':
         return _anthropic_messages(cfg, system_prompt, user_prompt), True
+
+    if cfg.provider == 'groq':
+        return _groq_chat(cfg, system_prompt, user_prompt), True
 
     raise AIProviderError(f'Proveedor desconocido: {cfg.provider}')
 
@@ -107,6 +114,43 @@ def _openai_chat(cfg: AIConfig, system_prompt: str, user_prompt: str) -> dict[st
         return json.loads(raw)
     except json.JSONDecodeError as exc:
         logger.error('OpenAI devolvió contenido no-JSON: %s', raw[:300])
+        raise AIProviderError('La IA no devolvió un JSON válido.') from exc
+
+
+# ---------- Groq (compat OpenAI API) ----------
+
+def _groq_chat(cfg: AIConfig, system_prompt: str, user_prompt: str) -> dict[str, Any]:
+    """Groq expone una API compatible con OpenAI; reusamos el cliente OpenAI con base_url."""
+    try:
+        from openai import OpenAI
+    except ImportError as exc:
+        raise AIProviderError(
+            'La librería openai no está instalada. Agrega "openai" a requirements.txt.',
+        ) from exc
+
+    client = OpenAI(
+        api_key=cfg.groq_key,
+        base_url='https://api.groq.com/openai/v1',
+    )
+    try:
+        resp = client.chat.completions.create(
+            model=cfg.model,
+            temperature=cfg.temperature,
+            response_format={'type': 'json_object'},
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.exception('Falló la llamada a Groq.')
+        raise AIProviderError(f'Fallo del proveedor Groq: {exc}') from exc
+
+    raw = resp.choices[0].message.content or ''
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as exc:
+        logger.error('Groq devolvió contenido no-JSON: %s', raw[:300])
         raise AIProviderError('La IA no devolvió un JSON válido.') from exc
 
 

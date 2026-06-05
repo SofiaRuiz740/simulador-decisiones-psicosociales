@@ -8,34 +8,82 @@
     [opened]="!(isHandset$ | async)"
     fixedInViewport>
 
-    <mat-toolbar class="sidenav-header">Menú</mat-toolbar>
+    <!-- BRAND -->
+    <div class="sidenav-brand">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="4" fill="#0d9488"/>
+        <circle cx="30" cy="14" r="4" fill="#1e3a8a"/>
+        <circle cx="20" cy="30" r="4" fill="#818cf8"/>
+        <path d="M10 10 L30 14 L20 30 Z" stroke="#0B1729" stroke-width="1.2" stroke-linejoin="round" fill="none" opacity="0.45"/>
+      </svg>
+      <div class="brand-text">
+        <strong>Simulador</strong>
+        <em>de Decisiones</em>
+      </div>
+    </div>
 
-    <mat-nav-list>
-      @for (item of navItems(); track item.route) {
-        <a
-          mat-list-item
-          [routerLink]="item.route"
-          routerLinkActive="active-link"
-          (click)="closeIfOverMode()">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
-        </a>
+    <!-- NAV agrupado -->
+    <nav class="nav">
+      @for (g of navGroups(); track g.titulo) {
+        <div class="nav-group">
+          <div class="nav-group-label">{{ g.titulo }}</div>
+          @for (item of g.items; track item.route) {
+            <a
+              class="nav-item"
+              [routerLink]="item.route"
+              routerLinkActive="active-link"
+              (click)="closeIfOverMode()">
+              <span class="ic-wrap">
+                <mat-icon>{{ item.icon }}</mat-icon>
+              </span>
+              <span class="lbl">{{ item.label }}</span>
+            </a>
+          }
+        </div>
       }
-    </mat-nav-list>
+    </nav>
+
+    <!-- FOOTER del sidenav: perfil + logout -->
+    @if (usuario(); as u) {
+      <footer class="sidenav-foot">
+        <div class="foot-user">
+          <span class="foot-avatar">{{ iniciales() }}</span>
+          <div class="foot-meta">
+            <strong>{{ u.nombre_completo || u.username }}</strong>
+            <span>{{ rolLabel() }}</span>
+          </div>
+          <button mat-icon-button matTooltip="Cerrar sesión" (click)="logout()" class="foot-logout">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+        <div class="foot-version">
+          <span class="mono">v0.1.0 · dev</span>
+        </div>
+      </footer>
+    }
   </mat-sidenav>
 
   <mat-sidenav-content class="content">
-    <mat-toolbar color="primary" class="topbar">
+    <!-- TOPBAR -->
+    <mat-toolbar class="topbar">
       @if (isHandset$ | async) {
         <button
           type="button"
           mat-icon-button
           aria-label="Abrir menú"
-          (click)="sidenav.toggle()">
+          (click)="sidenav.toggle()"
+          class="menu-btn">
           <mat-icon>menu</mat-icon>
         </button>
       }
-      <span class="app-name">{{ appName }}</span>
+
+      <a class="topbar-brand" routerLink="/inicio">
+        <span class="dot teal"></span>
+        <span class="dot deep"></span>
+        <span class="dot violet"></span>
+        <span class="topbar-name">{{ appName }}</span>
+      </a>
+
       <span class="spacer"></span>
 
       @if (usuario(); as u) {
@@ -45,15 +93,18 @@
           [matMenuTriggerFor]="userMenu"
           aria-label="Menú de usuario">
           <span class="avatar">{{ iniciales() }}</span>
-          <span class="user-name">{{ u.nombre_completo }}</span>
-          <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+          <span class="user-name">{{ u.nombre_completo || u.username }}</span>
+          <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon>
         </button>
 
-        <mat-menu #userMenu="matMenu">
+        <mat-menu #userMenu="matMenu" class="user-menu-pane">
           <div class="menu-header">
-            <p class="menu-user">{{ u.nombre_completo }}</p>
-            <p class="menu-email">{{ u.email }}</p>
-            <p class="menu-rol">{{ u.rol }}</p>
+            <span class="menu-avatar">{{ iniciales() }}</span>
+            <div>
+              <p class="menu-user">{{ u.nombre_completo || u.username }}</p>
+              <p class="menu-email">{{ u.email }}</p>
+              <p class="menu-rol">{{ rolLabel() }}</p>
+            </div>
           </div>
           <mat-divider />
           <button mat-menu-item (click)="logout()">

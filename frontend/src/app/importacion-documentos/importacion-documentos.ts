@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -16,94 +15,273 @@ import { ArchivoFuente, ExtrasService } from '../core/services/extras.service';
   selector: 'app-importacion-documentos',
   imports: [
     CommonModule, FormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
+    MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule,
     MatProgressBarModule, MatSnackBarModule,
   ],
   template: `
     <section class="page">
-      <header>
-        <h1>Importar caso desde documento</h1>
-        <p class="subtitle">Sube un PDF o TXT con el contenido del caso. Lo procesamos y creamos un caso "En revisión" para que lo edites.</p>
+      <header class="hero-block anim-fade-up">
+        <div class="hero-text">
+          <span class="kicker">Contenido</span>
+          <h1>Importar caso desde documento</h1>
+          <p>
+            Sube un PDF o TXT con un caso ya escrito. Extraemos el texto y
+            generamos un caso "En revisión" para que lo termines de editar.
+          </p>
+        </div>
+        <div class="hero-icon">
+          <mat-icon>upload_file</mat-icon>
+        </div>
       </header>
 
-      <mat-card class="step">
-        <h2><span class="num">1</span> Subir archivo</h2>
-        <p class="hint">Formatos: PDF, TXT (DOCX limitado).</p>
-        <input #fileInput type="file" accept=".pdf,.txt,.docx" hidden (change)="seleccionar($event)" />
-        <button mat-flat-button color="primary" (click)="fileInput.click()" [disabled]="loading()">
-          <mat-icon>upload_file</mat-icon> Seleccionar archivo
-        </button>
-        @if (archivo(); as a) {
-          <div class="info">
-            <mat-icon>description</mat-icon>
-            <strong>{{ a.nombre_original }}</strong> ({{ a.tipo }}) — {{ a.estado_display }}
+      <!-- Stepper visual -->
+      <div class="stepper">
+        @for (s of pasos; track s.num) {
+          <div class="step-pill"
+            [class.actual]="pasoActual() === s.num"
+            [class.hecho]="pasoActual() > s.num">
+            <span class="num">{{ s.num }}</span>
+            <div class="info">
+              <strong>{{ s.titulo }}</strong>
+              <span>{{ s.sub }}</span>
+            </div>
+            @if (pasoActual() > s.num) {
+              <mat-icon class="check">check_circle</mat-icon>
+            }
           </div>
         }
-      </mat-card>
+      </div>
 
+      <!-- PASO 1: SUBIR -->
+      <article class="step-card anim-fade-up" [class.active]="pasoActual() === 1">
+        <header>
+          <span class="num">1</span>
+          <div>
+            <h2>Subir archivo</h2>
+            <p>Formatos aceptados: PDF, TXT (DOCX con extracción básica).</p>
+          </div>
+        </header>
+
+        <div class="dropzone" (click)="fileInput.click()">
+          <mat-icon>cloud_upload</mat-icon>
+          <strong>Toca para seleccionar un archivo</strong>
+          <small>Máx 10 MB. Aceptamos PDF, TXT o DOCX.</small>
+        </div>
+        <input #fileInput type="file" accept=".pdf,.txt,.docx" hidden (change)="seleccionar($event)" />
+
+        @if (archivo(); as a) {
+          <div class="file-info">
+            <mat-icon>description</mat-icon>
+            <div>
+              <strong>{{ a.nombre_original }}</strong>
+              <span>{{ a.tipo }} · {{ a.estado_display }}</span>
+            </div>
+          </div>
+        }
+      </article>
+
+      <!-- PASO 2: PROCESAR -->
       @if (archivo()) {
-        <mat-card class="step">
-          <h2><span class="num">2</span> Procesar (extraer texto)</h2>
-          <button mat-flat-button color="primary" (click)="procesar()"
+        <article class="step-card anim-fade-up" [class.active]="pasoActual() === 2">
+          <header>
+            <span class="num">2</span>
+            <div>
+              <h2>Extraer texto</h2>
+              <p>Procesamos el contenido del documento para que puedas revisarlo.</p>
+            </div>
+          </header>
+          <button mat-flat-button color="primary" class="btn-accion"
+            (click)="procesar()"
             [disabled]="loading() || archivo()!.estado !== 'SUBIDO'">
             <mat-icon>auto_fix_high</mat-icon> Procesar
           </button>
 
           @if (archivo()!.texto_extraido) {
-            <div class="texto-preview">
-              <strong>Vista previa del texto extraído:</strong>
+            <div class="preview">
+              <div class="preview-head">
+                <mat-icon>article</mat-icon>
+                <strong>Vista previa</strong>
+              </div>
               <pre>{{ vistaPrevia() }}</pre>
             </div>
           }
-        </mat-card>
+        </article>
       }
 
+      <!-- PASO 3: CREAR -->
       @if (archivo()?.texto_extraido) {
-        <mat-card class="step">
-          <h2><span class="num">3</span> Crear caso</h2>
+        <article class="step-card anim-fade-up" [class.active]="pasoActual() === 3">
+          <header>
+            <span class="num">3</span>
+            <div>
+              <h2>Crear caso</h2>
+              <p>El caso se creará en estado "En revisión" para que lo edites con el editor estándar.</p>
+            </div>
+          </header>
+
           <mat-form-field appearance="outline" class="full">
             <mat-label>Nombre del caso</mat-label>
-            <input matInput [(ngModel)]="nombreCaso" required maxlength="200" />
+            <input matInput [(ngModel)]="nombreCasoVal" required maxlength="200" />
           </mat-form-field>
           <mat-form-field appearance="outline" class="full">
-            <mat-label>Área psicosocial</mat-label>
-            <input matInput [(ngModel)]="areaCaso" maxlength="150" />
+            <mat-label>Área psicosocial (opcional)</mat-label>
+            <input matInput [(ngModel)]="areaCasoVal" maxlength="150" />
           </mat-form-field>
-          <button mat-flat-button color="primary"
-            (click)="crearCaso()" [disabled]="loading() || !nombreCaso()">
-            <mat-icon>create</mat-icon> Crear caso EN REVISIÓN
+
+          <button mat-flat-button color="primary" class="btn-accion"
+            (click)="crearCaso()" [disabled]="loading() || !nombreCasoVal.trim()">
+            <mat-icon>create</mat-icon> Crear caso en revisión
           </button>
-        </mat-card>
+        </article>
       }
 
       @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
     </section>
   `,
   styles: [`
-    .page { display: flex; flex-direction: column; gap: 1rem; max-width: 800px; }
-    h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
-    .subtitle { margin: 0.25rem 0 0; color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; }
-    .step { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start; }
-    .step h2 { margin: 0; font-size: 1.1rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; }
-    .num {
+    .page { display: flex; flex-direction: column; gap: 1.25rem; padding-bottom: 3rem; max-width: 920px; margin: 0 auto; }
+
+    .hero-block .hero-icon {
+      flex-shrink: 0;
+      width: 80px; height: 80px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+      color: var(--mat-sys-on-primary);
       display: inline-flex; align-items: center; justify-content: center;
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--mat-sys-primary); color: var(--mat-sys-on-primary);
-      font-size: 0.9rem; font-weight: 600;
+      box-shadow: 0 10px 30px color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
+      mat-icon { font-size: 40px; width: 40px; height: 40px; }
     }
-    .hint { color: var(--mat-sys-on-surface-variant); font-size: 0.85rem; margin: 0; }
-    .info { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: var(--mat-sys-surface-container); border-radius: 8px; }
-    .texto-preview { width: 100%; }
-    .texto-preview pre {
-      white-space: pre-wrap; word-wrap: break-word;
-      background: var(--mat-sys-surface-container);
-      padding: 0.75rem; border-radius: 6px;
-      max-height: 300px; overflow-y: auto;
-      font-size: 0.85rem; margin: 0.5rem 0 0;
+
+    .stepper {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      .step-pill {
+        flex: 1 1 220px;
+        display: flex; align-items: center; gap: 0.7rem;
+        padding: 0.7rem 0.95rem;
+        background: var(--mat-sys-surface);
+        border-radius: 14px;
+        border: 1px solid var(--mat-sys-outline-variant);
+        opacity: 0.6;
+        transition: all 200ms ease;
+
+        .num {
+          flex-shrink: 0;
+          width: 32px; height: 32px;
+          border-radius: 10px;
+          background: var(--mat-sys-surface-container);
+          color: var(--mat-sys-on-surface);
+          display: inline-flex; align-items: center; justify-content: center;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 800;
+        }
+        .info { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+        strong { font-size: 0.92rem; }
+        span { font-size: 0.75rem; color: var(--mat-sys-on-surface-variant); }
+        .check { color: var(--mat-sys-primary); }
+
+        &.actual {
+          opacity: 1;
+          border-color: var(--mat-sys-primary);
+          box-shadow: 0 8px 22px color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+          .num { background: var(--mat-sys-primary); color: var(--mat-sys-on-primary); }
+        }
+        &.hecho {
+          opacity: 1;
+          .num { background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent); color: var(--mat-sys-primary); }
+        }
+      }
     }
+
+    .step-card {
+      padding: 1.5rem;
+      background: var(--mat-sys-surface);
+      border-radius: 20px;
+      border: 1px solid var(--mat-sys-outline-variant);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      display: flex; flex-direction: column; gap: 0.85rem;
+      opacity: 0.75;
+      transition: opacity 200ms ease, border-color 200ms ease;
+
+      &.active {
+        opacity: 1;
+        border-color: var(--mat-sys-primary);
+      }
+
+      header {
+        display: flex; align-items: center; gap: 0.85rem;
+        .num {
+          flex-shrink: 0;
+          width: 42px; height: 42px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+          color: var(--mat-sys-on-primary);
+          display: inline-flex; align-items: center; justify-content: center;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 800; font-size: 1.1rem;
+        }
+        h2 { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; }
+        p { margin: 0.15rem 0 0; color: var(--mat-sys-on-surface-variant); font-size: 0.88rem; }
+      }
+    }
+
+    .dropzone {
+      display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+      padding: 2rem 1.5rem;
+      background: var(--mat-sys-surface-container-low);
+      border: 2px dashed var(--mat-sys-outline-variant);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 200ms ease;
+      text-align: center;
+
+      &:hover {
+        background: color-mix(in srgb, var(--mat-sys-primary) 6%, var(--mat-sys-surface));
+        border-color: var(--mat-sys-primary);
+      }
+
+      mat-icon { font-size: 42px; width: 42px; height: 42px; color: var(--mat-sys-primary); }
+      strong { font-family: 'Plus Jakarta Sans', sans-serif; }
+      small { color: var(--mat-sys-on-surface-variant); }
+    }
+
+    .file-info {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.7rem 1rem;
+      background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+      border-radius: 12px;
+      mat-icon { color: var(--mat-sys-primary); }
+      strong { font-weight: 700; }
+      span { font-size: 0.82rem; color: var(--mat-sys-on-surface-variant); display: block; }
+    }
+
+    .preview {
+      border-radius: 14px;
+      background: var(--mat-sys-surface-container-low);
+      padding: 0.85rem 1rem;
+
+      .preview-head {
+        display: flex; align-items: center; gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        mat-icon { color: var(--mat-sys-primary); font-size: 18px; width: 18px; height: 18px; }
+      }
+      pre {
+        margin: 0; padding: 0;
+        white-space: pre-wrap; word-wrap: break-word;
+        font-size: 0.85rem; line-height: 1.5;
+        max-height: 300px; overflow-y: auto;
+        font-family: 'Inter', sans-serif;
+      }
+    }
+
+    .btn-accion {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      align-self: flex-start;
+      height: 44px; padding: 0 1.2rem;
+      border-radius: 12px; font-weight: 600;
+    }
+
     .full { width: 100%; }
-    button { display: inline-flex; align-items: center; gap: 0.4rem; }
   `],
 })
 export class ImportacionDocumentos {
@@ -113,8 +291,21 @@ export class ImportacionDocumentos {
 
   readonly loading = signal(false);
   readonly archivo = signal<ArchivoFuente | null>(null);
-  readonly nombreCaso = signal('');
-  readonly areaCaso = signal('');
+  nombreCasoVal = '';
+  areaCasoVal = '';
+
+  readonly pasos = [
+    { num: 1, titulo: 'Subir', sub: 'PDF o TXT desde tu equipo' },
+    { num: 2, titulo: 'Extraer', sub: 'Procesamos el texto' },
+    { num: 3, titulo: 'Crear', sub: 'Caso "En revisión" listo' },
+  ];
+
+  readonly pasoActual = computed(() => {
+    const a = this.archivo();
+    if (!a) return 1;
+    if (!a.texto_extraido) return 2;
+    return 3;
+  });
 
   vistaPrevia(): string {
     const txt = this.archivo()?.texto_extraido ?? '';
@@ -129,7 +320,7 @@ export class ImportacionDocumentos {
     this.servicio.subirArchivo(file).subscribe({
       next: (a) => {
         this.archivo.set(a);
-        this.nombreCaso.set(a.nombre_original.replace(/\.[^.]+$/, ''));
+        this.nombreCasoVal = a.nombre_original.replace(/\.[^.]+$/, '');
         this.loading.set(false);
         this.snackBar.open('Archivo subido. Procesa para extraer el texto.', 'OK', { duration: 3000 });
       },
@@ -145,8 +336,14 @@ export class ImportacionDocumentos {
     if (!a) return;
     this.loading.set(true);
     this.servicio.procesarArchivo(a.id).subscribe({
-      next: (res) => { this.archivo.set(res); this.loading.set(false); this.snackBar.open('Texto extraído.', 'OK', { duration: 2500 }); },
-      error: () => { this.loading.set(false); this.snackBar.open('No se pudo procesar.', 'OK', { duration: 3500 }); },
+      next: (res) => {
+        this.archivo.set(res); this.loading.set(false);
+        this.snackBar.open('Texto extraído.', 'OK', { duration: 2500 });
+      },
+      error: () => {
+        this.loading.set(false);
+        this.snackBar.open('No se pudo procesar.', 'OK', { duration: 3500 });
+      },
     });
   }
 
@@ -154,13 +351,16 @@ export class ImportacionDocumentos {
     const a = this.archivo();
     if (!a) return;
     this.loading.set(true);
-    this.servicio.crearCasoDesdeArchivo(a.id, this.nombreCaso(), this.areaCaso()).subscribe({
+    this.servicio.crearCasoDesdeArchivo(a.id, this.nombreCasoVal, this.areaCasoVal).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.snackBar.open('Caso creado. Te llevamos al editor.', 'OK', { duration: 2500 });
         this.router.navigate(['/casos', res.caso_id]);
       },
-      error: () => { this.loading.set(false); this.snackBar.open('No se pudo crear el caso.', 'OK', { duration: 3500 }); },
+      error: () => {
+        this.loading.set(false);
+        this.snackBar.open('No se pudo crear el caso.', 'OK', { duration: 3500 });
+      },
     });
   }
 }

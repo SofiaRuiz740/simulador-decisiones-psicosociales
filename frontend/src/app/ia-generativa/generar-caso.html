@@ -11,16 +11,13 @@
         conviertes en un caso real.
       </p>
     </div>
-    <div class="hero-badge" [class.ok]="proveedorActivo()" [class.warn]="proveedorActivo() === false">
-      <mat-icon>{{ proveedorActivo() ? 'auto_awesome' : 'science' }}</mat-icon>
+    <div class="hero-badge ok">
+      <mat-icon>psychology</mat-icon>
       <div>
-        <strong>{{ proveedorActivo() ? 'IA real activa' : 'Modo demo (stub)' }}</strong>
+        <strong>Asistente pedagógico</strong>
         <span>
-          @if (proveedorActivo()) {
-            El backend usará el LLM configurado en .env.
-          } @else {
-            Configura OPENAI_API_KEY en .env para usar IA real.
-          }
+          Construye un caso con personaje, escenarios, decisiones éticas y rúbrica
+          alineada a tu objetivo. Tú lo revisas y apruebas antes de usarlo.
         </span>
       </div>
     </div>

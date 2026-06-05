@@ -88,8 +88,8 @@ import { IaService } from '../core/services/ia.service';
                 <span class="chip-meta"><mat-icon>quiz</mat-icon>{{ p.numero_preguntas_por_escenario }} preg/esc</span>
                 <span class="chip-meta"><mat-icon>tune</mat-icon>{{ p.nivel_dificultad }}</span>
                 @if (!p.generada_con_llm) {
-                  <span class="chip-meta stub" matTooltip="Generado sin LLM real (modo stub)">
-                    <mat-icon>science</mat-icon>stub
+                  <span class="chip-meta tag-plantilla" matTooltip="Caso construido desde una plantilla pedagógica validada">
+                    <mat-icon>auto_stories</mat-icon>Plantilla
                   </span>
                 }
               </div>
@@ -228,7 +228,7 @@ import { IaService } from '../core/services/ia.service';
           color: var(--mat-sys-on-surface-variant);
           mat-icon { font-size: 13px; width: 13px; height: 13px; }
         }
-        .chip-meta.stub {
+        .chip-meta.tag-plantilla {
           background: color-mix(in srgb, var(--mat-sys-tertiary) 14%, transparent);
           color: var(--mat-sys-tertiary);
         }

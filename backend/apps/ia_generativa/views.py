@@ -1,58 +1,125 @@
-"""Endpoints de IA generativa."""
+"""Endpoints del módulo de IA generativa.
 
-from django.db import transaction
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+- POST /api/ia/generar-caso/                       → genera y guarda propuesta
+- GET  /api/ia/propuestas/                          → lista propuestas del docente
+- GET  /api/ia/propuestas/{id}/                     → detalle de una propuesta
+- POST /api/ia/propuestas/{id}/aprobar/             → estado APROBADO
+- POST /api/ia/propuestas/{id}/rechazar/            → estado RECHAZADO
+- POST /api/ia/propuestas/{id}/convertir-en-caso/   → crea Caso real
+"""
+
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.casos.models import Caso, Escenario, Pregunta, Respuesta
+from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
 
-from .services import generar_caso
+from .models import PropuestaCasoIA
+from .serializers import (
+    GenerarCasoRequestSerializer,
+    PropuestaCasoIASerializer,
+    RechazoSerializer,
+)
+from .services import (
+    ai_provider,
+    convertir_propuesta_en_caso,
+    generar_propuesta_caso,
+)
+from .services.case_generator import GenerationError
 
 
 @api_view(['POST'])
 @permission_classes([EsDocenteOAdmin])
-@transaction.atomic
 def generar_caso_view(request):
-    """
-    POST /api/ia/generar-caso/
-    Body: {tema: str, area?: str, preguntas_por_escenario?: int}
-    Crea el caso completo en estado GENERADO_IA con escenarios, preguntas y
-    respuestas. Devuelve el ID del caso para que el frontend lo abra y el
-    docente revise/edite antes de validar (RN10).
-    """
-    tema = request.data.get('tema', '').strip()
-    area = request.data.get('area', '').strip()
-    ppe = int(request.data.get('preguntas_por_escenario', 2))
-    if not tema:
-        return Response({'tema': 'Requerido.'}, status=status.HTTP_400_BAD_REQUEST)
+    """Genera una propuesta de caso vía IA y la devuelve."""
+    ser = GenerarCasoRequestSerializer(data=request.data)
+    ser.is_valid(raise_exception=True)
+    payload = ser.validated_data
 
-    estructura = generar_caso(tema, area, ppe)
-
-    caso = Caso.objects.create(
-        nombre=estructura['nombre'],
-        descripcion=estructura['descripcion'],
-        contexto_historia=estructura['contexto_historia'],
-        desarrollo_situacional=estructura.get('desarrollo_situacional', ''),
-        area_psicosocial=estructura.get('area_psicosocial', '') or area,
-        estado=Caso.Estado.GENERADO_IA,
-        docente_creador=request.user,
-    )
-    for i, esc in enumerate(estructura['escenarios'], start=1):
-        e = Escenario.objects.create(
-            caso=caso, orden=i, titulo=esc['titulo'], narrativa=esc.get('narrativa', ''),
+    try:
+        propuesta = generar_propuesta_caso(payload, request.user)
+    except GenerationError as exc:
+        return Response(
+            {'detail': str(exc), 'codigo': 'generacion_invalida'},
+            status=status.HTTP_502_BAD_GATEWAY,
         )
-        for j, preg in enumerate(esc['preguntas'], start=1):
-            p = Pregunta.objects.create(
-                escenario=e, orden=j, enunciado=preg['enunciado'], peso=preg.get('peso', 1),
-            )
-            for k, r in enumerate(preg['respuestas'], start=1):
-                Respuesta.objects.create(
-                    pregunta=p, orden=k, texto=r['texto'],
-                    es_correcta=r.get('es_correcta', False),
-                    justificacion=r.get('justificacion', ''),
-                    retroalimentacion=r.get('retroalimentacion', ''),
-                )
 
-    return Response({'caso_id': caso.id, 'nombre': caso.nombre}, status=status.HTTP_201_CREATED)
+    return Response(
+        PropuestaCasoIASerializer(propuesta).data,
+        status=status.HTTP_201_CREATED,
+    )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def estado_ia_view(request):
+    """Devuelve si el proveedor IA está configurado (sin exponer la API key)."""
+    return Response({
+        'proveedor_activo': ai_provider.hay_proveedor_activo(),
+    })
+
+
+class PropuestaCasoIAViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Lista, detalle y acciones de revisión sobre las propuestas IA."""
+
+    serializer_class = PropuestaCasoIASerializer
+    permission_classes = [EsDocenteOAdmin]
+
+    def get_queryset(self):
+        qs = PropuestaCasoIA.objects.select_related('docente', 'caso_resultante')
+        if self.request.user.rol == Usuario.Rol.ADMIN:
+            return qs
+        return qs.filter(docente=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='aprobar')
+    def aprobar(self, request, pk=None):
+        propuesta = get_object_or_404(self.get_queryset(), pk=pk)
+        if propuesta.estado == PropuestaCasoIA.Estado.CONVERTIDO_EN_CASO:
+            return Response(
+                {'detail': 'La propuesta ya fue convertida en caso.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        propuesta.estado = PropuestaCasoIA.Estado.APROBADO
+        propuesta.motivo_rechazo = ''
+        propuesta.fecha_aprobacion = timezone.now()
+        propuesta.save(update_fields=['estado', 'motivo_rechazo', 'fecha_aprobacion', 'fecha_actualizacion'])
+        return Response(PropuestaCasoIASerializer(propuesta).data)
+
+    @action(detail=True, methods=['post'], url_path='rechazar')
+    def rechazar(self, request, pk=None):
+        propuesta = get_object_or_404(self.get_queryset(), pk=pk)
+        if propuesta.estado == PropuestaCasoIA.Estado.CONVERTIDO_EN_CASO:
+            return Response(
+                {'detail': 'La propuesta ya fue convertida en caso.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        ser = RechazoSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        propuesta.estado = PropuestaCasoIA.Estado.RECHAZADO
+        propuesta.motivo_rechazo = ser.validated_data['motivo_rechazo']
+        propuesta.save(update_fields=['estado', 'motivo_rechazo', 'fecha_actualizacion'])
+        return Response(PropuestaCasoIASerializer(propuesta).data)
+
+    @action(detail=True, methods=['post'], url_path='convertir-en-caso')
+    def convertir_en_caso(self, request, pk=None):
+        propuesta = get_object_or_404(self.get_queryset(), pk=pk)
+        try:
+            caso = convertir_propuesta_en_caso(propuesta, request.user)
+        except GenerationError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'detail': 'Caso creado en estado EN_REVISION.',
+            'caso_id': caso.id,
+            'caso_nombre': caso.nombre,
+            'propuesta': PropuestaCasoIASerializer(propuesta).data,
+        }, status=status.HTTP_201_CREATED)

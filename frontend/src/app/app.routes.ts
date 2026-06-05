@@ -17,6 +17,11 @@ import { MainLayout } from './shared/layouts/main-layout/main-layout';
 export const routes: Routes = [
   // ---------- Rutas públicas ----------
   {
+    path: 'inicio',
+    loadComponent: () => import('./landing/landing').then((m) => m.Landing),
+    title: 'Simulador de Decisiones Psicosociales',
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
@@ -121,6 +126,6 @@ export const routes: Routes = [
   // ---------- Fallback ----------
   {
     path: '**',
-    redirectTo: 'auth/login',
+    redirectTo: 'inicio',
   },
 ];

@@ -17,7 +17,10 @@ class PreguntaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pregunta
-        fields = ('id', 'escenario', 'orden', 'enunciado', 'peso', 'respuestas')
+        fields = (
+            'id', 'escenario', 'orden', 'enunciado', 'peso',
+            'criterio_rubrica_id', 'respuestas',
+        )
         read_only_fields = ('id', 'respuestas')
 
 
@@ -31,10 +34,44 @@ class EscenarioSerializer(serializers.ModelSerializer):
 
 
 class RubricaSerializer(serializers.ModelSerializer):
+    suma_pesos_criterios = serializers.IntegerField(read_only=True)
+    es_consistente = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Rubrica
-        fields = ('id', 'caso', 'descripcion', 'escala_maxima', 'criterios', 'fecha_creacion', 'fecha_actualizacion')
-        read_only_fields = ('id', 'fecha_creacion', 'fecha_actualizacion')
+        fields = (
+            'id', 'caso', 'descripcion', 'escala_maxima', 'nota_aprobacion',
+            'criterios', 'niveles_globales',
+            'suma_pesos_criterios', 'es_consistente',
+            'fecha_creacion', 'fecha_actualizacion',
+        )
+        read_only_fields = (
+            'id', 'suma_pesos_criterios', 'es_consistente',
+            'fecha_creacion', 'fecha_actualizacion',
+        )
+
+    def validate_criterios(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError('Debe ser una lista de criterios.')
+        ids = set()
+        for idx, c in enumerate(value):
+            if not isinstance(c, dict):
+                raise serializers.ValidationError(f'Criterio #{idx + 1} inválido.')
+            cid = str(c.get('id', '')).strip()
+            if not cid:
+                raise serializers.ValidationError(f'Criterio #{idx + 1} sin id.')
+            if cid in ids:
+                raise serializers.ValidationError(f'Id de criterio duplicado: "{cid}".')
+            ids.add(cid)
+            try:
+                peso = int(c.get('peso', 0))
+            except (TypeError, ValueError):
+                raise serializers.ValidationError(f'Peso inválido en criterio "{cid}".')
+            if peso < 0 or peso > 100:
+                raise serializers.ValidationError(
+                    f'El peso de "{cid}" debe estar entre 0 y 100.',
+                )
+        return value
 
 
 class CasoListSerializer(serializers.ModelSerializer):

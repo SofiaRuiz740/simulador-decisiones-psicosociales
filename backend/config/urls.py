@@ -15,6 +15,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
+from apps.casos.unity_views import caso_completo_unity
 from apps.usuarios.views import CustomTokenObtainPairView
 from .views import health
 
@@ -41,6 +42,9 @@ urlpatterns = [
     path('api/participaciones/', include('apps.participaciones.urls')),
     path('api/resultados/', include('apps.resultados.urls')),
     path('api/reportes/', include('apps.reportes.urls')),
+
+    # ---------- Cliente Unity (ver docs/10-unity-roadmap.md) ----------
+    path('api/unity/caso-completo/', caso_completo_unity, name='unity_caso_completo'),
 ]
 
 # ---------- Archivos media en desarrollo ----------

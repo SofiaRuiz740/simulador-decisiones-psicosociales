@@ -1,4 +1,8 @@
-// Tema Material 3 — paleta violeta + ámbar para evocar introspección + calidez humana.
+// ============================================================
+// Theme Material 3 — Paleta académica
+// Azul profundo (azure) + Turquesa académico (cyan)
+// Evoca confianza, análisis, decisión, claridad.
+// ============================================================
 @use '@angular/material' as mat;
 
 html {
@@ -6,30 +10,91 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$violet-palette,
-        tertiary: mat.$orange-palette,
+        primary: mat.$azure-palette,    // azul profundo academico
+        tertiary: mat.$cyan-palette,    // turquesa
       ),
       typography: (
-        plain-family: 'Inter, Roboto, system-ui, sans-serif',
-        brand-family: 'Plus Jakarta Sans, Inter, sans-serif',
+        plain-family: 'Manrope, Inter, system-ui, sans-serif',
+        brand-family: 'Fraunces, Plus Jakarta Sans, Georgia, serif',
       ),
       density: 0,
     )
   );
 }
 
+// Variables CSS para acentos académicos.
+:root {
+  // ---- Paleta core ----
+  --app-deep:        #1e3a8a;   // azul noche, autoridad
+  --app-deep-soft:   #3b5bdb;   // azul medio
+  --app-ink:         #0B1729;   // casi negro, headings
+  --app-violet-soft: #818cf8;   // indigo soft, analisis
+  --app-teal:        #0d9488;   // turquesa, exito/analitica
+  --app-teal-soft:   #2dd4bf;
+  --app-slate:       #475569;   // pizarra
+  --app-paper:       #FAFBFD;   // off-white
+  --app-paper-warm:  #F5F2EB;   // off-white warm (editorial)
+  --app-line:        #E3E8EF;   // hairline
+  --app-accent-soft: #EBF1FA;   // chip bg suave
+
+  // Estados
+  --app-success: #16a34a;
+  --app-warn:    #f59e0b;
+  --app-danger:  #dc2626;
+
+  // ---- Sombras stratified ----
+  --shadow-sm:    0 1px 2px rgba(11, 23, 41, 0.04);
+  --shadow-md:    0 4px 14px rgba(11, 23, 41, 0.06);
+  --shadow-lg:    0 12px 32px rgba(11, 23, 41, 0.10);
+  --shadow-glow:  0 8px 24px rgba(30, 58, 138, 0.18);
+  --shadow-teal:  0 8px 24px rgba(13, 148, 136, 0.20);
+
+  // ---- Radios ----
+  --radius-sm:    10px;
+  --radius-md:    14px;
+  --radius-lg:    20px;
+  --radius-xl:    28px;
+  --radius-pill:  999px;
+
+  // ---- Motion ----
+  --ease-out:     cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast:       160ms;
+  --t-base:       220ms;
+  --t-slow:       360ms;
+
+  // ---- Tipografía ----
+  --font-display: 'Fraunces', 'Plus Jakarta Sans', 'Georgia', serif;
+  --font-sans:    'Manrope', 'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+
 body {
   color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.55;
   margin: 0;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv11', 'ss01';
 }
 
-// ---------- Globals reutilizables ----------
+// Selección de texto con la paleta nueva
+::selection {
+  background: color-mix(in srgb, var(--app-deep) 22%, transparent);
+  color: var(--app-ink);
+}
 
-// Gradiente de fondo para las pantallas "splash" (auth, estudiante acceso).
+// ============================================================
+// Fondos / decoraciones
+// ============================================================
+
+// Gradiente de fondo para pantallas "splash" (auth, estudiante acceso).
 .bg-gradient {
   background:
     radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
@@ -37,24 +102,187 @@ body {
     var(--mat-sys-surface-container-low);
 }
 
-// Tarjeta con sombra suave y bordes generosos para sensación "premium".
+// Gradiente "académico" más sobrio (azul deep + turquesa + violet soft).
+.bg-gradient-academic {
+  background:
+    radial-gradient(circle at 8% 6%, rgba(30, 58, 138, 0.16), transparent 50%),
+    radial-gradient(circle at 95% 95%, rgba(13, 148, 136, 0.14), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.08), transparent 60%),
+    var(--mat-sys-surface);
+}
+
+// Tarjeta con sombra suave y bordes generosos.
 .elevated-card {
   background-color: var(--mat-sys-surface);
-  border-radius: 20px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 12px 32px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm), var(--shadow-lg);
 }
 
-// Heading display grande (para hero sections).
+// Heading display grande (hero) — Fraunces variable, italic académica disponible.
 .display {
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
+  font-optical-sizing: auto;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: var(--app-ink);
+}
+.display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 1.02;
+}
+// Número editorial estilo magazine (01 — 02 — 03)
+.edition-num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.85rem;
+  font-feature-settings: 'tnum', 'lnum';
+  color: var(--app-slate);
+  letter-spacing: 0.02em;
+}
+// Mono para datos/codes
+.mono { font-family: var(--font-mono); font-feature-settings: 'tnum'; }
+
+// ============================================================
+// Bloques visuales reutilizables
+// ============================================================
+
+// Hero block estándar.
+.hero-block {
+  display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.75rem 2rem;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--mat-sys-primary) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 14%, transparent), transparent 55%),
+    var(--mat-sys-surface);
+  box-shadow: var(--shadow-md);
+
+  .hero-text { flex: 1 1 380px; }
+  .hero-text h1 {
+    margin: 0.45rem 0 0.2rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -0.025em;
+  }
+  .hero-text p { margin: 0; max-width: 560px; color: var(--mat-sys-on-surface-variant); line-height: 1.55; }
 }
 
-// Animaciones reutilizables.
+// Kicker estándar (azul primary).
+.kicker {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+  color: var(--mat-sys-primary);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+// Variantes del kicker.
+.kicker-deep {
+  @extend .kicker;
+  background: color-mix(in srgb, var(--app-deep) 14%, transparent);
+  color: var(--app-deep);
+}
+.kicker-teal {
+  @extend .kicker;
+  background: color-mix(in srgb, var(--app-teal) 14%, transparent);
+  color: var(--app-teal);
+}
+
+// Stats arriba/derecha del hero.
+.hero-stats {
+  display: flex; gap: 0.85rem; flex-wrap: wrap;
+  .stat {
+    padding: 0.9rem 1.2rem;
+    background: var(--mat-sys-surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    min-width: 110px; text-align: center;
+    strong {
+      display: block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.8rem; font-weight: 800; line-height: 1;
+      background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    span { font-size: 0.74rem; color: var(--mat-sys-on-surface-variant); text-transform: uppercase; letter-spacing: 0.04em; }
+  }
+}
+
+// Estado vacío.
+.empty-state {
+  padding: 3.5rem 1.5rem; text-align: center;
+  border: 1.5px dashed var(--mat-sys-outline-variant);
+  border-radius: 18px;
+  background: var(--mat-sys-surface);
+
+  > mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--app-deep); opacity: 0.55; }
+  h3 { margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', sans-serif; }
+  p { margin: 0 auto 1.25rem; max-width: 440px; color: var(--mat-sys-on-surface-variant); }
+  button, a { display: inline-flex; align-items: center; gap: 0.4rem; }
+}
+
+// Grid responsivo de cards.
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+// Chip "meta".
+.chip-meta {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.18rem 0.55rem;
+  background: var(--mat-sys-surface-container-low);
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  color: var(--mat-sys-on-surface-variant);
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  strong { color: var(--mat-sys-on-surface); font-weight: 600; }
+}
+
+// Superficie interactiva unificada.
+.interactive-surface {
+  transition: transform var(--t-base) var(--ease-out),
+              box-shadow var(--t-base) var(--ease-out),
+              border-color var(--t-base) var(--ease-out);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(30, 58, 138, 0.12);
+  }
+  &:active { transform: translateY(0); transition: transform 80ms; }
+}
+
+// Focus ring accesible.
+*:focus-visible {
+  outline: 2px solid var(--app-deep);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+// Skeleton con shimmer.
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--mat-sys-surface-container) 0%,
+    var(--mat-sys-surface-container-low) 50%,
+    var(--mat-sys-surface-container) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+// ============================================================
+// Animaciones
+// ============================================================
+
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -64,5 +292,48 @@ body {
   60%  { opacity: 1; transform: scale(1.04); }
   100% { transform: scale(1); }
 }
-.anim-fade-up   { animation: fade-up 0.4s ease both; }
-.anim-bounce-in { animation: bounce-in 0.5s ease both; }
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scale-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.35); }
+  50%      { box-shadow: 0 0 0 10px rgba(30, 58, 138, 0); }
+}
+@keyframes expand-card {
+  from { opacity: 0; max-height: 0; }
+  to   { opacity: 1; max-height: 2000px; }
+}
+
+.anim-fade-up        { animation: fade-up        0.4s var(--ease-out) both; }
+.anim-bounce-in      { animation: bounce-in      0.5s ease both; }
+.anim-slide-in-left  { animation: slide-in-left  0.45s var(--ease-out) both; }
+.anim-slide-in-right { animation: slide-in-right 0.45s var(--ease-out) both; }
+.anim-scale-pop      { animation: scale-pop      0.32s var(--ease-out) both; }
+.anim-pulse-soft     { animation: pulse-soft     2s ease-in-out infinite; }
+
+// Respetar prefers-reduced-motion.
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-bounce-in,
+  .anim-slide-in-left,
+  .anim-slide-in-right,
+  .anim-scale-pop,
+  .anim-pulse-soft,
+  .skeleton {
+    animation: none !important;
+  }
+  .interactive-surface { transition: none !important; }
+}

@@ -1,3 +1,4 @@
+import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +30,36 @@ interface PaginaSimulacion {
   ],
   templateUrl: './simulacion.html',
   styleUrl: './simulacion.scss',
+  animations: [
+    trigger('escena', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(24px) scale(0.985)' }),
+        animate(
+          '420ms cubic-bezier(0.22, 0.61, 0.36, 1)',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' }),
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '220ms ease-in',
+          style({ opacity: 0, transform: 'translateY(-12px) scale(0.99)' }),
+        ),
+      ]),
+    ]),
+    trigger('staggerEntrada', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(14px)' }),
+          stagger(90, [
+            animate(
+              '360ms cubic-bezier(0.22, 0.61, 0.36, 1)',
+              style({ opacity: 1, transform: 'translateY(0)' }),
+            ),
+          ]),
+        ], { optional: true }),
+      ]),
+    ]),
+  ],
 })
 export class Simulacion implements OnInit, OnDestroy {
   private readonly servicio = inject(SimulacionService);
@@ -55,6 +86,14 @@ export class Simulacion implements OnInit, OnDestroy {
   readonly esPrimeraPagina = computed(() => this.paginaIdx() === 0);
 
   readonly totalEscenarios = computed(() => this.participacion()?.caso?.escenarios.length ?? 0);
+
+  /** Clase de escena aplicada al shell para variar el fondo por escenario. */
+  readonly escenaClase = computed(() => {
+    const idx = this.paginaIdx();
+    if (idx === 0) return 'scene-intro';
+    // 5 paletas rotando para dar sensación de cambio narrativo.
+    return `scene-${(idx - 1) % 5 + 1}`;
+  });
 
   readonly totalPreguntas = computed(() => {
     const p = this.participacion();

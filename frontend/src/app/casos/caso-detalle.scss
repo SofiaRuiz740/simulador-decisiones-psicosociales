@@ -7,6 +7,15 @@
 }
 
 .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .head-text { flex: 1 1 auto; min-width: 280px; }
+  .head-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
   h1 { margin: 0; font-size: 1.6rem; font-weight: 500; }
   .meta {
     display: flex; gap: 0.75rem; flex-wrap: wrap;
@@ -20,6 +29,28 @@
 }
 
 .seccion { padding: 0.5rem; }
+
+.problemas-card {
+  border-left: 5px solid var(--mat-sys-error);
+  background: color-mix(in srgb, var(--mat-sys-error) 4%, var(--mat-sys-surface));
+
+  mat-card-title {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 1.05rem;
+  }
+
+  .problemas-list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex; flex-direction: column; gap: 0.4rem;
+
+    li {
+      display: flex; gap: 0.5rem; align-items: flex-start;
+      mat-icon { color: var(--mat-sys-error); margin-top: 2px; }
+    }
+  }
+}
 
 .full { width: 100%; }
 
@@ -41,9 +72,10 @@
 }
 
 .esc-edit, .preg-edit, .resp-edit {
-  display: flex; gap: 0.5rem; align-items: flex-start;
-  .grow { flex: 1 1 auto; }
+  display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;
+  .grow { flex: 1 1 auto; min-width: 220px; }
   .peso { width: 100px; }
+  .criterio-sel { width: 220px; }
 }
 
 .esc-actions, .preg-actions, .resp-actions {

@@ -25,6 +25,8 @@ class ResultadoSerializer(serializers.ModelSerializer):
     practica_id = serializers.IntegerField(source='participacion.practica_id', read_only=True)
     practica_nombre = serializers.CharField(source='participacion.practica.nombre', read_only=True)
     caso_nombre = serializers.CharField(source='participacion.practica.caso.nombre', read_only=True)
+    nota_aprobacion = serializers.SerializerMethodField()
+    rubrica_descripcion = serializers.SerializerMethodField()
     detalle_preguntas = serializers.SerializerMethodField()
 
     class Meta:
@@ -34,7 +36,8 @@ class ResultadoSerializer(serializers.ModelSerializer):
             'estudiante_correo', 'estudiante_nombre',
             'practica_id', 'practica_nombre', 'caso_nombre',
             'correctas', 'incorrectas', 'no_respondidas',
-            'peso_obtenido', 'peso_total', 'nota_final',
+            'peso_obtenido', 'peso_total', 'nota_final', 'aprobado',
+            'nota_aprobacion', 'rubrica_descripcion', 'desglose_criterios',
             'feedback_docente', 'notificado_estudiante',
             'fecha_calculo', 'fecha_actualizacion',
             'detalle_preguntas',
@@ -44,10 +47,19 @@ class ResultadoSerializer(serializers.ModelSerializer):
             'estudiante_correo', 'estudiante_nombre',
             'practica_id', 'practica_nombre', 'caso_nombre',
             'correctas', 'incorrectas', 'no_respondidas',
-            'peso_obtenido', 'peso_total', 'nota_final',
+            'peso_obtenido', 'peso_total', 'nota_final', 'aprobado',
+            'nota_aprobacion', 'rubrica_descripcion', 'desglose_criterios',
             'fecha_calculo', 'fecha_actualizacion',
             'detalle_preguntas', 'notificado_estudiante',
         )
+
+    def get_nota_aprobacion(self, obj):
+        rub = getattr(obj.participacion.practica.caso, 'rubrica', None)
+        return float(rub.nota_aprobacion) if rub else 60.0
+
+    def get_rubrica_descripcion(self, obj):
+        rub = getattr(obj.participacion.practica.caso, 'rubrica', None)
+        return rub.descripcion if rub else ''
 
     def get_detalle_preguntas(self, obj: Resultado):
         seleccionadas = {

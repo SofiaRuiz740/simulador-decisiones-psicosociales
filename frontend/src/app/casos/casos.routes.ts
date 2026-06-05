@@ -11,4 +11,9 @@ export const CASOS_ROUTES: Routes = [
     loadComponent: () => import('./caso-detalle').then((m) => m.CasoDetallePage),
     title: 'Editor de caso · Simulador',
   },
+  {
+    path: ':id/rubrica',
+    loadComponent: () => import('./caso-rubrica').then((m) => m.CasoRubricaPage),
+    title: 'Rúbrica · Simulador',
+  },
 ];

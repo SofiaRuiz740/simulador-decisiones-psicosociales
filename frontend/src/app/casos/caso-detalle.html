@@ -5,14 +5,58 @@
 
   @if (caso(); as c) {
     <header class="head">
-      <h1>{{ c.nombre }}</h1>
-      <div class="meta">
-        @if (c.area_psicosocial) { <span>{{ c.area_psicosocial }}</span> }
-        <span>{{ c.tiempo_estimado_min }} min</span>
-        <span class="estado">{{ c.estado_display }}</span>
+      <div class="head-text">
+        <h1>{{ c.nombre }}</h1>
+        <div class="meta">
+          @if (c.area_psicosocial) { <span>{{ c.area_psicosocial }}</span> }
+          <span>{{ c.tiempo_estimado_min }} min</span>
+          <span class="estado">{{ c.estado_display }}</span>
+        </div>
+        @if (c.descripcion) { <p class="desc">{{ c.descripcion }}</p> }
       </div>
-      @if (c.descripcion) { <p class="desc">{{ c.descripcion }}</p> }
+      <div class="head-actions">
+        <a mat-stroked-button color="primary" [routerLink]="['/casos', c.id, 'rubrica']">
+          <mat-icon>checklist</mat-icon>
+          {{ c.rubrica && c.rubrica.criterios.length > 0 ? 'Editar rúbrica' : 'Crear rúbrica' }}
+        </a>
+        <button mat-stroked-button (click)="validar()" [disabled]="validando()">
+          <mat-icon>rule</mat-icon> Validar
+        </button>
+        <button mat-flat-button color="primary" (click)="publicar()">
+          <mat-icon>publish</mat-icon> Publicar
+        </button>
+        <button mat-stroked-button (click)="duplicar()">
+          <mat-icon>content_copy</mat-icon> Duplicar
+        </button>
+        <button mat-stroked-button color="warn" (click)="archivar()">
+          <mat-icon>inventory_2</mat-icon> Archivar
+        </button>
+      </div>
     </header>
+
+    @if (problemas().length > 0) {
+      <mat-card class="problemas-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="warn">error_outline</mat-icon>
+            Problemas detectados
+          </mat-card-title>
+          <mat-card-subtitle>
+            Corrige estos puntos antes de publicar el caso.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="problemas-list">
+            @for (p of problemas(); track p.codigo + (p.ubicacion || '')) {
+              <li>
+                <mat-icon>warning</mat-icon>
+                <span>{{ p.mensaje }}</span>
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    }
 
     <!-- Historia / Contexto -->
     <mat-card class="seccion">
@@ -107,6 +151,17 @@
                     <mat-label>Peso</mat-label>
                     <input matInput type="number" [(ngModel)]="p.peso" min="1" />
                   </mat-form-field>
+                  @if (criteriosDisponibles().length > 0) {
+                    <mat-form-field appearance="outline" class="criterio-sel">
+                      <mat-label>Criterio de rúbrica</mat-label>
+                      <mat-select [(ngModel)]="p.criterio_rubrica_id">
+                        <mat-option value="">— Sin criterio —</mat-option>
+                        @for (cr of criteriosDisponibles(); track cr.id) {
+                          <mat-option [value]="cr.id">{{ cr.nombre || cr.id }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  }
                 </div>
                 <div class="preg-actions">
                   <button mat-icon-button color="primary" matTooltip="Guardar" (click)="guardarPregunta(p)">

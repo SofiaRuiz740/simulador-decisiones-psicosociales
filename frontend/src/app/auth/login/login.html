@@ -1,6 +1,9 @@
 <div class="login-card">
   <header class="head">
-    <h1>Bienvenido de nuevo</h1>
+    <span class="edition-num">№ 01 — Acceso</span>
+    <h1 class="display">
+      Bienvenido de <em>nuevo</em>.
+    </h1>
     <p>Ingresa con tu cuenta de docente o administrador.</p>
   </header>
 
@@ -55,32 +58,33 @@
 
     <button
       mat-flat-button
-      color="primary"
       type="submit"
       [disabled]="form.invalid || loading()"
       class="submit-btn">
-      <mat-icon>login</mat-icon>
       <span>Iniciar sesión</span>
+      <mat-icon>arrow_forward</mat-icon>
     </button>
   </form>
 
-  <p class="divider"><span>o</span></p>
+  <div class="divider"><span>o</span></div>
 
   <div class="alt-links">
     <a routerLink="/auth/registro-docente" class="alt-link">
-      <mat-icon>person_add</mat-icon>
+      <span class="alt-icon"><mat-icon>person_add</mat-icon></span>
       <div>
         <strong>Crear cuenta de docente</strong>
         <span>Empieza a diseñar casos en minutos.</span>
       </div>
+      <mat-icon class="alt-arrow">arrow_forward</mat-icon>
     </a>
 
     <a routerLink="/estudiante" class="alt-link">
-      <mat-icon>school</mat-icon>
+      <span class="alt-icon teal"><mat-icon>school</mat-icon></span>
       <div>
         <strong>Soy estudiante</strong>
         <span>Acceso con correo + código de práctica.</span>
       </div>
+      <mat-icon class="alt-arrow">arrow_forward</mat-icon>
     </a>
   </div>
 </div>

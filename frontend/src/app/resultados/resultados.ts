@@ -1,15 +1,14 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Resultado } from '../core/models/practicas.model';
 import { SimulacionService } from '../core/services/simulacion.service';
@@ -17,85 +16,13 @@ import { SimulacionService } from '../core/services/simulacion.service';
 @Component({
   selector: 'app-resultados',
   imports: [
-    CommonModule, FormsModule, DatePipe,
-    MatTableModule, MatCardModule, MatButtonModule, MatIconModule,
-    MatExpansionModule, MatFormFieldModule, MatInputModule,
-    MatProgressBarModule, MatSnackBarModule,
+    CommonModule, FormsModule, DatePipe, DecimalPipe,
+    MatButtonModule, MatIconModule,
+    MatFormFieldModule, MatInputModule, MatSelectModule,
+    MatProgressBarModule, MatSnackBarModule, MatTooltipModule,
   ],
-  template: `
-    <section class="page">
-      <header>
-        <h1>Resultados</h1>
-        <p class="subtitle">Calificaciones por participación. Haz click para ver el detalle y dejar feedback.</p>
-      </header>
-
-      @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
-
-      @if (!loading() && resultados().length === 0) {
-        <p class="empty">Aún no hay resultados. Los estudiantes deben completar sus prácticas primero.</p>
-      }
-
-      <mat-accordion>
-        @for (r of resultados(); track r.id) {
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{ r.estudiante_nombre }} ({{ r.estudiante_correo }})
-              </mat-panel-title>
-              <mat-panel-description>
-                {{ r.practica_nombre }} · <strong>{{ r.nota_final }}/100</strong> ·
-                {{ r.correctas }}✓ {{ r.incorrectas }}✗ {{ r.no_respondidas }}—
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-
-            <p class="meta">Calculado: {{ r.fecha_calculo | date:'medium' }} · Peso obtenido: {{ r.peso_obtenido }}/{{ r.peso_total }}</p>
-
-            <h3>Detalle pregunta por pregunta</h3>
-            <ul class="detalle">
-              @for (d of r.detalle_preguntas; track d.pregunta_id; let i = $index) {
-                <li>
-                  <strong>{{ i + 1 }}. {{ d.enunciado }}</strong> (peso {{ d.peso }})
-                  @if (d.respondida && d.respuesta_elegida) {
-                    <div [class.ok]="d.respuesta_elegida.es_correcta" [class.err]="!d.respuesta_elegida.es_correcta">
-                      Eligió: {{ d.respuesta_elegida.texto }}
-                      @if (d.respuesta_elegida.es_correcta) { ✓ } @else { ✗ }
-                    </div>
-                  } @else {
-                    <div class="ne">No respondió</div>
-                  }
-                </li>
-              }
-            </ul>
-
-            <h3>Feedback docente</h3>
-            <mat-form-field appearance="outline" class="feedback">
-              <textarea matInput rows="3" [(ngModel)]="feedbackEdit[r.id]"
-                [placeholder]="r.feedback_docente || 'Escribe tu feedback aquí…'"></textarea>
-            </mat-form-field>
-            <button mat-flat-button color="primary" (click)="guardarFeedback(r)">
-              <mat-icon>save</mat-icon> Guardar feedback
-            </button>
-          </mat-expansion-panel>
-        }
-      </mat-accordion>
-    </section>
-  `,
-  styles: [`
-    .page { display: flex; flex-direction: column; gap: 1rem; }
-    h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
-    .subtitle { color: var(--mat-sys-on-surface-variant); margin: 0.25rem 0 0; font-size: 0.9rem; }
-    .empty { padding: 2rem; text-align: center; color: var(--mat-sys-on-surface-variant);
-      background: var(--mat-sys-surface-container); border-radius: 12px; margin: 0; }
-    .meta { color: var(--mat-sys-on-surface-variant); font-size: 0.85rem; margin: 0.5rem 0; }
-    h3 { font-size: 1rem; font-weight: 500; margin: 1rem 0 0.5rem; }
-    .detalle { padding-left: 1.25rem; }
-    .detalle li { margin-bottom: 0.5rem; }
-    .ok { color: var(--mat-sys-primary); }
-    .err { color: var(--mat-sys-error); }
-    .ne { color: var(--mat-sys-on-surface-variant); font-style: italic; }
-    .feedback { width: 100%; }
-    button { display: inline-flex; align-items: center; gap: 0.4rem; }
-  `],
+  templateUrl: './resultados.html',
+  styleUrl: './resultados.scss',
 })
 export class Resultados implements OnInit {
   private readonly servicio = inject(SimulacionService);
@@ -104,8 +31,52 @@ export class Resultados implements OnInit {
   readonly loading = signal(true);
   readonly resultados = signal<Resultado[]>([]);
   readonly feedbackEdit: Record<number, string> = {};
+  readonly expandedId = signal<number | null>(null);
 
-  ngOnInit() { this.cargar(); }
+  // Filtros
+  filtroTexto = '';
+  filtroPractica: string | '' = '';
+
+  readonly practicasUnicas = computed(() => {
+    const set = new Map<number, string>();
+    this.resultados().forEach((r) => set.set(r.practica_id, r.practica_nombre));
+    return Array.from(set.entries()).map(([id, nombre]) => ({ id: String(id), nombre }));
+  });
+
+  readonly filtrados = computed(() => {
+    const txt = (this.filtroTexto || '').toLowerCase().trim();
+    const prac = this.filtroPractica;
+    return this.resultados().filter((r) => {
+      if (prac && String(r.practica_id) !== prac) return false;
+      if (!txt) return true;
+      return (
+        r.estudiante_nombre.toLowerCase().includes(txt) ||
+        r.estudiante_correo.toLowerCase().includes(txt) ||
+        r.practica_nombre.toLowerCase().includes(txt)
+      );
+    });
+  });
+
+  // KPIs
+  readonly total = computed(() => this.resultados().length);
+  readonly aprobadosCount = computed(() => this.resultados().filter((r) => r.aprobado).length);
+  readonly aprobadosPct = computed(() => {
+    const t = this.total();
+    return t === 0 ? 0 : (this.aprobadosCount() / t) * 100;
+  });
+  readonly promedio = computed(() => {
+    const xs = this.resultados();
+    if (xs.length === 0) return 0;
+    const total = xs.reduce((acc, r) => acc + Number(r.nota_final || 0), 0);
+    return total / xs.length;
+  });
+  readonly sinFeedback = computed(() =>
+    this.resultados().filter((r) => !r.feedback_docente?.trim()).length,
+  );
+
+  ngOnInit() {
+    this.cargar();
+  }
 
   cargar() {
     this.loading.set(true);
@@ -117,6 +88,17 @@ export class Resultados implements OnInit {
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  toggle(id: number) {
+    this.expandedId.set(this.expandedId() === id ? null : id);
+  }
+
+  tier(nota: number): { emoji: string; label: string; variant: 'top' | 'mid' | 'low' | 'fail' } {
+    if (nota >= 85) return { emoji: '🏆', label: 'Sobresaliente', variant: 'top' };
+    if (nota >= 70) return { emoji: '🎯', label: 'Notable', variant: 'mid' };
+    if (nota >= 50) return { emoji: '🌱', label: 'En camino', variant: 'low' };
+    return { emoji: '✕', label: 'No alcanza', variant: 'fail' };
   }
 
   guardarFeedback(r: Resultado) {

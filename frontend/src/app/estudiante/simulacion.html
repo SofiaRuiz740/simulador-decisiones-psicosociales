@@ -1,4 +1,9 @@
-<div class="sim-shell">
+<div class="sim-shell" [class]="escenaClase()">
+  <div class="scene-deco" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+  </div>
 
   @if (loading()) {
     <div class="splash">
@@ -59,11 +64,11 @@
       }
     </nav>
 
-    <main class="contenido">
+    <main class="contenido" [@staggerEntrada]="paginaIdx()">
       @if (paginas()[paginaIdx()]; as pagina) {
 
         @if (pagina.tipo === 'intro') {
-          <article class="story-card intro anim-fade-up">
+          <article class="story-card intro" [@escena]>
             <span class="cap">Caso</span>
             <h1>{{ p.caso?.nombre }}</h1>
             @if (p.caso?.area_psicosocial) {
@@ -97,7 +102,7 @@
         }
 
         @if (pagina.tipo === 'escenario' && pagina.escenario; as esc) {
-          <article class="story-card escenario anim-fade-up">
+          <article class="story-card escenario" [@escena]>
             <div class="cap-row">
               <span class="cap">Escenario {{ esc.orden }} de {{ totalEscenarios() }}</span>
               <span class="num-preguntas">{{ esc.preguntas.length }} {{ esc.preguntas.length === 1 ? 'pregunta' : 'preguntas' }}</span>

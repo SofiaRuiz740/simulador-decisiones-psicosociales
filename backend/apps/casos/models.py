@@ -79,6 +79,13 @@ class Pregunta(models.Model):
         default=1,
         help_text='Peso relativo en la rúbrica del caso.',
     )
+    criterio_rubrica_id = models.CharField(
+        'criterio de rúbrica',
+        max_length=40,
+        blank=True,
+        default='',
+        help_text='ID del criterio (en Rubrica.criterios) al que aporta esta pregunta.',
+    )
 
     class Meta:
         verbose_name = 'Pregunta'
@@ -114,17 +121,53 @@ class Respuesta(models.Model):
         return f'{marca} {snippet}'
 
 
+def _niveles_default() -> list:
+    """Niveles de desempeño por defecto cuando se crea una rúbrica nueva."""
+    return [
+        {'nivel': 1, 'nombre': 'Incipiente', 'descriptor': ''},
+        {'nivel': 2, 'nombre': 'En desarrollo', 'descriptor': ''},
+        {'nivel': 3, 'nombre': 'Logrado', 'descriptor': ''},
+        {'nivel': 4, 'nombre': 'Sobresaliente', 'descriptor': ''},
+    ]
+
+
 class Rubrica(models.Model):
-    """Rúbrica de calificación asociada a un caso (RF24). 1:1 con Caso."""
+    """Rúbrica de calificación asociada a un caso (RF24). 1:1 con Caso.
+
+    Estructura del campo `criterios`:
+    [
+      {
+        "id": "c1",
+        "nombre": "Empatía",
+        "descripcion": "Capacidad de identificar emociones del otro",
+        "peso": 30,
+        "niveles": [
+          {"nivel": 1, "nombre": "Incipiente",     "descriptor": "..."},
+          {"nivel": 2, "nombre": "En desarrollo",  "descriptor": "..."},
+          {"nivel": 3, "nombre": "Logrado",        "descriptor": "..."},
+          {"nivel": 4, "nombre": "Sobresaliente",  "descriptor": "..."}
+        ]
+      }
+    ]
+    """
 
     caso = models.OneToOneField(Caso, on_delete=models.CASCADE, related_name='rubrica')
     descripcion = models.TextField('descripción', blank=True)
     escala_maxima = models.PositiveIntegerField('puntaje máximo', default=100)
+    nota_aprobacion = models.DecimalField(
+        'nota mínima de aprobación', max_digits=6, decimal_places=2, default=60,
+    )
     criterios = models.JSONField(
         'criterios',
         blank=True,
         default=list,
-        help_text='Lista de criterios: [{nombre, peso, descripcion}, ...].',
+        help_text='Lista de criterios con niveles de desempeño. Ver docstring.',
+    )
+    niveles_globales = models.JSONField(
+        'plantilla de niveles',
+        blank=True,
+        default=_niveles_default,
+        help_text='Plantilla de niveles que se aplica a nuevos criterios.',
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -135,3 +178,11 @@ class Rubrica(models.Model):
 
     def __str__(self) -> str:
         return f'Rúbrica de {self.caso.nombre}'
+
+    @property
+    def suma_pesos_criterios(self) -> int:
+        return sum(int(c.get('peso', 0) or 0) for c in (self.criterios or []))
+
+    @property
+    def es_consistente(self) -> bool:
+        return self.suma_pesos_criterios == 100

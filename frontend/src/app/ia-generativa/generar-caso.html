@@ -1,0 +1,113 @@
+<section class="page">
+  <header class="hero anim-fade-up">
+    <div class="hero-text">
+      <a routerLink="/ia-generativa" class="back-link">
+        <mat-icon>arrow_back</mat-icon> Mis propuestas
+      </a>
+      <h1>Generar caso con IA</h1>
+      <p class="sub">
+        La IA actúa como tu asistente: crea un caso narrativo coherente con
+        teorías de psicología social. Tú decides si lo apruebas, editas o lo
+        conviertes en un caso real.
+      </p>
+    </div>
+    <div class="hero-badge ok">
+      <mat-icon>psychology</mat-icon>
+      <div>
+        <strong>Asistente pedagógico</strong>
+        <span>
+          Construye un caso con personaje, escenarios, decisiones éticas y rúbrica
+          alineada a tu objetivo. Tú lo revisas y apruebas antes de usarlo.
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <mat-card class="formulario">
+    <form [formGroup]="form" (ngSubmit)="generar()" class="grid">
+      <mat-form-field appearance="outline" class="col-full">
+        <mat-label>Tema del caso</mat-label>
+        <input matInput formControlName="tema" placeholder="Ej: presión social en adolescentes universitarios" />
+        @if (form.controls.tema.invalid && form.controls.tema.touched) {
+          <mat-error>Mínimo 4 caracteres, máximo 300.</mat-error>
+        }
+        <mat-hint align="end">{{ form.controls.tema.value.length }}/300</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-full">
+        <mat-label>Objetivo de aprendizaje</mat-label>
+        <textarea matInput formControlName="objetivo_aprendizaje" rows="3"
+          placeholder="Ej: evaluar la toma de decisiones éticas ante presión grupal"></textarea>
+        @if (form.controls.objetivo_aprendizaje.invalid && form.controls.objetivo_aprendizaje.touched) {
+          <mat-error>Describe el objetivo (mínimo 10 caracteres).</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nivel de dificultad</mat-label>
+        <mat-select formControlName="nivel_dificultad">
+          <mat-option value="bajo">Bajo</mat-option>
+          <mat-option value="medio">Medio</mat-option>
+          <mat-option value="alto">Alto</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Número de escenarios</mat-label>
+        <mat-select formControlName="numero_escenarios">
+          @for (n of [1,2,3,4,5,6,7,8]; track n) {
+            <mat-option [value]="n">{{ n }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>Entre 1 y 8.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Preguntas por escenario</mat-label>
+        <mat-select formControlName="numero_preguntas_por_escenario">
+          @for (n of [1,2,3,4,5,6]; track n) {
+            <mat-option [value]="n">{{ n }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="col-full">
+        <mat-label>Tono narrativo</mat-label>
+        <input matInput formControlName="tono"
+          placeholder="Ej: académico, narrativo e interactivo" />
+      </mat-form-field>
+
+      <div class="actions col-full">
+        <button mat-flat-button color="primary" type="submit"
+          class="btn-generar" [disabled]="form.invalid || loading()">
+          <mat-icon>{{ loading() ? 'hourglass_top' : 'auto_awesome' }}</mat-icon>
+          {{ loading() ? 'Generando…' : 'Generar caso con IA' }}
+        </button>
+      </div>
+    </form>
+  </mat-card>
+
+  @if (loading()) {
+    <mat-card class="pasos anim-fade-up">
+      <h3>Trabajando…</h3>
+      <mat-progress-bar mode="determinate" [value]="pctPasos()" />
+      <ul class="lista-pasos">
+        @for (p of pasos; track p.titulo; let i = $index) {
+          <li
+            [class.activo]="i === pasoIdx()"
+            [class.hecho]="i < pasoIdx()">
+            <mat-icon class="ic">
+              @if (i < pasoIdx()) { check_circle }
+              @else if (i === pasoIdx()) { sync }
+              @else { radio_button_unchecked }
+            </mat-icon>
+            <div>
+              <strong>{{ p.titulo }}</strong>
+              <span>{{ p.sub }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </mat-card>
+  }
+</section>

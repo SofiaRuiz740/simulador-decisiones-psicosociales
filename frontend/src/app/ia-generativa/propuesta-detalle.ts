@@ -18,6 +18,7 @@ import {
 } from '../core/models/ia.model';
 import { IaService } from '../core/services/ia.service';
 import { GamePreview } from './components/game-preview/game-preview';
+import { RechazarPropuestaDialog } from './dialogs/rechazar-propuesta-dialog';
 
 @Component({
   selector: 'app-propuesta-detalle',
@@ -55,6 +56,12 @@ import { GamePreview } from './components/game-preview/game-preview';
             </div>
           </div>
           <div class="head-actions">
+            @if (puedeEditar()) {
+              <a mat-stroked-button color="primary"
+                [routerLink]="['/ia-generativa/propuesta', p.id, 'editar']">
+                <mat-icon>edit</mat-icon> Editar
+              </a>
+            }
             @if (puedeAprobar()) {
               <button mat-stroked-button color="primary" (click)="aprobar()">
                 <mat-icon>verified</mat-icon> Aprobar
@@ -166,6 +173,13 @@ export class PropuestaDetallePage implements OnInit {
   readonly loading = signal(true);
   readonly propuesta = signal<PropuestaCasoIA | null>(null);
 
+  readonly puedeEditar = computed(() => {
+    const p = this.propuesta();
+    if (!p) return false;
+    return p.estado === EstadoPropuestaIA.EnRevision
+        || p.estado === EstadoPropuestaIA.Aprobado;
+  });
+
   readonly puedeAprobar = computed(() => {
     const p = this.propuesta();
     if (!p) return false;
@@ -219,13 +233,19 @@ export class PropuestaDetallePage implements OnInit {
   rechazar(): void {
     const p = this.propuesta();
     if (!p) return;
-    const motivo = prompt('Motivo del rechazo (opcional):') ?? '';
-    this.ia.rechazarPropuesta(p.id, motivo).subscribe({
-      next: (actualizada) => {
-        this.propuesta.set(actualizada);
-        this.snackBar.open('Propuesta rechazada.', 'OK', { duration: 2500 });
-      },
-      error: () => this.snackBar.open('No se pudo rechazar.', 'OK', { duration: 3500 }),
+    this.dialog.open(RechazarPropuestaDialog, {
+      width: '480px',
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+    }).afterClosed().subscribe((res) => {
+      if (!res) return;
+      this.ia.rechazarPropuesta(p.id, res.motivo).subscribe({
+        next: (actualizada) => {
+          this.propuesta.set(actualizada);
+          this.snackBar.open('Propuesta rechazada.', 'OK', { duration: 2500 });
+        },
+        error: () => this.snackBar.open('No se pudo rechazar.', 'OK', { duration: 3500 }),
+      });
     });
   }
 

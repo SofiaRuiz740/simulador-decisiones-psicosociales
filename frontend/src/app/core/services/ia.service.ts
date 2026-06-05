@@ -4,6 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Paginated } from '../models/academico.model';
 import {
+  ContenidoIA,
   ConvertirEnCasoResultado,
   EstadoIA,
   GenerarCasoInput,
@@ -41,6 +42,14 @@ export class IaService {
     return this.http.post<PropuestaCasoIA>(
       `${this.api}/ia/propuestas/${id}/rechazar/`,
       { motivo_rechazo },
+    );
+  }
+
+  /** Actualiza el contenido editado por el docente. */
+  actualizarContenido(id: number, contenido_json: ContenidoIA) {
+    return this.http.patch<PropuestaCasoIA>(
+      `${this.api}/ia/propuestas/${id}/`,
+      { contenido_json },
     );
   }
 

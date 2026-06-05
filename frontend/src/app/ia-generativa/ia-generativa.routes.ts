@@ -18,4 +18,10 @@ export const IA_GENERATIVA_ROUTES: Routes = [
       import('./propuesta-detalle').then((m) => m.PropuestaDetallePage),
     title: 'Propuesta IA · Preview',
   },
+  {
+    path: 'propuesta/:id/editar',
+    loadComponent: () =>
+      import('./propuesta-editor').then((m) => m.PropuestaEditorPage),
+    title: 'Editar propuesta · IA generativa',
+  },
 ];

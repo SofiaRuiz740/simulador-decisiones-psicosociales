@@ -1,0 +1,253 @@
+<section class="page">
+
+  <a [routerLink]="['/ia-generativa/propuesta', propuesta()?.id]" class="back-link">
+    <mat-icon>arrow_back</mat-icon> Volver al preview
+  </a>
+
+  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
+
+  @if (propuesta(); as p) {
+    @if (contenido(); as c) {
+      <header class="head anim-fade-up">
+        <div class="head-text">
+          <span class="kicker-deep">Editor de propuesta</span>
+          <h1 class="display">
+            Ajusta el caso a tu <em>medida</em>.
+          </h1>
+          <p class="lead">
+            Edita títulos, narrativas, opciones y retroalimentaciones.
+            Los cambios se guardan sobre la propuesta y se reflejan en el preview.
+          </p>
+        </div>
+        <div class="head-actions">
+          <button mat-stroked-button class="btn-cancel"
+            [routerLink]="['/ia-generativa/propuesta', p.id]">
+            Cancelar
+          </button>
+          <button mat-flat-button class="btn-save"
+            (click)="guardar()" [disabled]="guardando()">
+            <mat-icon>save</mat-icon>
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </header>
+
+      <!-- Datos generales -->
+      <section class="block anim-fade-up">
+        <header class="block-head">
+          <span class="block-num">01</span>
+          <h2 class="block-title">Datos generales</h2>
+        </header>
+        <div class="grid-2">
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Título del caso</mat-label>
+            <input matInput [(ngModel)]="c.titulo" maxlength="200" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Descripción breve</mat-label>
+            <textarea matInput rows="2" [(ngModel)]="c.descripcion"></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Área de psicología social</mat-label>
+            <input matInput [(ngModel)]="c.area_psicologia_social" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tiempo estimado (minutos)</mat-label>
+            <input matInput type="number" min="5" max="120" [(ngModel)]="c.tiempo_estimado" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Objetivo de aprendizaje</mat-label>
+            <textarea matInput rows="2" [(ngModel)]="c.objetivo_aprendizaje"></textarea>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <!-- Storytelling -->
+      <section class="block anim-fade-up">
+        <header class="block-head">
+          <span class="block-num">02</span>
+          <h2 class="block-title">Historia</h2>
+        </header>
+        <div class="grid-2">
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Introducción</mat-label>
+            <textarea matInput rows="3" [(ngModel)]="c.storytelling.introduccion"></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Personaje principal</mat-label>
+            <input matInput [(ngModel)]="c.storytelling.personaje_principal" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contexto general</mat-label>
+            <input matInput [(ngModel)]="c.storytelling.contexto_general" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Conflicto central</mat-label>
+            <input matInput [(ngModel)]="c.storytelling.conflicto_central" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Objetivo del estudiante</mat-label>
+            <input matInput [(ngModel)]="c.storytelling.objetivo_del_estudiante" />
+          </mat-form-field>
+        </div>
+      </section>
+
+      <!-- Escenarios -->
+      <section class="block anim-fade-up">
+        <header class="block-head">
+          <span class="block-num">03</span>
+          <h2 class="block-title">Escenarios y decisiones</h2>
+          <span class="block-meta">{{ c.escenarios.length }} escenarios</span>
+        </header>
+
+        @for (esc of c.escenarios; track $index; let escIdx = $index) {
+          <article class="esc">
+            <header class="esc-head">
+              <span class="esc-tag">Escenario {{ escIdx + 1 }}</span>
+              <input
+                class="esc-titulo"
+                [(ngModel)]="esc.titulo"
+                placeholder="Título del escenario"
+                maxlength="200" />
+            </header>
+
+            <div class="grid-2 esc-grid">
+              <mat-form-field appearance="outline" class="col-full">
+                <mat-label>Contexto</mat-label>
+                <textarea matInput rows="2" [(ngModel)]="esc.contexto"></textarea>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="col-full">
+                <mat-label>Narrativa</mat-label>
+                <textarea matInput rows="3" [(ngModel)]="esc.narrativa"></textarea>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Ambiente visual sugerido</mat-label>
+                <input matInput [(ngModel)]="esc.ambiente_visual_sugerido" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Emoción principal</mat-label>
+                <input matInput [(ngModel)]="esc.emocion_principal" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="col-full">
+                <mat-label>Decisión clave</mat-label>
+                <input matInput [(ngModel)]="esc.decision_clave" />
+              </mat-form-field>
+            </div>
+
+            <!-- Preguntas -->
+            @for (preg of esc.preguntas; track $index; let pregIdx = $index) {
+              <div class="preg">
+                <header class="preg-head">
+                  <span class="preg-tag">P{{ pregIdx + 1 }}</span>
+                  <input
+                    class="preg-enunciado"
+                    [(ngModel)]="preg.enunciado"
+                    placeholder="Enunciado de la pregunta" />
+                </header>
+
+                <ul class="opciones">
+                  @for (op of preg.opciones; track $index; let opIdx = $index) {
+                    <li class="op" [class.correcta]="op.es_correcta">
+                      <button
+                        type="button"
+                        class="op-mark"
+                        [class.checked]="op.es_correcta"
+                        (click)="marcarCorrecta(escIdx, pregIdx, opIdx)"
+                        matTooltip="Marcar como correcta">
+                        <mat-icon>{{ op.es_correcta ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                        <span class="op-letra">{{ ['A','B','C','D','E','F'][opIdx] }}</span>
+                      </button>
+
+                      <div class="op-body">
+                        <mat-form-field appearance="outline" class="col-full">
+                          <mat-label>Texto de la opción</mat-label>
+                          <input matInput [(ngModel)]="op.texto" />
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="col-full">
+                          <mat-label>Retroalimentación al estudiante</mat-label>
+                          <textarea matInput rows="2" [(ngModel)]="op.retroalimentacion"></textarea>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="col-full">
+                          <mat-label>Impacto narrativo</mat-label>
+                          <input matInput [(ngModel)]="op.impacto_narrativo" />
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="col-full">
+                          <mat-label>Justificación teórica</mat-label>
+                          <textarea matInput rows="2" [(ngModel)]="op.justificacion"></textarea>
+                        </mat-form-field>
+                      </div>
+
+                      <button
+                        type="button"
+                        mat-icon-button
+                        class="op-del"
+                        matTooltip="Eliminar opción"
+                        (click)="delOpcion(escIdx, pregIdx, opIdx)">
+                        <mat-icon>delete_outline</mat-icon>
+                      </button>
+                    </li>
+                  }
+                </ul>
+
+                <button
+                  type="button"
+                  mat-stroked-button
+                  class="btn-add"
+                  (click)="addOpcion(escIdx, pregIdx)">
+                  <mat-icon>add</mat-icon>
+                  Agregar opción
+                </button>
+              </div>
+            }
+          </article>
+        }
+      </section>
+
+      <!-- Cierre -->
+      <section class="block anim-fade-up">
+        <header class="block-head">
+          <span class="block-num">04</span>
+          <h2 class="block-title">Retroalimentación de cierre</h2>
+        </header>
+
+        <mat-form-field appearance="outline" class="col-full">
+          <mat-label>Retroalimentación general al estudiante</mat-label>
+          <textarea matInput rows="3" [(ngModel)]="c.retroalimentacion_general"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="col-full">
+          <mat-label>Recomendaciones para el docente</mat-label>
+          <textarea matInput rows="2" [(ngModel)]="c.recomendaciones_docente"></textarea>
+        </mat-form-field>
+      </section>
+
+      <!-- Barra final -->
+      <footer class="foot-bar">
+        <button mat-stroked-button class="btn-cancel"
+          [routerLink]="['/ia-generativa/propuesta', p.id]">
+          Cancelar
+        </button>
+        <button mat-flat-button class="btn-save"
+          (click)="guardarYVolver()" [disabled]="guardando()">
+          <mat-icon>save</mat-icon>
+          {{ guardando() ? 'Guardando…' : 'Guardar y volver al preview' }}
+        </button>
+      </footer>
+    }
+  }
+</section>

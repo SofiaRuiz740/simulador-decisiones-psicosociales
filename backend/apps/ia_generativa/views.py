@@ -66,10 +66,11 @@ def estado_ia_view(request):
 class PropuestaCasoIAViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    """Lista, detalle y acciones de revisión sobre las propuestas IA."""
+    """Lista, detalle, edición y acciones de revisión sobre las propuestas IA."""
 
     serializer_class = PropuestaCasoIASerializer
     permission_classes = [EsDocenteOAdmin]
@@ -79,6 +80,31 @@ class PropuestaCasoIAViewSet(
         if self.request.user.rol == Usuario.Rol.ADMIN:
             return qs
         return qs.filter(docente=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        """Solo se permite editar mientras la propuesta no haya sido convertida o rechazada."""
+        propuesta = self.get_object()
+        if propuesta.estado in (
+            PropuestaCasoIA.Estado.CONVERTIDO_EN_CASO,
+            PropuestaCasoIA.Estado.RECHAZADO,
+        ):
+            return Response(
+                {'detail': 'No puedes editar una propuesta ya convertida o rechazada.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        propuesta = self.get_object()
+        if propuesta.estado in (
+            PropuestaCasoIA.Estado.CONVERTIDO_EN_CASO,
+            PropuestaCasoIA.Estado.RECHAZADO,
+        ):
+            return Response(
+                {'detail': 'No puedes editar una propuesta ya convertida o rechazada.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().partial_update(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], url_path='aprobar')
     def aprobar(self, request, pk=None):

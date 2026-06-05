@@ -40,7 +40,7 @@ class PropuestaCasoIASerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id', 'titulo', 'estado_display', 'generada_con_llm',
-            'caso_resultante_id', 'contenido_json',
+            'caso_resultante_id',
             'fecha_creacion', 'fecha_actualizacion', 'fecha_aprobacion',
         )
 

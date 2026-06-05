@@ -1,0 +1,273 @@
+<!-- ============================================================
+     LANDING editorial cientifica
+     ============================================================ -->
+<div class="landing">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a class="brand" routerLink="/inicio" aria-label="Inicio">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="4" fill="#0d9488"/>
+        <circle cx="30" cy="14" r="4" fill="#1e3a8a"/>
+        <circle cx="20" cy="30" r="4" fill="#818cf8"/>
+        <path d="M10 10 L30 14 L20 30 Z" stroke="#0B1729" stroke-width="1.2" stroke-linejoin="round" fill="none" opacity="0.4"/>
+      </svg>
+      <span class="brand-text">
+        <strong>Simulador</strong>
+        <em>de Decisiones Psicosociales</em>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="link-ghost" routerLink="/estudiante">Soy estudiante</a>
+      <a mat-stroked-button routerLink="/auth/login" class="cta-out">Ingresar</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-grid">
+
+      <!-- columna izquierda: titulo + descripcion + cta -->
+      <div class="hero-text anim-fade-up" style="--delay: 0ms">
+        <div class="hero-kicker">
+          <span class="edition-num">№ 01</span>
+          <span class="dot"></span>
+          <span class="tag">Plataforma académica</span>
+        </div>
+
+        <h1 class="hero-title display">
+          Decisiones que <em>enseñan</em>,
+          <br/>
+          casos que <em>movilizan</em>.
+        </h1>
+
+        <p class="hero-lead">
+          Un simulador para llevar la psicología social al aula como una experiencia
+          de decisión real. Los docentes diseñan casos editables; los estudiantes los
+          viven escena a escena, con rúbrica, retroalimentación y trazabilidad.
+        </p>
+
+        <div class="hero-cta">
+          <a mat-flat-button color="primary" routerLink="/auth/login" class="btn-primary">
+            <mat-icon>arrow_forward</mat-icon>
+            Acceder como docente
+          </a>
+          <a mat-stroked-button routerLink="/estudiante" class="btn-secondary">
+            <mat-icon>vpn_key</mat-icon>
+            Soy estudiante
+          </a>
+        </div>
+
+        <div class="hero-marks">
+          <span><strong>9</strong> apps integradas</span>
+          <span class="sep">·</span>
+          <span><strong>IA</strong> generativa opcional</span>
+          <span class="sep">·</span>
+          <span><strong>Rúbrica</strong> con niveles</span>
+        </div>
+      </div>
+
+      <!-- columna derecha: composicion visual -->
+      <aside class="hero-visual anim-fade-up" style="--delay: 120ms" aria-hidden="true">
+        <div class="card-stack">
+          <article class="card-floating c1">
+            <span class="card-tag">Escenario</span>
+            <p>"El grupo presiona para que decidas rápido. Tres compañeros te observan."</p>
+            <div class="choice">
+              <span class="choice-dot"></span>
+              <span>Pides un minuto para reflexionar</span>
+            </div>
+            <div class="choice active">
+              <span class="choice-dot"></span>
+              <span>Propones una alternativa al grupo</span>
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="choice">
+              <span class="choice-dot"></span>
+              <span>Te alineas con la mayoría</span>
+            </div>
+          </article>
+
+          <article class="card-floating c2">
+            <span class="card-tag">Rúbrica</span>
+            <div class="rubric-row">
+              <span>Razonamiento ético</span>
+              <span class="mono">40%</span>
+            </div>
+            <div class="rubric-bar"><span style="width: 78%"></span></div>
+            <div class="rubric-row">
+              <span>Análisis psicosocial</span>
+              <span class="mono">35%</span>
+            </div>
+            <div class="rubric-bar"><span style="width: 65%"></span></div>
+            <div class="rubric-row">
+              <span>Toma de decisiones</span>
+              <span class="mono">25%</span>
+            </div>
+            <div class="rubric-bar"><span style="width: 88%"></span></div>
+          </article>
+
+          <article class="card-floating c3">
+            <span class="card-tag">Resultado</span>
+            <div class="result-num">
+              <strong>8.4</strong>
+              <span>/10</span>
+            </div>
+            <p class="result-feedback">Decisiones coherentes con la teoría. Continúa explorando casos con dilemas éticos abiertos.</p>
+          </article>
+        </div>
+
+        <!-- líneas decorativas hairline -->
+        <svg class="deco-lines" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+          <line x1="0" y1="80" x2="400" y2="80" stroke="#E3E8EF" stroke-width="1"/>
+          <line x1="80" y1="0" x2="80" y2="400" stroke="#E3E8EF" stroke-width="1"/>
+          <circle cx="80" cy="80" r="4" fill="#1e3a8a"/>
+          <line x1="0" y1="320" x2="400" y2="320" stroke="#E3E8EF" stroke-width="1"/>
+          <circle cx="320" cy="320" r="4" fill="#0d9488"/>
+        </svg>
+      </aside>
+    </div>
+
+    <!-- "scroll cue" sutil -->
+    <div class="scroll-cue" aria-hidden="true">
+      <span class="line"></span>
+      <span>Sigue leyendo</span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       SECCIÓN: capabilities (3 columnas con números editoriales)
+       ============================================================ -->
+  <section class="section section-capabilities">
+    <div class="section-head">
+      <span class="kicker-deep">El sistema</span>
+      <h2 class="section-title display">
+        Tres piezas para enseñar <em>juicio psicosocial</em>.
+      </h2>
+      <p class="section-lead">
+        Cada caso integra contexto, decisión y evaluación.
+        Sin formularios planos: una experiencia narrativa con
+        rúbrica explícita.
+      </p>
+    </div>
+
+    <div class="caps-grid">
+      @for (cap of capabilities; track cap.num; let i = $index) {
+        <article class="cap-card anim-fade-up" [style.--delay]="(i * 90) + 'ms'">
+          <header class="cap-head">
+            <span class="cap-num">{{ cap.num }}</span>
+            <div class="cap-icon"><mat-icon>{{ cap.icon }}</mat-icon></div>
+          </header>
+          <h3 class="cap-title">{{ cap.title }}</h3>
+          <p class="cap-lead">{{ cap.lead }}</p>
+          <div class="cap-rule"></div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECCIÓN: cómo funciona (4 pasos en timeline horizontal)
+       ============================================================ -->
+  <section class="section section-flow">
+    <div class="section-head">
+      <span class="kicker-teal">Cómo funciona</span>
+      <h2 class="section-title display">
+        Cuatro pasos del <em>caso al insight</em>.
+      </h2>
+    </div>
+
+    <ol class="steps">
+      @for (s of steps; track s.t; let i = $index) {
+        <li class="step anim-fade-up" [style.--delay]="(i * 80) + 'ms'">
+          <span class="step-n">{{ s.n }}</span>
+          <h4 class="step-title">{{ s.t }}</h4>
+          <p class="step-desc">{{ s.d }}</p>
+          @if (i < steps.length - 1) {
+            <span class="step-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14m0 0l-6-6m6 6l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          }
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- ============================================================
+       SECCIÓN: para quién (3 tarjetas)
+       ============================================================ -->
+  <section class="section section-audiences">
+    <div class="section-head">
+      <span class="kicker">Para quién</span>
+      <h2 class="section-title display">
+        Pensado para tres <em>roles</em>.
+      </h2>
+    </div>
+
+    <div class="aud-grid">
+      @for (a of audiences; track a.tag; let i = $index) {
+        <article class="aud-card anim-fade-up" [style.--delay]="(i * 90) + 'ms'">
+          <span class="aud-icon"><mat-icon>{{ a.icon }}</mat-icon></span>
+          <span class="aud-tag">{{ a.tag }}</span>
+          <h3 class="aud-title">{{ a.title }}</h3>
+          <p class="aud-desc">{{ a.desc }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECCIÓN: CTA final
+       ============================================================ -->
+  <section class="section section-cta">
+    <div class="cta-card">
+      <div class="cta-text">
+        <span class="edition-num">№ 04</span>
+        <h2 class="display">
+          ¿Listo para crear tu <em>primer caso</em>?
+        </h2>
+        <p>
+          La cuenta de docente es gratuita para uso académico.
+          Tarda menos de un minuto.
+        </p>
+      </div>
+      <div class="cta-actions">
+        <a mat-flat-button color="primary" routerLink="/auth/registro-docente" class="btn-primary">
+          Crear cuenta de docente <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <a mat-stroked-button routerLink="/auth/login" class="btn-link">
+          Ya tengo cuenta
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="foot">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <strong>Simulador de Decisiones Psicosociales</strong>
+        <p>Universidad Alexander Von Humboldt · 2026</p>
+      </div>
+      <nav class="foot-nav">
+        <span class="foot-label">Acceso</span>
+        <a routerLink="/auth/login">Docente</a>
+        <a routerLink="/auth/registro-docente">Crear cuenta</a>
+        <a routerLink="/estudiante">Estudiante</a>
+      </nav>
+      <div class="foot-meta">
+        <span class="foot-label">Versión</span>
+        <span class="mono">dev · 0.1.0</span>
+      </div>
+    </div>
+    <div class="foot-line"></div>
+    <p class="foot-credit">
+      Proyecto académico. Hecho con cuidado para enseñar a decidir.
+    </p>
+  </footer>
+
+</div>

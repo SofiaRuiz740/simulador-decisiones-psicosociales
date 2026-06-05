@@ -1,0 +1,83 @@
+<section class="page">
+
+  <!-- HERO editorial -->
+  <header class="hero anim-fade-up">
+    <div class="hero-cap">
+      <span class="edition-num">№ 01 — Panel docente</span>
+      <span class="dot">·</span>
+      <span class="today">{{ hoy }}</span>
+    </div>
+
+    <h1 class="hero-title display">
+      {{ saludo() }}, <em>{{ nombre() }}</em>.
+    </h1>
+
+    <p class="hero-lead">
+      Diseña casos, agenda prácticas y acompaña a tus estudiantes en decisiones
+      psicosociales con sentido. Empieza por las acciones de abajo.
+    </p>
+
+    <div class="hero-marks">
+      <span>Tu sesión está activa</span>
+      <span class="sep">·</span>
+      <span><strong class="mono">{{ casosCount() ?? '0' }}</strong> casos</span>
+      <span class="sep">·</span>
+      <span><strong class="mono">{{ practicasCount() ?? '0' }}</strong> prácticas</span>
+    </div>
+  </header>
+
+  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
+
+  <!-- KPIs editoriales -->
+  <section class="kpis">
+    @for (k of kpis(); track k.num; let i = $index) {
+      <article class="kpi anim-fade-up" [attr.data-variant]="k.variant"
+        [style.--delay]="(i * 60) + 'ms'">
+        <header class="kpi-head">
+          <span class="kpi-num">{{ k.num }}</span>
+          <span class="kpi-icon"><mat-icon>{{ k.icon }}</mat-icon></span>
+        </header>
+        <div class="kpi-body">
+          <strong class="kpi-value">{{ k.value }}</strong>
+          <p class="kpi-label">{{ k.label }}</p>
+        </div>
+        <div class="kpi-foot">
+          <span class="kpi-hint">{{ k.hint }}</span>
+        </div>
+      </article>
+    }
+  </section>
+
+  <!-- Section: acciones -->
+  <section class="section-actions">
+    <header class="sec-head">
+      <div>
+        <span class="kicker-deep">Acciones</span>
+        <h2 class="sec-title display">
+          Empieza por <em>aquí</em>.
+        </h2>
+      </div>
+    </header>
+
+    <div class="actions-grid">
+      @for (a of accesos; track a.ruta; let i = $index) {
+        <a [routerLink]="a.ruta" class="action-card anim-fade-up"
+          [attr.data-variant]="a.variant"
+          [style.--delay]="(i * 50) + 'ms'">
+          <header class="ac-head">
+            <span class="ac-num">{{ a.num }}</span>
+            <span class="ac-tag">{{ a.tag }}</span>
+          </header>
+          <div class="ac-icon"><mat-icon>{{ a.icono }}</mat-icon></div>
+          <h3 class="ac-title">{{ a.titulo }}</h3>
+          <p class="ac-desc">{{ a.descripcion }}</p>
+          <footer class="ac-foot">
+            <span>Ir a la sección</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </footer>
+        </a>
+      }
+    </div>
+  </section>
+
+</section>

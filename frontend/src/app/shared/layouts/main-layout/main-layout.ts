@@ -8,6 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, map, shareReplay } from 'rxjs';
 
@@ -19,8 +20,13 @@ interface NavItem {
   label: string;
   route: string;
   icon: string;
-  /** Roles que pueden ver este item. Si está vacío, lo ven todos los autenticados. */
   roles?: Rol[];
+  group: 'principal' | 'gestion' | 'practica' | 'analitica';
+}
+
+interface NavGroup {
+  titulo: string;
+  items: NavItem[];
 }
 
 @Component({
@@ -37,6 +43,7 @@ interface NavItem {
     MatSidenavModule,
     MatMenuModule,
     MatDividerModule,
+    MatTooltipModule,
   ],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
@@ -59,24 +66,46 @@ export class MainLayout {
     );
 
   private readonly allNavItems: NavItem[] = [
-    { label: 'Panel administrador', route: '/admin', icon: 'admin_panel_settings', roles: [Rol.Admin] },
-    { label: 'Panel docente', route: '/docente', icon: 'school', roles: [Rol.Docente] },
-    { label: 'Estudiantes', route: '/estudiantes', icon: 'group', roles: [Rol.Docente, Rol.Admin] },
-    { label: 'Grupos', route: '/grupos', icon: 'workspaces', roles: [Rol.Docente, Rol.Admin] },
-    { label: 'Casos de estudio', route: '/casos', icon: 'menu_book', roles: [Rol.Docente, Rol.Admin] },
-    { label: 'IA generativa', route: '/ia-generativa', icon: 'auto_awesome', roles: [Rol.Docente] },
-    { label: 'Importar documentos', route: '/importacion-documentos', icon: 'upload_file', roles: [Rol.Docente] },
-    { label: 'Prácticas', route: '/practicas', icon: 'event', roles: [Rol.Docente, Rol.Admin] },
-    { label: 'Participaciones', route: '/participaciones', icon: 'play_circle', roles: [Rol.Docente, Rol.Estudiante] },
-    { label: 'Resultados', route: '/resultados', icon: 'assessment', roles: [Rol.Docente, Rol.Estudiante, Rol.Admin] },
-    { label: 'Reportes', route: '/reportes', icon: 'description', roles: [Rol.Docente, Rol.Admin] },
+    // Principal
+    { label: 'Panel administrador', route: '/admin', icon: 'admin_panel_settings', roles: [Rol.Admin], group: 'principal' },
+    { label: 'Panel docente', route: '/docente', icon: 'school', roles: [Rol.Docente], group: 'principal' },
+
+    // Gestión
+    { label: 'Casos de estudio', route: '/casos', icon: 'menu_book', roles: [Rol.Docente, Rol.Admin], group: 'gestion' },
+    { label: 'IA generativa', route: '/ia-generativa', icon: 'auto_awesome', roles: [Rol.Docente], group: 'gestion' },
+    { label: 'Importar documentos', route: '/importacion-documentos', icon: 'upload_file', roles: [Rol.Docente], group: 'gestion' },
+    { label: 'Estudiantes', route: '/estudiantes', icon: 'group', roles: [Rol.Docente, Rol.Admin], group: 'gestion' },
+    { label: 'Grupos', route: '/grupos', icon: 'workspaces', roles: [Rol.Docente, Rol.Admin], group: 'gestion' },
+
+    // Práctica
+    { label: 'Prácticas', route: '/practicas', icon: 'event', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
+    { label: 'Participaciones', route: '/participaciones', icon: 'play_circle', roles: [Rol.Docente, Rol.Estudiante], group: 'practica' },
+
+    // Analítica
+    { label: 'Resultados', route: '/resultados', icon: 'assessment', roles: [Rol.Docente, Rol.Estudiante, Rol.Admin], group: 'analitica' },
+    { label: 'Reportes', route: '/reportes', icon: 'description', roles: [Rol.Docente, Rol.Admin], group: 'analitica' },
   ];
 
-  /** Items filtrados por el rol del usuario actual. */
-  readonly navItems = computed(() => {
+  /** Items agrupados y filtrados por rol. */
+  readonly navGroups = computed<NavGroup[]>(() => {
     const actual = this.rol();
     if (!actual) return [];
-    return this.allNavItems.filter((it) => !it.roles || it.roles.includes(actual));
+
+    const filtered = this.allNavItems.filter((it) => !it.roles || it.roles.includes(actual));
+    const groupOrder: NavItem['group'][] = ['principal', 'gestion', 'practica', 'analitica'];
+    const labels: Record<NavItem['group'], string> = {
+      principal: 'Principal',
+      gestion: 'Gestión',
+      practica: 'Práctica',
+      analitica: 'Analítica',
+    };
+
+    return groupOrder
+      .map((g) => ({
+        titulo: labels[g],
+        items: filtered.filter((it) => it.group === g),
+      }))
+      .filter((g) => g.items.length > 0);
   });
 
   /** Iniciales del usuario para el avatar. */
@@ -87,6 +116,16 @@ export class MainLayout {
     const last = (u.last_name || '').charAt(0);
     const combo = (first + last).toUpperCase();
     return combo || (u.username || '?').charAt(0).toUpperCase();
+  });
+
+  /** Etiqueta del rol para mostrar (no usar el enum crudo). */
+  readonly rolLabel = computed(() => {
+    const u = this.usuario();
+    if (!u) return '';
+    if (u.rol === 'ADMIN') return 'Administrador';
+    if (u.rol === 'DOCENTE') return 'Docente';
+    if (u.rol === 'ESTUDIANTE') return 'Estudiante';
+    return u.rol;
   });
 
   closeIfOverMode(): void {

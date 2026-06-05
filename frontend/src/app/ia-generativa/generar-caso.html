@@ -14,12 +14,12 @@
     <div class="hero-badge" [class.ok]="proveedorActivo()" [class.warn]="proveedorActivo() === false">
       <mat-icon>{{ proveedorActivo() ? 'auto_awesome' : 'science' }}</mat-icon>
       <div>
-        <strong>{{ proveedorActivo() ? 'IA real activa' : 'Modo demo (stub)' }}</strong>
+        <strong>{{ proveedorActivo() ? 'Asistente conectado' : 'Modo de prueba' }}</strong>
         <span>
           @if (proveedorActivo()) {
-            El backend usará el LLM configurado en .env.
+            Listo para generar casos con IA. Cada propuesta tarda unos segundos.
           } @else {
-            Configura OPENAI_API_KEY en .env para usar IA real.
+            Generaremos un caso plantilla. Para casos únicos, pide al admin configurar la IA.
           }
         </span>
       </div>

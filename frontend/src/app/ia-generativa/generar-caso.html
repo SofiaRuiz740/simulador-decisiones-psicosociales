@@ -11,16 +11,13 @@
         conviertes en un caso real.
       </p>
     </div>
-    <div class="hero-badge" [class.ok]="proveedorActivo()" [class.warn]="proveedorActivo() === false">
-      <mat-icon>{{ proveedorActivo() ? 'auto_awesome' : 'science' }}</mat-icon>
+    <div class="hero-badge ok">
+      <mat-icon>psychology</mat-icon>
       <div>
-        <strong>{{ proveedorActivo() ? 'Asistente conectado' : 'Modo de prueba' }}</strong>
+        <strong>Asistente pedagógico</strong>
         <span>
-          @if (proveedorActivo()) {
-            Listo para generar casos con IA. Cada propuesta tarda unos segundos.
-          } @else {
-            Generaremos un caso plantilla. Para casos únicos, pide al admin configurar la IA.
-          }
+          Construye un caso con personaje, escenarios, decisiones éticas y rúbrica
+          alineada a tu objetivo. Tú lo revisas y apruebas antes de usarlo.
         </span>
       </div>
     </div>

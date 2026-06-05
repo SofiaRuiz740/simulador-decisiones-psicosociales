@@ -50,7 +50,7 @@ import { GamePreview } from './components/game-preview/game-preview';
               <span class="chip"><mat-icon>tune</mat-icon>{{ p.nivel_dificultad }}</span>
               <span class="chip"><mat-icon>view_carousel</mat-icon>{{ p.numero_escenarios }} escenarios</span>
               @if (!p.generada_con_llm) {
-                <span class="chip warn"><mat-icon>science</mat-icon>stub (sin LLM)</span>
+                <span class="chip warn"><mat-icon>auto_stories</mat-icon>Plantilla pedagógica</span>
               }
             </div>
           </div>

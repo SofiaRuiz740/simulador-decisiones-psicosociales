@@ -245,8 +245,8 @@ export class Estudiante {
           err.error?.codigo?.[0] ||
           err.error?.detail ||
           (err.status === 0
-            ? 'No hay conexión con el servidor. Verifica que el backend esté corriendo.'
-            : 'Datos incorrectos. Verifica tu correo y código.');
+            ? 'No pudimos conectar en este momento. Intenta de nuevo en unos minutos.'
+            : 'Los datos no coinciden. Verifica tu correo y el código que te dio tu docente.');
         this.error.set(msg);
       },
     });

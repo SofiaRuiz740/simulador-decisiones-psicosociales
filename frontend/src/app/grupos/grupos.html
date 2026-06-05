@@ -1,86 +1,142 @@
 <section class="page">
-  <header class="page-header">
-    <div>
-      <h1 class="title">Grupos académicos</h1>
-      <p class="subtitle">
-        @if (!loading()) { {{ grupos().length }} grupos. }
-        @else { Cargando… }
-      </p>
+
+  <!-- HERO -->
+  <header class="hero anim-fade-up">
+    <div class="hero-cap">
+      <span class="edition-num">№ Gestión</span>
+      <span class="dot">·</span>
+      <span class="lbl">Grupos académicos</span>
     </div>
-    <button mat-flat-button color="primary" (click)="crear()">
-      <mat-icon>add</mat-icon>
-      <span>Crear grupo</span>
-    </button>
+    <h1 class="hero-title display">
+      Agrupa estudiantes,
+      <em>simplifica</em> tus prácticas.
+    </h1>
+    <p class="hero-lead">
+      Organiza a tus estudiantes en grupos para asignar prácticas en lote.
+      Toca un grupo para ver y gestionar sus integrantes.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <strong class="mono">{{ grupos().length }}</strong>
+        <span>Grupos</span>
+      </div>
+      <div class="stat">
+        <strong class="mono">{{ totalEstudiantes() }}</strong>
+        <span>Estudiantes</span>
+      </div>
+      <div class="stat">
+        <strong class="mono">{{ gruposVacios() }}</strong>
+        <span>Sin integrantes</span>
+      </div>
+    </div>
   </header>
 
-  @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button mat-flat-button (click)="crear()" class="btn-create">
+      <mat-icon>add</mat-icon>
+      Crear grupo
+    </button>
+  </div>
 
+  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
+
+  <!-- Empty state -->
   @if (!loading() && grupos().length === 0) {
     <div class="empty">
-      <mat-icon>folder_open</mat-icon>
-      <p>Aún no has creado ningún grupo.</p>
-      <button mat-stroked-button color="primary" (click)="crear()">Crear el primero</button>
+      <div class="empty-glyph"><mat-icon>workspaces</mat-icon></div>
+      <h3 class="display">Aún no tienes <em>grupos</em></h3>
+      <p>Agrupa estudiantes para asignar prácticas en lote y mantener orden.</p>
+      <button mat-flat-button (click)="crear()" class="btn-create">
+        <mat-icon>add</mat-icon>
+        Crear el primer grupo
+      </button>
     </div>
   }
 
-  <div class="cards">
+  <!-- Grid de grupos -->
+  <div class="grid">
     @for (g of grupos(); track g.id) {
-      <mat-card
-        class="grupo-card"
+      <article
+        class="grupo-card anim-fade-up"
         [class.expanded]="grupoExpandidoId() === g.id"
+        [attr.data-size]="variantPor(g.estudiantes_count)"
         (click)="expandir(g)">
-        <mat-card-header>
-          <mat-card-title>{{ g.nombre }}</mat-card-title>
-          <mat-card-subtitle>{{ g.estudiantes_count }} estudiantes</mat-card-subtitle>
-          <div class="card-actions">
+
+        <!-- Ribbon lateral por variante -->
+        <span class="ribbon" aria-hidden="true"></span>
+
+        <header class="head">
+          <div class="head-icon">
+            <mat-icon>workspaces</mat-icon>
+          </div>
+          <div class="head-info">
+            <strong class="name">{{ g.nombre }}</strong>
+            <span class="meta">
+              <span class="mono">{{ g.estudiantes_count }}</span>
+              {{ g.estudiantes_count === 1 ? 'estudiante' : 'estudiantes' }}
+            </span>
+          </div>
+          <div class="head-actions">
             <button mat-icon-button matTooltip="Editar" (click)="editar(g, $event)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="eliminar(g, $event)">
-              <mat-icon>delete</mat-icon>
+            <button mat-icon-button matTooltip="Eliminar" (click)="eliminar(g, $event)" class="btn-danger">
+              <mat-icon>delete_outline</mat-icon>
             </button>
           </div>
-        </mat-card-header>
+        </header>
 
         @if (g.descripcion) {
-          <mat-card-content>
-            <p class="desc">{{ g.descripcion }}</p>
-          </mat-card-content>
+          <p class="desc">{{ g.descripcion }}</p>
         }
 
+        <!-- Hint expand cuando NO está expandido -->
+        @if (grupoExpandidoId() !== g.id) {
+          <div class="hint">
+            <mat-icon>expand_more</mat-icon>
+            <span>Ver integrantes</span>
+          </div>
+        }
+
+        <!-- Detalle expandido -->
         @if (grupoExpandidoId() === g.id && detalle()) {
-          <mat-card-content class="detalle">
-            <div class="detalle-header">
-              <strong>Estudiantes del grupo</strong>
-              <button mat-stroked-button color="primary" (click)="agregarEstudiantes(); $event.stopPropagation()">
+          <div class="detalle anim-fade-up" (click)="$event.stopPropagation()">
+            <div class="det-head">
+              <span class="kicker-deep">Integrantes</span>
+              <button mat-stroked-button (click)="agregarEstudiantes()" class="btn-add">
                 <mat-icon>person_add</mat-icon>
-                <span>Agregar</span>
+                Agregar
               </button>
             </div>
+
             @if (detalle()!.estudiantes.length === 0) {
-              <p class="vacio">Este grupo aún no tiene estudiantes.</p>
+              <p class="vacio">Este grupo aún no tiene integrantes.</p>
             } @else {
-              <ul class="estudiantes-list">
+              <ul class="estu-list">
                 @for (e of detalle()!.estudiantes; track e.id) {
                   <li>
-                    <div>
-                      <span class="nombre">{{ e.nombre_completo }}</span>
-                      <span class="correo">{{ e.correo }}</span>
+                    <span class="ava">{{ inicialesDe(e.nombre_completo, e.correo) }}</span>
+                    <div class="estu-info">
+                      <strong>{{ e.nombre_completo }}</strong>
+                      <span>{{ e.correo }}</span>
                     </div>
                     <button
                       mat-icon-button
-                      color="warn"
+                      class="btn-remove"
                       matTooltip="Remover del grupo"
-                      (click)="removerEstudiante(e.id); $event.stopPropagation()">
+                      (click)="removerEstudiante(e.id)">
                       <mat-icon>close</mat-icon>
                     </button>
                   </li>
                 }
               </ul>
             }
-          </mat-card-content>
+          </div>
         }
-      </mat-card>
+      </article>
     }
   </div>
+
 </section>

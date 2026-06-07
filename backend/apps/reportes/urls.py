@@ -14,6 +14,7 @@ from .views import (
     reporte_materia_pdf,
     reporte_practica_excel,
     reporte_practica_pdf,
+    reporte_tematico,
     reportes_analitica,
     reportes_resumen,
 )
@@ -36,4 +37,11 @@ urlpatterns = [
     path('materia/<int:materia_id>/excel/', reporte_materia_excel, name='reporte_materia_excel'),
     path('estudiante/<int:estudiante_id>/pdf/', reporte_estudiante_pdf, name='reporte_estudiante_pdf'),
     path('estudiante/<int:estudiante_id>/excel/', reporte_estudiante_excel, name='reporte_estudiante_excel'),
+    # Reportes temáticos (P1): participacion | desempeno | respuestas | tiempos |
+    # notas | retroalimentaciones | feedback  ×  pdf | excel.
+    path(
+        'tematico/<str:tipo>/<str:formato>/',
+        reporte_tematico,
+        name='reporte_tematico',
+    ),
 ]

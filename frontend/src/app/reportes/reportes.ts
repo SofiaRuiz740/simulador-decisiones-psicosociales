@@ -11,6 +11,7 @@ import { AcademicoService } from '../core/services/academico.service';
 import {
   ExtrasService,
   NotaRango,
+  ReporteTematicoTipo,
   ReportesAnalitica,
   ReportesFiltros,
   ReportesResumen,
@@ -19,7 +20,13 @@ import { PracticasService } from '../core/services/practicas.service';
 
 interface CatalogoReporte {
   titulo: string;
-  tipo: 'grupo' | 'materia' | 'estudiante' | 'proximamente';
+  tipo: 'grupo' | 'materia' | 'estudiante' | 'tematico';
+  /** Slug del reporte temático (solo cuando tipo === 'tematico'). */
+  tematicoTipo?: ReporteTematicoTipo;
+  /** Descripción corta para mostrar al docente. */
+  descripcion?: string;
+  /** Icono Material referido en el HTML. */
+  icono?: string;
 }
 
 @Component({
@@ -50,16 +57,26 @@ export class Reportes implements OnInit {
   readonly descargando = signal<string | null>(null);
 
   readonly catalogoReportes: CatalogoReporte[] = [
-    { titulo: 'Reporte por grupo', tipo: 'grupo' },
-    { titulo: 'Reporte por materia', tipo: 'materia' },
-    { titulo: 'Reporte por estudiante', tipo: 'estudiante' },
-    { titulo: 'Participación', tipo: 'proximamente' },
-    { titulo: 'Desempeño', tipo: 'proximamente' },
-    { titulo: 'Respuestas', tipo: 'proximamente' },
-    { titulo: 'Tiempos', tipo: 'proximamente' },
-    { titulo: 'Notas', tipo: 'proximamente' },
-    { titulo: 'Retroalimentaciones', tipo: 'proximamente' },
-    { titulo: 'Feedback', tipo: 'proximamente' },
+    { titulo: 'Reporte por grupo', tipo: 'grupo',
+      descripcion: 'Resultados consolidados de un grupo seleccionado.', icono: 'groups' },
+    { titulo: 'Reporte por materia', tipo: 'materia',
+      descripcion: 'Resultados de todas las prácticas de una materia.', icono: 'menu_book' },
+    { titulo: 'Reporte por estudiante', tipo: 'estudiante',
+      descripcion: 'Histórico de prácticas de un estudiante.', icono: 'person' },
+    { titulo: 'Participación', tipo: 'tematico', tematicoTipo: 'participacion',
+      descripcion: 'Cobertura de respuestas por estudiante y práctica.', icono: 'how_to_reg' },
+    { titulo: 'Desempeño', tipo: 'tematico', tematicoTipo: 'desempeno',
+      descripcion: 'Promedio por criterio de rúbrica.', icono: 'leaderboard' },
+    { titulo: 'Respuestas', tipo: 'tematico', tematicoTipo: 'respuestas',
+      descripcion: 'Correctas, incorrectas y sin responder por estudiante.', icono: 'fact_check' },
+    { titulo: 'Tiempos', tipo: 'tematico', tematicoTipo: 'tiempos',
+      descripcion: 'Duración vs tiempo máximo permitido.', icono: 'timer' },
+    { titulo: 'Notas', tipo: 'tematico', tematicoTipo: 'notas',
+      descripcion: 'Notas finales y distribución por rangos.', icono: 'grading' },
+    { titulo: 'Retroalimentaciones', tipo: 'tematico', tematicoTipo: 'retroalimentaciones',
+      descripcion: 'Feedback ya entregado por el docente.', icono: 'reviews' },
+    { titulo: 'Feedback pendiente', tipo: 'tematico', tematicoTipo: 'feedback',
+      descripcion: 'Resultados esperando retroalimentación del docente.', icono: 'pending_actions' },
   ];
 
   filtroDesde = '';
@@ -92,6 +109,7 @@ export class Reportes implements OnInit {
       hasta: this.filtroHasta || undefined,
       materia_id: this.filtroMateriaId ?? undefined,
       grupo_id: this.filtroGrupoId ?? undefined,
+      estudiante_id: this.filtroEstudianteId ?? undefined,
     };
   }
 
@@ -139,41 +157,51 @@ export class Reportes implements OnInit {
   }
 
   descargarCatalogoPDF(item: CatalogoReporte): void {
-    const id = this.idCatalogo(item.tipo);
-    if (!id) {
-      this.snackBar.open('Selecciona un registro en los filtros superiores.', 'OK', { duration: 3500 });
-      return;
-    }
-    const key = `${item.tipo}-${id}-pdf`;
-    this.descargando.set(key);
-    const obs = item.tipo === 'grupo'
-      ? this.extras.descargarReporteGrupoPDF(id)
-      : item.tipo === 'materia'
-        ? this.extras.descargarReporteMateriaPDF(id)
-        : this.extras.descargarReporteEstudiantePDF(id);
-    obs.subscribe({
-      next: (blob) => this.guardarBlob(blob, `reporte-${item.tipo}-${id}.pdf`),
-      error: () => this.snackBar.open('No se pudo descargar el PDF.', 'OK', { duration: 3500 }),
-      complete: () => this.descargando.set(null),
-    });
+    this.descargarCatalogo(item, 'pdf');
   }
 
   descargarCatalogoExcel(item: CatalogoReporte): void {
-    const id = this.idCatalogo(item.tipo);
-    if (!id) {
-      this.snackBar.open('Selecciona un registro en los filtros superiores.', 'OK', { duration: 3500 });
+    this.descargarCatalogo(item, 'excel');
+  }
+
+  private descargarCatalogo(item: CatalogoReporte, formato: 'pdf' | 'excel'): void {
+    if (item.tipo === 'tematico' && item.tematicoTipo) {
+      const ext = formato === 'pdf' ? 'pdf' : 'xlsx';
+      const key = `${item.tematicoTipo}-${formato}`;
+      this.descargando.set(key);
+      this.extras.descargarReporteTematico(item.tematicoTipo, formato, this.filtrosActuales())
+        .subscribe({
+          next: (blob) => this.guardarBlob(blob, `reporte-${item.tematicoTipo}.${ext}`),
+          error: () => this.snackBar.open(
+            `No se pudo descargar el ${formato.toUpperCase()}.`, 'OK', { duration: 3500 },
+          ),
+          complete: () => this.descargando.set(null),
+        });
       return;
     }
-    const key = `${item.tipo}-${id}-xlsx`;
+
+    const id = this.idCatalogo(item.tipo);
+    if (!id) {
+      this.snackBar.open(
+        'Selecciona un registro en los filtros superiores.', 'OK', { duration: 3500 },
+      );
+      return;
+    }
+    const ext = formato === 'pdf' ? 'pdf' : 'xlsx';
+    const key = `${item.tipo}-${id}-${formato}`;
     this.descargando.set(key);
-    const obs = item.tipo === 'grupo'
-      ? this.extras.descargarReporteGrupoExcel(id)
-      : item.tipo === 'materia'
-        ? this.extras.descargarReporteMateriaExcel(id)
-        : this.extras.descargarReporteEstudianteExcel(id);
+    const obs = formato === 'pdf'
+      ? (item.tipo === 'grupo' ? this.extras.descargarReporteGrupoPDF(id)
+        : item.tipo === 'materia' ? this.extras.descargarReporteMateriaPDF(id)
+        : this.extras.descargarReporteEstudiantePDF(id))
+      : (item.tipo === 'grupo' ? this.extras.descargarReporteGrupoExcel(id)
+        : item.tipo === 'materia' ? this.extras.descargarReporteMateriaExcel(id)
+        : this.extras.descargarReporteEstudianteExcel(id));
     obs.subscribe({
-      next: (blob) => this.guardarBlob(blob, `reporte-${item.tipo}-${id}.xlsx`),
-      error: () => this.snackBar.open('No se pudo descargar el Excel.', 'OK', { duration: 3500 }),
+      next: (blob) => this.guardarBlob(blob, `reporte-${item.tipo}-${id}.${ext}`),
+      error: () => this.snackBar.open(
+        `No se pudo descargar el ${formato.toUpperCase()}.`, 'OK', { duration: 3500 },
+      ),
       complete: () => this.descargando.set(null),
     });
   }
@@ -189,7 +217,7 @@ export class Reportes implements OnInit {
     if (item.tipo === 'grupo' && !this.filtroGrupoId) return 'Elige un grupo arriba';
     if (item.tipo === 'materia' && !this.filtroMateriaId) return 'Elige una materia arriba';
     if (item.tipo === 'estudiante' && !this.filtroEstudianteId) return 'Elige un estudiante arriba';
-    if (item.tipo === 'proximamente') return 'Próximamente';
+    if (item.tipo === 'tematico') return item.descripcion || 'Aplica los filtros y descarga.';
     return 'Listo para descargar';
   }
 

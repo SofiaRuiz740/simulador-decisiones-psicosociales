@@ -426,3 +426,214 @@ def eventos_actividad_docente(user: Usuario, limit: int = 10) -> list[dict]:
 
     eventos.sort(key=lambda e: e['fecha'], reverse=True)
     return eventos[:limit]
+
+
+# =============================================================================
+# Reportes temáticos (P1) — vista parametrizada para 7 informes
+# =============================================================================
+
+REPORTES_TEMATICOS = {
+    'participacion': 'Participación',
+    'desempeno': 'Desempeño',
+    'respuestas': 'Respuestas',
+    'tiempos': 'Tiempos',
+    'notas': 'Notas',
+    'retroalimentaciones': 'Retroalimentaciones',
+    'feedback': 'Feedback pendiente',
+}
+
+
+def _format_tiempo(segundos: int) -> str:
+    if not segundos:
+        return '—'
+    m, s = divmod(int(segundos), 60)
+    h, m = divmod(m, 60)
+    if h:
+        return f'{h}h {m}m'
+    return f'{m}m {s}s'
+
+
+def _data_participacion(resultados_qs) -> dict:
+    filas = []
+    for r in resultados_qs:
+        part = r.participacion
+        practica = part.practica
+        total_preg = sum(
+            len(p.respuestas.all())
+            for esc in practica.caso.escenarios.all()
+            for p in esc.preguntas.all()
+        ) or (r.correctas + r.incorrectas + r.no_respondidas)
+        respondidas = r.correctas + r.incorrectas
+        pct = round((respondidas / total_preg) * 100, 1) if total_preg else 0
+        filas.append([
+            part.estudiante.nombre_completo,
+            part.estudiante.correo,
+            practica.nombre,
+            part.get_estado_display(),
+            respondidas,
+            r.no_respondidas,
+            f'{pct}%',
+        ])
+    return {
+        'titulo': 'Reporte de Participación',
+        'subtitulo': 'Cobertura de respuestas por estudiante y práctica.',
+        'columnas': ['Estudiante', 'Correo', 'Práctica', 'Estado', 'Respondidas',
+                     'Sin responder', '% Cobertura'],
+        'filas': filas,
+    }
+
+
+def _data_desempeno(resultados_qs) -> dict:
+    resultados = list(resultados_qs)
+    por_criterio = _desempeno_por_criterio(resultados)
+    filas = []
+    for c in por_criterio:
+        prom = c['porcentaje_promedio']
+        cualitativo = (
+            'Sobresaliente' if prom >= 90
+            else 'Logrado' if prom >= 70
+            else 'En desarrollo' if prom >= 50
+            else 'Incipiente'
+        )
+        filas.append([c['nombre'], f'{prom}%', cualitativo])
+    return {
+        'titulo': 'Reporte de Desempeño',
+        'subtitulo': f'Promedio por criterio de rúbrica sobre {len(resultados)} resultado(s).',
+        'columnas': ['Criterio', '% Promedio', 'Calificación cualitativa'],
+        'filas': filas,
+    }
+
+
+def _data_respuestas(resultados_qs) -> dict:
+    filas = []
+    for r in resultados_qs:
+        total = r.correctas + r.incorrectas + r.no_respondidas
+        filas.append([
+            r.participacion.estudiante.nombre_completo,
+            r.participacion.practica.nombre,
+            r.correctas, r.incorrectas, r.no_respondidas, total,
+        ])
+    return {
+        'titulo': 'Reporte de Respuestas',
+        'subtitulo': 'Conteo de respuestas correctas, incorrectas y sin responder.',
+        'columnas': ['Estudiante', 'Práctica', 'Correctas', 'Incorrectas', 'Sin resp.', 'Total'],
+        'filas': filas,
+    }
+
+
+def _data_tiempos(resultados_qs) -> dict:
+    filas = []
+    for r in resultados_qs:
+        part = r.participacion
+        max_min = part.practica.tiempo_max_min or 0
+        max_seg = max_min * 60
+        aprov = f'{round((part.tiempo_usado_seg / max_seg) * 100, 1)}%' if max_seg else '—'
+        filas.append([
+            part.estudiante.nombre_completo,
+            part.practica.nombre,
+            _format_tiempo(part.tiempo_usado_seg),
+            max_min or '—',
+            aprov,
+        ])
+    return {
+        'titulo': 'Reporte de Tiempos',
+        'subtitulo': 'Duración de la participación frente al tiempo máximo permitido.',
+        'columnas': ['Estudiante', 'Práctica', 'Tiempo usado', 'Tiempo máx (min)', 'Aprovechamiento'],
+        'filas': filas,
+    }
+
+
+def _data_notas(resultados_qs) -> dict:
+    resultados = list(resultados_qs)
+    filas = []
+    for r in resultados:
+        filas.append([
+            r.participacion.estudiante.nombre_completo,
+            r.participacion.practica.nombre,
+            float(r.nota_final),
+            'Sí' if r.aprobado else 'No',
+            r.fecha_calculo.strftime('%Y-%m-%d %H:%M'),
+        ])
+    dist = _distribucion_notas(resultados)
+    notas = [float(r.nota_final) for r in resultados]
+    promedio = round(sum(notas) / len(notas), 2) if notas else 0
+    return {
+        'titulo': 'Reporte de Notas',
+        'subtitulo': (
+            f'{len(resultados)} resultado(s) · promedio {promedio} · '
+            + ' · '.join(f'{b["rango"]}: {b["cantidad"]}' for b in dist)
+        ),
+        'columnas': ['Estudiante', 'Práctica', 'Nota final', 'Aprobado', 'Fecha'],
+        'filas': filas,
+    }
+
+
+def _data_retroalimentaciones(resultados_qs) -> dict:
+    qs = resultados_qs.exclude(feedback_docente='').exclude(feedback_docente__isnull=True)
+    filas = []
+    for r in qs:
+        filas.append([
+            r.participacion.estudiante.nombre_completo,
+            r.participacion.practica.nombre,
+            float(r.nota_final),
+            (r.feedback_docente or '')[:600],
+        ])
+    return {
+        'titulo': 'Reporte de Retroalimentaciones',
+        'subtitulo': f'{qs.count()} resultado(s) con feedback entregado por el docente.',
+        'columnas': ['Estudiante', 'Práctica', 'Nota', 'Feedback del docente'],
+        'filas': filas,
+    }
+
+
+def _data_feedback(resultados_qs) -> dict:
+    qs = _sin_feedback_qs(resultados_qs).order_by('-fecha_calculo')
+    filas = []
+    for r in qs:
+        filas.append([
+            r.participacion.estudiante.nombre_completo,
+            r.participacion.estudiante.correo,
+            r.participacion.practica.nombre,
+            float(r.nota_final),
+            r.fecha_calculo.strftime('%Y-%m-%d %H:%M'),
+        ])
+    return {
+        'titulo': 'Reporte de Feedback pendiente',
+        'subtitulo': f'{qs.count()} resultado(s) sin feedback del docente.',
+        'columnas': ['Estudiante', 'Correo', 'Práctica', 'Nota', 'Fecha de cálculo'],
+        'filas': filas,
+    }
+
+
+_TEMATICO_BUILDERS = {
+    'participacion': _data_participacion,
+    'desempeno': _data_desempeno,
+    'respuestas': _data_respuestas,
+    'tiempos': _data_tiempos,
+    'notas': _data_notas,
+    'retroalimentaciones': _data_retroalimentaciones,
+    'feedback': _data_feedback,
+}
+
+
+def datos_reporte_tematico(
+    tipo: str,
+    user: Usuario,
+    *,
+    desde: date | None = None,
+    hasta: date | None = None,
+    materia_id: int | None = None,
+    grupo_id: int | None = None,
+    estudiante_id: int | None = None,
+) -> dict | None:
+    """Devuelve `{titulo, subtitulo, columnas, filas}` o `None` si el tipo no existe."""
+    builder = _TEMATICO_BUILDERS.get(tipo)
+    if builder is None:
+        return None
+    qs = filtrar_resultados(
+        user, desde=desde, hasta=hasta,
+        materia_id=materia_id, grupo_id=grupo_id, estudiante_id=estudiante_id,
+    ).prefetch_related(
+        'participacion__practica__caso__escenarios__preguntas__respuestas',
+    )
+    return builder(qs)

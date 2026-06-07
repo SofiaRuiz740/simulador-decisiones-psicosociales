@@ -69,7 +69,11 @@
                     <td>{{ f.intentos }}</td>
                     <td>{{ f.respondidas }}</td>
                     <td class="col-actions">
-                      <button type="button" class="btn-ghost" disabled title="Detalle en próxima iteración">Detalle</button>
+                      <button type="button" class="btn-ghost"
+                              (click)="verDetalle(f)"
+                              title="Ver caso de esta participación">
+                        Detalle
+                      </button>
                     </td>
                   </tr>
                 }
@@ -82,23 +86,88 @@
   </div>
 
   <div class="tab-panel" [class.active]="tab() === 'simulacion'">
-    <div class="sim-preview sim-preview--placeholder" aria-label="Vista previa de simulación">
-      <div class="sim-silhouette"></div>
-      <div class="sim-preview__scene">
-        <span class="sim-preview__badge">Vista previa docente</span>
-        <div class="sim-preview__dialog">
-          <p>Desde aquí podrás previsualizar el flujo que verá el estudiante durante la simulación.</p>
-        </div>
-        <p class="sim-preview__question">Selecciona una participación en curso para cargar escenarios reales del caso.</p>
-        <button type="button" class="sim-option" disabled>Opción de ejemplo (deshabilitada)</button>
-        <button type="button" class="sim-option" disabled>Otra opción (deshabilitada)</button>
-        <div class="sim-preview__footer">
-          <div class="sim-timer">—:—</div>
-          <div class="sim-progress"><div class="sim-progress__fill" style="width: 0%"></div></div>
-          <span>—/—</span>
-        </div>
+    @if (!seleccionada()) {
+      <div class="empty-state-mockup">
+        <strong>Sin participación seleccionada</strong>
+        Ve a la pestaña <em>Seguimiento docente</em> y pulsa <em>Detalle</em>
+        en una fila para previsualizar el caso real que está respondiendo el
+        estudiante.
       </div>
-    </div>
-    <p class="sim-preview-note">La vista previa interactiva se conectará cuando selecciones una fila en seguimiento.</p>
+    } @else if (cargandoCaso()) {
+      <mat-progress-bar mode="indeterminate" />
+    } @else if (!casoSeleccionado()) {
+      <div class="empty-state-mockup">
+        <strong>No se pudo cargar el caso</strong>
+        Verifica que el caso siga existiendo y que tengas permiso para verlo.
+        <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">Volver</button>
+      </div>
+    } @else if (casoSeleccionado(); as c) {
+      <div class="surface preview-real">
+        <header class="preview-real__head">
+          <div>
+            <h3>Vista previa del caso: {{ c.nombre }}</h3>
+            @if (resumenSeleccion(); as r) {
+              <p class="muted">
+                {{ r.estudiante }} · {{ r.practica }} · {{ r.escenarios }} escenario(s) · {{ r.preguntas }} pregunta(s).
+                Solo lectura: ningún cambio aquí afecta la participación del estudiante.
+              </p>
+            }
+          </div>
+          <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">
+            Cerrar vista
+          </button>
+        </header>
+
+        @if (c.contexto_historia) {
+          <div class="preview-real__contexto">
+            <strong>Contexto</strong>
+            <p>{{ c.contexto_historia }}</p>
+          </div>
+        }
+
+        @if (c.escenarios.length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            Este caso aún no tiene escenarios cargados.
+          </div>
+        }
+
+        @for (esc of c.escenarios; track esc.id) {
+          <article class="preview-real__esc">
+            <header>
+              <span class="badge">Escenario {{ esc.orden }}</span>
+              <h4>{{ esc.titulo }}</h4>
+            </header>
+            @if (esc.narrativa) {
+              <p class="preview-real__narrativa">{{ esc.narrativa }}</p>
+            }
+
+            @if (recursosVisibles(esc.recursos_multimedia).length) {
+              <div class="preview-real__medios">
+                @for (r of recursosVisibles(esc.recursos_multimedia); track $index) {
+                  <span class="preview-real__media-pill">
+                    {{ r.tipo === 'imagen' ? '🖼️' : r.tipo === 'audio' ? '🔊' : '🎬' }}
+                    {{ r.titulo || r.url }}
+                  </span>
+                }
+              </div>
+            }
+
+            @for (preg of esc.preguntas; track preg.id; let pi = $index) {
+              <section class="preview-real__pregunta">
+                <p><strong>P{{ pi + 1 }}.</strong> {{ preg.enunciado }}</p>
+                <ul class="preview-real__respuestas">
+                  @for (resp of preg.respuestas; track resp.id) {
+                    <li [class.correcta]="resp.es_correcta">
+                      {{ resp.texto }}
+                      @if (resp.es_correcta) { <span class="check">✓ correcta</span> }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </article>
+        }
+      </div>
+    }
   </div>
 </section>

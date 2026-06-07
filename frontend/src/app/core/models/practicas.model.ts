@@ -173,6 +173,7 @@ export interface SeguimientoParticipacion {
   estudiante_correo: string;
   practica_id: number;
   practica_nombre: string;
+  caso_id: number;
   caso_nombre: string;
   estado: EstadoParticipacion | string;
   estado_display: string;

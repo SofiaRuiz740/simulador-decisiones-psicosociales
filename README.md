@@ -164,6 +164,7 @@ Toda la documentación técnica vive en [`docs/`](./docs):
 - [Plan de desarrollo](./docs/08-plan-desarrollo.md)
 - [Despliegue](./docs/09-despliegue.md)
 - [Roadmap Unity](./docs/10-unity-roadmap.md)
+- **[Guía de entrega final](./docs/11-entrega-final.md)** — operación, reportes, importación, reglas activas y checklist pre-entrega.
 
 ---
 

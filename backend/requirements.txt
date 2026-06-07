@@ -34,9 +34,10 @@ openpyxl>=3.1,<4.0
 reportlab>=4.0,<5.0
 
 # =========================================================
-# Extracción de texto desde PDF (importación de casos)
+# Extracción de texto desde PDF y DOCX (importación de casos)
 # =========================================================
 pypdf>=4.0,<6.0
+python-docx>=1.1,<2.0
 
 # =========================================================
 # IA generativa (proveedor OpenAI por defecto; opcional Anthropic)

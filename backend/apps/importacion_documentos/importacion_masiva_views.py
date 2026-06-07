@@ -13,12 +13,15 @@ from apps.academico.importacion import (
     importar_estudiantes,
     importar_grupos,
 )
+from apps.casos.models import Caso, Rubrica
 from apps.importacion_documentos.plantillas import (
     generar_caso_ejemplo,
     generar_guia_importacion,
     generar_plantilla_caso,
     generar_plantilla_rubrica,
+    parsear_plantilla_rubrica,
 )
+from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
 
 from .serializers import ResultadoImportacionSerializer
@@ -105,3 +108,50 @@ class ImportacionMasivaViewSet(viewsets.ViewSet):
         )
         resp['Content-Disposition'] = 'attachment; filename="caso-ejemplo.docx"'
         return resp
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path=r'importar-rubrica/(?P<caso_id>\d+)',
+    )
+    def importar_rubrica(self, request, caso_id=None):
+        """Importa criterios y niveles de una rúbrica desde la plantilla XLSX
+        y los asocia a un caso. Si el caso ya tiene rúbrica se SOBREESCRIBEN
+        los criterios; los demás campos (escala, nota_aprobacion) se conservan.
+        """
+        archivo = self._archivo(request)
+
+        # Validar acceso al caso (mismo docente o admin).
+        try:
+            caso = Caso.objects.get(pk=caso_id)
+        except Caso.DoesNotExist:
+            raise ValidationError({'caso': 'Caso no encontrado.'})
+        if request.user.rol == Usuario.Rol.DOCENTE and caso.docente_creador_id != request.user.id:
+            raise ValidationError({'caso': 'Este caso pertenece a otro docente.'})
+
+        resultado = parsear_plantilla_rubrica(archivo)
+        criterios = resultado['criterios']
+        if not criterios and resultado['errores']:
+            return Response(
+                {
+                    'errores': resultado['errores'],
+                    'advertencias': resultado['advertencias'],
+                    'detail': 'No se importó ningún criterio.',
+                },
+                status=400,
+            )
+
+        rubrica, creada = Rubrica.objects.get_or_create(
+            caso=caso, defaults={'criterios': criterios},
+        )
+        if not creada:
+            rubrica.criterios = criterios
+            rubrica.save(update_fields=['criterios', 'fecha_actualizacion'])
+
+        return Response({
+            'caso_id': caso.id,
+            'criterios_importados': len(criterios),
+            'errores': resultado['errores'],
+            'advertencias': resultado['advertencias'],
+            'rubrica_creada': creada,
+        })

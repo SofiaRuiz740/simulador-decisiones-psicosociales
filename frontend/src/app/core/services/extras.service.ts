@@ -117,6 +117,14 @@ export interface ResultadoImportacion {
   advertencias: { fila: number | null; mensaje: string }[];
 }
 
+export interface ResultadoImportacionRubrica {
+  caso_id: number;
+  criterios_importados: number;
+  rubrica_creada: boolean;
+  errores: { fila: number | null; mensaje: string }[];
+  advertencias: { fila: number | null; mensaje: string }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ExtrasService {
   private readonly http = inject(HttpClient);
@@ -255,6 +263,15 @@ export class ExtrasService {
   }
   descargarReporteEstudianteExcel(estudianteId: number) {
     return this.http.get(`${this.api}/reportes/estudiante/${estudianteId}/excel/`, { responseType: 'blob' });
+  }
+
+  importarRubrica(casoId: number, file: File) {
+    const fd = new FormData();
+    fd.append('archivo', file);
+    return this.http.post<ResultadoImportacionRubrica>(
+      `${this.api}/importacion/masiva/importar-rubrica/${casoId}/`,
+      fd,
+    );
   }
 
   /**

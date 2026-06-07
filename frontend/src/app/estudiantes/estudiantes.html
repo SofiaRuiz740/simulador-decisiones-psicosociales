@@ -19,7 +19,7 @@
         <div class="metric__label">Inactivos</div>
       </article>
       <article class="metric metric--teal">
-        <div class="metric__value">—</div>
+        <div class="metric__value">{{ sinGrupo() }}</div>
         <div class="metric__label">Sin grupo</div>
       </article>
     </section>
@@ -73,15 +73,15 @@
                   <td><strong>{{ e.nombre_completo }}</strong></td>
                   <td>{{ e.correo }}</td>
                   <td>{{ e.id }}</td>
-                  <td>—</td>
-                  <td>—</td>
+                  <td>{{ e.materia_display?.trim() || '—' }}</td>
+                  <td>{{ e.grupos_display?.trim() || '—' }}</td>
                   <td>
                     <span class="badge" [class]="e.activo ? 'badge badge--activo' : 'badge badge--inactivo'">
                       {{ e.activo ? 'Activo' : 'Inactivo' }}
                     </span>
                   </td>
-                  <td>—</td>
-                  <td>—</td>
+                  <td>{{ e.ultima_practica?.nombre || '—' }}</td>
+                  <td>{{ e.ultima_nota != null ? e.ultima_nota : '—' }}</td>
                   <td class="col-actions">
                     <div class="actions actions--end">
                       <button type="button" class="btn-ghost" (click)="editar(e)">Editar</button>

@@ -125,7 +125,12 @@
         </div>
         <div class="form-group">
           <label for="casoMateria">Materia</label>
-          <input id="casoMateria" disabled placeholder="—" title="Sin API de materias vinculadas" />
+          <select id="casoMateria" formControlName="materia">
+            <option [ngValue]="null">— Sin materia —</option>
+            @for (m of materias(); track m.id) {
+              <option [ngValue]="m.id">{{ m.nombre }}</option>
+            }
+          </select>
         </div>
       </form>
       <div class="form-actions">

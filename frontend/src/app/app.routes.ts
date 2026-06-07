@@ -117,7 +117,7 @@ export const routes: Routes = [
             (m) => m.PARTICIPACIONES_ROUTES,
           ),
         canActivate: [roleGuard],
-        data: { roles: [Rol.Docente, Rol.Estudiante] },
+        data: { roles: [Rol.Docente, Rol.Admin] },
       },
       {
         path: 'resultados',

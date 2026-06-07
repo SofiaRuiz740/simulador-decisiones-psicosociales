@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
 
-import { AdminMetricas, ExtrasService } from '../core/services/extras.service';
+import { AdminMetricas, EventoActividad, ExtrasService } from '../core/services/extras.service';
 
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, RouterLink, MatProgressBarModule],
+  imports: [CommonModule, DatePipe, RouterLink, MatProgressBarModule],
   template: `
     <section class="module page">
       <header class="hero-glass">
@@ -41,7 +41,30 @@ import { AdminMetricas, ExtrasService } from '../core/services/extras.service';
             <h2>Actividad reciente</h2>
             <a routerLink="/admin/actividad" class="btn-ghost">Ver todo</a>
           </div>
-          <div class="empty-state-mockup">Sin actividad reciente registrada.</div>
+          @if (actividad().length === 0) {
+            <div class="empty-state-mockup">Sin actividad reciente registrada.</div>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Evento</th>
+                    <th>Detalle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of actividad(); track e.fecha + e.tipo + e.referencia_id) {
+                    <tr>
+                      <td>{{ e.fecha | date:'short' }}</td>
+                      <td>{{ e.tipo_display }}</td>
+                      <td>{{ e.titulo }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </section>
 
         <section class="panel">
@@ -141,6 +164,7 @@ export class Admin implements OnInit {
 
   readonly loading = signal(true);
   readonly metricas = signal<AdminMetricas | null>(null);
+  readonly actividad = signal<EventoActividad[]>([]);
 
   readonly practicasActivas = computed(() => {
     const m = this.metricas();
@@ -153,6 +177,9 @@ export class Admin implements OnInit {
     this.servicio.adminMetricas().subscribe({
       next: (m) => { this.metricas.set(m); this.loading.set(false); },
       error: () => this.loading.set(false),
+    });
+    this.servicio.adminActividad(8).subscribe({
+      next: (rows) => this.actividad.set(rows),
     });
   }
 

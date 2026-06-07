@@ -26,7 +26,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const rol = auth.rol();
   if (rol === Rol.Admin) return router.createUrlTree(['/admin']);
   if (rol === Rol.Docente) return router.createUrlTree(['/docente']);
-  if (rol === Rol.Estudiante) return router.createUrlTree(['/estudiante']);
+  if (rol === Rol.Estudiante) return router.createUrlTree(['/panel-estudiante']);
 
   return router.createUrlTree(['/auth']);
 };

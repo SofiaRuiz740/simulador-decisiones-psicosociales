@@ -46,6 +46,54 @@
   padding: 1.25rem 0;
 }
 
+.chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.chart-bar-row {
+  display: grid;
+  grid-template-columns: minmax(5rem, 28%) 1fr 2.5rem;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.chart-bar-label {
+  color: var(--app-slate);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-bar-track {
+  height: 0.55rem;
+  background: var(--app-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 2px;
+}
+
+.chart-bar-fill--accent {
+  background: var(--app-accent, #5c6bc0);
+}
+
+.chart-bar-fill--teal {
+  background: var(--app-teal, #00897b);
+}
+
+.chart-bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .card__header {
   margin-bottom: 0.5rem;
 }

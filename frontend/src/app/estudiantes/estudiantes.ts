@@ -33,6 +33,7 @@ export class Estudiantes implements OnInit {
   readonly total = signal(0);
   readonly activos = computed(() => this.estudiantes().filter((e) => e.activo).length);
   readonly inactivos = computed(() => this.estudiantes().filter((e) => !e.activo).length);
+  readonly sinGrupo = computed(() => this.estudiantes().filter((e) => e.sin_grupo).length);
 
   filtroTexto = '';
   filtroEstado: '' | 'activo' | 'inactivo' = '';

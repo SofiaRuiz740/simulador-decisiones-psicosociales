@@ -5,6 +5,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Resultado, DetallePreguntaResultado } from '../core/models/practicas.model';
+import { Rol } from '../core/models/usuario.model';
+import { AuthService } from '../core/auth/auth.service';
 import { SimulacionService } from '../core/services/simulacion.service';
 
 @Component({
@@ -18,7 +20,28 @@ import { SimulacionService } from '../core/services/simulacion.service';
 })
 export class Resultados implements OnInit {
   private readonly servicio = inject(SimulacionService);
+  private readonly auth = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
+
+  readonly esDocente = computed(() =>
+    this.auth.hasRol(Rol.Docente, Rol.Admin),
+  );
+
+  readonly tabs = computed(() => {
+    const base = [
+      { id: 'lista' as const, label: 'Resultados' },
+      { id: 'detalle' as const, label: 'Detalle respuestas' },
+      { id: 'retro' as const, label: 'Retroalimentación final' },
+    ];
+    if (this.esDocente()) {
+      return [
+        base[0],
+        { id: 'feedback' as const, label: 'Feedback docente' },
+        ...base.slice(1),
+      ];
+    }
+    return base;
+  });
 
   readonly loading = signal(true);
   readonly resultados = signal<Resultado[]>([]);
@@ -27,13 +50,6 @@ export class Resultados implements OnInit {
   readonly seleccionado = signal<Resultado | null>(null);
   readonly detalleResultado = signal<Resultado | null>(null);
   readonly retroResultado = signal<Resultado | null>(null);
-
-  readonly tabs = [
-    { id: 'lista' as const, label: 'Resultados' },
-    { id: 'feedback' as const, label: 'Feedback docente' },
-    { id: 'detalle' as const, label: 'Detalle respuestas' },
-    { id: 'retro' as const, label: 'Retroalimentación final' },
-  ];
 
   // Filtros
   filtroTexto = '';
@@ -119,6 +135,13 @@ export class Resultados implements OnInit {
   puntajeLabel(r: Resultado): string {
     if (!r.peso_total) return '—';
     return `${r.peso_obtenido}/${r.peso_total}`;
+  }
+
+  formatoTiempo(seg: number): string {
+    if (!seg) return '—';
+    const m = Math.floor(seg / 60);
+    const s = seg % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
   }
 
   esAcertada(d: DetallePreguntaResultado): boolean {

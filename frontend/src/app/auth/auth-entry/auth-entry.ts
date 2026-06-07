@@ -9,7 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
 
@@ -21,7 +21,7 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
 
 @Component({
   selector: 'app-auth-entry',
-  imports: [CommonModule, ReactiveFormsModule, MatProgressBarModule],
+  imports: [CommonModule, ReactiveFormsModule, MatProgressBarModule, RouterLink],
   templateUrl: './auth-entry.html',
   styleUrl: './auth-entry.scss',
 })

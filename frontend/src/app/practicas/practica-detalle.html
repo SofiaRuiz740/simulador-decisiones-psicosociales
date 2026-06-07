@@ -59,8 +59,8 @@
       <section class="panel">
         <div class="panel__toolbar">
           <div class="toolbar">
-            <span class="toolbar__hint">Selecciona estudiantes o grupos para autorizar</span>
-            <button type="button" class="btn-primary" (click)="autorizar()">Autorizar seleccionados</button>
+            <span class="toolbar__hint">Selecciona estudiantes o grupos. Al autorizar se envía la invitación desde tu Gmail.</span>
+            <button type="button" class="btn-primary" (click)="autorizar()">Autorizar y enviar correo</button>
           </div>
         </div>
         <div class="panel__body">
@@ -121,6 +121,7 @@
                     <th>Estudiante</th>
                     <th>Correo</th>
                     <th>Código</th>
+                    <th>Invitación</th>
                     <th class="col-actions"></th>
                   </tr>
                 </thead>
@@ -130,8 +131,21 @@
                       <td><strong>{{ a.estudiante_nombre }}</strong></td>
                       <td>{{ a.estudiante_correo }}</td>
                       <td><code>{{ a.codigo_acceso }}</code></td>
+                      <td>
+                        @if (a.notificado) {
+                          <span class="badge badge--activo">Enviada</span>
+                        } @else {
+                          <span class="badge badge--pendiente">No enviada</span>
+                        }
+                      </td>
                       <td class="col-actions">
                         <button type="button" class="btn-ghost" (click)="copiar(a.codigo_acceso)">Copiar</button>
+                        <button type="button" class="btn-ghost" (click)="reenviarInvitacion(a.id)">
+                          {{ a.notificado ? 'Reenviar' : 'Enviar' }}
+                        </button>
+                        @if (a.reintento_autorizado) {
+                          <span class="muted">Reintento pendiente</span>
+                        }
                       </td>
                     </tr>
                   }
@@ -145,12 +159,53 @@
 
     <!-- Seguimiento -->
     <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
-      <div class="surface tab-empty">
-        <div class="empty-state-mockup">
-          <strong>Seguimiento en tiempo real</strong>
-          El progreso de participaciones aparecerá aquí cuando el backend lo exponga.
+      <section class="panel">
+        <div class="panel__body">
+          @if (seguimiento().length === 0) {
+            <div class="empty-state-mockup">
+              <strong>Sin participaciones aún</strong>
+              Autoriza estudiantes y espera a que inicien la simulación.
+            </div>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Estado</th>
+                    <th>Progreso</th>
+                    <th>Respondidas</th>
+                    <th>Tiempo</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of seguimiento(); track r.autorizacion_id) {
+                    <tr>
+                      <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                      <td><span class="badge" [class]="seguimientoBadge(r.estado)">{{ r.estado_display }}</span></td>
+                      <td>{{ r.progreso_pct }}%</td>
+                      <td>{{ r.respondidas }}/{{ r.total_preguntas }}</td>
+                      <td>{{ r.tiempo_usado_seg }}s</td>
+                      <td class="col-actions">
+                        @if (puedeAutorizarReintento(r.estado)) {
+                          @if (reintentoAutorizado(r.autorizacion_id)) {
+                            <span class="muted">Reintento pendiente</span>
+                          } @else {
+                            <button type="button" class="btn-ghost" (click)="autorizarReintento(r.autorizacion_id)">
+                              Autorizar reintento
+                            </button>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
-      </div>
+      </section>
     </div>
 
   }

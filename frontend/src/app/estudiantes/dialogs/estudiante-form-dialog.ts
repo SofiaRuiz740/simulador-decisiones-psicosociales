@@ -41,7 +41,7 @@ interface DialogData {
         </div>
         <div class="form-group">
           <label>Identificación</label>
-          <input disabled placeholder="—" title="Sin API de identificación" />
+          <input formControlName="identificacion" maxlength="50" placeholder="Opcional" />
         </div>
         <div class="form-group">
           <label>Grupo</label>
@@ -86,6 +86,7 @@ export class EstudianteFormDialog {
       correo: [data.estudiante?.correo ?? '', [Validators.required, Validators.email]],
       first_name: [data.estudiante?.first_name ?? '', [Validators.required]],
       last_name: [data.estudiante?.last_name ?? '', [Validators.required]],
+      identificacion: [data.estudiante?.identificacion ?? ''],
       activo: [data.estudiante?.activo ?? true],
     });
     if (this.esEdicion) this.form.controls.correo.disable();
@@ -105,12 +106,14 @@ export class EstudianteFormDialog {
       ? this.servicio.actualizarEstudiante(this.data.estudiante!.id, {
           first_name: payload.first_name,
           last_name: payload.last_name,
+          identificacion: payload.identificacion.trim(),
           activo: payload.activo,
         })
       : this.servicio.crearEstudiante({
           correo: payload.correo,
           first_name: payload.first_name,
           last_name: payload.last_name,
+          identificacion: payload.identificacion.trim(),
         });
 
     obs$.subscribe({

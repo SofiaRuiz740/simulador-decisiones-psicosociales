@@ -48,3 +48,24 @@ class ParticipacionConCasoSerializer(ParticipacionSerializer):
 class ResponderSerializer(serializers.Serializer):
     pregunta_id = serializers.IntegerField(min_value=1)
     respuesta_id = serializers.IntegerField(min_value=1)
+
+
+class ParticipacionSeguimientoSerializer(serializers.Serializer):
+    """Fila de seguimiento docente (autorización + participación opcional)."""
+
+    id = serializers.IntegerField(allow_null=True)
+    autorizacion_id = serializers.IntegerField()
+    estudiante_id = serializers.IntegerField()
+    estudiante_nombre = serializers.CharField()
+    estudiante_correo = serializers.EmailField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    caso_nombre = serializers.CharField()
+    estado = serializers.CharField()
+    estado_display = serializers.CharField()
+    progreso_pct = serializers.IntegerField()
+    total_preguntas = serializers.IntegerField()
+    respondidas = serializers.IntegerField()
+    tiempo_usado_seg = serializers.IntegerField()
+    tiempo_restante_seg = serializers.IntegerField()
+    intentos = serializers.IntegerField()

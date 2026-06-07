@@ -5,7 +5,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
-import { ArchivoFuente, ExtrasService } from '../core/services/extras.service';
+import {
+  ArchivoFuente,
+  ExtrasService,
+  ResultadoImportacion,
+} from '../core/services/extras.service';
 
 @Component({
   selector: 'app-importacion-documentos',
@@ -26,6 +30,8 @@ export class ImportacionDocumentos {
   readonly loading = signal(false);
   readonly archivo = signal<ArchivoFuente | null>(null);
   readonly tab = signal('caso');
+  readonly resultadoEstudiantes = signal<ResultadoImportacion | null>(null);
+  readonly resultadoGrupos = signal<ResultadoImportacion | null>(null);
   nombreCasoVal = '';
   areaCasoVal = '';
 
@@ -37,12 +43,12 @@ export class ImportacionDocumentos {
   ];
 
   readonly plantillas = [
-    { titulo: 'Plantilla caso', formato: 'DOCX' },
-    { titulo: 'Plantilla estudiantes', formato: 'Excel' },
-    { titulo: 'Plantilla grupos', formato: 'Excel' },
-    { titulo: 'Plantilla rúbrica', formato: 'Excel' },
-    { titulo: 'Guía de importación', formato: 'PDF' },
-    { titulo: 'Caso ejemplo', formato: 'DOCX' },
+    { titulo: 'Plantilla estudiantes', formato: 'Excel', tipo: 'estudiantes' as const },
+    { titulo: 'Plantilla grupos', formato: 'Excel', tipo: 'grupos' as const },
+    { titulo: 'Plantilla caso', formato: 'DOCX', tipo: 'caso' as const },
+    { titulo: 'Plantilla rúbrica', formato: 'Excel', tipo: 'rubrica' as const },
+    { titulo: 'Guía de importación', formato: 'PDF', tipo: 'guia' as const },
+    { titulo: 'Caso ejemplo', formato: 'DOCX', tipo: 'ejemplo' as const },
   ];
 
   readonly pasoActual = computed(() => {
@@ -74,6 +80,52 @@ export class ImportacionDocumentos {
         this.snackBar.open(err?.error?.archivo?.[0] || 'No se pudo subir.', 'OK', { duration: 4000 });
       },
     });
+  }
+
+  seleccionarEstudiantes(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.loading.set(true);
+    this.resultadoEstudiantes.set(null);
+    this.servicio.importarEstudiantes(file).subscribe({
+      next: (res) => {
+        this.resultadoEstudiantes.set(res);
+        this.loading.set(false);
+        const msg = res.errores.length
+          ? `Importación parcial: ${res.filas_exitosas}/${res.filas_procesadas} filas.`
+          : `Importados ${res.filas_exitosas} estudiantes correctamente.`;
+        this.snackBar.open(msg, 'OK', { duration: 4000 });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const msg = err?.error?.archivo?.[0] || 'No se pudo importar el archivo.';
+        this.snackBar.open(msg, 'OK', { duration: 4000 });
+      },
+    });
+    (ev.target as HTMLInputElement).value = '';
+  }
+
+  seleccionarGrupos(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.loading.set(true);
+    this.resultadoGrupos.set(null);
+    this.servicio.importarGrupos(file).subscribe({
+      next: (res) => {
+        this.resultadoGrupos.set(res);
+        this.loading.set(false);
+        const msg = res.errores.length
+          ? `Importación parcial: ${res.filas_exitosas}/${res.filas_procesadas} filas.`
+          : `Importados ${res.filas_exitosas} grupos correctamente.`;
+        this.snackBar.open(msg, 'OK', { duration: 4000 });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const msg = err?.error?.archivo?.[0] || 'No se pudo importar el archivo.';
+        this.snackBar.open(msg, 'OK', { duration: 4000 });
+      },
+    });
+    (ev.target as HTMLInputElement).value = '';
   }
 
   procesar() {
@@ -110,11 +162,33 @@ export class ImportacionDocumentos {
     });
   }
 
-  avisoImportacion(tipo: string): void {
-    this.snackBar.open(`Importación de ${tipo} disponible próximamente.`, 'OK', { duration: 3500 });
-  }
-
-  descargarPlantilla(nombre: string): void {
-    this.snackBar.open(`Descarga de «${nombre}» disponible próximamente.`, 'OK', { duration: 3000 });
+  descargarPlantilla(p: { titulo: string; tipo: 'estudiantes' | 'grupos' | 'caso' | 'rubrica' | 'guia' | 'ejemplo' }): void {
+    const handlers: Record<string, () => void> = {
+      estudiantes: () => this.servicio.descargarPlantillaEstudiantes().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-estudiantes.xlsx'),
+        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
+      }),
+      grupos: () => this.servicio.descargarPlantillaGrupos().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-grupos.xlsx'),
+        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
+      }),
+      caso: () => this.servicio.descargarPlantillaCaso().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-caso.docx'),
+        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
+      }),
+      rubrica: () => this.servicio.descargarPlantillaRubrica().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-rubrica.xlsx'),
+        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
+      }),
+      guia: () => this.servicio.descargarGuiaImportacion().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'guia-importacion.pdf'),
+        error: () => this.snackBar.open('No se pudo descargar la guía.', 'OK', { duration: 3500 }),
+      }),
+      ejemplo: () => this.servicio.descargarCasoEjemplo().subscribe({
+        next: (blob) => this.servicio.descargarArchivo(blob, 'caso-ejemplo.docx'),
+        error: () => this.snackBar.open('No se pudo descargar el ejemplo.', 'OK', { duration: 3500 }),
+      }),
+    };
+    handlers[p.tipo]?.();
   }
 }

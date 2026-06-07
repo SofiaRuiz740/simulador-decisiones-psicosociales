@@ -1,12 +1,11 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../core/auth/auth.service';
-import { AcademicoService } from '../core/services/academico.service';
-import { CasosService } from '../core/services/casos.service';
+import { EventoActividad, ExtrasService } from '../core/services/extras.service';
 import { PracticasService } from '../core/services/practicas.service';
 import { EstadoPractica, Practica } from '../core/models/practicas.model';
 
@@ -17,15 +16,14 @@ interface AccesoRapido {
 
 @Component({
   selector: 'app-docente',
-  imports: [CommonModule, RouterLink, MatProgressBarModule],
+  imports: [CommonModule, DatePipe, RouterLink, MatProgressBarModule],
   templateUrl: './docente.html',
   styleUrl: './docente.scss',
 })
 export class Docente implements OnInit {
   private readonly auth = inject(AuthService);
-  private readonly academico = inject(AcademicoService);
-  private readonly casosSrv = inject(CasosService);
   private readonly practicasSrv = inject(PracticasService);
+  private readonly extras = inject(ExtrasService);
 
   readonly loading = signal(true);
 
@@ -39,6 +37,8 @@ export class Docente implements OnInit {
   readonly estudiantesCount = signal<number | null>(null);
   readonly casosCount = signal<number | null>(null);
   readonly practicasActivas = signal<number | null>(null);
+  readonly feedbackPendiente = signal<number | null>(null);
+  readonly actividad = signal<EventoActividad[]>([]);
   readonly proximasPracticas = signal<Practica[]>([]);
 
   readonly accesos: AccesoRapido[] = [
@@ -51,18 +51,16 @@ export class Docente implements OnInit {
 
   ngOnInit(): void {
     forkJoin({
-      estudiantes: this.academico.listarEstudiantes(),
-      casos: this.casosSrv.listarCasos(),
+      metricas: this.extras.docenteMetricas(),
+      actividad: this.extras.docenteActividad(4),
       practicas: this.practicasSrv.listar(),
     }).subscribe({
-      next: ({ estudiantes, casos, practicas }) => {
-        this.estudiantesCount.set(estudiantes.count);
-        this.casosCount.set(casos.count);
-
-        const activas = practicas.results.filter(
-          (p) => p.estado === EstadoPractica.SinIniciar || p.estado === EstadoPractica.EnCurso,
-        );
-        this.practicasActivas.set(activas.length);
+      next: ({ metricas, actividad, practicas }) => {
+        this.estudiantesCount.set(metricas.estudiantes);
+        this.casosCount.set(metricas.casos);
+        this.practicasActivas.set(metricas.practicas_activas);
+        this.feedbackPendiente.set(metricas.feedback_pendiente);
+        this.actividad.set(actividad);
 
         const proximas = [...practicas.results]
           .filter((p) => p.estado !== EstadoPractica.Cancelada && p.estado !== EstadoPractica.Finalizada)
@@ -83,6 +81,13 @@ export class Docente implements OnInit {
       month: 'short',
       year: 'numeric',
     });
+  }
+
+  activityDotClass(tipo: string): string {
+    if (tipo.includes('PRACTICA') || tipo.includes('RESULTADO')) {
+      return 'activity-item__dot activity-item__dot--teal';
+    }
+    return 'activity-item__dot';
   }
 
   badgeClass(estado: EstadoPractica): string {

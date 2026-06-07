@@ -19,6 +19,7 @@ class Estudiante(models.Model):
     """Estudiante del sistema, identificado globalmente por su correo."""
 
     correo = models.EmailField('correo electrónico', unique=True)
+    identificacion = models.CharField('identificación', max_length=50, blank=True)
     first_name = models.CharField('nombre', max_length=150)
     last_name = models.CharField('apellido', max_length=150)
 
@@ -70,16 +71,59 @@ class Estudiante(models.Model):
         return f'{self.first_name} {self.last_name}'.strip() or self.correo
 
 
-class Grupo(models.Model):
-    """Grupo académico creado por un docente. Contiene estudiantes vía InscripcionGrupo."""
+class Materia(models.Model):
+    """Materia o asignatura académica administrada por un docente."""
 
     nombre = models.CharField('nombre', max_length=150)
-    descripcion = models.TextField('descripción', blank=True)
+    programa = models.CharField('programa', max_length=150, blank=True)
+    periodo = models.CharField('periodo académico', max_length=50, blank=True)
+    activo = models.BooleanField('activa', default=True)
 
     docente = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name='docente',
         on_delete=models.CASCADE,
+        related_name='materias',
+    )
+
+    fecha_creacion = models.DateTimeField('fecha de creación', auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField('última actualización', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Materia'
+        verbose_name_plural = 'Materias'
+        ordering = ['nombre']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['docente', 'nombre'],
+                name='unique_materia_nombre_por_docente',
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.nombre
+
+
+class Grupo(models.Model):
+    """Grupo académico creado por un docente. Contiene estudiantes vía InscripcionGrupo."""
+
+    nombre = models.CharField('nombre', max_length=150)
+    descripcion = models.TextField('descripción', blank=True)
+    periodo = models.CharField('periodo académico', max_length=50, blank=True)
+
+    docente = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='docente',
+        on_delete=models.CASCADE,
+        related_name='grupos',
+    )
+
+    materia = models.ForeignKey(
+        Materia,
+        verbose_name='materia',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='grupos',
     )
 

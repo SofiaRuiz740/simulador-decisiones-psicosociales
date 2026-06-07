@@ -17,3 +17,23 @@
   color: var(--app-slate);
   text-align: center;
 }
+
+.progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 88px;
+}
+
+.progress-bar--inline {
+  flex: 1;
+  min-width: 56px;
+  max-width: 72px;
+  margin: 0;
+}
+
+.progress-inline__pct {
+  font-size: 0.75rem;
+  color: var(--app-slate);
+  white-space: nowrap;
+}

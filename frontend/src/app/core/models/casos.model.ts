@@ -86,6 +86,12 @@ export interface CasoListItem {
   docente_creador: number;
   docente_creador_username: string;
   escenarios_count: number;
+  preguntas_count: number;
+  tiene_rubrica: boolean;
+  rubrica_resumen: string | null;
+  completitud_pct: number;
+  materia: number | null;
+  materia_display: string | null;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }
@@ -105,6 +111,7 @@ export interface CasoInput {
   area_psicosocial?: string;
   tiempo_estimado_min?: number;
   estado?: EstadoCaso;
+  materia?: number | null;
 }
 
 export interface EscenarioInput {

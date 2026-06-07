@@ -1,9 +1,10 @@
 /**
  * Configuración para PRODUCCIÓN.
- * Reemplazar `apiUrl` por la URL pública del backend desplegado (Render/Railway).
+ * Con reverse proxy (nginx): el backend se expone en /api del mismo origen.
+ * Si frontend y API están en hosts distintos, reemplaza apiUrl por la URL pública.
  */
 export const environment = {
   production: true,
-  apiUrl: 'TODO_URL_PRODUCCION/api',
+  apiUrl: '/api',
   appName: 'Simulador de Decisiones Psicosociales',
 };

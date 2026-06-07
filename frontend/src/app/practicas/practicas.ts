@@ -18,11 +18,17 @@ import { Router, RouterLink } from '@angular/router';
 
 import { CasoListItem, EstadoCaso } from '../core/models/casos.model';
 
-import { EstadoPractica, Practica } from '../core/models/practicas.model';
+import { EstadoPractica, Practica, AutorizacionListItem, SeguimientoParticipacion } from '../core/models/practicas.model';
+
+import { Grupo, Materia } from '../core/models/academico.model';
 
 import { CasosService } from '../core/services/casos.service';
 
+import { AcademicoService } from '../core/services/academico.service';
+
 import { PracticasService } from '../core/services/practicas.service';
+
+import { SimulacionService } from '../core/services/simulacion.service';
 
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { PracticaFormDialog } from './dialogs/practica-form-dialog';
@@ -63,7 +69,11 @@ export class Practicas implements OnInit {
 
   private readonly servicio = inject(PracticasService);
 
+  private readonly simulacion = inject(SimulacionService);
+
   private readonly casosSrv = inject(CasosService);
+
+  private readonly academico = inject(AcademicoService);
 
   private readonly fb = inject(FormBuilder);
 
@@ -83,7 +93,19 @@ export class Practicas implements OnInit {
 
   readonly practicas = signal<Practica[]>([]);
 
+  readonly autorizaciones = signal<AutorizacionListItem[]>([]);
+
+  readonly seguimiento = signal<SeguimientoParticipacion[]>([]);
+
+  readonly loadingAutorizaciones = signal(false);
+
+  readonly loadingSeguimiento = signal(false);
+
   readonly casos = signal<CasoListItem[]>([]);
+
+  readonly materias = signal<Materia[]>([]);
+
+  readonly grupos = signal<Grupo[]>([]);
 
   readonly tab = signal('agenda');
 
@@ -98,6 +120,10 @@ export class Practicas implements OnInit {
     nombre: ['', Validators.required],
 
     caso: [null as number | null, Validators.required],
+
+    materia: [null as number | null],
+
+    grupo: [null as number | null],
 
     fecha_inicio: ['', Validators.required],
 
@@ -167,6 +193,12 @@ export class Practicas implements OnInit {
 
 
 
+  readonly historialEventos = computed(() =>
+    [...this.seguimiento()].filter((r) => r.estado === 'FINALIZADA' || r.estado === 'INCOMPLETA'),
+  );
+
+
+
   contar(estado: string): number {
 
     return this.practicas().filter((p) => p.estado === estado).length;
@@ -201,6 +233,112 @@ export class Practicas implements OnInit {
 
     this.cargarCasos();
 
+    this.cargarAutorizaciones();
+
+    this.cargarSeguimiento();
+
+    this.academico.listarMaterias().subscribe({
+
+      next: (resp) => this.materias.set(resp.results.filter((m) => m.activo)),
+
+    });
+
+    this.academico.listarGrupos().subscribe({
+
+      next: (resp) => this.grupos.set(resp.results),
+
+    });
+
+  }
+
+
+
+  cargarAutorizaciones() {
+
+    this.loadingAutorizaciones.set(true);
+
+    this.servicio.listarAutorizaciones().subscribe({
+
+      next: (rows) => { this.autorizaciones.set(rows); this.loadingAutorizaciones.set(false); },
+
+      error: () => this.loadingAutorizaciones.set(false),
+
+    });
+
+  }
+
+
+
+  cargarSeguimiento() {
+
+    this.loadingSeguimiento.set(true);
+
+    this.simulacion.listarSeguimiento().subscribe({
+
+      next: (rows) => { this.seguimiento.set(rows); this.loadingSeguimiento.set(false); },
+
+      error: () => this.loadingSeguimiento.set(false),
+
+    });
+
+  }
+
+
+
+  irAgregarParticipantes() {
+
+    const p = this.practicas()[0];
+
+    if (p) this.router.navigate(['/practicas', p.id]);
+
+    else this.snackBar.open('Crea una práctica primero.', 'OK', { duration: 3000 });
+
+  }
+
+
+
+  copiarCodigo(codigo: string) {
+
+    navigator.clipboard.writeText(codigo);
+
+    this.snackBar.open(`Código copiado: ${codigo}`, 'OK', { duration: 2000 });
+
+  }
+
+
+
+  seguimientoBadge(estado: string): string {
+
+    switch (estado) {
+
+      case 'EN_CURSO': return 'badge badge--en-curso';
+
+      case 'FINALIZADA': return 'badge badge--finalizado';
+
+      case 'NO_INICIADA': return 'badge badge--sin-iniciar';
+
+      default: return 'badge';
+
+    }
+
+  }
+
+  puedeAutorizarReintento(estado: string): boolean {
+    return estado === 'FINALIZADA' || estado === 'INCOMPLETA';
+  }
+
+  reintentoAutorizado(autorizacionId: number): boolean {
+    return this.autorizaciones().some((a) => a.id === autorizacionId && a.reintento_autorizado);
+  }
+
+  autorizarReintento(r: SeguimientoParticipacion): void {
+    this.servicio.autorizarReintento(r.practica_id, r.autorizacion_id).subscribe({
+      next: () => {
+        this.snackBar.open('Reintento autorizado.', 'OK', { duration: 2500 });
+        this.cargarAutorizaciones();
+      },
+      error: () => this.snackBar.open('No se pudo autorizar el reintento.', 'OK', { duration: 3500 }),
+    });
   }
 
 
@@ -276,6 +414,10 @@ export class Practicas implements OnInit {
       nombre: v.nombre,
 
       caso: v.caso as number,
+
+      materia: v.materia,
+
+      grupo: v.grupo,
 
       fecha_inicio: new Date(v.fecha_inicio).toISOString(),
 

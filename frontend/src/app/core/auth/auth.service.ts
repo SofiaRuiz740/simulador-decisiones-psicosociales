@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { Observable, catchError, of, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { AccesoEstudianteRespuesta } from '../models/practicas.model';
 import { JwtPayload, Rol, TokenPair, Usuario } from '../models/usuario.model';
 
 const ACCESS_KEY = 'simulador.access';
 const REFRESH_KEY = 'simulador.refresh';
 const USER_KEY = 'simulador.user';
+export const PRACTICA_ACTIVA_KEY = 'simulador.practica_activa';
 
 /** Respuesta del backend para login/registro: tokens + usuario. */
 interface AuthResponse extends TokenPair {
@@ -59,12 +61,42 @@ export class AuthService {
       .pipe(tap((res) => this.handleAuthSuccess(res)));
   }
 
-  // ---------- Acceso estudiante (correo + código) — backend pendiente ----------
+  cargarPerfil(): Observable<Usuario> {
+    return this.http.get<Usuario>(`${environment.apiUrl}/auth/perfil/`).pipe(
+      tap((u) => {
+        localStorage.setItem(USER_KEY, JSON.stringify(u));
+        this._usuario.set(u);
+      }),
+    );
+  }
 
-  loginEstudiante(correo: string, codigo: string): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/estudiante-acceso/`, { correo, codigo })
-      .pipe(tap((res) => this.handleAuthSuccess(res)));
+  configurarCorreoInvitaciones(correo_smtp_password: string): Observable<Usuario> {
+    return this.http.patch<Usuario>(`${environment.apiUrl}/auth/perfil/`, {
+      correo_smtp_password,
+    }).pipe(
+      tap((u) => {
+        localStorage.setItem(USER_KEY, JSON.stringify(u));
+        this._usuario.set(u);
+      }),
+    );
+  }
+
+  // ---------- Acceso estudiante (correo + código) ----------
+
+  /** Persiste tokens, usuario ESTUDIANTE y práctica activa tras /auth/estudiante-acceso/. */
+  establecerSesionEstudiante(res: AccesoEstudianteRespuesta): void {
+    const usuario: Usuario = {
+      id: res.estudiante.id,
+      username: res.estudiante.correo,
+      email: res.estudiante.correo,
+      nombre_completo: res.estudiante.nombre_completo,
+      rol: Rol.Estudiante,
+    };
+    localStorage.setItem(ACCESS_KEY, res.access);
+    localStorage.setItem(REFRESH_KEY, res.refresh);
+    localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+    localStorage.setItem(PRACTICA_ACTIVA_KEY, JSON.stringify(res.practica));
+    this._usuario.set(usuario);
   }
 
   // ---------- Logout ----------
@@ -90,6 +122,7 @@ export class AuthService {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(PRACTICA_ACTIVA_KEY);
     this._usuario.set(null);
   }
 

@@ -5,7 +5,7 @@
   </header>
 
   <nav class="tabs" aria-label="Secciones resultados">
-    @for (t of tabs; track t.id) {
+    @for (t of tabs(); track t.id) {
       <button type="button" class="tab" [class.active]="tab() === t.id" (click)="setTab(t.id)">{{ t.label }}</button>
     }
   </nav>
@@ -26,10 +26,12 @@
           <div class="metric__value">{{ promedio() | number:'1.1-1' }}</div>
           <div class="metric__label">Promedio</div>
         </article>
-        <article class="metric">
-          <div class="metric__value">{{ sinFeedback() }}</div>
-          <div class="metric__label">Sin feedback</div>
-        </article>
+        @if (esDocente()) {
+          <article class="metric">
+            <div class="metric__value">{{ sinFeedback() }}</div>
+            <div class="metric__label">Sin feedback</div>
+          </article>
+        }
       </section>
     }
 
@@ -63,7 +65,9 @@
             <table>
               <thead>
                 <tr>
-                  <th>Estudiante</th>
+                  @if (esDocente()) {
+                    <th>Estudiante</th>
+                  }
                   <th>Práctica</th>
                   <th>Materia</th>
                   <th>Grupo</th>
@@ -79,15 +83,17 @@
               <tbody>
                 @for (r of filtrados(); track r.id) {
                   <tr>
-                    <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                    @if (esDocente()) {
+                      <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                    }
                     <td>{{ r.practica_nombre }}</td>
-                    <td>—</td>
-                    <td>—</td>
+                    <td>{{ r.materia_display?.trim() || '—' }}</td>
+                    <td>{{ r.grupos_display?.trim() || '—' }}</td>
                     <td>{{ r.correctas }}</td>
                     <td>{{ r.incorrectas }}</td>
                     <td>{{ puntajeLabel(r) }}</td>
                     <td><strong>{{ r.nota_final }}</strong></td>
-                    <td>—</td>
+                    <td>{{ formatoTiempo(r.tiempo_usado_seg) }}</td>
                     <td>
                       <span class="badge" [class]="r.aprobado ? 'badge badge--aprobado' : 'badge badge--pendiente'">
                         {{ r.aprobado ? 'Aprobado' : 'No aprobado' }}
@@ -97,7 +103,9 @@
                       <div class="actions actions--end">
                         <button type="button" class="btn-ghost" (click)="abrirRetro(r)">Retro</button>
                         <button type="button" class="btn-ghost" (click)="abrirDetalle(r)">Detalle</button>
-                        <button type="button" class="btn-ghost" (click)="abrirFeedback(r)">Feedback</button>
+                        @if (esDocente()) {
+                          <button type="button" class="btn-ghost" (click)="abrirFeedback(r)">Feedback</button>
+                        }
                       </div>
                     </td>
                   </tr>
@@ -110,7 +118,8 @@
     </section>
   </div>
 
-  <!-- Feedback docente -->
+  <!-- Feedback docente (solo docente/admin) -->
+  @if (esDocente()) {
   <div class="tab-panel" [class.active]="tab() === 'feedback'">
     @if (seleccionado(); as r) {
       <div class="builder-block">
@@ -143,6 +152,7 @@
       </div>
     }
   </div>
+  }
 
   <!-- Detalle respuestas -->
   <div class="tab-panel" [class.active]="tab() === 'detalle'">
@@ -234,7 +244,9 @@
         }
         <div class="form-actions">
           <button type="button" class="btn-ghost" (click)="setTab('lista')">Volver</button>
-          <button type="button" class="btn-primary" (click)="abrirFeedback(r)">Editar feedback</button>
+          @if (esDocente()) {
+            <button type="button" class="btn-primary" (click)="abrirFeedback(r)">Editar feedback</button>
+          }
         </div>
       </div>
     } @else {

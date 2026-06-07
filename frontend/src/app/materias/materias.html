@@ -4,61 +4,88 @@
     <h1><em>Materias</em></h1>
   </header>
 
-  <section class="metrics">
-    <article class="metric">
-      <div class="metric__value">—</div>
-      <div class="metric__label">Total materias</div>
-    </article>
-    <article class="metric metric--accent">
-      <div class="metric__value">—</div>
-      <div class="metric__label">Materias activas</div>
-    </article>
-    <article class="metric">
-      <div class="metric__value">—</div>
-      <div class="metric__label">Grupos asociados</div>
-    </article>
-    <article class="metric metric--teal">
-      <div class="metric__value">—</div>
-      <div class="metric__label">Estudiantes vinculados</div>
-    </article>
-  </section>
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ materias().length }}</div>
+        <div class="metric__label">Total materias</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ activas() }}</div>
+        <div class="metric__label">Materias activas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ totalGrupos() }}</div>
+        <div class="metric__label">Grupos asociados</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ totalEstudiantes() }}</div>
+        <div class="metric__label">Estudiantes vinculados</div>
+      </article>
+    </section>
+  }
 
   <section class="panel">
     <div class="panel__toolbar">
       <div class="toolbar">
         <div class="toolbar__filters">
-          <input type="search" placeholder="Buscar…" disabled />
-          <select disabled><option>Todos</option></select>
+          <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+          <select [(ngModel)]="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activas</option>
+            <option value="inactivo">Inactivas</option>
+          </select>
         </div>
-        <button type="button" class="btn-primary" disabled>Crear materia</button>
+        <button type="button" class="btn-primary" (click)="crear()">Crear materia</button>
       </div>
     </div>
     <div class="panel__body">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Materia</th>
-              <th>Programa</th>
-              <th>Periodo</th>
-              <th>Grupos</th>
-              <th>Estudiantes</th>
-              <th>Estado</th>
-              <th class="col-actions"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td [attr.colspan]="7">
-                <div class="empty-state-mockup empty-state-mockup--compact">
-                  <strong>Sin materias registradas</strong>
-                  La gestión de materias estará disponible cuando el backend exponga este módulo.
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (filtradas().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Sin materias registradas</strong>
+          Crea tu primera materia con el botón «Crear materia».
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Materia</th>
+                <th>Programa</th>
+                <th>Periodo</th>
+                <th>Grupos</th>
+                <th>Estudiantes</th>
+                <th>Estado</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of filtradas(); track m.id) {
+                <tr>
+                  <td><strong>{{ m.nombre }}</strong></td>
+                  <td>{{ m.programa?.trim() || '—' }}</td>
+                  <td>{{ m.periodo?.trim() || '—' }}</td>
+                  <td>{{ m.grupos_count }}</td>
+                  <td>{{ m.estudiantes_count }}</td>
+                  <td>
+                    <span class="badge" [class]="m.activo ? 'badge badge--activo' : 'badge badge--inactivo'">
+                      {{ m.activo ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </td>
+                  <td class="col-actions">
+                    <div class="actions actions--end">
+                      <button type="button" class="btn-ghost" (click)="editar(m)">Editar</button>
+                      <button type="button" class="btn-ghost" (click)="eliminar(m)">Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
   </section>
 

@@ -12,6 +12,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     """Representación pública del usuario autenticado (perfil)."""
 
     nombre_completo = serializers.SerializerMethodField()
+    correo_smtp_configurado = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Usuario
@@ -24,8 +25,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'nombre_completo',
             'rol',
             'date_joined',
+            'correo_smtp_configurado',
         )
-        read_only_fields = ('id', 'rol', 'date_joined', 'nombre_completo')
+        read_only_fields = ('id', 'rol', 'date_joined', 'nombre_completo', 'correo_smtp_configurado')
 
     def get_nombre_completo(self, obj: Usuario) -> str:
         full = obj.get_full_name().strip()
@@ -49,6 +51,14 @@ class RegistroDocenteSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'},
     )
+    correo_smtp_password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        min_length=8,
+        style={'input_type': 'password'},
+        help_text='Contraseña de aplicación Gmail (misma cuenta). Si no se envía, se usa la contraseña de acceso.',
+    )
 
     class Meta:
         model = Usuario
@@ -59,6 +69,7 @@ class RegistroDocenteSerializer(serializers.ModelSerializer):
             'last_name',
             'password',
             'password_confirm',
+            'correo_smtp_password',
         )
         extra_kwargs = {
             'email': {'required': True, 'allow_blank': False},
@@ -82,10 +93,32 @@ class RegistroDocenteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Usuario:
         password = validated_data.pop('password')
+        smtp_password = validated_data.pop('correo_smtp_password', '') or password
         usuario = Usuario(rol=Usuario.Rol.DOCENTE, **validated_data)
         usuario.set_password(password)
+        usuario.correo_smtp_password = smtp_password
         usuario.save()
         return usuario
+
+
+class PerfilUpdateSerializer(serializers.ModelSerializer):
+    """Actualización parcial del perfil docente (clave SMTP para invitaciones)."""
+
+    correo_smtp_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        min_length=8,
+        style={'input_type': 'password'},
+    )
+
+    class Meta:
+        model = Usuario
+        fields = ('correo_smtp_password',)
+
+    def update(self, instance: Usuario, validated_data: dict) -> Usuario:
+        instance.correo_smtp_password = validated_data['correo_smtp_password']
+        instance.save(update_fields=['correo_smtp_password'])
+        return instance
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

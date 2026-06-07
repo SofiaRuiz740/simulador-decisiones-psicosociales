@@ -23,7 +23,7 @@
         <div class="metric__label">Estudiantes</div>
       </article>
       <article class="metric">
-        <div class="metric__value">—</div>
+        <div class="metric__value">{{ feedbackPendiente() ?? '—' }}</div>
         <div class="metric__label">Feedback pendiente</div>
       </article>
     </section>
@@ -45,8 +45,21 @@
       <div class="card__header">
         <h3 class="card__title">Actividad reciente</h3>
       </div>
-      <ul class="activity-list">
-        <li class="activity-list__empty">Sin actividad reciente. Las acciones que realices aparecerán aquí.</li>
+      <ul class="activity-list activity-list--feed">
+        @if (actividad().length === 0) {
+          <li class="activity-list__empty">Sin actividad reciente. Las acciones que realices aparecerán aquí.</li>
+        } @else {
+          @for (e of actividad(); track e.referencia_tipo + e.referencia_id + e.fecha) {
+            <li class="activity-item">
+              <span [class]="activityDotClass(e.tipo)"></span>
+              <div class="activity-item__content">
+                <span class="activity-item__tag">{{ e.tipo_display }}</span>
+                <p class="activity-item__text">{{ e.titulo }}</p>
+                <time class="activity-item__time">{{ e.fecha | date:'d MMM y, h:mm a' }}</time>
+              </div>
+            </li>
+          }
+        }
       </ul>
     </section>
 
@@ -76,7 +89,7 @@
               @for (p of proximasPracticas(); track p.id) {
                 <tr>
                   <td>{{ p.nombre || p.caso_nombre }}</td>
-                  <td>—</td>
+                  <td>{{ p.grupos_display?.trim() || '—' }}</td>
                   <td>{{ formatFecha(p.fecha_inicio) }}</td>
                   <td><span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span></td>
                 </tr>

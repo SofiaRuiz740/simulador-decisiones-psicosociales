@@ -83,10 +83,31 @@
 
   <!-- Estudiantes -->
   <div class="tab-panel" [class.active]="tab() === 'estudiantes'">
-    <div class="dropzone" (click)="avisoImportacion('estudiantes')">
-      <p class="dropzone__title">Subir Excel</p>
+    <div class="dropzone" (click)="fileEstudiantes.click()">
+      <p class="dropzone__title">Subir Excel o CSV</p>
       <p class="dropzone__hint">nombre, correo, identificación, materia, grupo</p>
     </div>
+    <input #fileEstudiantes type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarEstudiantes($event)" />
+
+    @if (resultadoEstudiantes(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.estudiantes_creados }} creados · {{ r.estudiantes_vinculados }} vinculados ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
     <div class="template-preview" style="margin-top: 1rem">
       <h4>Plantilla esperada</h4>
       <table class="template-table">
@@ -94,7 +115,7 @@
           <tr><th>nombre</th><th>correo</th><th>identificacion</th><th>materia</th><th>grupo</th></tr>
         </thead>
         <tbody>
-          <tr><td colspan="5" class="template-table__empty">Sin datos — la importación masiva estará disponible cuando el backend la exponga.</td></tr>
+          <tr><td>Ana López</td><td>ana@institucion.edu</td><td>20201234</td><td>Psicología social</td><td>Grupo A</td></tr>
         </tbody>
       </table>
     </div>
@@ -102,10 +123,30 @@
 
   <!-- Grupos -->
   <div class="tab-panel" [class.active]="tab() === 'grupos'">
-    <div class="dropzone" (click)="avisoImportacion('grupos')">
-      <p class="dropzone__title">Subir Excel de grupos</p>
-      <p class="dropzone__hint">grupo, materia, periodo, estudiantes</p>
+    <div class="dropzone" (click)="fileGrupos.click()">
+      <p class="dropzone__title">Subir Excel o CSV de grupos</p>
+      <p class="dropzone__hint">grupo, materia, periodo, estudiantes (correos separados por ;)</p>
     </div>
+    <input #fileGrupos type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarGrupos($event)" />
+
+    @if (resultadoGrupos(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
     <div class="template-preview" style="margin-top: 1rem">
       <h4>Plantilla esperada</h4>
       <table class="template-table">
@@ -113,7 +154,7 @@
           <tr><th>grupo</th><th>materia</th><th>periodo</th><th>estudiantes</th></tr>
         </thead>
         <tbody>
-          <tr><td colspan="4" class="template-table__empty">Sin datos — la importación masiva estará disponible cuando el backend la exponga.</td></tr>
+          <tr><td>Grupo A</td><td>Psicología social</td><td>2026-1</td><td>ana@x.edu; pedro@x.edu</td></tr>
         </tbody>
       </table>
     </div>
@@ -123,7 +164,7 @@
   <div class="tab-panel" [class.active]="tab() === 'plantillas'">
     <div class="import-types">
       @for (p of plantillas; track p.titulo) {
-        <button type="button" class="import-type" (click)="descargarPlantilla(p.titulo)">
+        <button type="button" class="import-type" (click)="descargarPlantilla(p)">
           <h4>{{ p.titulo }}</h4>
           <p>{{ p.formato }}</p>
         </button>

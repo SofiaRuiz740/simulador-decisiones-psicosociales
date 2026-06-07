@@ -7,3 +7,37 @@
 .page {
   padding-bottom: 0;
 }
+
+.activity-list--feed {
+  .activity-item__content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .activity-item__tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--app-purple-dark);
+    margin-bottom: 0.15rem;
+  }
+
+  .activity-item__text {
+    margin: 0 0 0.25rem;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .activity-item__time {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--app-slate);
+    font-variant-numeric: tabular-nums;
+  }
+}

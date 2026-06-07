@@ -18,6 +18,10 @@ import { CasoListItem, EstadoCaso } from '../core/models/casos.model';
 
 import { CasosService } from '../core/services/casos.service';
 
+import { AcademicoService } from '../core/services/academico.service';
+
+import { Materia } from '../core/models/academico.model';
+
 import { mockupDialog } from '../shared/constants/dialog-config';
 
 import { CasoFormDialog } from './dialogs/caso-form-dialog';
@@ -56,6 +60,8 @@ export class Casos implements OnInit {
 
   private readonly servicio = inject(CasosService);
 
+  private readonly academico = inject(AcademicoService);
+
   private readonly fb = inject(FormBuilder);
 
   private readonly dialog = inject(MatDialog);
@@ -76,6 +82,8 @@ export class Casos implements OnInit {
 
   readonly casoSeleccionado = signal<CasoListItem | null>(null);
 
+  readonly materias = signal<Materia[]>([]);
+
   filtroTexto = '';
 
   filtroEstado: EstadoCaso | '' = '';
@@ -91,6 +99,8 @@ export class Casos implements OnInit {
     area_psicosocial: ['', Validators.maxLength(150)],
 
     tiempo_estimado_min: [30, [Validators.required, Validators.min(1)]],
+
+    materia: [null as number | null],
 
   });
 
@@ -152,7 +162,12 @@ export class Casos implements OnInit {
 
 
 
-  ngOnInit() { this.cargar(); }
+  ngOnInit() {
+    this.cargar();
+    this.academico.listarMaterias().subscribe({
+      next: (resp) => this.materias.set(resp.results.filter((m) => m.activo)),
+    });
+  }
 
 
 
@@ -258,25 +273,27 @@ export class Casos implements OnInit {
 
 
 
-  materiaLabel(_c: CasoListItem): string {
+  materiaLabel(c: CasoListItem): string {
 
-    return '—';
-
-  }
-
-
-
-  preguntasLabel(_c: CasoListItem): string {
-
-    return '—';
+    return c.materia_display?.trim() || '—';
 
   }
 
 
 
-  rubricaLabel(_c: CasoListItem): string {
+  preguntasLabel(c: CasoListItem): string {
 
-    return '—';
+    return String(c.preguntas_count ?? 0);
+
+  }
+
+
+
+  rubricaLabel(c: CasoListItem): string {
+
+    if (!c.tiene_rubrica) return '—';
+
+    return c.rubrica_resumen?.trim() || 'Sí';
 
   }
 
@@ -284,19 +301,7 @@ export class Casos implements OnInit {
 
   completitud(c: CasoListItem): string {
 
-    let pts = 10;
-
-    if (c.descripcion?.trim()) pts += 10;
-
-    if (c.area_psicosocial?.trim()) pts += 10;
-
-    if (c.escenarios_count > 0) pts += 35;
-
-    if (c.estado === 'VALIDADO') pts += 25;
-
-    else if (c.estado === 'EN_REVISION') pts += 15;
-
-    return `${Math.min(100, pts)}%`;
+    return `${c.completitud_pct ?? 0}%`;
 
   }
 

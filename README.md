@@ -47,8 +47,13 @@ docker compose up --build -d
 # 3. Aplicar migraciones
 docker compose exec backend python manage.py migrate
 
-# 4. Crear superusuario administrador
-docker compose exec backend python manage.py createsuperuser
+# 4. Crear administrador de plataforma (rol ADMIN + Django Admin)
+docker compose exec backend python manage.py seed_admin
+# Credenciales por defecto (configurables en .env):
+#   usuario: admin
+#   contraseña: Admin123!
+# Panel Angular: http://localhost:4200/auth/login → /admin
+# Django Admin:  http://localhost:8000/admin/
 ```
 
 Backend disponible en `http://localhost:8000`.

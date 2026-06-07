@@ -49,7 +49,7 @@
             <article class="list-row" [class.list-row--expanded]="grupoExpandidoId() === g.id">
               <div (click)="expandir(g)" role="button" tabindex="0" (keyup.enter)="expandir(g)">
                 <div class="list-row__title">{{ g.nombre }}</div>
-                <div class="list-row__meta">— · —</div>
+                <div class="list-row__meta">{{ g.materia_display?.trim() || '—' }} · {{ g.periodo_display?.trim() || '—' }}</div>
                 @if (g.descripcion) {
                   <div class="list-row__meta list-row__meta--sub">{{ g.descripcion }}</div>
                 }

@@ -20,7 +20,11 @@ class ResultadoViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewset
     def get_queryset(self):
         u = self.request.user
         qs = Resultado.objects.select_related(
-            'participacion__estudiante', 'participacion__practica__caso',
+            'participacion__estudiante',
+            'participacion__practica__caso',
+            'participacion__practica__materia',
+            'participacion__practica__caso__materia',
+            'participacion__practica__docente',
         )
         if u.rol == Usuario.Rol.ADMIN:
             return qs

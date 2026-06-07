@@ -55,8 +55,8 @@
                 @for (p of filtradas(); track p.id) {
                   <tr>
                     <td>{{ p.caso_nombre }}</td>
-                    <td>—</td>
-                    <td>—</td>
+                    <td>{{ p.materia_display?.trim() || '—' }}</td>
+                    <td>{{ p.grupos_display?.trim() || '—' }}</td>
                     <td>{{ p.fecha_inicio | date:'short' }}</td>
                     <td>{{ p.fecha_fin | date:'short' }}</td>
                     <td>{{ p.tiempo_max_min }} min</td>
@@ -107,11 +107,21 @@
           </div>
           <div class="form-group">
             <label for="pracMateria">Materia</label>
-            <input id="pracMateria" disabled placeholder="—" title="Sin API de materias vinculadas" />
+            <select id="pracMateria" formControlName="materia">
+              <option [ngValue]="null">— Sin materia —</option>
+              @for (m of materias(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nombre }}</option>
+              }
+            </select>
           </div>
           <div class="form-group">
             <label for="pracGrupo">Grupo</label>
-            <input id="pracGrupo" disabled placeholder="—" title="Sin API de grupos en agendado" />
+            <select id="pracGrupo" formControlName="grupo">
+              <option [ngValue]="null">— Sin grupo —</option>
+              @for (g of grupos(); track g.id) {
+                <option [ngValue]="g.id">{{ g.nombre }}</option>
+              }
+            </select>
           </div>
           <div class="form-group">
             <label for="pracInicio">Fecha inicio</label>
@@ -149,33 +159,47 @@
       <div class="panel__toolbar">
         <div class="toolbar">
           <div class="toolbar__filters"></div>
-          <button type="button" class="btn-primary" disabled title="Requiere API de participantes">Agregar</button>
+          <button type="button" class="btn-primary" (click)="irAgregarParticipantes()">Agregar</button>
         </div>
       </div>
       <div class="panel__body">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Estudiante</th>
-                <th>Grupo</th>
-                <th>Correo</th>
-                <th>Asignación</th>
-                <th class="col-actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td [attr.colspan]="5">
-                  <div class="empty-state-mockup empty-state-mockup--compact">
-                    <strong>Sin participantes</strong>
-                    La gestión por práctica estará disponible cuando el backend exponga este listado.
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        @if (loadingAutorizaciones()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (autorizaciones().length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin participantes</strong>
+            Autoriza estudiantes desde el detalle de una práctica.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Grupo</th>
+                  <th>Correo</th>
+                  <th>Práctica</th>
+                  <th>Asignación</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of autorizaciones(); track a.id) {
+                  <tr>
+                    <td><strong>{{ a.estudiante_nombre }}</strong></td>
+                    <td>{{ a.grupos_display?.trim() || '—' }}</td>
+                    <td>{{ a.estudiante_correo }}</td>
+                    <td>{{ a.practica_nombre }}</td>
+                    <td>{{ a.asignacion_display }}</td>
+                    <td class="col-actions">
+                      <a class="btn-ghost" [routerLink]="['/practicas', a.practica_id]">Abrir</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
     </section>
   </div>
@@ -187,50 +211,119 @@
         <div class="surface surface--flat codigos-hint">
           <p>Genera un código por estudiante. Lo usarán en la pantalla de acceso del simulador junto con su correo, como contraseña de ingreso.</p>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Práctica</th>
-                <th>Estudiante</th>
-                <th>Correo</th>
-                <th>Código</th>
-                <th>Estado</th>
-                <th class="col-actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td [attr.colspan]="6">
-                  <div class="empty-state-mockup empty-state-mockup--compact">
-                    <strong>Sin códigos</strong>
-                    Consulta los códigos en el detalle de cada práctica o cuando el listado global esté disponible.
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        @if (loadingAutorizaciones()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (autorizaciones().length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin códigos</strong>
+            Autoriza estudiantes en el detalle de una práctica.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Práctica</th>
+                  <th>Estudiante</th>
+                  <th>Correo</th>
+                  <th>Código</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of autorizaciones(); track a.id) {
+                  <tr>
+                    <td>{{ a.practica_nombre }}</td>
+                    <td><strong>{{ a.estudiante_nombre }}</strong></td>
+                    <td>{{ a.estudiante_correo }}</td>
+                    <td><code>{{ a.codigo_acceso }}</code></td>
+                    <td>{{ a.asignacion_display }}</td>
+                    <td class="col-actions">
+                      <button type="button" class="btn-ghost" (click)="copiarCodigo(a.codigo_acceso)">Copiar</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
     </section>
   </div>
 
   <!-- Seguimiento -->
   <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
-    <div class="surface surface--flat tab-empty">
-      <div class="empty-state-mockup">
-        <strong>Sin seguimiento en tiempo real</strong>
-        El progreso por estudiante aparecerá aquí cuando el backend exponga participaciones activas.
+    <section class="panel">
+      <div class="panel__body">
+        @if (loadingSeguimiento()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (seguimiento().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin seguimiento en tiempo real</strong>
+            Autoriza estudiantes y espera a que inicien la simulación.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Práctica</th>
+                  <th>Estado</th>
+                  <th>Progreso</th>
+                  <th>Respondidas</th>
+                  <th>Tiempo</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of seguimiento(); track r.autorizacion_id) {
+                  <tr>
+                    <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                    <td>{{ r.practica_nombre }}</td>
+                    <td><span class="badge" [class]="seguimientoBadge(r.estado)">{{ r.estado_display }}</span></td>
+                    <td>{{ r.progreso_pct }}%</td>
+                    <td>{{ r.respondidas }}/{{ r.total_preguntas }}</td>
+                    <td>{{ r.tiempo_usado_seg }}s</td>
+                    <td class="col-actions">
+                      @if (puedeAutorizarReintento(r.estado)) {
+                        @if (reintentoAutorizado(r.autorizacion_id)) {
+                          <span class="muted">Reintento pendiente</span>
+                        } @else {
+                          <button type="button" class="btn-ghost" (click)="autorizarReintento(r)">
+                            Autorizar reintento
+                          </button>
+                        }
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
-    </div>
+    </section>
   </div>
 
   <!-- Historial -->
   <div class="tab-panel" [class.active]="tab() === 'historial'">
     <div class="surface tab-empty">
-      <ul class="activity-list activity-list--empty">
-        <li class="activity-list__empty-note">Sin eventos de historial disponibles por ahora.</li>
-      </ul>
+      @if (historialEventos().length === 0) {
+        <ul class="activity-list activity-list--empty">
+          <li class="activity-list__empty-note">Sin prácticas finalizadas aún.</li>
+        </ul>
+      } @else {
+        <ul class="activity-list">
+          @for (r of historialEventos(); track r.autorizacion_id) {
+            <li>
+              <strong>{{ r.estudiante_nombre }}</strong> finalizó {{ r.practica_nombre }}
+              <span class="muted">· {{ r.caso_nombre }} · {{ r.respondidas }}/{{ r.total_preguntas }} resp.</span>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 

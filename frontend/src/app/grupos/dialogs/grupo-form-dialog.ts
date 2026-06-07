@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, inject, signal } from '@angular/core';
+import { Component, Inject, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AcademicoService } from '../../core/services/academico.service';
-import { Grupo } from '../../core/models/academico.model';
+import { Grupo, Materia } from '../../core/models/academico.model';
 
 interface DialogData {
   grupo?: Grupo;
@@ -31,7 +31,16 @@ interface DialogData {
         </div>
         <div class="form-group full">
           <label>Materia</label>
-          <select disabled><option>—</option></select>
+          <select formControlName="materia">
+            <option [ngValue]="null">— Sin materia —</option>
+            @for (m of materias(); track m.id) {
+              <option [ngValue]="m.id">{{ m.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Periodo</label>
+          <input formControlName="periodo" maxlength="50" placeholder="Ej. 2026-1" />
         </div>
         <div class="form-group full">
           <label>Descripción</label>
@@ -49,12 +58,13 @@ interface DialogData {
   `,
   styles: [`.field-error { font-size: 0.75rem; color: var(--app-danger); }`],
 })
-export class GrupoFormDialog {
+export class GrupoFormDialog implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly servicio = inject(AcademicoService);
   private readonly dialogRef = inject(MatDialogRef<GrupoFormDialog>);
 
   readonly loading = signal(false);
+  readonly materias = signal<Materia[]>([]);
   readonly serverErrors = signal<Record<string, string[]>>({});
   readonly esEdicion: boolean;
   readonly form;
@@ -63,7 +73,15 @@ export class GrupoFormDialog {
     this.esEdicion = !!data.grupo;
     this.form = this.fb.nonNullable.group({
       nombre: [data.grupo?.nombre ?? '', [Validators.required, Validators.maxLength(150)]],
+      materia: [data.grupo?.materia ?? null as number | null],
+      periodo: [data.grupo?.periodo ?? ''],
       descripcion: [data.grupo?.descripcion ?? ''],
+    });
+  }
+
+  ngOnInit(): void {
+    this.servicio.listarMaterias().subscribe({
+      next: (resp) => this.materias.set(resp.results.filter((m) => m.activo)),
     });
   }
 

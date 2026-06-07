@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Estudiante, Grupo, InscripcionGrupo
+from .models import Estudiante, Grupo, InscripcionGrupo, Materia
 
 
 class InscripcionInline(admin.TabularInline):
@@ -18,9 +18,16 @@ class EstudianteAdmin(admin.ModelAdmin):
     filter_horizontal = ('docentes',)
 
 
+@admin.register(Materia)
+class MateriaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'programa', 'periodo', 'docente', 'activo', 'fecha_creacion')
+    list_filter = ('activo', 'docente')
+    search_fields = ('nombre', 'programa')
+
+
 @admin.register(Grupo)
 class GrupoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'docente', 'fecha_creacion')
+    list_display = ('nombre', 'docente', 'materia', 'periodo', 'fecha_creacion')
     list_filter = ('docente',)
     search_fields = ('nombre',)
     inlines = [InscripcionInline]

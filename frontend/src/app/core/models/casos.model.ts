@@ -29,13 +29,25 @@ export interface Pregunta {
   respuestas: Respuesta[];
 }
 
+export type RecursoMultimediaTipo = 'imagen' | 'audio' | 'video';
+
+export interface RecursoMultimedia {
+  tipo: RecursoMultimediaTipo;
+  url: string;
+  titulo?: string;
+}
+
 export interface Escenario {
   id: number;
   caso: number;
   orden: number;
   titulo: string;
   narrativa: string;
-  recursos_multimedia: string[];
+  /** Recursos asociados al escenario. Formato unificado:
+   * `{tipo: 'imagen'|'audio'|'video', url, titulo?}`.
+   * Mantiene retrocompat con strings antiguos (se interpretan como imagen).
+   */
+  recursos_multimedia: (RecursoMultimedia | string)[];
   preguntas: Pregunta[];
 }
 
@@ -119,7 +131,7 @@ export interface EscenarioInput {
   orden: number;
   titulo: string;
   narrativa?: string;
-  recursos_multimedia?: string[];
+  recursos_multimedia?: (RecursoMultimedia | string)[];
 }
 
 export interface PreguntaInput {

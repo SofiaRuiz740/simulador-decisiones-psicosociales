@@ -15,7 +15,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { CasoDetalle, Escenario, Pregunta, Respuesta } from '../core/models/casos.model';
+import {
+  CasoDetalle,
+  Escenario,
+  Pregunta,
+  RecursoMultimedia,
+  Respuesta,
+} from '../core/models/casos.model';
 import { CasosService, ProblemaValidacion } from '../core/services/casos.service';
 import { UxService } from '../core/services/ux.service';
 import { CasePreview, CasePreviewData } from '../shared/components/case-preview/case-preview';
@@ -259,11 +265,43 @@ export class CasoDetallePage implements OnInit {
 
   guardarEscenario(esc: Escenario): void {
     this.servicio.actualizarEscenario(esc.id, {
-      titulo: esc.titulo, narrativa: esc.narrativa, orden: esc.orden,
+      titulo: esc.titulo,
+      narrativa: esc.narrativa,
+      orden: esc.orden,
+      recursos_multimedia: this.recursosDeEscenario(esc).filter((r) => r.url.trim()),
     }).subscribe({
       next: () => this.snackBar.open(`Escenario "${esc.titulo}" guardado.`, 'OK', { duration: 2000 }),
       error: () => this.snackBar.open('No se pudo guardar.', 'OK', { duration: 3500 }),
     });
+  }
+
+  /** Devuelve los recursos del escenario normalizados como objetos. Soporta
+   * el formato antiguo (string = URL de imagen). Mantiene la referencia para
+   * que `ngModel` siga editando el mismo array. */
+  recursosDeEscenario(esc: Escenario): RecursoMultimedia[] {
+    const lista = esc.recursos_multimedia || [];
+    let huboCambios = false;
+    const normalizados: RecursoMultimedia[] = lista.map((r) => {
+      if (typeof r === 'string') {
+        huboCambios = true;
+        return { tipo: 'imagen', url: r, titulo: '' };
+      }
+      return r;
+    });
+    if (huboCambios) {
+      esc.recursos_multimedia = normalizados;
+    }
+    return normalizados as RecursoMultimedia[];
+  }
+
+  agregarRecurso(esc: Escenario): void {
+    const lista = this.recursosDeEscenario(esc);
+    lista.push({ tipo: 'imagen', url: '', titulo: '' });
+  }
+
+  quitarRecurso(esc: Escenario, idx: number): void {
+    const lista = this.recursosDeEscenario(esc);
+    lista.splice(idx, 1);
   }
 
   async eliminarEscenario(esc: Escenario): Promise<void> {

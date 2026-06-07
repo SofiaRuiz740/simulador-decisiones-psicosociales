@@ -164,6 +164,43 @@
                             <mat-label>Narrativa</mat-label>
                             <textarea matInput [(ngModel)]="esc.narrativa" rows="3"></textarea>
                           </mat-form-field>
+
+                          <!-- Recursos multimedia del escenario (P3) -->
+                          <div class="multimedia-block">
+                            <div class="multimedia-block__header">
+                              <mat-icon>perm_media</mat-icon>
+                              <strong>Recursos multimedia</strong>
+                              <span class="muted">(imagen, audio o video por URL)</span>
+                            </div>
+                            @for (r of recursosDeEscenario(esc); track $index; let i = $index) {
+                              <div class="multimedia-row">
+                                <mat-form-field appearance="outline" class="multimedia-row__tipo">
+                                  <mat-label>Tipo</mat-label>
+                                  <mat-select [(ngModel)]="r.tipo">
+                                    <mat-option value="imagen">Imagen</mat-option>
+                                    <mat-option value="audio">Audio</mat-option>
+                                    <mat-option value="video">Video</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="multimedia-row__url">
+                                  <mat-label>URL del recurso</mat-label>
+                                  <input matInput [(ngModel)]="r.url" placeholder="https://…" />
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" class="multimedia-row__titulo">
+                                  <mat-label>Título (opcional)</mat-label>
+                                  <input matInput [(ngModel)]="r.titulo" maxlength="120" />
+                                </mat-form-field>
+                                <button mat-icon-button color="warn" type="button"
+                                        (click)="quitarRecurso(esc, i)" matTooltip="Quitar recurso">
+                                  <mat-icon>delete</mat-icon>
+                                </button>
+                              </div>
+                            }
+                            <button type="button" class="btn-ghost" (click)="agregarRecurso(esc)">
+                              <mat-icon>add</mat-icon> Añadir recurso
+                            </button>
+                          </div>
+
                           <div class="esc-actions">
                             <button type="button" class="btn-primary" (click)="guardarEscenario(esc)">Guardar</button>
                             <button type="button" class="btn-ghost" (click)="eliminarEscenario(esc)">Eliminar</button>

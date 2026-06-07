@@ -1,26 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Grupo } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { mockupDialog } from '../shared/constants/dialog-config';
 import { GrupoFormDialog } from './dialogs/grupo-form-dialog';
 
 @Component({
   selector: 'app-grupos',
   imports: [
     CommonModule,
-    MatButtonModule,
+    FormsModule,
     MatDialogModule,
-    MatIconModule,
     MatProgressBarModule,
     MatSnackBarModule,
-    MatTooltipModule,
   ],
   templateUrl: './grupos.html',
   styleUrl: './grupos.scss',
@@ -35,25 +32,22 @@ export class Grupos implements OnInit {
   readonly grupoExpandidoId = signal<number | null>(null);
   readonly detalle = signal<import('../core/models/academico.model').GrupoDetalle | null>(null);
 
+  filtroTexto = '';
+
+  readonly filtrados = computed(() => {
+    const txt = this.filtroTexto.toLowerCase().trim();
+    if (!txt) return this.grupos();
+    return this.grupos().filter((g) =>
+      g.nombre.toLowerCase().includes(txt) ||
+      (g.descripcion || '').toLowerCase().includes(txt),
+    );
+  });
+
   readonly totalEstudiantes = computed(() =>
     this.grupos().reduce((acc, g) => acc + (g.estudiantes_count || 0), 0),
   );
 
   readonly gruposVacios = computed(() => this.grupos().filter((g) => !g.estudiantes_count).length);
-
-  /** Variant del ribbon según cantidad de estudiantes. */
-  variantPor(count: number): 'empty' | 'small' | 'big' {
-    if (!count) return 'empty';
-    if (count < 10) return 'small';
-    return 'big';
-  }
-
-  inicialesDe(nombre: string, correo: string): string {
-    const partes = (nombre || correo).split(/\s+/);
-    const a = partes[0]?.charAt(0) || '';
-    const b = partes[partes.length - 1]?.charAt(0) || '';
-    return (a + (partes.length > 1 ? b : '')).toUpperCase() || '?';
-  }
 
   ngOnInit(): void {
     this.cargar();
@@ -91,9 +85,7 @@ export class Grupos implements OnInit {
   }
 
   crear(): void {
-    this.dialog
-      .open(GrupoFormDialog, { width: '500px', data: {} })
-      .afterClosed()
+    this.dialog.open(GrupoFormDialog, { ...mockupDialog('500px'), data: {} }).afterClosed()
       .subscribe((g) => {
         if (g) this.cargar();
       });
@@ -101,9 +93,7 @@ export class Grupos implements OnInit {
 
   editar(g: Grupo, ev: Event): void {
     ev.stopPropagation();
-    this.dialog
-      .open(GrupoFormDialog, { width: '500px', data: { grupo: g } })
-      .afterClosed()
+    this.dialog.open(GrupoFormDialog, { ...mockupDialog('500px'), data: { grupo: g } }).afterClosed()
       .subscribe((res) => {
         if (res) this.cargar();
       });
@@ -134,7 +124,7 @@ export class Grupos implements OnInit {
       './dialogs/agregar-estudiantes-dialog'
     );
     this.dialog
-      .open(AgregarEstudiantesDialog, { width: '500px', data: { grupo: detalle } })
+      .open(AgregarEstudiantesDialog, { ...mockupDialog('500px'), data: { grupo: detalle } })
       .afterClosed()
       .subscribe((g) => {
         if (g) {

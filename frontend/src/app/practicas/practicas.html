@@ -1,0 +1,330 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Prácticas</em></h1>
+  </header>
+
+  <nav class="tabs" aria-label="Secciones prácticas">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <!-- Agenda -->
+  <div class="tab-panel" [class.active]="tab() === 'agenda'">
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters">
+            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+            <select [(ngModel)]="filtroEstado">
+              <option value="">Todos</option>
+              <option value="SIN_INICIAR">Sin iniciar</option>
+              <option value="EN_CURSO">En curso</option>
+              <option value="FINALIZADA">Finalizada</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filtradas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin prácticas agendadas</strong>
+            Usa la pestaña «Nueva práctica» para crear una.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Caso</th>
+                  <th>Materia</th>
+                  <th>Grupo</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Tiempo</th>
+                  <th>Lugar</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of filtradas(); track p.id) {
+                  <tr>
+                    <td>{{ p.caso_nombre }}</td>
+                    <td>{{ p.materia_display?.trim() || '—' }}</td>
+                    <td>{{ p.grupos_display?.trim() || '—' }}</td>
+                    <td>{{ p.fecha_inicio | date:'short' }}</td>
+                    <td>{{ p.fecha_fin | date:'short' }}</td>
+                    <td>{{ p.tiempo_max_min }} min</td>
+                    <td>{{ p.lugar_fisico || '—' }}</td>
+                    <td><span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span></td>
+                    <td class="col-actions">
+                      <div class="actions actions--end">
+                        <a class="btn-ghost" [routerLink]="['/practicas', p.id]">Abrir</a>
+                        <button type="button" class="btn-ghost" (click)="eliminar(p, $event)">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Nueva práctica -->
+  <div class="tab-panel" [class.active]="tab() === 'nueva'">
+    <div class="builder-block">
+      <div class="builder-header">
+        <h3 class="card__title">Agendar práctica</h3>
+      </div>
+      @if (cargandoCasos()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (casosValidados().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Sin casos validados</strong>
+          Publica un caso desde «Casos de estudio» antes de agendar.
+        </div>
+      } @else {
+        <form [formGroup]="formNueva" class="form-grid" (ngSubmit)="agendarInline()">
+          <div class="form-group">
+            <label for="pracNombre">Nombre de la práctica</label>
+            <input id="pracNombre" formControlName="nombre" placeholder="Ej. Simulación semana 6" />
+          </div>
+          <div class="form-group">
+            <label for="pracCaso">Caso validado</label>
+            <select id="pracCaso" formControlName="caso">
+              @for (c of casosValidados(); track c.id) {
+                <option [value]="c.id">{{ c.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pracMateria">Materia</label>
+            <select id="pracMateria" formControlName="materia">
+              <option [ngValue]="null">— Sin materia —</option>
+              @for (m of materias(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pracGrupo">Grupo</label>
+            <select id="pracGrupo" formControlName="grupo">
+              <option [ngValue]="null">— Sin grupo —</option>
+              @for (g of grupos(); track g.id) {
+                <option [ngValue]="g.id">{{ g.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pracInicio">Fecha inicio</label>
+            <input id="pracInicio" type="datetime-local" formControlName="fecha_inicio" required />
+          </div>
+          <div class="form-group">
+            <label for="pracFin">Fecha fin</label>
+            <input id="pracFin" type="datetime-local" formControlName="fecha_fin" required />
+          </div>
+          <div class="form-group">
+            <label for="pracTiempo">Tiempo máximo (min)</label>
+            <input id="pracTiempo" type="number" formControlName="tiempo_max_min" min="1" />
+          </div>
+          <div class="form-group">
+            <label for="pracLugar">Lugar físico</label>
+            <input id="pracLugar" formControlName="lugar_fisico" placeholder="Opcional" />
+          </div>
+          <div class="form-group full">
+            <label for="pracMensaje">Mensaje personalizado</label>
+            <textarea id="pracMensaje" formControlName="mensaje_personalizado" rows="3" placeholder="Mensaje para los estudiantes"></textarea>
+          </div>
+        </form>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="agendarInline()" [disabled]="formNueva.invalid || guardando()">
+            Agendar práctica
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Participantes -->
+  <div class="tab-panel" [class.active]="tab() === 'participantes'">
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters"></div>
+          <button type="button" class="btn-primary" (click)="irAgregarParticipantes()">Agregar</button>
+        </div>
+      </div>
+      <div class="panel__body">
+        @if (loadingAutorizaciones()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (autorizaciones().length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin participantes</strong>
+            Autoriza estudiantes desde el detalle de una práctica.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Grupo</th>
+                  <th>Correo</th>
+                  <th>Práctica</th>
+                  <th>Asignación</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of autorizaciones(); track a.id) {
+                  <tr>
+                    <td><strong>{{ a.estudiante_nombre }}</strong></td>
+                    <td>{{ a.grupos_display?.trim() || '—' }}</td>
+                    <td>{{ a.estudiante_correo }}</td>
+                    <td>{{ a.practica_nombre }}</td>
+                    <td>{{ a.asignacion_display }}</td>
+                    <td class="col-actions">
+                      <a class="btn-ghost" [routerLink]="['/practicas', a.practica_id]">Abrir</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Códigos de acceso -->
+  <div class="tab-panel" [class.active]="tab() === 'codigos'">
+    <section class="panel">
+      <div class="panel__body">
+        <div class="surface surface--flat codigos-hint">
+          <p>Genera un código por estudiante. Lo usarán en la pantalla de acceso del simulador junto con su correo, como contraseña de ingreso.</p>
+        </div>
+        @if (loadingAutorizaciones()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (autorizaciones().length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin códigos</strong>
+            Autoriza estudiantes en el detalle de una práctica.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Práctica</th>
+                  <th>Estudiante</th>
+                  <th>Correo</th>
+                  <th>Código</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of autorizaciones(); track a.id) {
+                  <tr>
+                    <td>{{ a.practica_nombre }}</td>
+                    <td><strong>{{ a.estudiante_nombre }}</strong></td>
+                    <td>{{ a.estudiante_correo }}</td>
+                    <td><code>{{ a.codigo_acceso }}</code></td>
+                    <td>{{ a.asignacion_display }}</td>
+                    <td class="col-actions">
+                      <button type="button" class="btn-ghost" (click)="copiarCodigo(a.codigo_acceso)">Copiar</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Seguimiento -->
+  <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
+    <section class="panel">
+      <div class="panel__body">
+        @if (loadingSeguimiento()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (seguimiento().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin seguimiento en tiempo real</strong>
+            Autoriza estudiantes y espera a que inicien la simulación.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Práctica</th>
+                  <th>Estado</th>
+                  <th>Progreso</th>
+                  <th>Respondidas</th>
+                  <th>Tiempo</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of seguimiento(); track r.autorizacion_id) {
+                  <tr>
+                    <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                    <td>{{ r.practica_nombre }}</td>
+                    <td><span class="badge" [class]="seguimientoBadge(r.estado)">{{ r.estado_display }}</span></td>
+                    <td>{{ r.progreso_pct }}%</td>
+                    <td>{{ r.respondidas }}/{{ r.total_preguntas }}</td>
+                    <td>{{ r.tiempo_usado_seg }}s</td>
+                    <td class="col-actions">
+                      @if (puedeAutorizarReintento(r.estado)) {
+                        @if (reintentoAutorizado(r.autorizacion_id)) {
+                          <span class="muted">Reintento pendiente</span>
+                        } @else {
+                          <button type="button" class="btn-ghost" (click)="autorizarReintento(r)">
+                            Autorizar reintento
+                          </button>
+                        }
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Historial -->
+  <div class="tab-panel" [class.active]="tab() === 'historial'">
+    <div class="surface tab-empty">
+      @if (historialEventos().length === 0) {
+        <ul class="activity-list activity-list--empty">
+          <li class="activity-list__empty-note">Sin prácticas finalizadas aún.</li>
+        </ul>
+      } @else {
+        <ul class="activity-list">
+          @for (r of historialEventos(); track r.autorizacion_id) {
+            <li>
+              <strong>{{ r.estudiante_nombre }}</strong> finalizó {{ r.practica_nombre }}
+              <span class="muted">· {{ r.caso_nombre }} · {{ r.respondidas }}/{{ r.total_preguntas }} resp.</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+</section>

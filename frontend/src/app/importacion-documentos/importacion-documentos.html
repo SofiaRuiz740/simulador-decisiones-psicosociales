@@ -1,0 +1,179 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Importar</em></h1>
+  </header>
+
+  <nav class="tabs" aria-label="Tipos de importación">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <!-- Caso -->
+  <div class="tab-panel" [class.active]="tab() === 'caso'">
+    <div class="dropzone" (click)="fileInput.click()">
+      <p class="dropzone__title">Subir documento</p>
+      <p class="dropzone__hint">PDF, DOCX o TXT — máx. 10 MB</p>
+    </div>
+    <input #fileInput type="file" accept=".pdf,.txt,.docx" hidden (change)="seleccionar($event)" />
+
+    @if (archivo(); as a) {
+      <div class="file-info">
+        <strong>{{ a.nombre_original }}</strong>
+        <span>{{ a.tipo }} · {{ a.estado_display }}</span>
+      </div>
+    }
+
+    @if (archivo() && !archivo()!.texto_extraido) {
+      <div class="builder-block" style="margin-top: 1rem">
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="procesar()" [disabled]="loading() || archivo()!.estado !== 'SUBIDO'">
+            Procesar documento
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="grid-2 import-grid">
+      <div class="template-preview">
+        <h4>Estructura esperada</h4>
+        <div class="doc-preview">
+          <h5>Datos generales</h5>
+          <p>Nombre, área psicosocial, tiempo estimado</p>
+          <h5>Contexto e historia</h5>
+          <p>Narrativa del caso…</p>
+          <h5>Escenarios y preguntas</h5>
+          <p>Escenario 1, Pregunta 1…</p>
+          <h5>Rúbrica</h5>
+          <p>Criterios y niveles</p>
+        </div>
+      </div>
+
+      <div class="template-preview">
+        <h4>Resultado</h4>
+        @if (archivo()?.texto_extraido) {
+          <div class="field">
+            <label for="nombreCaso">Nombre del caso</label>
+            <input id="nombreCaso" type="text" [(ngModel)]="nombreCasoVal" maxlength="200" required />
+          </div>
+          <div class="field">
+            <label for="areaCaso">Área psicosocial (opcional)</label>
+            <input id="areaCaso" type="text" [(ngModel)]="areaCasoVal" maxlength="150" />
+          </div>
+          @if (archivo()!.texto_extraido) {
+            <div class="doc-preview doc-preview--compact">
+              <pre>{{ vistaPrevia() }}</pre>
+            </div>
+          }
+          <div class="form-actions">
+            <button type="button" class="btn-primary" (click)="crearCaso()" [disabled]="loading() || !nombreCasoVal.trim()">
+              Crear caso en revisión
+            </button>
+          </div>
+        } @else {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin resultado</strong>
+            Sube y procesa un documento para ver la vista previa y crear el caso.
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Estudiantes -->
+  <div class="tab-panel" [class.active]="tab() === 'estudiantes'">
+    <div class="dropzone" (click)="fileEstudiantes.click()">
+      <p class="dropzone__title">Subir Excel o CSV</p>
+      <p class="dropzone__hint">nombre, correo, identificación, materia, grupo</p>
+    </div>
+    <input #fileEstudiantes type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarEstudiantes($event)" />
+
+    @if (resultadoEstudiantes(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.estudiantes_creados }} creados · {{ r.estudiantes_vinculados }} vinculados ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <div class="template-preview" style="margin-top: 1rem">
+      <h4>Plantilla esperada</h4>
+      <table class="template-table">
+        <thead>
+          <tr><th>nombre</th><th>correo</th><th>identificacion</th><th>materia</th><th>grupo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ana López</td><td>ana@institucion.edu</td><td>20201234</td><td>Psicología social</td><td>Grupo A</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Grupos -->
+  <div class="tab-panel" [class.active]="tab() === 'grupos'">
+    <div class="dropzone" (click)="fileGrupos.click()">
+      <p class="dropzone__title">Subir Excel o CSV de grupos</p>
+      <p class="dropzone__hint">grupo, materia, periodo, estudiantes (correos separados por ;)</p>
+    </div>
+    <input #fileGrupos type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarGrupos($event)" />
+
+    @if (resultadoGrupos(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <div class="template-preview" style="margin-top: 1rem">
+      <h4>Plantilla esperada</h4>
+      <table class="template-table">
+        <thead>
+          <tr><th>grupo</th><th>materia</th><th>periodo</th><th>estudiantes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Grupo A</td><td>Psicología social</td><td>2026-1</td><td>ana@x.edu; pedro@x.edu</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Plantillas -->
+  <div class="tab-panel" [class.active]="tab() === 'plantillas'">
+    <div class="import-types">
+      @for (p of plantillas; track p.titulo) {
+        <button type="button" class="import-type" (click)="descargarPlantilla(p)">
+          <h4>{{ p.titulo }}</h4>
+          <p>{{ p.formato }}</p>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+</section>

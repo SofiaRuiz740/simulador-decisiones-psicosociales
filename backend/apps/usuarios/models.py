@@ -25,6 +25,12 @@ class Usuario(AbstractUser):
         choices=Rol.choices,
         default=Rol.DOCENTE,
     )
+    correo_smtp_password = models.CharField(
+        'clave SMTP del correo',
+        max_length=128,
+        blank=True,
+        help_text='Contraseña de aplicación Gmail (misma cuenta que email).',
+    )
 
     class Meta:
         verbose_name = 'Usuario'
@@ -45,3 +51,7 @@ class Usuario(AbstractUser):
     @property
     def es_estudiante(self) -> bool:
         return self.rol == self.Rol.ESTUDIANTE
+
+    @property
+    def correo_smtp_configurado(self) -> bool:
+        return bool((self.correo_smtp_password or '').strip())

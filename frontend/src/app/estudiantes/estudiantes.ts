@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Estudiante } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { mockupDialog } from '../shared/constants/dialog-config';
 import { AgregarPorCorreoDialog } from './dialogs/agregar-por-correo-dialog';
 import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
 
@@ -16,12 +15,10 @@ import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
   selector: 'app-estudiantes',
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
+    FormsModule,
     MatDialogModule,
     MatProgressBarModule,
     MatSnackBarModule,
-    MatTooltipModule,
   ],
   templateUrl: './estudiantes.html',
   styleUrl: './estudiantes.scss',
@@ -35,13 +32,25 @@ export class Estudiantes implements OnInit {
   readonly estudiantes = signal<Estudiante[]>([]);
   readonly total = signal(0);
   readonly activos = computed(() => this.estudiantes().filter((e) => e.activo).length);
+  readonly inactivos = computed(() => this.estudiantes().filter((e) => !e.activo).length);
+  readonly sinGrupo = computed(() => this.estudiantes().filter((e) => e.sin_grupo).length);
 
-  inicialesDe(nombre: string, correo: string): string {
-    const partes = (nombre || correo).split(/\s+/);
-    const a = partes[0]?.charAt(0) || '';
-    const b = partes[partes.length - 1]?.charAt(0) || '';
-    return (a + (partes.length > 1 ? b : '')).toUpperCase() || '?';
-  }
+  filtroTexto = '';
+  filtroEstado: '' | 'activo' | 'inactivo' = '';
+
+  readonly filtrados = computed(() => {
+    const txt = this.filtroTexto.toLowerCase().trim();
+    const est = this.filtroEstado;
+    return this.estudiantes().filter((e) => {
+      if (est === 'activo' && !e.activo) return false;
+      if (est === 'inactivo' && e.activo) return false;
+      if (!txt) return true;
+      return (
+        e.nombre_completo.toLowerCase().includes(txt) ||
+        e.correo.toLowerCase().includes(txt)
+      );
+    });
+  });
 
   ngOnInit(): void {
     this.cargar();
@@ -63,27 +72,21 @@ export class Estudiantes implements OnInit {
   }
 
   agregarPorCorreo(): void {
-    this.dialog
-      .open(AgregarPorCorreoDialog, { width: '500px', autoFocus: true })
-      .afterClosed()
+    this.dialog.open(AgregarPorCorreoDialog, mockupDialog('500px')).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });
   }
 
   crear(): void {
-    this.dialog
-      .open(EstudianteFormDialog, { width: '500px', data: {} })
-      .afterClosed()
+    this.dialog.open(EstudianteFormDialog, { ...mockupDialog('500px'), data: {} }).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });
   }
 
   editar(estudiante: Estudiante): void {
-    this.dialog
-      .open(EstudianteFormDialog, { width: '500px', data: { estudiante } })
-      .afterClosed()
+    this.dialog.open(EstudianteFormDialog, { ...mockupDialog('500px'), data: { estudiante } }).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });

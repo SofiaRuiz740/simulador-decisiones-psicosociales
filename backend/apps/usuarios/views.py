@@ -12,6 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Usuario
 from .serializers import (
     CustomTokenObtainPairSerializer,
+    PerfilUpdateSerializer,
     RegistroDocenteSerializer,
     UsuarioSerializer,
 )
@@ -56,14 +57,29 @@ class RegistroDocenteView(generics.CreateAPIView):
         )
 
 
-class PerfilView(generics.RetrieveAPIView):
-    """Devuelve el perfil del usuario autenticado (protegido)."""
+class PerfilView(generics.RetrieveUpdateAPIView):
+    """Perfil del usuario autenticado (GET) y configuración de correo SMTP (PATCH)."""
 
-    serializer_class = UsuarioSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self) -> Usuario:
         return self.request.user
+
+    def get_serializer_class(self):
+        if self.request.method in ('PUT', 'PATCH'):
+            return PerfilUpdateSerializer
+        return UsuarioSerializer
+
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        if request.user.rol not in (Usuario.Rol.DOCENTE, Usuario.Rol.ADMIN):
+            return Response(
+                {'detail': 'Solo docentes pueden configurar el correo de invitaciones.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = PerfilUpdateSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UsuarioSerializer(request.user).data)
 
 
 class LogoutView(APIView):

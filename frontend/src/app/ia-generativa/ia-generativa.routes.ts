@@ -5,12 +5,13 @@ export const IA_GENERATIVA_ROUTES: Routes = [
     path: '',
     loadComponent: () =>
       import('./propuestas-list').then((m) => m.PropuestasListPage),
-    title: 'IA generativa · Propuestas',
+    title: 'IA generativa',
   },
   {
     path: 'nuevo',
-    loadComponent: () => import('./generar-caso').then((m) => m.GenerarCasoPage),
-    title: 'Generar caso con IA',
+    loadComponent: () =>
+      import('./propuestas-list').then((m) => m.PropuestasListPage),
+    title: 'IA generativa · Nueva propuesta',
   },
   {
     path: 'propuesta/:id',

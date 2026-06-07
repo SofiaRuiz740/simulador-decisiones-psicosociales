@@ -2,9 +2,19 @@
 
 from rest_framework import serializers
 
-from apps.academico.models import Estudiante
+from apps.academico.models import Estudiante, Grupo
+from apps.academico.validators import validar_materia_docente
 
 from .models import AutorizacionEstudiante, Practica
+
+
+def validar_grupo_docente(grupo: Grupo | None, user) -> Grupo | None:
+    if grupo is None:
+        return None
+    from apps.usuarios.models import Usuario
+    if user.rol == Usuario.Rol.DOCENTE and grupo.docente_id != user.id:
+        raise serializers.ValidationError('El grupo no pertenece a este docente.')
+    return grupo
 
 
 class AutorizacionSerializer(serializers.ModelSerializer):
@@ -24,11 +34,14 @@ class PracticaListSerializer(serializers.ModelSerializer):
     caso_nombre = serializers.CharField(source='caso.nombre', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     autorizaciones_count = serializers.SerializerMethodField()
+    materia_display = serializers.SerializerMethodField()
+    grupos_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Practica
         fields = (
-            'id', 'nombre', 'caso', 'caso_nombre', 'docente',
+            'id', 'nombre', 'caso', 'caso_nombre', 'docente', 'materia', 'grupo',
+            'materia_display', 'grupos_display',
             'fecha_inicio', 'fecha_fin', 'tiempo_max_min',
             'lugar_fisico', 'mensaje_personalizado',
             'estado', 'estado_display', 'autorizaciones_count',
@@ -36,11 +49,44 @@ class PracticaListSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id', 'docente', 'caso_nombre', 'estado_display',
+            'materia_display', 'grupos_display',
             'autorizaciones_count', 'fecha_creacion', 'fecha_actualizacion',
         )
 
     def get_autorizaciones_count(self, obj: Practica) -> int:
         return obj.autorizaciones.count()
+
+    def get_materia_display(self, obj: Practica) -> str | None:
+        if obj.materia_id:
+            return obj.materia.nombre
+        if obj.caso.materia_id:
+            return obj.caso.materia.nombre
+        return None
+
+    def get_grupos_display(self, obj: Practica) -> str | None:
+        if obj.grupo_id:
+            return obj.grupo.nombre
+        estudiante_ids = obj.autorizaciones.values_list('estudiante_id', flat=True)
+        if not estudiante_ids:
+            return None
+        nombres = Grupo.objects.filter(
+            docente=obj.docente,
+            estudiantes__id__in=estudiante_ids,
+        ).distinct().order_by('nombre').values_list('nombre', flat=True)
+        lista = list(nombres)
+        return ', '.join(lista) if lista else None
+
+    def validate_materia(self, value):
+        request = self.context.get('request')
+        if request:
+            validar_materia_docente(value, request.user)
+        return value
+
+    def validate_grupo(self, value):
+        request = self.context.get('request')
+        if request:
+            validar_grupo_docente(value, request.user)
+        return value
 
 
 class PracticaDetalleSerializer(PracticaListSerializer):
@@ -59,6 +105,60 @@ class AutorizarEstudiantesSerializer(serializers.Serializer):
     grupo_ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1), required=False, default=list,
     )
+    correo_smtp_password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        style={'input_type': 'password'},
+    )
+
+
+class ReenviarInvitacionSerializer(serializers.Serializer):
+    correo_smtp_password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        style={'input_type': 'password'},
+    )
+
+
+class MisPracticaEstudianteSerializer(serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True)
+    autorizacion_id = serializers.IntegerField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    caso_nombre = serializers.CharField()
+    codigo_acceso = serializers.CharField()
+    materia_display = serializers.CharField(allow_null=True)
+    fecha_inicio = serializers.DateTimeField()
+    fecha_fin = serializers.DateTimeField()
+    tiempo_max_min = serializers.IntegerField()
+    practica_estado = serializers.CharField()
+    practica_estado_display = serializers.CharField()
+    estado = serializers.CharField()
+    estado_display = serializers.CharField()
+    progreso_pct = serializers.IntegerField()
+    total_preguntas = serializers.IntegerField()
+    respondidas = serializers.IntegerField()
+    tiempo_usado_seg = serializers.IntegerField()
+    tiempo_restante_seg = serializers.IntegerField()
+    nota_final = serializers.FloatField(allow_null=True)
+
+
+class AutorizacionListSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    practica_estado = serializers.CharField()
+    practica_estado_display = serializers.CharField()
+    estudiante_id = serializers.IntegerField()
+    estudiante_nombre = serializers.CharField()
+    estudiante_correo = serializers.EmailField()
+    grupos_display = serializers.CharField(allow_null=True)
+    codigo_acceso = serializers.CharField()
+    asignacion_display = serializers.CharField()
+    reintento_autorizado = serializers.BooleanField()
+    fecha_creacion = serializers.DateTimeField()
 
 
 class AccesoEstudianteSerializer(serializers.Serializer):

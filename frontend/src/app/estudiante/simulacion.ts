@@ -25,8 +25,7 @@ interface PaginaSimulacion {
   selector: 'app-simulacion',
   imports: [
     CommonModule, RouterLink,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatProgressBarModule, MatRadioModule, MatSnackBarModule,
+    MatProgressBarModule, MatSnackBarModule,
   ],
   templateUrl: './simulacion.html',
   styleUrl: './simulacion.scss',
@@ -140,22 +139,20 @@ export class Simulacion implements OnInit, OnDestroy {
   }
 
   private iniciarTimer(p: Participacion) {
-    const practicaActiva = JSON.parse(localStorage.getItem('simulador.practica_activa') || '{}');
-    const tiempoMaxMin: number = practicaActiva.tiempo_max_min || 30;
-    const inicio = p.inicio ? new Date(p.inicio).getTime() : Date.now();
-    const finEsperado = inicio + tiempoMaxMin * 60 * 1000;
-
-    const tick = () => {
-      const restante = Math.max(0, Math.floor((finEsperado - Date.now()) / 1000));
-      this.tiempoRestanteSeg.set(restante);
-      if (restante <= 0) {
-        clearInterval(this.timerInterval);
-        this.snackBar.open('Tiempo agotado. Finalizando…', 'OK', { duration: 3000 });
-        this.finalizar(true);
-      }
+    const sync = () => {
+      this.servicio.progreso(p.id).subscribe({
+        next: (prog) => {
+          this.tiempoRestanteSeg.set(prog.tiempo_restante_seg);
+          if (prog.tiempo_restante_seg <= 0 && prog.estado === 'EN_CURSO') {
+            if (this.timerInterval) clearInterval(this.timerInterval);
+            this.snackBar.open('Tiempo agotado. Finalizando…', 'OK', { duration: 3000 });
+            this.finalizar(true);
+          }
+        },
+      });
     };
-    tick();
-    this.timerInterval = setInterval(tick, 1000);
+    sync();
+    this.timerInterval = setInterval(sync, 1000);
   }
 
   tiempoFormato(): string {

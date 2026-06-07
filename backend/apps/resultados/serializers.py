@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from apps.casos.models import Pregunta
 from apps.casos.serializers import RespuestaSerializer
+from apps.practicas.services import _grupos_estudiante_docente, _materia_display_practica
 
 from .models import Resultado
 
@@ -25,6 +26,10 @@ class ResultadoSerializer(serializers.ModelSerializer):
     practica_id = serializers.IntegerField(source='participacion.practica_id', read_only=True)
     practica_nombre = serializers.CharField(source='participacion.practica.nombre', read_only=True)
     caso_nombre = serializers.CharField(source='participacion.practica.caso.nombre', read_only=True)
+    materia_display = serializers.SerializerMethodField()
+    grupos_display = serializers.SerializerMethodField()
+    tiempo_usado_seg = serializers.IntegerField(source='participacion.tiempo_usado_seg', read_only=True)
+    participacion_estado = serializers.CharField(source='participacion.estado', read_only=True)
     nota_aprobacion = serializers.SerializerMethodField()
     rubrica_descripcion = serializers.SerializerMethodField()
     detalle_preguntas = serializers.SerializerMethodField()
@@ -35,6 +40,7 @@ class ResultadoSerializer(serializers.ModelSerializer):
             'id', 'participacion',
             'estudiante_correo', 'estudiante_nombre',
             'practica_id', 'practica_nombre', 'caso_nombre',
+            'materia_display', 'grupos_display', 'tiempo_usado_seg', 'participacion_estado',
             'correctas', 'incorrectas', 'no_respondidas',
             'peso_obtenido', 'peso_total', 'nota_final', 'aprobado',
             'nota_aprobacion', 'rubrica_descripcion', 'desglose_criterios',
@@ -46,12 +52,20 @@ class ResultadoSerializer(serializers.ModelSerializer):
             'id', 'participacion',
             'estudiante_correo', 'estudiante_nombre',
             'practica_id', 'practica_nombre', 'caso_nombre',
+            'materia_display', 'grupos_display', 'tiempo_usado_seg', 'participacion_estado',
             'correctas', 'incorrectas', 'no_respondidas',
             'peso_obtenido', 'peso_total', 'nota_final', 'aprobado',
             'nota_aprobacion', 'rubrica_descripcion', 'desglose_criterios',
             'fecha_calculo', 'fecha_actualizacion',
             'detalle_preguntas', 'notificado_estudiante',
         )
+
+    def get_materia_display(self, obj: Resultado) -> str | None:
+        return _materia_display_practica(obj.participacion.practica)
+
+    def get_grupos_display(self, obj: Resultado) -> str | None:
+        part = obj.participacion
+        return _grupos_estudiante_docente(part.estudiante, part.practica.docente_id)
 
     def get_nota_aprobacion(self, obj):
         rub = getattr(obj.participacion.practica.caso, 'rubrica', None)

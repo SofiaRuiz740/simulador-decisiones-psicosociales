@@ -32,6 +32,22 @@ class Practica(models.Model):
         on_delete=models.PROTECT,
         related_name='practicas',
     )
+    materia = models.ForeignKey(
+        'academico.Materia',
+        verbose_name='materia',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='practicas',
+    )
+    grupo = models.ForeignKey(
+        'academico.Grupo',
+        verbose_name='grupo',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='practicas',
+    )
     fecha_inicio = models.DateTimeField('fecha y hora de inicio')
     fecha_fin = models.DateTimeField('fecha y hora de finalización')
     tiempo_max_min = models.PositiveIntegerField('tiempo máximo de participación (min)', default=30)

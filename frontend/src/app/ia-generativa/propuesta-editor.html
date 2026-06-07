@@ -1,43 +1,31 @@
-<section class="page">
+<section class="module page">
 
-  <a [routerLink]="['/ia-generativa/propuesta', propuesta()?.id]" class="back-link">
-    <mat-icon>arrow_back</mat-icon> Volver al preview
-  </a>
+  <a [routerLink]="['/ia-generativa/propuesta', propuesta()?.id]" class="page-back">← Volver al preview</a>
 
-  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
+  @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
 
   @if (propuesta(); as p) {
     @if (contenido(); as c) {
-      <header class="head anim-fade-up">
-        <div class="head-text">
-          <span class="kicker-deep">Editor de propuesta</span>
-          <h1 class="display">
-            Ajusta el caso a tu <em>medida</em>.
-          </h1>
-          <p class="lead">
-            Edita títulos, narrativas, opciones y retroalimentaciones.
-            Los cambios se guardan sobre la propuesta y se reflejan en el preview.
-          </p>
-        </div>
-        <div class="head-actions">
-          <button mat-stroked-button class="btn-cancel"
-            [routerLink]="['/ia-generativa/propuesta', p.id]">
-            Cancelar
-          </button>
-          <button mat-flat-button class="btn-save"
-            (click)="guardar()" [disabled]="guardando()">
-            <mat-icon>save</mat-icon>
-            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
-          </button>
+      <header class="hero-glass hero-glass--compact">
+        <div class="hero-glass__row">
+          <div>
+            <h1><em>Editor</em> de propuesta</h1>
+            <p class="hero-glass__meta">{{ p.titulo }}</p>
+          </div>
+          <div class="actions actions--end">
+            <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id]">Cancelar</a>
+            <button type="button" class="btn-primary" (click)="guardar()" [disabled]="guardando()">
+              {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+            </button>
+          </div>
         </div>
       </header>
 
       <!-- Datos generales -->
-      <section class="block anim-fade-up">
-        <header class="block-head">
-          <span class="block-num">01</span>
-          <h2 class="block-title">Datos generales</h2>
-        </header>
+      <div class="builder-block section-block">
+        <div class="builder-header">
+          <h3 class="card__title">01 · Datos generales</h3>
+        </div>
         <div class="grid-2">
           <mat-form-field appearance="outline" class="col-full">
             <mat-label>Título del caso</mat-label>
@@ -64,14 +52,13 @@
             <textarea matInput rows="2" [(ngModel)]="c.objetivo_aprendizaje"></textarea>
           </mat-form-field>
         </div>
-      </section>
+      </div>
 
       <!-- Storytelling -->
-      <section class="block anim-fade-up">
-        <header class="block-head">
-          <span class="block-num">02</span>
-          <h2 class="block-title">Historia</h2>
-        </header>
+      <div class="builder-block section-block">
+        <div class="builder-header">
+          <h3 class="card__title">02 · Historia</h3>
+        </div>
         <div class="grid-2">
           <mat-form-field appearance="outline" class="col-full">
             <mat-label>Introducción</mat-label>
@@ -98,15 +85,14 @@
             <input matInput [(ngModel)]="c.storytelling.objetivo_del_estudiante" />
           </mat-form-field>
         </div>
-      </section>
+      </div>
 
       <!-- Escenarios -->
-      <section class="block anim-fade-up">
-        <header class="block-head">
-          <span class="block-num">03</span>
-          <h2 class="block-title">Escenarios y decisiones</h2>
-          <span class="block-meta">{{ c.escenarios.length }} escenarios</span>
-        </header>
+      <div class="builder-block section-block">
+        <div class="builder-header">
+          <h3 class="card__title">03 · Escenarios y decisiones</h3>
+          <span class="section-meta">{{ c.escenarios.length }} escenarios</span>
+        </div>
 
         @for (esc of c.escenarios; track $index; let escIdx = $index) {
           <article class="esc">
@@ -216,14 +202,13 @@
             }
           </article>
         }
-      </section>
+      </div>
 
       <!-- Cierre -->
-      <section class="block anim-fade-up">
-        <header class="block-head">
-          <span class="block-num">04</span>
-          <h2 class="block-title">Retroalimentación de cierre</h2>
-        </header>
+      <div class="builder-block section-block">
+        <div class="builder-header">
+          <h3 class="card__title">04 · Retroalimentación de cierre</h3>
+        </div>
 
         <mat-form-field appearance="outline" class="col-full">
           <mat-label>Retroalimentación general al estudiante</mat-label>
@@ -234,19 +219,15 @@
           <mat-label>Recomendaciones para el docente</mat-label>
           <textarea matInput rows="2" [(ngModel)]="c.recomendaciones_docente"></textarea>
         </mat-form-field>
-      </section>
+      </div>
 
-      <!-- Barra final -->
-      <footer class="foot-bar">
-        <button mat-stroked-button class="btn-cancel"
-          [routerLink]="['/ia-generativa/propuesta', p.id]">
-          Cancelar
-        </button>
-        <button mat-flat-button class="btn-save"
-          (click)="guardarYVolver()" [disabled]="guardando()">
-          <mat-icon>save</mat-icon>
-          {{ guardando() ? 'Guardando…' : 'Guardar y volver al preview' }}
-        </button>
+      <footer class="builder-footer editor-footer">
+        <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id]">Cancelar</a>
+        <div class="builder-footer__actions">
+          <button type="button" class="btn-primary" (click)="guardarYVolver()" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar y volver al preview' }}
+          </button>
+        </div>
       </footer>
     }
   }

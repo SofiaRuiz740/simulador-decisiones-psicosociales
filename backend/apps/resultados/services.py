@@ -9,6 +9,9 @@ cálculo plano histórico: peso_obtenido / peso_total * escala_maxima.
 
 from decimal import Decimal
 
+from django.conf import settings
+from django.core.mail import send_mail
+
 from apps.casos.models import Pregunta
 from apps.participaciones.models import Participacion, RespuestaSeleccionada
 
@@ -32,6 +35,35 @@ def _nivel_alcanzado(porcentaje: float, niveles: list) -> dict | None:
     if porcentaje <= 0:
         idx = 0
     return ordenados[idx]
+
+
+def notificar_resultado_estudiante(resultado: Resultado) -> None:
+    """Envía correo con la nota al estudiante (RF42). Marca notificado si el envío sale bien."""
+    if resultado.notificado_estudiante:
+        return
+    estudiante = resultado.participacion.estudiante
+    practica = resultado.participacion.practica
+    asunto = f'Resultado de la práctica: {practica.nombre}'
+    cuerpo = (
+        f'Hola {estudiante.nombre_completo},\n\n'
+        f'Tu participación en la práctica «{practica.nombre}» fue calificada.\n'
+        f'  • Nota final: {resultado.nota_final}\n'
+        f'  • Estado: {"Aprobado" if resultado.aprobado else "No aprobado"}\n'
+        f'  • Correctas: {resultado.correctas} · Incorrectas: {resultado.incorrectas}\n\n'
+        f'Consulta el detalle en el simulador.\n'
+    )
+    try:
+        send_mail(
+            asunto,
+            cuerpo,
+            settings.DEFAULT_FROM_EMAIL,
+            [estudiante.correo],
+            fail_silently=True,
+        )
+        resultado.notificado_estudiante = True
+        resultado.save(update_fields=['notificado_estudiante'])
+    except Exception:
+        pass
 
 
 def calcular_resultado(participacion: Participacion) -> Resultado:
@@ -128,4 +160,5 @@ def calcular_resultado(participacion: Participacion) -> Resultado:
             'desglose_criterios': desglose,
         },
     )
+    notificar_resultado_estudiante(resultado)
     return resultado

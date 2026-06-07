@@ -1,0 +1,83 @@
+<div class="case-preview">
+  <div class="case-preview__device">
+    <div class="case-preview__chrome">
+      <div class="case-preview__dots"><i></i><i></i><i></i></div>
+      <div class="case-preview__url">simulador.psico.edu · práctica</div>
+    </div>
+    <div class="case-preview__screen">
+      <div class="case-preview__scene">
+        @if (hasScene()) {
+          <div class="case-preview__meta">
+            @if (data().escenarioTitulo) {
+              <span class="case-preview__tag">
+                Escenario {{ data().escenarioOrden ?? 1 }} · {{ data().escenarioTitulo }}
+              </span>
+            }
+            @if (data().pregunta) {
+              <span class="case-preview__step">
+                Pregunta 1 de {{ data().preguntasCount || 1 }}
+              </span>
+            }
+          </div>
+          @if (data().narrativa) {
+            <div class="case-preview__narrative">
+              <p>{{ data().narrativa }}</p>
+            </div>
+          }
+          @if (data().pregunta) {
+            <p class="case-preview__question">{{ data().pregunta }}</p>
+          }
+          @if (data().opciones?.length) {
+            <div class="case-preview__options">
+              @for (op of data().opciones!; track $index) {
+                <button
+                  type="button"
+                  class="case-preview__opt"
+                  [class.selected]="selectedOption() === $index"
+                  (click)="selectOption($index)">
+                  <span class="case-preview__opt-letter">{{ optionLetter($index) }}</span>
+                  <span>{{ op.texto }}</span>
+                </button>
+              }
+            </div>
+          }
+        } @else {
+          <div class="case-preview__empty">
+            <p>Configura escenarios y preguntas para ver la vista previa.</p>
+          </div>
+        }
+        <div class="case-preview__bar">
+          <div class="case-preview__timer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            </svg>
+            {{ data().tiempoMin || 30 }}:00
+          </div>
+          <div class="case-preview__progress">
+            <div class="case-preview__progress-fill" [style.width.%]="progressPct()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="case-preview__aside">
+    <div class="case-preview__card">
+      <h5>Caso</h5>
+      <p><strong>{{ data().titulo || 'Sin título' }}</strong></p>
+    </div>
+    <div class="case-preview__card">
+      <h5>Resumen</h5>
+      <div class="case-preview__stat"><span>Tiempo</span><strong>{{ data().tiempoMin ?? '—' }} min</strong></div>
+      <div class="case-preview__stat"><span>Escenarios</span><strong>{{ data().escenariosCount ?? '—' }}</strong></div>
+      <div class="case-preview__stat"><span>Preguntas</span><strong>{{ data().preguntasCount ?? '—' }}</strong></div>
+      <div class="case-preview__stat"><span>Estado</span><strong>{{ data().estadoDisplay || '—' }}</strong></div>
+    </div>
+    <div class="case-preview__card">
+      <h5>Nota</h5>
+      <p class="case-preview__note">
+        Así verá el estudiante la simulación. Las opciones dependen de lo configurado en los pasos anteriores.
+      </p>
+    </div>
+  </aside>
+</div>

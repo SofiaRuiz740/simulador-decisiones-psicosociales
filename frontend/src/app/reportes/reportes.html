@@ -1,0 +1,189 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Reportes</em></h1>
+  </header>
+
+  <div class="panel__toolbar report-toolbar">
+    <div class="toolbar">
+      <div class="toolbar__filters">
+        <input type="date" [(ngModel)]="filtroDesde" aria-label="Desde" />
+        <input type="date" [(ngModel)]="filtroHasta" aria-label="Hasta" />
+        <select [(ngModel)]="filtroMateriaId" aria-label="Materia">
+          <option [ngValue]="null">Todas las materias</option>
+          @for (m of materias(); track m.id) {
+            <option [ngValue]="m.id">{{ m.nombre }}</option>
+          }
+        </select>
+        <select [(ngModel)]="filtroGrupoId" aria-label="Grupo">
+          <option [ngValue]="null">Todos los grupos</option>
+          @for (g of grupos(); track g.id) {
+            <option [ngValue]="g.id">{{ g.nombre }}</option>
+          }
+        </select>
+        <select [(ngModel)]="filtroEstudianteId" aria-label="Estudiante">
+          <option [ngValue]="null">Todos los estudiantes</option>
+          @for (e of estudiantes(); track e.id) {
+            <option [ngValue]="e.id">{{ e.nombre_completo }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="btn-secondary" (click)="aplicarFiltros()">Filtrar</button>
+    </div>
+  </div>
+
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ resumen()?.practicas ?? 0 }}</div>
+        <div class="metric__label">Prácticas</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ resumen()?.con_participantes ?? 0 }}</div>
+        <div class="metric__label">Con participantes</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ resumen()?.finalizadas ?? 0 }}</div>
+        <div class="metric__label">Finalizadas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ resumen()?.exportaciones ?? 0 }}</div>
+        <div class="metric__label">Exportaciones</div>
+      </article>
+    </section>
+  }
+
+  <section class="surface report-list">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate" />
+    } @else if (practicas().length === 0) {
+      <div class="empty-state-mockup">
+        <strong>No hay prácticas para reportar</strong>
+        Agenda y ejecuta prácticas para generar reportes PDF o Excel.
+      </div>
+    } @else {
+      <div class="form-section__title">Reporte por práctica</div>
+      @for (p of practicas(); track p.id) {
+        <article class="report-item">
+          <div>
+            <h3>{{ p.nombre }}</h3>
+            <p>{{ p.caso_nombre }} · {{ p.fecha_inicio | date:'mediumDate' }}</p>
+          </div>
+          <div class="actions actions--end">
+            <button type="button" class="btn-ghost" (click)="descargarPDF(p)" [disabled]="descargando() === p.id + '-pdf'">PDF</button>
+            <button type="button" class="btn-ghost" (click)="descargarExcel(p)" [disabled]="descargando() === p.id + '-xlsx'">Excel</button>
+          </div>
+        </article>
+      }
+
+      <div class="form-section__title report-catalog-title">Otros reportes</div>
+      @for (r of catalogoReportes; track r.titulo) {
+        <article class="report-item" [class.report-item--disabled]="r.tipo === 'proximamente'">
+          <div>
+            <h3>{{ r.titulo }}</h3>
+            <p class="muted">{{ hintCatalogo(r) }}</p>
+          </div>
+          <div class="actions actions--end">
+            <button
+              type="button"
+              class="btn-ghost"
+              [disabled]="r.tipo === 'proximamente' || descargando() === r.tipo + '-' + idCatalogo(r.tipo) + '-pdf'"
+              (click)="descargarCatalogoPDF(r)"
+            >PDF</button>
+            <button
+              type="button"
+              class="btn-ghost"
+              [disabled]="r.tipo === 'proximamente' || descargando() === r.tipo + '-' + idCatalogo(r.tipo) + '-xlsx'"
+              (click)="descargarCatalogoExcel(r)"
+            >Excel</button>
+          </div>
+        </article>
+      }
+    }
+  </section>
+
+  <div class="grid-2 charts-grid">
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Desempeño por criterio</h3>
+      </div>
+      @if ((analitica()?.desempeno_criterios?.length ?? 0) === 0) {
+        <div class="empty-state-mockup empty-state-mockup--compact">
+          Gráfico disponible cuando haya resultados agregados.
+        </div>
+      } @else {
+        <div class="chart-bars">
+          @for (c of analitica()!.desempeno_criterios; track c.criterio_id) {
+            <div class="chart-bar-row">
+              <span class="chart-bar-label">{{ c.nombre }}</span>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill chart-bar-fill--accent" [style.width.%]="c.porcentaje_promedio"></div>
+              </div>
+              <span class="chart-bar-value">{{ c.porcentaje_promedio }}%</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Distribución de notas</h3>
+      </div>
+      @if ((analitica()?.total_resultados ?? 0) === 0) {
+        <div class="empty-state-mockup empty-state-mockup--compact">
+          Gráfico disponible cuando haya resultados agregados.
+        </div>
+      } @else {
+        <div class="chart-bars">
+          @for (d of analitica()!.distribucion_notas; track d.rango) {
+            <div class="chart-bar-row">
+              <span class="chart-bar-label">{{ d.rango }}</span>
+              <div class="chart-bar-track">
+                <div
+                  class="chart-bar-fill chart-bar-fill--teal"
+                  [style.width.%]="(d.cantidad / maxNotas(analitica()!.distribucion_notas)) * 100"
+                ></div>
+              </div>
+              <span class="chart-bar-value">{{ d.cantidad }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+
+  <section class="surface feedback-pending">
+    <div class="card__header">
+      <h3 class="card__title">Feedback pendiente</h3>
+    </div>
+    @if ((analitica()?.feedback_pendiente?.length ?? 0) === 0) {
+      <div class="empty-state-mockup empty-state-mockup--compact">
+        No hay retroalimentaciones pendientes con los filtros actuales.
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Práctica</th>
+              <th>Nota</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of analitica()!.feedback_pendiente; track f.resultado_id) {
+              <tr>
+                <td>{{ f.estudiante_nombre }}</td>
+                <td>{{ f.practica_nombre }}</td>
+                <td>{{ f.nota_final }}</td>
+                <td>{{ f.fecha_calculo | date:'short' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+</section>

@@ -1,6 +1,7 @@
 """Views de la app academico: ViewSets para Estudiante y Grupo."""
 
 from django.db import transaction
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -10,13 +11,15 @@ from rest_framework.response import Response
 from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
 
-from .models import Estudiante, Grupo, InscripcionGrupo
+from .models import Estudiante, Grupo, InscripcionGrupo, Materia
 from .serializers import (
     AgregarEstudiantePorCorreoSerializer,
+    EstudianteListSerializer,
     EstudianteSerializer,
     GrupoDetalleSerializer,
     GrupoEstudiantesSerializer,
     GrupoSerializer,
+    MateriaSerializer,
 )
 
 
@@ -36,11 +39,20 @@ class EstudianteViewSet(viewsets.ModelViewSet):
     serializer_class = EstudianteSerializer
     permission_classes = [EsDocenteOAdmin]
 
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return EstudianteListSerializer
+        return EstudianteSerializer
+
     def get_queryset(self):
         user = self.request.user
         if user.rol == Usuario.Rol.ADMIN:
-            return Estudiante.objects.all().select_related('docente_creador')
-        return user.estudiantes.all().select_related('docente_creador')
+            return Estudiante.objects.all().select_related('docente_creador').prefetch_related(
+                'grupos__materia',
+            )
+        return user.estudiantes.all().select_related('docente_creador').prefetch_related(
+            'grupos__materia',
+        )
 
     @transaction.atomic
     def perform_create(self, serializer: EstudianteSerializer) -> None:
@@ -125,8 +137,8 @@ class GrupoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.rol == Usuario.Rol.ADMIN:
-            return Grupo.objects.all().select_related('docente').prefetch_related('estudiantes')
-        return user.grupos.all().select_related('docente').prefetch_related('estudiantes')
+            return Grupo.objects.all().select_related('docente', 'materia').prefetch_related('estudiantes')
+        return user.grupos.all().select_related('docente', 'materia').prefetch_related('estudiantes')
 
     def perform_create(self, serializer: GrupoSerializer) -> None:
         serializer.save(docente=self.request.user)
@@ -166,7 +178,7 @@ class GrupoViewSet(viewsets.ModelViewSet):
 
         # Re-fetch para que el serializer vea los estudiantes recién agregados
         # (el prefetch_related original ya estaba cacheado).
-        grupo = Grupo.objects.prefetch_related('estudiantes').get(pk=grupo.pk)
+        grupo = Grupo.objects.prefetch_related('estudiantes').select_related('materia').get(pk=grupo.pk)
         return Response(GrupoDetalleSerializer(grupo).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='remover-estudiantes')
@@ -180,5 +192,24 @@ class GrupoViewSet(viewsets.ModelViewSet):
             estudiante_id__in=ser.validated_data['estudiante_ids'],
         ).delete()
 
-        grupo = Grupo.objects.prefetch_related('estudiantes').get(pk=grupo.pk)
+        grupo = Grupo.objects.prefetch_related('estudiantes').select_related('materia').get(pk=grupo.pk)
         return Response(GrupoDetalleSerializer(grupo).data, status=status.HTTP_200_OK)
+
+
+class MateriaViewSet(viewsets.ModelViewSet):
+    """CRUD de materias académicas del docente."""
+
+    serializer_class = MateriaSerializer
+    permission_classes = [EsDocenteOAdmin]
+
+    def get_queryset(self):
+        qs = Materia.objects.annotate(
+            grupos_count=Count('grupos', distinct=True),
+            estudiantes_count=Count('grupos__estudiantes', distinct=True),
+        ).select_related('docente').order_by('nombre')
+        if self.request.user.rol == Usuario.Rol.ADMIN:
+            return qs
+        return qs.filter(docente=self.request.user)
+
+    def perform_create(self, serializer: MateriaSerializer) -> None:
+        serializer.save(docente=self.request.user)

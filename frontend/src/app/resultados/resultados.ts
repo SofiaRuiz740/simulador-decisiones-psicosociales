@@ -1,37 +1,55 @@
-import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { Resultado } from '../core/models/practicas.model';
+import { Resultado, DetallePreguntaResultado } from '../core/models/practicas.model';
+import { Rol } from '../core/models/usuario.model';
+import { AuthService } from '../core/auth/auth.service';
 import { SimulacionService } from '../core/services/simulacion.service';
 
 @Component({
   selector: 'app-resultados',
   imports: [
-    CommonModule, FormsModule, DatePipe, DecimalPipe,
-    MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatProgressBarModule, MatSnackBarModule, MatTooltipModule,
+    CommonModule, FormsModule, DecimalPipe,
+    MatProgressBarModule, MatSnackBarModule,
   ],
   templateUrl: './resultados.html',
   styleUrl: './resultados.scss',
 })
 export class Resultados implements OnInit {
   private readonly servicio = inject(SimulacionService);
+  private readonly auth = inject(AuthService);
   private readonly snackBar = inject(MatSnackBar);
+
+  readonly esDocente = computed(() =>
+    this.auth.hasRol(Rol.Docente, Rol.Admin),
+  );
+
+  readonly tabs = computed(() => {
+    const base = [
+      { id: 'lista' as const, label: 'Resultados' },
+      { id: 'detalle' as const, label: 'Detalle respuestas' },
+      { id: 'retro' as const, label: 'Retroalimentación final' },
+    ];
+    if (this.esDocente()) {
+      return [
+        base[0],
+        { id: 'feedback' as const, label: 'Feedback docente' },
+        ...base.slice(1),
+      ];
+    }
+    return base;
+  });
 
   readonly loading = signal(true);
   readonly resultados = signal<Resultado[]>([]);
   readonly feedbackEdit: Record<number, string> = {};
-  readonly expandedId = signal<number | null>(null);
+  readonly tab = signal<'lista' | 'feedback' | 'detalle' | 'retro'>('lista');
+  readonly seleccionado = signal<Resultado | null>(null);
+  readonly detalleResultado = signal<Resultado | null>(null);
+  readonly retroResultado = signal<Resultado | null>(null);
 
   // Filtros
   filtroTexto = '';
@@ -91,14 +109,44 @@ export class Resultados implements OnInit {
   }
 
   toggle(id: number) {
-    this.expandedId.set(this.expandedId() === id ? null : id);
+    const r = this.resultados().find((x) => x.id === id);
+    if (r) this.abrirFeedback(r);
   }
 
-  tier(nota: number): { emoji: string; label: string; variant: 'top' | 'mid' | 'low' | 'fail' } {
-    if (nota >= 85) return { emoji: '🏆', label: 'Sobresaliente', variant: 'top' };
-    if (nota >= 70) return { emoji: '🎯', label: 'Notable', variant: 'mid' };
-    if (nota >= 50) return { emoji: '🌱', label: 'En camino', variant: 'low' };
-    return { emoji: '✕', label: 'No alcanza', variant: 'fail' };
+  setTab(id: 'lista' | 'feedback' | 'detalle' | 'retro') {
+    this.tab.set(id);
+  }
+
+  abrirFeedback(r: Resultado) {
+    this.seleccionado.set(r);
+    this.tab.set('feedback');
+  }
+
+  abrirDetalle(r: Resultado) {
+    this.detalleResultado.set(r);
+    this.tab.set('detalle');
+  }
+
+  abrirRetro(r: Resultado) {
+    this.retroResultado.set(r);
+    this.tab.set('retro');
+  }
+
+  puntajeLabel(r: Resultado): string {
+    if (!r.peso_total) return '—';
+    return `${r.peso_obtenido}/${r.peso_total}`;
+  }
+
+  formatoTiempo(seg: number): string {
+    if (!seg) return '—';
+    const m = Math.floor(seg / 60);
+    const s = seg % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  esAcertada(d: DetallePreguntaResultado): boolean {
+    if (!d.respondida || !d.respuesta_elegida) return false;
+    return d.respuestas_correctas.some((rc) => rc.id === d.respuesta_elegida!.id);
   }
 
   guardarFeedback(r: Resultado) {

@@ -1,0 +1,104 @@
+<section class="module page">
+  <header class="hero-glass">
+    <h1><em>Participaciones</em></h1>
+  </header>
+
+  <section class="metrics">
+    <article class="metric">
+      <div class="metric__value">{{ metricas().autorizados }}</div>
+      <div class="metric__label">Autorizados</div>
+    </article>
+    <article class="metric metric--accent">
+      <div class="metric__value">{{ metricas().en_curso }}</div>
+      <div class="metric__label">En curso</div>
+    </article>
+    <article class="metric metric--teal">
+      <div class="metric__value">{{ metricas().finalizados }}</div>
+      <div class="metric__label">Finalizados</div>
+    </article>
+    <article class="metric">
+      <div class="metric__value">{{ metricas().pendientes }}</div>
+      <div class="metric__label">Pendientes</div>
+    </article>
+  </section>
+
+  <nav class="tabs" aria-label="Secciones participaciones">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
+    <section class="panel">
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin participaciones</strong>
+            Autoriza estudiantes en una práctica para ver el seguimiento aquí.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  @for (col of columnasSeguimiento; track col) {
+                    <th>{{ col }}</th>
+                  }
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of filas(); track f.autorizacion_id) {
+                  <tr>
+                    <td><strong>{{ f.estudiante_nombre }}</strong></td>
+                    <td>{{ f.practica_nombre }}</td>
+                    <td>{{ f.caso_nombre }}</td>
+                    <td><span [class]="badgeClass(f.estado)">{{ f.estado_display }}</span></td>
+                    <td>
+                      <div class="progress-inline">
+                        <div class="progress-bar progress-bar--inline">
+                          <div class="progress-bar__fill" [style.width.%]="f.progreso_pct"></div>
+                        </div>
+                        <span class="progress-inline__pct">{{ f.progreso_pct }}%</span>
+                      </div>
+                    </td>
+                    <td>{{ formatoTiempo(f.tiempo_usado_seg) }}</td>
+                    <td>{{ formatoTiempo(f.tiempo_restante_seg) }}</td>
+                    <td>{{ f.intentos }}</td>
+                    <td>{{ f.respondidas }}</td>
+                    <td class="col-actions">
+                      <button type="button" class="btn-ghost" disabled title="Detalle en próxima iteración">Detalle</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <div class="tab-panel" [class.active]="tab() === 'simulacion'">
+    <div class="sim-preview sim-preview--placeholder" aria-label="Vista previa de simulación">
+      <div class="sim-silhouette"></div>
+      <div class="sim-preview__scene">
+        <span class="sim-preview__badge">Vista previa docente</span>
+        <div class="sim-preview__dialog">
+          <p>Desde aquí podrás previsualizar el flujo que verá el estudiante durante la simulación.</p>
+        </div>
+        <p class="sim-preview__question">Selecciona una participación en curso para cargar escenarios reales del caso.</p>
+        <button type="button" class="sim-option" disabled>Opción de ejemplo (deshabilitada)</button>
+        <button type="button" class="sim-option" disabled>Otra opción (deshabilitada)</button>
+        <div class="sim-preview__footer">
+          <div class="sim-timer">—:—</div>
+          <div class="sim-progress"><div class="sim-progress__fill" style="width: 0%"></div></div>
+          <span>—/—</span>
+        </div>
+      </div>
+    </div>
+    <p class="sim-preview-note">La vista previa interactiva se conectará cuando selecciones una fila en seguimiento.</p>
+  </div>
+</section>

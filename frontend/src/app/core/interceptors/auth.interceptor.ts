@@ -1,16 +1,12 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, switchMap, throwError } from 'rxjs';
 
 import { AuthService } from '../auth/auth.service';
 
 /**
- * Añade el header `Authorization: Bearer <access>` a peticiones salientes
- * cuando el usuario tiene un token de acceso vigente.
- *
- * Excepciones:
- * - Endpoints públicos (token/, token/refresh/, registro-docente/, estudiante-acceso/, health/)
- *   no necesitan token y se dejan pasar sin tocar.
- * - Cualquier URL que no apunte al backend del simulador tampoco se modifica.
+ * Añade Bearer token y renueva el access token ante 401 (excepto en rutas públicas).
  */
 const PUBLIC_PATHS = [
   '/auth/token/',
@@ -21,24 +17,46 @@ const PUBLIC_PATHS = [
   '/health/',
 ];
 
+function withBearer(req: Parameters<HttpInterceptorFn>[0], token: string) {
+  return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
+  const router = inject(Router);
 
   const isPublic = PUBLIC_PATHS.some((path) => req.url.includes(path));
-  if (isPublic) {
-    return next(req);
-  }
-
   const token = auth.getAccessToken();
-  if (!token) {
-    return next(req);
-  }
+  const outgoing = !isPublic && token ? withBearer(req, token) : req;
 
-  const cloned = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  return next(outgoing).pipe(
+    catchError((err: HttpErrorResponse) => {
+      const canRefresh =
+        err.status === 401 &&
+        !isPublic &&
+        !req.url.includes('/auth/token/refresh/') &&
+        !!auth.getRefreshToken();
 
-  return next(cloned);
+      if (!canRefresh) {
+        return throwError(() => err);
+      }
+
+      return auth.refreshAccessToken().pipe(
+        switchMap(() => {
+          const newToken = auth.getAccessToken();
+          if (!newToken) {
+            auth.clearLocalSession();
+            router.navigate(['/auth/login']);
+            return throwError(() => err);
+          }
+          return next(withBearer(req, newToken));
+        }),
+        catchError(() => {
+          auth.clearLocalSession();
+          router.navigate(['/auth/login']);
+          return throwError(() => err);
+        }),
+      );
+    }),
+  );
 };

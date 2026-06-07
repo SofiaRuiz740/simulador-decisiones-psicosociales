@@ -1,5 +1,7 @@
 """ViewSets de la app casos: Caso, Escenario, Pregunta, Respuesta, Rubrica."""
 
+from django.db.models import Count, Exists, OuterRef
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -29,8 +31,12 @@ class CasoViewSet(viewsets.ModelViewSet):
         return CasoListSerializer
 
     def get_queryset(self):
-        qs = Caso.objects.select_related('docente_creador').prefetch_related(
+        qs = Caso.objects.select_related('docente_creador', 'materia').prefetch_related(
             'escenarios__preguntas__respuestas', 'rubrica',
+        ).annotate(
+            escenarios_count=Count('escenarios', distinct=True),
+            preguntas_count=Count('escenarios__preguntas', distinct=True),
+            tiene_rubrica=Exists(Rubrica.objects.filter(caso_id=OuterRef('pk'))),
         )
         if self.request.user.rol == Usuario.Rol.ADMIN:
             return qs

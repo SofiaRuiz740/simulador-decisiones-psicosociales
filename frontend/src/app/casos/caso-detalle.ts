@@ -17,6 +17,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CasoDetalle, Escenario, Pregunta, Respuesta } from '../core/models/casos.model';
 import { CasosService, ProblemaValidacion } from '../core/services/casos.service';
+import { CasePreview, CasePreviewData } from '../shared/components/case-preview/case-preview';
 
 @Component({
   selector: 'app-caso-detalle',
@@ -25,6 +26,7 @@ import { CasosService, ProblemaValidacion } from '../core/services/casos.service
     MatCardModule, MatExpansionModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressBarModule,
     MatSnackBarModule, MatTooltipModule, MatDividerModule, MatSelectModule,
+    CasePreview,
   ],
   templateUrl: './caso-detalle.html',
   styleUrl: './caso-detalle.scss',
@@ -39,6 +41,68 @@ export class CasoDetallePage implements OnInit {
   readonly caso = signal<CasoDetalle | null>(null);
   readonly problemas = signal<ProblemaValidacion[]>([]);
   readonly validando = signal(false);
+  readonly step = signal('casos-datos');
+  readonly escenarioExpandido = signal<number | null>(null);
+  readonly preguntaSel = signal<number | null>(null);
+
+  readonly builderSteps = [
+    { id: 'casos-datos', group: 'Información', title: 'Datos generales' },
+    { id: 'casos-contexto', group: 'Narrativa', title: 'Contexto e historia' },
+    { id: 'casos-escenarios', group: 'Simulación', title: 'Escenarios' },
+    { id: 'casos-preguntas', group: 'Simulación', title: 'Preguntas' },
+    { id: 'casos-respuestas', group: 'Simulación', title: 'Respuestas' },
+    { id: 'casos-retro', group: 'Evaluación', title: 'Retroalimentación' },
+    { id: 'casos-rubrica', group: 'Evaluación', title: 'Rúbrica' },
+    { id: 'casos-preview', group: 'Cierre', title: 'Vista previa' },
+  ];
+
+  readonly stepGroups = [
+    { label: 'Información', steps: this.builderSteps.filter((s) => s.group === 'Información') },
+    { label: 'Narrativa', steps: this.builderSteps.filter((s) => s.group === 'Narrativa') },
+    { label: 'Simulación', steps: this.builderSteps.filter((s) => s.group === 'Simulación') },
+    { label: 'Evaluación', steps: this.builderSteps.filter((s) => s.group === 'Evaluación') },
+    { label: 'Cierre', steps: this.builderSteps.filter((s) => s.group === 'Cierre') },
+  ];
+
+  readonly stepIndex = computed(() =>
+    this.builderSteps.findIndex((s) => s.id === this.step()),
+  );
+
+  readonly pctCompletado = computed(() => {
+    const c = this.caso();
+    if (!c) return 0;
+    let pts = 10;
+    if (c.contexto_historia?.trim()) pts += 15;
+    if (c.escenarios.length) pts += 20;
+    if (this.totalPreguntas() > 0) pts += 20;
+    if (c.rubrica?.criterios?.length) pts += 15;
+    return Math.min(100, pts);
+  });
+
+  readonly filasPreguntas = computed(() => {
+    const c = this.caso();
+    if (!c) return [];
+    return c.escenarios.flatMap((esc) =>
+      esc.preguntas.map((p) => ({
+        pregunta: p,
+        escenarioOrden: esc.orden,
+        escenarioId: esc.id,
+      })),
+    );
+  });
+
+  readonly totalPreguntas = computed(() => this.filasPreguntas().length);
+
+  readonly preguntaActiva = computed(() => {
+    const id = this.preguntaSel();
+    if (!id) return null;
+    for (const esc of this.caso()?.escenarios ?? []) {
+      const p = esc.preguntas.find((x) => x.id === id);
+      if (p) return p;
+    }
+    return null;
+  });
+
   readonly siguienteOrdenEscenario = computed(() => {
     const c = this.caso();
     if (!c || c.escenarios.length === 0) return 1;
@@ -47,6 +111,28 @@ export class CasoDetallePage implements OnInit {
   readonly criteriosDisponibles = computed(() =>
     this.caso()?.rubrica?.criterios ?? [],
   );
+
+  readonly previewData = computed((): CasePreviewData | null => {
+    const c = this.caso();
+    if (!c) return null;
+    const esc = c.escenarios[0];
+    const preg = esc?.preguntas[0];
+    return {
+      titulo: c.nombre,
+      area: c.area_psicosocial,
+      tiempoMin: c.tiempo_estimado_min,
+      escenariosCount: c.escenarios.length,
+      preguntasCount: this.totalPreguntas(),
+      estadoDisplay: c.estado_display,
+      escenarioTitulo: esc?.titulo,
+      escenarioOrden: esc?.orden,
+      escenariosTotal: c.escenarios.length,
+      narrativa: esc?.narrativa || c.contexto_historia || c.descripcion,
+      pregunta: preg?.enunciado,
+      opciones: preg?.respuestas?.map((r) => ({ texto: r.texto })) ?? [],
+      progresoPct: this.pctCompletado(),
+    };
+  });
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -57,7 +143,12 @@ export class CasoDetallePage implements OnInit {
   cargar(id: number) {
     this.loading.set(true);
     this.servicio.obtenerCaso(id).subscribe({
-      next: (c) => { this.caso.set(c); this.loading.set(false); },
+      next: (c) => {
+        this.caso.set(c);
+        const firstPreg = c.escenarios.flatMap((e) => e.preguntas)[0];
+        if (firstPreg) this.preguntaSel.set(firstPreg.id);
+        this.loading.set(false);
+      },
       error: () => {
         this.loading.set(false);
         this.snackBar.open('No se pudo cargar el caso.', 'OK', { duration: 3500 });
@@ -66,7 +157,67 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  // ---------- Caso (texto largo: contexto + desarrollo) ----------
+  stepNum(stepId: string): number {
+    return this.builderSteps.findIndex((s) => s.id === stepId) + 1;
+  }
+
+  stepLabel(): string {
+    const s = this.builderSteps[this.stepIndex()];
+    return s ? `${s.title} · ${this.stepIndex() + 1}/${this.builderSteps.length}` : '';
+  }
+
+  goStep(id: string): void {
+    this.step.set(id);
+  }
+
+  prevStep(): void {
+    const idx = this.stepIndex();
+    if (idx > 0) this.step.set(this.builderSteps[idx - 1].id);
+  }
+
+  nextStep(): void {
+    const idx = this.stepIndex();
+    if (idx < this.builderSteps.length - 1) this.step.set(this.builderSteps[idx + 1].id);
+  }
+
+  toggleEscenario(id: number): void {
+    this.escenarioExpandido.set(this.escenarioExpandido() === id ? null : id);
+  }
+
+  irPregunta(preguntaId: number): void {
+    this.preguntaSel.set(preguntaId);
+    const row = this.filasPreguntas().find((r) => r.pregunta.id === preguntaId);
+    if (row) {
+      this.escenarioExpandido.set(row.escenarioId);
+      this.step.set('casos-escenarios');
+    }
+  }
+
+  badgeClass(estado: string): string {
+    switch (estado) {
+      case 'VALIDADO': return 'badge badge--validado';
+      case 'BORRADOR': return 'badge badge--borrador';
+      case 'EN_REVISION': return 'badge badge--en-revision';
+      case 'ARCHIVADO': return 'badge badge--archivado';
+      default: return 'badge';
+    }
+  }
+
+  // ---------- Caso (metadatos + texto largo) ----------
+
+  guardarDatos(): void {
+    const c = this.caso();
+    if (!c) return;
+    this.servicio.actualizarCaso(c.id, {
+      nombre: c.nombre,
+      descripcion: c.descripcion,
+      area_psicosocial: c.area_psicosocial,
+      tiempo_estimado_min: c.tiempo_estimado_min,
+    }).subscribe({
+      next: () => this.snackBar.open('Datos generales guardados.', 'OK', { duration: 2500 }),
+      error: () => this.snackBar.open('No se pudo guardar.', 'OK', { duration: 3500 }),
+    });
+  }
 
   guardarTextoLargo(): void {
     const c = this.caso();

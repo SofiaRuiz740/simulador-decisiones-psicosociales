@@ -1,0 +1,165 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Casos</em> de estudio</h1>
+  </header>
+
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ casos().length }}</div>
+        <div class="metric__label">Total casos</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ contarPorEstado('VALIDADO') }}</div>
+        <div class="metric__label">Validados</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ contarPorEstado('BORRADOR') }}</div>
+        <div class="metric__label">En borrador</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ contarPorEstado('EN_REVISION') }}</div>
+        <div class="metric__label">En revisión</div>
+      </article>
+    </section>
+  }
+
+  <nav class="subnav" aria-label="Vistas de casos">
+    <button type="button" class="subnav-btn" [class.active]="vista() === 'banco'" (click)="vista.set('banco')">Banco de casos</button>
+    <button type="button" class="subnav-btn" [class.active]="vista() === 'crear'" (click)="irCrear()">Crear caso</button>
+    <button type="button" class="subnav-btn" [class.active]="vista() === 'editar'" (click)="vista.set('editar')">Editar caso</button>
+  </nav>
+
+  @if (vista() === 'banco') {
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters">
+            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+            <select [(ngModel)]="filtroEstado">
+              <option value="">Todos</option>
+              <option value="BORRADOR">Borrador</option>
+              <option value="EN_REVISION">En revisión</option>
+              <option value="VALIDADO">Validado</option>
+              <option value="ARCHIVADO">Archivado</option>
+            </select>
+          </div>
+          <button type="button" class="btn-primary" (click)="crear()">Crear caso</button>
+        </div>
+      </div>
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filtrados().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin casos en el banco</strong>
+            Crea tu primer caso con el botón «Crear caso».
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Caso</th>
+                  <th>Materia</th>
+                  <th>Estado</th>
+                  <th>Tiempo</th>
+                  <th>Esc.</th>
+                  <th>Preg.</th>
+                  <th>Rúbrica</th>
+                  <th>Completitud</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of filtrados(); track c.id) {
+                  <tr>
+                    <td><strong>{{ c.nombre }}</strong></td>
+                    <td>{{ materiaLabel(c) }}</td>
+                    <td><span class="badge" [class]="badgeClass(c.estado)">{{ c.estado_display }}</span></td>
+                    <td>{{ c.tiempo_estimado_min }} min</td>
+                    <td>{{ c.escenarios_count }}</td>
+                    <td>{{ preguntasLabel(c) }}</td>
+                    <td>{{ rubricaLabel(c) }}</td>
+                    <td>{{ completitud(c) }}</td>
+                    <td class="col-actions">
+                      <div class="actions actions--end">
+                        <a class="btn-ghost" [routerLink]="['/casos', c.id]">Abrir</a>
+                        <button type="button" class="btn-ghost" (click)="editar(c)">Editar</button>
+                        <a class="btn-ghost" [routerLink]="['/casos', c.id, 'rubrica']">Rúbrica</a>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (vista() === 'crear') {
+    <div class="builder-block">
+      <div class="builder-header">
+        <h3 class="card__title">Crear caso</h3>
+      </div>
+      <p class="tab-empty-note">Define los metadatos iniciales y continúa en el editor de escenarios.</p>
+      <form [formGroup]="formCrear" class="form-grid">
+        <div class="form-group full">
+          <label for="casoNombre">Nombre del caso</label>
+          <input id="casoNombre" formControlName="nombre" placeholder="Ej. Conflicto comunitario" />
+        </div>
+        <div class="form-group full">
+          <label for="casoDesc">Descripción breve</label>
+          <textarea id="casoDesc" formControlName="descripcion" rows="2" placeholder="Resumen del caso"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="casoArea">Área psicosocial</label>
+          <input id="casoArea" formControlName="area_psicosocial" placeholder="Ej. Convivencia escolar" />
+        </div>
+        <div class="form-group">
+          <label for="casoTiempo">Tiempo estimado (min)</label>
+          <input id="casoTiempo" type="number" formControlName="tiempo_estimado_min" min="1" />
+        </div>
+        <div class="form-group">
+          <label for="casoMateria">Materia</label>
+          <input id="casoMateria" disabled placeholder="—" title="Sin API de materias vinculadas" />
+        </div>
+      </form>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" (click)="crearInline()" [disabled]="formCrear.invalid || guardando()">
+          Crear y abrir editor
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (vista() === 'editar') {
+    @if (casoSeleccionado(); as sel) {
+      <div class="builder-block">
+        <div class="builder-header">
+          <h3 class="card__title">{{ sel.nombre }}</h3>
+          <span class="badge" [class]="badgeClass(sel.estado)">{{ sel.estado_display }}</span>
+        </div>
+        <p class="tab-empty-note">
+          {{ sel.area_psicosocial || 'Sin área' }} · {{ sel.tiempo_estimado_min }} min · {{ sel.escenarios_count }} escenarios · {{ completitud(sel) }} completitud
+        </p>
+        <div class="form-actions">
+          <a class="btn-primary" [routerLink]="['/casos', sel.id]">Abrir constructor</a>
+          <button type="button" class="btn-ghost" (click)="editarMetadatos(sel)">Editar metadatos</button>
+          <button type="button" class="btn-ghost" (click)="vista.set('banco')">Volver al banco</button>
+        </div>
+      </div>
+    } @else {
+      <div class="surface tab-empty">
+        <div class="empty-state-mockup">
+          <strong>Selecciona un caso</strong>
+          Abre un caso desde el banco con «Editar» para verlo aquí.
+        </div>
+      </div>
+    }
+  }
+
+</section>

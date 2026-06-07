@@ -1,0 +1,142 @@
+<section class="module page result-page">
+
+  @if (loading()) {
+    <div class="surface empty-state-mockup">
+      <strong>Calculando tu resultado…</strong>
+    </div>
+  }
+
+  @if (resultado(); as r) {
+    <header class="hero-glass hero-glass--compact">
+      <h1><em>{{ tierTitulo() }}</em></h1>
+      <p class="hero-glass__meta">{{ tierMensaje() }}</p>
+    </header>
+
+    <section class="surface result-hero">
+      <span class="result-emoji">{{ tierEmoji() }}</span>
+      <div class="result-score" [style.--pct]="porcentaje() + '%'">
+        <strong>{{ r.nota_final }}</strong>
+        <span>/ 100</span>
+      </div>
+      <span class="badge" [class.badge--validado]="r.aprobado" [class.badge--pendiente]="!r.aprobado">
+        {{ r.aprobado ? 'Aprobado' : 'No aprobado' }} · mínimo {{ r.nota_aprobacion }}
+      </span>
+      <p class="hero-glass__meta" style="margin-top:12px">{{ r.caso_nombre }} · {{ r.practica_nombre }}</p>
+    </section>
+
+    <section class="metrics">
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ r.correctas }}</div>
+        <div class="metric__label">Correctas</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ r.incorrectas }}</div>
+        <div class="metric__label">Incorrectas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ r.no_respondidas }}</div>
+        <div class="metric__label">Sin responder</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ porcentaje() }}%</div>
+        <div class="metric__label">Puntaje</div>
+      </article>
+    </section>
+
+    @if (r.desglose_criterios && r.desglose_criterios.length > 0) {
+      <section class="panel">
+        <div class="panel__toolbar">
+          <div class="toolbar">
+            <h2 class="panel-title">Desempeño por criterio</h2>
+          </div>
+        </div>
+        <div class="panel__body panel__body--padded">
+          @if (r.rubrica_descripcion) {
+            <p class="hero-glass__meta">{{ r.rubrica_descripcion }}</p>
+          }
+          @for (cr of r.desglose_criterios; track cr.criterio_id) {
+            <article class="criterio-row">
+              <div class="criterio-row__head">
+                <strong>{{ cr.nombre }}</strong>
+                <span class="badge badge--en-curso">{{ cr.peso }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar__fill" [style.width.%]="cr.porcentaje"></div>
+              </div>
+              <p class="criterio-row__meta">
+                {{ cr.porcentaje | number:'1.0-0' }}% de aciertos
+                @if (cr.nivel_alcanzado) {
+                  · Nivel {{ cr.nivel_alcanzado.nivel }} · {{ cr.nivel_alcanzado.nombre }}
+                }
+              </p>
+              @if (cr.nivel_alcanzado?.descriptor) {
+                <p class="criterio-row__desc">{{ cr.nivel_alcanzado!.descriptor }}</p>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (r.feedback_docente) {
+      <section class="builder-block">
+        <div class="form-section__title">Feedback de tu docente</div>
+        <p class="feedback-text">{{ r.feedback_docente }}</p>
+      </section>
+    }
+
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <h2 class="panel-title">Retroalimentación pregunta por pregunta</h2>
+        </div>
+      </div>
+      <div class="panel__body panel__body--padded">
+        @for (d of r.detalle_preguntas; track d.pregunta_id; let i = $index) {
+          <article class="preg-result" [class.preg-result--ok]="d.respondida && d.respuesta_elegida?.es_correcta"
+            [class.preg-result--fail]="d.respondida && d.respuesta_elegida && !d.respuesta_elegida.es_correcta">
+            <header class="preg-result__head">
+              <span class="preg-result__num">{{ i + 1 }}</span>
+              <h3>{{ d.enunciado }}</h3>
+            </header>
+
+            @if (!d.respondida) {
+              <p class="preg-result__status">No respondiste esta pregunta.</p>
+            }
+
+            @if (d.respuesta_elegida; as resp) {
+              <p class="preg-result__answer"><strong>Tu respuesta:</strong> {{ resp.texto }}</p>
+              @if (resp.retroalimentacion) {
+                <div class="surface surface--flat retro-box">{{ resp.retroalimentacion }}</div>
+              }
+              @if (!resp.es_correcta && d.respuestas_correctas.length > 0) {
+                <div class="correctas-list">
+                  <strong>Respuesta(s) correcta(s):</strong>
+                  <ul>
+                    @for (c of d.respuestas_correctas; track c.id) {
+                      <li>{{ c.texto }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            } @else if (d.respuestas_correctas.length > 0) {
+              <div class="correctas-list">
+                <strong>Respuesta(s) correcta(s):</strong>
+                <ul>
+                  @for (c of d.respuestas_correctas; track c.id) {
+                    <li>{{ c.texto }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="button" class="btn-primary" (click)="salir()">Cerrar sesión</button>
+    </div>
+  }
+
+</section>

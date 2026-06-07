@@ -1,205 +1,249 @@
-<section class="page">
+<section class="module page">
 
-  <!-- HERO editorial -->
-  <header class="hero anim-fade-up">
-    <div class="hero-cap">
-      <span class="edition-num">№ Analítica</span>
-      <span class="dot">·</span>
-      <span class="lbl">Resultados</span>
-    </div>
-    <h1 class="hero-title display">
-      Decisiones <em>analizadas</em>, aprendizaje visible.
-    </h1>
-    <p class="hero-lead">
-      Calificaciones por participación. Toca cada fila para ver el desempeño por criterio,
-      las decisiones del estudiante y dejar tu retroalimentación.
-    </p>
+  <header class="hero-glass">
+    <h1><em>Resultados</em></h1>
   </header>
 
-  <!-- KPIs -->
-  <section class="kpis">
-    <article class="kpi" data-variant="deep">
-      <span class="kpi-num">01</span>
-      <strong class="kpi-val mono">{{ total() }}</strong>
-      <span class="kpi-lbl">Resultados</span>
-    </article>
-    <article class="kpi" data-variant="teal">
-      <span class="kpi-num">02</span>
-      <strong class="kpi-val mono">{{ aprobadosCount() }}</strong>
-      <span class="kpi-lbl">Aprobados <em>({{ aprobadosPct() | number:'1.0-0' }}%)</em></span>
-    </article>
-    <article class="kpi" data-variant="violet">
-      <span class="kpi-num">03</span>
-      <strong class="kpi-val mono">{{ promedio() | number:'1.1-1' }}</strong>
-      <span class="kpi-lbl">Promedio</span>
-    </article>
-    <article class="kpi" data-variant="warn">
-      <span class="kpi-num">04</span>
-      <strong class="kpi-val mono">{{ sinFeedback() }}</strong>
-      <span class="kpi-lbl">Sin feedback</span>
-    </article>
-  </section>
+  <nav class="tabs" aria-label="Secciones resultados">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="setTab(t.id)">{{ t.label }}</button>
+    }
+  </nav>
 
-  <!-- Filtros -->
-  @if (resultados().length > 0) {
-    <div class="toolbar">
-      <mat-form-field appearance="outline" class="search">
-        <mat-label>Buscar</mat-label>
-        <input matInput [(ngModel)]="filtroTexto" placeholder="Estudiante, correo o práctica..." />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="prac-sel">
-        <mat-label>Práctica</mat-label>
-        <mat-select [(ngModel)]="filtroPractica">
-          <mat-option value="">Todas</mat-option>
-          @for (p of practicasUnicas(); track p.id) {
-            <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-  }
+  <!-- Resultados -->
+  <div class="tab-panel" [class.active]="tab() === 'lista'">
+    @if (!loading()) {
+      <section class="metrics">
+        <article class="metric">
+          <div class="metric__value">{{ total() }}</div>
+          <div class="metric__label">Resultados</div>
+        </article>
+        <article class="metric metric--teal">
+          <div class="metric__value">{{ aprobadosCount() }}</div>
+          <div class="metric__label">Aprobados</div>
+        </article>
+        <article class="metric metric--accent">
+          <div class="metric__value">{{ promedio() | number:'1.1-1' }}</div>
+          <div class="metric__label">Promedio</div>
+        </article>
+        <article class="metric">
+          <div class="metric__value">{{ sinFeedback() }}</div>
+          <div class="metric__label">Sin feedback</div>
+        </article>
+      </section>
+    }
 
-  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
-
-  <!-- Empty -->
-  @if (!loading() && resultados().length === 0) {
-    <div class="empty">
-      <div class="empty-glyph"><mat-icon>assessment</mat-icon></div>
-      <h3 class="display">Aún no hay <em>resultados</em></h3>
-      <p>Los resultados aparecen cuando los estudiantes finalizan sus prácticas.</p>
-    </div>
-  }
-
-  <!-- Listado de cards -->
-  <div class="list">
-    @for (r of filtrados(); track r.id; let i = $index) {
-      <article class="res-card anim-fade-up"
-        [class.expanded]="expandedId() === r.id"
-        [attr.data-tier]="tier(+r.nota_final).variant"
-        [style.--delay]="(i * 40) + 'ms'">
-
-        <!-- Resumen clickeable -->
-        <button class="res-summary" type="button" (click)="toggle(r.id)" [attr.aria-expanded]="expandedId() === r.id">
-          <span class="ribbon" aria-hidden="true"></span>
-
-          <span class="ava">
-            {{ r.estudiante_nombre.charAt(0).toUpperCase() }}
-          </span>
-
-          <div class="meta">
-            <strong class="who">{{ r.estudiante_nombre }}</strong>
-            <span class="sub">
-              <span>{{ r.practica_nombre }}</span>
-              <span class="sep">·</span>
-              <span class="mono">{{ r.fecha_calculo | date:'mediumDate' }}</span>
-            </span>
-          </div>
-
-          <div class="counts">
-            <span class="cnt ok"><mat-icon>check</mat-icon>{{ r.correctas }}</span>
-            <span class="cnt no"><mat-icon>close</mat-icon>{{ r.incorrectas }}</span>
-            <span class="cnt empty"><mat-icon>remove</mat-icon>{{ r.no_respondidas }}</span>
-          </div>
-
-          <div class="grade">
-            <span class="grade-emoji">{{ tier(+r.nota_final).emoji }}</span>
-            <span class="grade-val mono">{{ r.nota_final }}<em>/{{ r.peso_total > 0 ? 100 : '—' }}</em></span>
-            <span class="grade-tier">{{ tier(+r.nota_final).label }}</span>
-          </div>
-
-          <mat-icon class="chev">{{ expandedId() === r.id ? 'expand_less' : 'expand_more' }}</mat-icon>
-        </button>
-
-        <!-- Detalle expandido -->
-        @if (expandedId() === r.id) {
-          <div class="res-detalle anim-fade-up">
-
-            <!-- Datos generales -->
-            <div class="info-row">
-              <span class="chip-meta">
-                <mat-icon>person</mat-icon>{{ r.estudiante_correo }}
-              </span>
-              <span class="chip-meta">
-                <mat-icon>scale</mat-icon>Peso {{ r.peso_obtenido }}/{{ r.peso_total }}
-              </span>
-              <span class="chip-meta" [class.aprob]="r.aprobado" [class.no-aprob]="!r.aprobado">
-                <mat-icon>{{ r.aprobado ? 'verified' : 'cancel' }}</mat-icon>
-                {{ r.aprobado ? 'Aprobado' : 'No aprobado' }} (mín {{ r.nota_aprobacion }})
-              </span>
-            </div>
-
-            <!-- Criterios -->
-            @if (r.desglose_criterios && r.desglose_criterios.length > 0) {
-              <section class="block">
-                <header class="block-head">
-                  <span class="kicker-deep">Desempeño por criterio</span>
-                </header>
-                <div class="criterios">
-                  @for (cr of r.desglose_criterios; track cr.criterio_id) {
-                    <div class="cr-row">
-                      <div class="cr-info">
-                        <strong>{{ cr.nombre }}</strong>
-                        <span>
-                          <span class="mono">{{ cr.peso }}%</span> ·
-                          <span class="mono">{{ cr.porcentaje | number:'1.0-0' }}%</span> aciertos
-                          @if (cr.nivel_alcanzado) { · {{ cr.nivel_alcanzado.nombre }} }
-                        </span>
-                      </div>
-                      <div class="cr-bar"><div class="cr-fill" [style.width.%]="cr.porcentaje"></div></div>
-                    </div>
-                  }
-                </div>
-              </section>
-            }
-
-            <!-- Detalle por pregunta -->
-            <section class="block">
-              <header class="block-head">
-                <span class="kicker-deep">Detalle por pregunta</span>
-              </header>
-              <ol class="detalle-list">
-                @for (d of r.detalle_preguntas; track d.pregunta_id; let i = $index) {
-                  <li class="d-item"
-                    [class.ok]="d.respondida && d.respuesta_elegida?.es_correcta"
-                    [class.err]="d.respondida && d.respuesta_elegida && !d.respuesta_elegida.es_correcta"
-                    [class.empty]="!d.respondida">
-                    <div class="d-head">
-                      <span class="d-num">{{ i + 1 }}</span>
-                      <strong>{{ d.enunciado }}</strong>
-                      <span class="d-peso">peso <span class="mono">{{ d.peso }}</span></span>
-                    </div>
-                    @if (d.respondida && d.respuesta_elegida) {
-                      <p class="d-eleccion">
-                        <em>Eligió:</em> {{ d.respuesta_elegida.texto }}
-                        <mat-icon>{{ d.respuesta_elegida.es_correcta ? 'check_circle' : 'cancel' }}</mat-icon>
-                      </p>
-                    } @else {
-                      <p class="d-eleccion empty"><em>No respondió.</em></p>
-                    }
-                  </li>
+    <section class="panel">
+      @if (resultados().length > 0) {
+        <div class="panel__toolbar">
+          <div class="toolbar">
+            <div class="toolbar__filters">
+              <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+              <select [(ngModel)]="filtroPractica">
+                <option value="">Todas las prácticas</option>
+                @for (p of practicasUnicas(); track p.id) {
+                  <option [value]="p.id">{{ p.nombre }}</option>
                 }
-              </ol>
-            </section>
+              </select>
+            </div>
+          </div>
+        </div>
+      }
 
-            <!-- Feedback docente -->
-            <section class="block">
-              <header class="block-head">
-                <span class="kicker-deep">Feedback del docente</span>
-              </header>
-              <mat-form-field appearance="outline" class="feedback">
-                <textarea matInput rows="3" [(ngModel)]="feedbackEdit[r.id]"
-                  placeholder="Escribe tu retroalimentación para el estudiante..."></textarea>
-              </mat-form-field>
-              <button mat-flat-button class="btn-save" (click)="guardarFeedback(r)">
-                <mat-icon>save</mat-icon>
-                Guardar feedback
-              </button>
-            </section>
-
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (resultados().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Aún no hay resultados</strong>
+            Aparecerán cuando los estudiantes finalicen sus prácticas.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Práctica</th>
+                  <th>Materia</th>
+                  <th>Grupo</th>
+                  <th>✓</th>
+                  <th>✗</th>
+                  <th>Puntaje</th>
+                  <th>Nota</th>
+                  <th>Tiempo</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of filtrados(); track r.id) {
+                  <tr>
+                    <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                    <td>{{ r.practica_nombre }}</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>{{ r.correctas }}</td>
+                    <td>{{ r.incorrectas }}</td>
+                    <td>{{ puntajeLabel(r) }}</td>
+                    <td><strong>{{ r.nota_final }}</strong></td>
+                    <td>—</td>
+                    <td>
+                      <span class="badge" [class]="r.aprobado ? 'badge badge--aprobado' : 'badge badge--pendiente'">
+                        {{ r.aprobado ? 'Aprobado' : 'No aprobado' }}
+                      </span>
+                    </td>
+                    <td class="col-actions">
+                      <div class="actions actions--end">
+                        <button type="button" class="btn-ghost" (click)="abrirRetro(r)">Retro</button>
+                        <button type="button" class="btn-ghost" (click)="abrirDetalle(r)">Detalle</button>
+                        <button type="button" class="btn-ghost" (click)="abrirFeedback(r)">Feedback</button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
-      </article>
+      </div>
+    </section>
+  </div>
+
+  <!-- Feedback docente -->
+  <div class="tab-panel" [class.active]="tab() === 'feedback'">
+    @if (seleccionado(); as r) {
+      <div class="builder-block">
+        <h3 class="card__title">Feedback — {{ r.estudiante_nombre }}</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Práctica</label>
+            <input readonly [value]="r.practica_nombre" />
+          </div>
+          <div class="form-group">
+            <label>Nota final</label>
+            <input readonly [value]="r.nota_final" />
+          </div>
+          <div class="form-group full">
+            <label>Observaciones</label>
+            <textarea rows="4" [(ngModel)]="feedbackEdit[r.id]" placeholder="Escribe tu retroalimentación…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="guardarFeedback(r)">Guardar</button>
+          <button type="button" class="btn-ghost" (click)="setTab('lista')">Volver</button>
+        </div>
+      </div>
+    } @else {
+      <div class="surface tab-empty">
+        <div class="empty-state-mockup">
+          <strong>Selecciona un resultado</strong>
+          Usa el botón «Feedback» en la pestaña Resultados para redactar la retroalimentación.
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Detalle respuestas -->
+  <div class="tab-panel" [class.active]="tab() === 'detalle'">
+    @if (detalleResultado(); as r) {
+      <section class="panel">
+        <div class="panel__toolbar">
+          <div class="toolbar">
+            <h2 class="panel-title">{{ r.estudiante_nombre }} · {{ r.practica_nombre }}</h2>
+            <button type="button" class="btn-ghost" (click)="setTab('lista')">Volver</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          @if (r.detalle_preguntas.length === 0) {
+            <div class="empty-state-mockup">Sin detalle de respuestas para este resultado.</div>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pregunta</th>
+                    <th>Seleccionada</th>
+                    <th>Correcta</th>
+                    <th>Estado</th>
+                    <th>Retroalimentación</th>
+                    <th>Puntaje</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (d of r.detalle_preguntas; track d.pregunta_id) {
+                    <tr>
+                      <td>{{ d.enunciado }}</td>
+                      <td>{{ d.respuesta_elegida?.texto || '—' }}</td>
+                      <td>{{ d.respuestas_correctas[0]?.texto || '—' }}</td>
+                      <td>
+                        @if (!d.respondida) {
+                          <span class="badge">Sin responder</span>
+                        } @else if (esAcertada(d)) {
+                          <span class="badge badge--aprobado">Acertada</span>
+                        } @else {
+                          <span class="badge badge--pendiente">Fallida</span>
+                        }
+                      </td>
+                      <td>{{ d.respuesta_elegida?.retroalimentacion || '—' }}</td>
+                      <td>{{ d.peso }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </section>
+    } @else {
+      <div class="surface tab-empty">
+        <div class="empty-state-mockup">
+          <strong>Selecciona un resultado</strong>
+          Usa el botón «Detalle» en la pestaña Resultados para ver el desglose pregunta por pregunta.
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Retroalimentación final -->
+  <div class="tab-panel" [class.active]="tab() === 'retro'">
+    @if (retroResultado(); as r) {
+      <div class="surface retro-panel">
+        <h3 class="card__title">Retroalimentación — {{ r.estudiante_nombre }}</h3>
+        <div class="grid-2 retro-grid">
+          <div>
+            <p class="retro-stat">Acertadas: <strong>{{ r.correctas }}</strong></p>
+            <p class="retro-note">Desempeño en respuestas correctas según la rúbrica del caso.</p>
+          </div>
+          <div>
+            <p class="retro-stat">Fallidas: <strong>{{ r.incorrectas + r.no_respondidas }}</strong></p>
+            <p class="retro-note">Incluye respuestas incorrectas y preguntas sin responder.</p>
+          </div>
+        </div>
+        <p class="retro-final"><strong>Nota final:</strong> {{ r.nota_final }}</p>
+        @if (r.rubrica_descripcion) {
+          <p class="retro-note">{{ r.rubrica_descripcion }}</p>
+        }
+        @if (r.feedback_docente.trim()) {
+          <div class="form-card" style="margin-top: 1rem">
+            <div class="form-section__title">Feedback del docente</div>
+            <p>{{ r.feedback_docente }}</p>
+          </div>
+        } @else {
+          <p class="retro-note">Sin feedback docente registrado aún.</p>
+        }
+        <div class="form-actions">
+          <button type="button" class="btn-ghost" (click)="setTab('lista')">Volver</button>
+          <button type="button" class="btn-primary" (click)="abrirFeedback(r)">Editar feedback</button>
+        </div>
+      </div>
+    } @else {
+      <div class="surface tab-empty">
+        <div class="empty-state-mockup">
+          <strong>Selecciona un resultado</strong>
+          Usa el botón «Retro» en la pestaña Resultados para ver la retroalimentación consolidada.
+        </div>
+      </div>
     }
   </div>
 

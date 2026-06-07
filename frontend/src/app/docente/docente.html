@@ -1,83 +1,91 @@
-<section class="page">
+<section class="module page">
 
-  <!-- HERO editorial -->
-  <header class="hero anim-fade-up">
-    <div class="hero-cap">
-      <span class="edition-num">№ 01 — Panel docente</span>
-      <span class="dot">·</span>
-      <span class="today">{{ hoy }}</span>
-    </div>
-
-    <h1 class="hero-title display">
-      {{ saludo() }}, <em>{{ nombre() }}</em>.
-    </h1>
-
-    <p class="hero-lead">
-      Diseña casos, agenda prácticas y acompaña a tus estudiantes en decisiones
-      psicosociales con sentido. Empieza por las acciones de abajo.
-    </p>
-
-    <div class="hero-marks">
-      <span>Tu sesión está activa</span>
-      <span class="sep">·</span>
-      <span><strong class="mono">{{ casosCount() ?? '0' }}</strong> casos</span>
-      <span class="sep">·</span>
-      <span><strong class="mono">{{ practicasCount() ?? '0' }}</strong> prácticas</span>
-    </div>
+  <header class="hero-glass">
+    <h1>Hola, <em>{{ nombreCorto() }}</em></h1>
   </header>
 
-  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" class="prog" />
+  }
 
-  <!-- KPIs editoriales -->
-  <section class="kpis">
-    @for (k of kpis(); track k.num; let i = $index) {
-      <article class="kpi anim-fade-up" [attr.data-variant]="k.variant"
-        [style.--delay]="(i * 60) + 'ms'">
-        <header class="kpi-head">
-          <span class="kpi-num">{{ k.num }}</span>
-          <span class="kpi-icon"><mat-icon>{{ k.icon }}</mat-icon></span>
-        </header>
-        <div class="kpi-body">
-          <strong class="kpi-value">{{ k.value }}</strong>
-          <p class="kpi-label">{{ k.label }}</p>
-        </div>
-        <div class="kpi-foot">
-          <span class="kpi-hint">{{ k.hint }}</span>
-        </div>
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ casosCount() ?? '—' }}</div>
+        <div class="metric__label">Casos</div>
       </article>
-    }
-  </section>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ practicasActivas() ?? '—' }}</div>
+        <div class="metric__label">Prácticas activas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ estudiantesCount() ?? '—' }}</div>
+        <div class="metric__label">Estudiantes</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">—</div>
+        <div class="metric__label">Feedback pendiente</div>
+      </article>
+    </section>
+  }
 
-  <!-- Section: acciones -->
-  <section class="section-actions">
-    <header class="sec-head">
-      <div>
-        <span class="kicker-deep">Acciones</span>
-        <h2 class="sec-title display">
-          Empieza por <em>aquí</em>.
-        </h2>
-      </div>
-    </header>
-
-    <div class="actions-grid">
-      @for (a of accesos; track a.ruta; let i = $index) {
-        <a [routerLink]="a.ruta" class="action-card anim-fade-up"
-          [attr.data-variant]="a.variant"
-          [style.--delay]="(i * 50) + 'ms'">
-          <header class="ac-head">
-            <span class="ac-num">{{ a.num }}</span>
-            <span class="ac-tag">{{ a.tag }}</span>
-          </header>
-          <div class="ac-icon"><mat-icon>{{ a.icono }}</mat-icon></div>
-          <h3 class="ac-title">{{ a.titulo }}</h3>
-          <p class="ac-desc">{{ a.descripcion }}</p>
-          <footer class="ac-foot">
-            <span>Ir a la sección</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </footer>
-        </a>
+  <section class="surface">
+    <div class="card__header">
+      <h3 class="card__title">Acciones rápidas</h3>
+    </div>
+    <div class="quick-actions">
+      @for (a of accesos; track a.ruta) {
+        <a [routerLink]="a.ruta" class="quick-action">{{ a.titulo }}</a>
       }
     </div>
   </section>
+
+  <div class="grid-2">
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Actividad reciente</h3>
+      </div>
+      <ul class="activity-list">
+        <li class="activity-list__empty">Sin actividad reciente. Las acciones que realices aparecerán aquí.</li>
+      </ul>
+    </section>
+
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Próximas prácticas</h3>
+      </div>
+      @if (loading()) {
+        <div class="empty-state-mockup">Cargando…</div>
+      } @else if (proximasPracticas().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Sin prácticas programadas</strong>
+          Agenda una práctica para verla aquí.
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Práctica</th>
+                <th>Grupo</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of proximasPracticas(); track p.id) {
+                <tr>
+                  <td>{{ p.nombre || p.caso_nombre }}</td>
+                  <td>—</td>
+                  <td>{{ formatFecha(p.fecha_inicio) }}</td>
+                  <td><span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </div>
 
 </section>

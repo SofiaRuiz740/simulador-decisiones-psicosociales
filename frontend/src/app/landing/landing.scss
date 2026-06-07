@@ -9,8 +9,8 @@
   min-height: 100vh;
   color: var(--app-ink);
   background:
-    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(30, 58, 138, 0.06), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(13, 148, 136, 0.04), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(111, 82, 184, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(155, 114, 243, 0.05), transparent 60%),
     var(--app-paper);
   overflow-x: hidden;
 }
@@ -81,9 +81,15 @@
 }
 
 .cta-out {
-  border-radius: var(--radius-md) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
   letter-spacing: -0.005em;
+  text-decoration: none;
 }
 
 /* ===================================================================
@@ -130,7 +136,7 @@
 
   em {
     font-style: italic;
-    background: linear-gradient(180deg, var(--app-deep) 0%, var(--app-teal) 100%);
+    background: linear-gradient(180deg, var(--app-purple-dark) 0%, var(--app-purple) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -151,35 +157,40 @@
   margin-bottom: 2rem;
 
   .btn-primary {
-    border-radius: var(--radius-md) !important;
-    height: 52px !important;
-    padding: 0 1.6rem !important;
-    font-weight: 700 !important;
-    font-size: 0.98rem !important;
+    border-radius: var(--radius-md);
+    height: 52px;
+    padding: 0 1.6rem;
+    font-weight: 700;
+    font-size: 0.98rem;
     letter-spacing: -0.005em;
-    background: var(--app-deep) !important;
-    color: white !important;
-    box-shadow: var(--shadow-glow);
-    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--app-purple-dark);
+    color: white;
+    box-shadow: 0 8px 24px rgba(111, 82, 184, 0.28);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
+    border: none;
     transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 32px rgba(30, 58, 138, 0.32);
+      box-shadow: 0 14px 32px rgba(111, 82, 184, 0.32);
     }
-    mat-icon { font-size: 20px; width: 20px; height: 20px; }
   }
 
   .btn-secondary {
-    border-radius: var(--radius-md) !important;
-    height: 52px !important;
-    padding: 0 1.4rem !important;
-    font-weight: 600 !important;
-    border: 1px solid var(--app-line) !important;
-    color: var(--app-ink) !important;
-    display: inline-flex; align-items: center; gap: 0.45rem;
-
-    mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--app-deep); }
+    border-radius: var(--radius-md);
+    height: 52px;
+    padding: 0 1.4rem;
+    font-weight: 600;
+    border: 1px solid var(--app-line);
+    color: var(--app-ink);
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
   }
 }
 
@@ -580,7 +591,7 @@
   .aud-icon {
     width: 56px; height: 56px;
     border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
+    background: linear-gradient(135deg, var(--app-purple-dark), var(--app-purple));
     color: white;
     display: inline-flex; align-items: center; justify-content: center;
     margin-bottom: 1.5rem;
@@ -629,10 +640,10 @@
   padding: clamp(2.25rem, 4vw, 3.25rem) clamp(2rem, 4vw, 3.5rem);
   background:
     radial-gradient(ellipse 60% 80% at 100% 0%, rgba(255, 255, 255, 0.12), transparent 50%),
-    linear-gradient(135deg, var(--app-deep) 0%, #0c2766 100%);
+    linear-gradient(135deg, var(--app-purple-dark) 0%, #4a2d6e 100%);
   border-radius: var(--radius-xl);
   color: white;
-  box-shadow: 0 20px 60px rgba(30, 58, 138, 0.30);
+  box-shadow: 0 20px 60px rgba(111, 82, 184, 0.30);
   position: relative;
   overflow: hidden;
 
@@ -685,23 +696,28 @@
     @media (max-width: 768px) { flex-direction: row; flex-wrap: wrap; }
 
     .btn-primary {
-      background: white !important;
-      color: var(--app-deep) !important;
-      border-radius: var(--radius-md) !important;
-      height: 52px !important;
-      padding: 0 1.6rem !important;
-      font-weight: 700 !important;
+      background: white;
+      color: var(--app-purple-dark);
+      border-radius: var(--radius-md);
+      height: 52px;
+      padding: 0 1.6rem;
+      font-weight: 700;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.20);
-      display: inline-flex; align-items: center; gap: 0.45rem;
-      mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
     }
     .btn-link {
-      background: transparent !important;
-      color: rgba(255, 255, 255, 0.85) !important;
-      border: 1px solid rgba(255, 255, 255, 0.25) !important;
-      border-radius: var(--radius-md) !important;
-      height: 46px !important;
-      padding: 0 1.2rem !important;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-md);
+      height: 46px;
+      padding: 0 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
     }
   }
 }

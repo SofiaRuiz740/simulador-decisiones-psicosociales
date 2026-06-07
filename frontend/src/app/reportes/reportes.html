@@ -1,0 +1,107 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Reportes</em></h1>
+  </header>
+
+  <div class="panel__toolbar report-toolbar">
+    <div class="toolbar">
+      <div class="toolbar__filters toolbar__filters--disabled">
+        <input type="date" disabled aria-label="Desde" />
+        <input type="date" disabled aria-label="Hasta" />
+        <select disabled><option>Todas las materias</option></select>
+        <select disabled><option>Todos los grupos</option></select>
+      </div>
+      <button type="button" class="btn-secondary" disabled>Filtrar</button>
+    </div>
+  </div>
+
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ totalPracticas() }}</div>
+        <div class="metric__label">Prácticas</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ conAutorizados() }}</div>
+        <div class="metric__label">Con participantes</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ finalizadas() }}</div>
+        <div class="metric__label">Finalizadas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">—</div>
+        <div class="metric__label">Exportaciones</div>
+      </article>
+    </section>
+  }
+
+  <section class="surface report-list">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate" />
+    } @else if (practicas().length === 0) {
+      <div class="empty-state-mockup">
+        <strong>No hay prácticas para reportar</strong>
+        Agenda y ejecuta prácticas para generar reportes PDF o Excel.
+      </div>
+    } @else {
+      <div class="form-section__title">Reporte por práctica</div>
+      @for (p of practicas(); track p.id) {
+        <article class="report-item">
+          <div>
+            <h3>{{ p.nombre }}</h3>
+            <p>{{ p.caso_nombre }} · {{ p.fecha_inicio | date:'mediumDate' }}</p>
+          </div>
+          <div class="actions actions--end">
+            <button type="button" class="btn-ghost" (click)="descargarPDF(p)" [disabled]="descargando() === p.id + '-pdf'">PDF</button>
+            <button type="button" class="btn-ghost" (click)="descargarExcel(p)" [disabled]="descargando() === p.id + '-xlsx'">Excel</button>
+          </div>
+        </article>
+      }
+
+      <div class="form-section__title report-catalog-title">Otros reportes</div>
+      @for (r of catalogoReportes; track r) {
+        <article class="report-item report-item--disabled">
+          <div>
+            <h3>{{ r }}</h3>
+            <p class="muted">Próximamente</p>
+          </div>
+          <div class="actions actions--end">
+            <button type="button" class="btn-ghost" disabled>PDF</button>
+            <button type="button" class="btn-ghost" disabled>Excel</button>
+          </div>
+        </article>
+      }
+    }
+  </section>
+
+  <div class="grid-2 charts-grid">
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Desempeño por criterio</h3>
+      </div>
+      <div class="empty-state-mockup empty-state-mockup--compact">
+        Gráfico disponible cuando haya resultados agregados.
+      </div>
+    </section>
+    <section class="surface">
+      <div class="card__header">
+        <h3 class="card__title">Distribución de notas</h3>
+      </div>
+      <div class="empty-state-mockup empty-state-mockup--compact">
+        Gráfico disponible cuando haya resultados agregados.
+      </div>
+    </section>
+  </div>
+
+  <section class="surface feedback-pending">
+    <div class="card__header">
+      <h3 class="card__title">Feedback pendiente</h3>
+    </div>
+    <div class="empty-state-mockup empty-state-mockup--compact">
+      El resumen de retroalimentaciones pendientes aparecerá aquí.
+    </div>
+  </section>
+
+</section>

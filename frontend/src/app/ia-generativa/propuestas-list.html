@@ -1,0 +1,147 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>IA</em> generativa</h1>
+  </header>
+
+  <nav class="tabs" aria-label="Secciones IA">
+    <button type="button" class="tab" [class.active]="tab() === 'nueva'" (click)="setTab('nueva')">Nueva propuesta</button>
+    <button type="button" class="tab" [class.active]="tab() === 'borradores'" (click)="setTab('borradores')">Borradores</button>
+    <button type="button" class="tab" [class.active]="tab() === 'historial'" (click)="setTab('historial')">Historial</button>
+  </nav>
+
+  <!-- Tab: Nueva propuesta -->
+  <div class="tab-panel" [class.active]="tab() === 'nueva'">
+    <div class="builder-block">
+      <div class="builder-header">
+        <h3 class="card__title">Nueva propuesta</h3>
+      </div>
+
+      <form class="form-panel" [formGroup]="form" (ngSubmit)="generar()">
+        <div class="field">
+          <label for="iaTema">Tema del caso <span>*</span></label>
+          <input
+            id="iaTema"
+            type="text"
+            formControlName="tema"
+            placeholder="Ej: Conflicto comunitario por uso del espacio público"
+            maxlength="300" />
+          <div class="field-counter">{{ form.controls.tema.value.length }}/300</div>
+        </div>
+
+        <div class="field">
+          <label for="iaObjetivo">Objetivo de aprendizaje <span>*</span></label>
+          <textarea
+            id="iaObjetivo"
+            formControlName="objetivo_aprendizaje"
+            placeholder="Competencias psicosociales a desarrollar…"
+            rows="4"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="iaDificultad">Dificultad <span>*</span></label>
+            <select id="iaDificultad" formControlName="nivel_dificultad">
+              <option value="bajo">Básico</option>
+              <option value="medio">Medio</option>
+              <option value="alto">Avanzado</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="iaEscenarios">Escenarios <span>*</span></label>
+            <select id="iaEscenarios" formControlName="numero_escenarios">
+              @for (n of [1,2,3,4,5,6,7,8]; track n) {
+                <option [value]="n">{{ n }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="iaPreguntas">Preguntas / escenario <span>*</span></label>
+            <select id="iaPreguntas" formControlName="numero_preguntas_por_escenario">
+              @for (n of [1,2,3,4,5,6]; track n) {
+                <option [value]="n">{{ n }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="iaTono">Tono narrativo</label>
+          <input id="iaTono" type="text" formControlName="tono" />
+        </div>
+
+        @if (generando()) {
+          <div class="progress-bar">
+            <div class="progress-bar__fill" [style.width.%]="pctPasos()"></div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="form.invalid || generando()">
+            {{ generando() ? 'Generando…' : 'Generar caso' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tab: Borradores -->
+  <div class="tab-panel" [class.active]="tab() === 'borradores'">
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters">
+            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" [ngModelOptions]="{standalone: true}" />
+            <select [(ngModel)]="filtroEstado" [ngModelOptions]="{standalone: true}">
+              <option value="">Todos</option>
+              <option [value]="EstadoPropuestaIA.Borrador">Borrador</option>
+              <option [value]="EstadoPropuestaIA.EnRevision">En revisión</option>
+              <option [value]="EstadoPropuestaIA.Aprobado">Aprobado</option>
+              <option [value]="EstadoPropuestaIA.Rechazado">Rechazado</option>
+              <option [value]="EstadoPropuestaIA.ConvertidoEnCaso">Convertido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="panel__body">
+        @if (loadingLista()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filtradas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin borradores</strong>
+            Genera una propuesta en la pestaña «Nueva propuesta».
+          </div>
+        } @else {
+          <div class="surface surface--flat">
+            @for (p of filtradas(); track p.id) {
+              <article class="list-row">
+                <div>
+                  <div class="list-row__title">{{ p.titulo }}</div>
+                  <div class="list-row__meta">{{ p.fecha_creacion | date:'mediumDate' }}</div>
+                </div>
+                <div class="list-row__side">
+                  <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
+                  <div class="actions actions--end">
+                    <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id]">Ver</a>
+                    <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id, 'editar']">Editar</a>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Tab: Historial -->
+  <div class="tab-panel" [class.active]="tab() === 'historial'">
+    <div class="surface">
+      <div class="empty-state-mockup">
+        <strong>Sin historial disponible</strong>
+        El registro de actividad de propuestas IA aparecerá aquí cuando el backend lo exponga.
+      </div>
+    </div>
+  </div>
+
+</section>

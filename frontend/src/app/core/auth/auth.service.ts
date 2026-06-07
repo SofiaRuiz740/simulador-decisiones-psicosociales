@@ -131,7 +131,7 @@ export class AuthService {
   /** Dashboard inicial según rol — útil para el redirect post-login. */
   dashboardDeRol(rol: Rol | null): string {
     if (rol === Rol.Admin) return '/admin';
-    if (rol === Rol.Estudiante) return '/estudiante';
+    if (rol === Rol.Estudiante) return '/panel-estudiante';
     return '/docente'; // default y fallback
   }
 

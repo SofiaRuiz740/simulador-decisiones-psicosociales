@@ -1,0 +1,329 @@
+/* =============================================
+   Design tokens — útiles para migrar a Figma
+   ============================================= */
+:root {
+  --color-bg-panel: #f0f0f2;
+  --color-card: #ffffff;
+  --color-title: #3d2b5a;
+  --color-subtitle: #9a8fb0;
+  --color-text: #4a3f5c;
+  --color-text-muted: #8b7fa0;
+  --color-border: #e4e0ea;
+  --color-border-focus: #b89ee8;
+  --color-icon: #9b7fd4;
+  --color-link: #8b6fc9;
+  --color-link-hover: #6f52b8;
+  --gradient-button: linear-gradient(90deg, #d4b8f5 0%, #a87ef0 55%, #9b72f3 100%);
+  --gradient-button-hover: linear-gradient(90deg, #c9a7eb 0%, #9b72f3 100%);
+  --shadow-card: 0 12px 40px rgba(61, 43, 90, 0.08);
+  --radius-card: 40px;
+  --radius-input: 14px;
+  --radius-button: 14px;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* =============================================
+   Login page — layout 50/50
+   ============================================= */
+.login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.login-page__hero {
+  position: relative;
+  overflow: hidden;
+  background: #2a1545;
+}
+
+.login-page__hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.login-page__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+  background: var(--color-bg-panel);
+}
+
+/* =============================================
+   Login card
+   ============================================= */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 56px 48px 52px;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.login-card__header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.login-card__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-title);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.login-card__subtitle {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--color-subtitle);
+  letter-spacing: 0.01em;
+}
+
+/* =============================================
+   Form fields
+   ============================================= */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-field__icon {
+  position: absolute;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon);
+  pointer-events: none;
+}
+
+.form-field__input {
+  width: 100%;
+  height: 52px;
+  padding: 0 44px 0 46px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-card);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field__input::placeholder {
+  color: #b5adc4;
+}
+
+.form-field__input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(155, 114, 243, 0.12);
+}
+
+.form-field__input--password {
+  padding-right: 48px;
+}
+
+.form-field__toggle {
+  position: absolute;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-icon);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.form-field__toggle:hover {
+  color: var(--color-link);
+  background: rgba(155, 114, 243, 0.08);
+}
+
+/* =============================================
+   Auth switch (login ↔ registro)
+   ============================================= */
+.auth-switch {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.auth-switch__link {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-left: 4px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-link);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.auth-switch__link:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.auth-switch__link:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+a.auth-switch__link {
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+a.auth-switch__link:hover {
+  text-decoration: underline;
+}
+
+/* =============================================
+   Primary button (solo formularios auth)
+   ============================================= */
+.login-form .btn-primary,
+.login-card > form .btn-primary {
+  width: 100%;
+  height: 52px;
+  margin-top: 4px;
+  border: none;
+  border-radius: var(--radius-button);
+  background: var(--gradient-button);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 16px rgba(155, 114, 243, 0.25);
+}
+
+.login-form .btn-primary:hover,
+.login-card > form .btn-primary:hover {
+  background: var(--gradient-button-hover);
+  box-shadow: 0 6px 20px rgba(155, 114, 243, 0.35);
+}
+
+.login-form .btn-primary:active,
+.login-card > form .btn-primary:active {
+  transform: scale(0.985);
+}
+
+.login-form .btn-primary:focus-visible,
+.login-card > form .btn-primary:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 3px;
+}
+
+.login-form .btn-primary:disabled,
+.login-card > form .btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =============================================
+   Responsive
+   ============================================= */
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: 38vh auto;
+  }
+
+  .login-page__hero {
+    min-height: 38vh;
+  }
+
+  .login-page__panel {
+    padding: 32px 24px 48px;
+  }
+
+  .login-card {
+    max-width: 480px;
+    padding: 40px 32px 36px;
+    border-radius: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px 28px;
+    border-radius: 28px;
+  }
+}

@@ -1,0 +1,29 @@
+.page {
+  padding-bottom: 0;
+}
+
+.import-grid {
+  margin-top: 1.5rem;
+}
+
+.doc-preview--compact pre {
+  max-height: 160px;
+  overflow: auto;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.empty-state-mockup--compact {
+  padding: 1.25rem 0;
+}
+
+.import-type--disabled {
+  opacity: 0.65;
+  cursor: default;
+  pointer-events: none;
+}
+
+.tab-empty {
+  padding: 0;
+}

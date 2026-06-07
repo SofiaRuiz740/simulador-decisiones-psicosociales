@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-participaciones',
-  template: `
-    <div class="placeholder">
-      <h1>Participaciones</h1>
-      <p>Simulación interactiva del estudiante: storytelling, escenarios, preguntas, temporizador.</p>
-      <p class="note">Módulo en construcción.</p>
-    </div>
-  `,
-  styles: [
-    `.placeholder { padding: 2rem; }
-     .note { color: var(--mat-sys-on-surface-variant); font-style: italic; }`,
-  ],
+  templateUrl: './participaciones.html',
+  styleUrl: './participaciones.scss',
 })
-export class Participaciones {}
+export class Participaciones {
+  readonly tab = signal<'seguimiento' | 'simulacion'>('seguimiento');
+
+  readonly tabs = [
+    { id: 'seguimiento' as const, label: 'Seguimiento docente' },
+    { id: 'simulacion' as const, label: 'Vista previa simulación' },
+  ];
+
+  readonly columnasSeguimiento = [
+    'Estudiante', 'Práctica', 'Caso', 'Estado', 'Progreso', 'Tiempo',
+    'Restante', 'Intentos', 'Resp.',
+  ];
+}

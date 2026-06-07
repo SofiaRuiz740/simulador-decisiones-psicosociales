@@ -25,8 +25,7 @@ interface PaginaSimulacion {
   selector: 'app-simulacion',
   imports: [
     CommonModule, RouterLink,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatProgressBarModule, MatRadioModule, MatSnackBarModule,
+    MatProgressBarModule, MatSnackBarModule,
   ],
   templateUrl: './simulacion.html',
   styleUrl: './simulacion.scss',

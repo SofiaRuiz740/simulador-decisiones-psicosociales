@@ -1,0 +1,19 @@
+.page {
+  padding-bottom: 0;
+}
+
+.sim-preview--placeholder {
+  opacity: 0.92;
+
+  .sim-option {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.sim-preview-note {
+  margin: 1rem 0 0;
+  font-size: 0.76rem;
+  color: var(--app-slate);
+  text-align: center;
+}

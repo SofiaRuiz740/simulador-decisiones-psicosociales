@@ -1,0 +1,58 @@
+.page {
+  padding-bottom: 2rem;
+}
+
+.report-toolbar {
+  margin-bottom: 1rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.toolbar__filters--disabled {
+  opacity: 0.55;
+}
+
+.report-list {
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.report-catalog-title {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--app-line);
+}
+
+.report-item--disabled {
+  opacity: 0.55;
+
+  .muted {
+    font-size: 0.72rem;
+    color: var(--app-slate);
+    margin: 2px 0 0;
+  }
+}
+
+.charts-grid {
+  margin-bottom: 1rem;
+}
+
+.feedback-pending {
+  padding: 1.25rem 1.5rem;
+}
+
+.empty-state-mockup--compact {
+  padding: 1.25rem 0;
+}
+
+.card__header {
+  margin-bottom: 0.5rem;
+}
+
+.card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}

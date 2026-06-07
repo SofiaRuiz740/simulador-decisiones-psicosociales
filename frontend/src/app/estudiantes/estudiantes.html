@@ -1,71 +1,100 @@
-<section class="page">
-  <header class="hero-block anim-fade-up">
-    <div class="hero-text">
-      <span class="kicker">Personas</span>
-      <h1>Estudiantes</h1>
-      <p>
-        Registra, vincula y mantén tu lista de estudiantes lista para asignar prácticas.
-        Los códigos de acceso se generan automáticamente al agendar una práctica.
-      </p>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><strong>{{ total() }}</strong><span>Total</span></div>
-      <div class="stat"><strong>{{ activos() }}</strong><span>Activos</span></div>
-    </div>
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Estudiantes</em></h1>
   </header>
 
-  <div class="toolbar">
-    <button mat-stroked-button color="primary" (click)="crear()">
-      <mat-icon>person_add</mat-icon>
-      Crear estudiante
-    </button>
-    <button mat-flat-button color="primary" (click)="agregarPorCorreo()">
-      <mat-icon>email</mat-icon>
-      Agregar por correo
-    </button>
-  </div>
-
-  @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
-
-  @if (!loading() && estudiantes().length === 0) {
-    <div class="empty-state">
-      <mat-icon>group_add</mat-icon>
-      <h3>Aún no tienes estudiantes</h3>
-      <p>Agrega tu primera persona usando un correo institucional o creando un estudiante manualmente.</p>
-      <button mat-flat-button color="primary" (click)="agregarPorCorreo()">
-        <mat-icon>email</mat-icon> Agregar por correo
-      </button>
-    </div>
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ total() }}</div>
+        <div class="metric__label">Total estudiantes</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ activos() }}</div>
+        <div class="metric__label">Activos</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ inactivos() }}</div>
+        <div class="metric__label">Inactivos</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">—</div>
+        <div class="metric__label">Sin grupo</div>
+      </article>
+    </section>
   }
 
-  <div class="cards-grid">
-    @for (e of estudiantes(); track e.id) {
-      <article class="estu-card anim-fade-up" [class.inactivo]="!e.activo">
-        <div class="head">
-          <span class="avatar">{{ inicialesDe(e.nombre_completo, e.correo) }}</span>
-          <div class="info">
-            <strong class="nombre">{{ e.nombre_completo }}</strong>
-            <span class="correo">{{ e.correo }}</span>
-          </div>
-          <span class="ribbon" [class.ok]="e.activo" [class.no]="!e.activo">
-            {{ e.activo ? 'Activo' : 'Inactivo' }}
-          </span>
+  <section class="panel">
+    <div class="panel__toolbar">
+      <div class="toolbar">
+        <div class="toolbar__filters">
+          <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+          <select [(ngModel)]="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+          </select>
         </div>
-        <div class="meta">
-          <span class="chip-meta">
-            <mat-icon>person</mat-icon>
-            Creado por <strong>{{ e.docente_creador_username }}</strong>
-          </span>
+        <div class="actions actions--end">
+          <button type="button" class="btn-secondary" (click)="agregarPorCorreo()">Agregar por correo</button>
+          <button type="button" class="btn-primary" (click)="crear()">Registrar</button>
         </div>
-        <div class="acciones">
-          <button mat-stroked-button (click)="editar(e)">
-            <mat-icon>edit</mat-icon> Editar
-          </button>
-          <button mat-stroked-button color="warn" (click)="desvincular(e)">
-            <mat-icon>person_remove</mat-icon> Desvincular
-          </button>
+      </div>
+    </div>
+
+    <div class="panel__body">
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (filtrados().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Aún no hay estudiantes</strong>
+          Registra tu primera persona o agrégala por correo institucional.
         </div>
-      </article>
-    }
-  </div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>ID</th>
+                <th>Materia</th>
+                <th>Grupo</th>
+                <th>Estado</th>
+                <th>Última práctica</th>
+                <th>Nota</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of filtrados(); track e.id) {
+                <tr>
+                  <td><strong>{{ e.nombre_completo }}</strong></td>
+                  <td>{{ e.correo }}</td>
+                  <td>{{ e.id }}</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>
+                    <span class="badge" [class]="e.activo ? 'badge badge--activo' : 'badge badge--inactivo'">
+                      {{ e.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td class="col-actions">
+                    <div class="actions actions--end">
+                      <button type="button" class="btn-ghost" (click)="editar(e)">Editar</button>
+                      <button type="button" class="btn-ghost" (click)="desvincular(e)">Desvincular</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+
 </section>

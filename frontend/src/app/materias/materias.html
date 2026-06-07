@@ -1,0 +1,65 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Materias</em></h1>
+  </header>
+
+  <section class="metrics">
+    <article class="metric">
+      <div class="metric__value">—</div>
+      <div class="metric__label">Total materias</div>
+    </article>
+    <article class="metric metric--accent">
+      <div class="metric__value">—</div>
+      <div class="metric__label">Materias activas</div>
+    </article>
+    <article class="metric">
+      <div class="metric__value">—</div>
+      <div class="metric__label">Grupos asociados</div>
+    </article>
+    <article class="metric metric--teal">
+      <div class="metric__value">—</div>
+      <div class="metric__label">Estudiantes vinculados</div>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel__toolbar">
+      <div class="toolbar">
+        <div class="toolbar__filters">
+          <input type="search" placeholder="Buscar…" disabled />
+          <select disabled><option>Todos</option></select>
+        </div>
+        <button type="button" class="btn-primary" disabled>Crear materia</button>
+      </div>
+    </div>
+    <div class="panel__body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Materia</th>
+              <th>Programa</th>
+              <th>Periodo</th>
+              <th>Grupos</th>
+              <th>Estudiantes</th>
+              <th>Estado</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td [attr.colspan]="7">
+                <div class="empty-state-mockup empty-state-mockup--compact">
+                  <strong>Sin materias registradas</strong>
+                  La gestión de materias estará disponible cuando el backend exponga este módulo.
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</section>

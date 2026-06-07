@@ -39,6 +39,14 @@ export class PracticaDetallePage implements OnInit {
 
   readonly loading = signal(true);
   readonly practica = signal<PracticaDetalle | null>(null);
+  readonly tab = signal<'resumen' | 'participantes' | 'codigos' | 'seguimiento'>('resumen');
+
+  readonly tabs = [
+    { id: 'resumen' as const, label: 'Resumen' },
+    { id: 'participantes' as const, label: 'Participantes' },
+    { id: 'codigos' as const, label: 'Códigos de acceso' },
+    { id: 'seguimiento' as const, label: 'Seguimiento' },
+  ];
 
   readonly estudiantes = signal<Estudiante[]>([]);
   readonly grupos = signal<Grupo[]>([]);
@@ -69,6 +77,16 @@ export class PracticaDetallePage implements OnInit {
   copiar(codigo: string) {
     navigator.clipboard.writeText(codigo);
     this.snackBar.open(`Código copiado: ${codigo}`, 'OK', { duration: 2000 });
+  }
+
+  badgeClass(estado: EstadoPractica): string {
+    switch (estado) {
+      case EstadoPractica.SinIniciar: return 'badge badge--sin-iniciar';
+      case EstadoPractica.EnCurso: return 'badge badge--en-curso';
+      case EstadoPractica.Finalizada: return 'badge badge--finalizado';
+      case EstadoPractica.Cancelada: return 'badge badge--cancelado';
+      default: return 'badge';
+    }
   }
 
   autorizar() {

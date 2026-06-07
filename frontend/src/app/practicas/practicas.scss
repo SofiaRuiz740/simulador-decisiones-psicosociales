@@ -1,0 +1,38 @@
+.page {
+  padding-bottom: 0;
+}
+
+.tab-empty-note {
+  font-size: 0.84rem;
+  color: var(--app-slate);
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}
+
+.tab-empty {
+  padding: 0;
+}
+
+.codigos-hint {
+  margin-bottom: 1rem;
+  padding: 1rem 1.125rem;
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--app-slate);
+    line-height: 1.55;
+  }
+}
+
+.activity-list--empty {
+  padding: 1.5rem 1.75rem;
+  margin: 0;
+
+  .activity-list__empty-note {
+    list-style: none;
+    font-size: 0.84rem;
+    color: var(--app-slate);
+    text-align: center;
+  }
+}

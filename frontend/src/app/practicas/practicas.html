@@ -1,0 +1,237 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Prácticas</em></h1>
+  </header>
+
+  <nav class="tabs" aria-label="Secciones prácticas">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <!-- Agenda -->
+  <div class="tab-panel" [class.active]="tab() === 'agenda'">
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters">
+            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+            <select [(ngModel)]="filtroEstado">
+              <option value="">Todos</option>
+              <option value="SIN_INICIAR">Sin iniciar</option>
+              <option value="EN_CURSO">En curso</option>
+              <option value="FINALIZADA">Finalizada</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filtradas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin prácticas agendadas</strong>
+            Usa la pestaña «Nueva práctica» para crear una.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Caso</th>
+                  <th>Materia</th>
+                  <th>Grupo</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Tiempo</th>
+                  <th>Lugar</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of filtradas(); track p.id) {
+                  <tr>
+                    <td>{{ p.caso_nombre }}</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>{{ p.fecha_inicio | date:'short' }}</td>
+                    <td>{{ p.fecha_fin | date:'short' }}</td>
+                    <td>{{ p.tiempo_max_min }} min</td>
+                    <td>{{ p.lugar_fisico || '—' }}</td>
+                    <td><span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span></td>
+                    <td class="col-actions">
+                      <div class="actions actions--end">
+                        <a class="btn-ghost" [routerLink]="['/practicas', p.id]">Abrir</a>
+                        <button type="button" class="btn-ghost" (click)="eliminar(p, $event)">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <!-- Nueva práctica -->
+  <div class="tab-panel" [class.active]="tab() === 'nueva'">
+    <div class="builder-block">
+      <div class="builder-header">
+        <h3 class="card__title">Agendar práctica</h3>
+      </div>
+      @if (cargandoCasos()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (casosValidados().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Sin casos validados</strong>
+          Publica un caso desde «Casos de estudio» antes de agendar.
+        </div>
+      } @else {
+        <form [formGroup]="formNueva" class="form-grid" (ngSubmit)="agendarInline()">
+          <div class="form-group">
+            <label for="pracNombre">Nombre de la práctica</label>
+            <input id="pracNombre" formControlName="nombre" placeholder="Ej. Simulación semana 6" />
+          </div>
+          <div class="form-group">
+            <label for="pracCaso">Caso validado</label>
+            <select id="pracCaso" formControlName="caso">
+              @for (c of casosValidados(); track c.id) {
+                <option [value]="c.id">{{ c.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pracMateria">Materia</label>
+            <input id="pracMateria" disabled placeholder="—" title="Sin API de materias vinculadas" />
+          </div>
+          <div class="form-group">
+            <label for="pracGrupo">Grupo</label>
+            <input id="pracGrupo" disabled placeholder="—" title="Sin API de grupos en agendado" />
+          </div>
+          <div class="form-group">
+            <label for="pracInicio">Fecha inicio</label>
+            <input id="pracInicio" type="datetime-local" formControlName="fecha_inicio" required />
+          </div>
+          <div class="form-group">
+            <label for="pracFin">Fecha fin</label>
+            <input id="pracFin" type="datetime-local" formControlName="fecha_fin" required />
+          </div>
+          <div class="form-group">
+            <label for="pracTiempo">Tiempo máximo (min)</label>
+            <input id="pracTiempo" type="number" formControlName="tiempo_max_min" min="1" />
+          </div>
+          <div class="form-group">
+            <label for="pracLugar">Lugar físico</label>
+            <input id="pracLugar" formControlName="lugar_fisico" placeholder="Opcional" />
+          </div>
+          <div class="form-group full">
+            <label for="pracMensaje">Mensaje personalizado</label>
+            <textarea id="pracMensaje" formControlName="mensaje_personalizado" rows="3" placeholder="Mensaje para los estudiantes"></textarea>
+          </div>
+        </form>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="agendarInline()" [disabled]="formNueva.invalid || guardando()">
+            Agendar práctica
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Participantes -->
+  <div class="tab-panel" [class.active]="tab() === 'participantes'">
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <div class="toolbar__filters"></div>
+          <button type="button" class="btn-primary" disabled title="Requiere API de participantes">Agregar</button>
+        </div>
+      </div>
+      <div class="panel__body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Grupo</th>
+                <th>Correo</th>
+                <th>Asignación</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td [attr.colspan]="5">
+                  <div class="empty-state-mockup empty-state-mockup--compact">
+                    <strong>Sin participantes</strong>
+                    La gestión por práctica estará disponible cuando el backend exponga este listado.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Códigos de acceso -->
+  <div class="tab-panel" [class.active]="tab() === 'codigos'">
+    <section class="panel">
+      <div class="panel__body">
+        <div class="surface surface--flat codigos-hint">
+          <p>Genera un código por estudiante. Lo usarán en la pantalla de acceso del simulador junto con su correo, como contraseña de ingreso.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Práctica</th>
+                <th>Estudiante</th>
+                <th>Correo</th>
+                <th>Código</th>
+                <th>Estado</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td [attr.colspan]="6">
+                  <div class="empty-state-mockup empty-state-mockup--compact">
+                    <strong>Sin códigos</strong>
+                    Consulta los códigos en el detalle de cada práctica o cuando el listado global esté disponible.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Seguimiento -->
+  <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
+    <div class="surface surface--flat tab-empty">
+      <div class="empty-state-mockup">
+        <strong>Sin seguimiento en tiempo real</strong>
+        El progreso por estudiante aparecerá aquí cuando el backend exponga participaciones activas.
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="tab-panel" [class.active]="tab() === 'historial'">
+    <div class="surface tab-empty">
+      <ul class="activity-list activity-list--empty">
+        <li class="activity-list__empty-note">Sin eventos de historial disponibles por ahora.</li>
+      </ul>
+    </div>
+  </div>
+
+</section>

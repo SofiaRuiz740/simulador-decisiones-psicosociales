@@ -51,6 +51,7 @@ def fila_mis_practicas(auth: AutorizacionEstudiante) -> dict:
 def listar_mis_practicas(estudiante: Estudiante) -> list[dict]:
     auths = AutorizacionEstudiante.objects.filter(
         estudiante=estudiante,
+        revocada=False,
     ).select_related(
         'practica__caso', 'practica__materia', 'practica__caso__materia', 'estudiante',
     ).prefetch_related(

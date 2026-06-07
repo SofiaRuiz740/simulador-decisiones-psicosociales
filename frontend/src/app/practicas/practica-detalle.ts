@@ -109,6 +109,53 @@ export class PracticaDetallePage implements OnInit {
     return estado === 'FINALIZADA' || estado === 'INCOMPLETA';
   }
 
+  async desautorizar(autorizacionId: number, nombreEstudiante: string): Promise<void> {
+    const p = this.practica();
+    if (!p) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Quitar autorización',
+      mensaje: `${nombreEstudiante} dejará de tener acceso a la práctica "${p.nombre}". Si tiene SMTP configurado se notificará por correo.`,
+      variant: 'danger',
+      textoConfirmar: 'Quitar autorización',
+      icono: 'person_off',
+    });
+    if (!ok) return;
+    const motivo = await this.ux.askInput({
+      titulo: 'Motivo (opcional)',
+      mensaje: 'Si lo deseas, indica un motivo. El estudiante lo verá en el correo de notificación.',
+      label: 'Motivo',
+      placeholder: 'Ej: la práctica fue reasignada a otro grupo.',
+      icono: 'edit_note',
+      multiline: true,
+      rows: 3,
+      maxlength: 300,
+    });
+    // El askInput devuelve null si cancela; el campo es opcional, así que `null` = sin motivo.
+    const motivoFinal = motivo === null ? '' : motivo;
+
+    // Si el docente aún no tiene SMTP configurado, pedimos la clave Gmail
+    // antes de la petición para que la notificación se envíe.
+    this.pedirClaveGmail('Notificar al estudiante por correo').subscribe((clave) => {
+      if (clave === null) return;
+      this.practicas.desautorizarEstudiante(
+        p.id, autorizacionId, motivoFinal, clave || undefined,
+      ).subscribe({
+        next: (resp) => {
+          if (clave) this.auth.cargarPerfil().subscribe();
+          const msg = resp.email_enviado
+            ? `${nombreEstudiante} fue desautorizado y notificado por correo.`
+            : `${nombreEstudiante} fue desautorizado. ${resp.email_error || 'No se pudo enviar el correo.'}`;
+          this.snackBar.open(msg, 'OK', { duration: 5000 });
+          this.cargar(p.id);
+        },
+        error: (err) => {
+          const msg = err?.error?.detail || 'No se pudo desautorizar.';
+          this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo desautorizar.', 'OK', { duration: 4500 });
+        },
+      });
+    });
+  }
+
   async autorizarReintento(autorizacionId: number): Promise<void> {
     const p = this.practica();
     if (!p) return;

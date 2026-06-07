@@ -58,6 +58,25 @@ export class PracticasService {
     );
   }
 
+  desautorizarEstudiante(
+    practicaId: number,
+    autorizacionId: number,
+    motivo: string,
+    correo_smtp_password?: string,
+  ) {
+    const body: Record<string, string> = {};
+    if (motivo) body['motivo'] = motivo;
+    if (correo_smtp_password) body['correo_smtp_password'] = correo_smtp_password;
+    return this.http.post<{
+      autorizacion: unknown;
+      email_enviado: boolean;
+      email_error: string | null;
+    }>(
+      `${this.api}/practicas/${practicaId}/desautorizar-estudiante/${autorizacionId}/`,
+      body,
+    );
+  }
+
   misPracticas() {
     return this.http.get<MisPracticaEstudiante[]>(`${this.api}/practicas/mis-practicas/`);
   }

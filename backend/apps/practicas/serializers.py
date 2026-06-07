@@ -25,9 +25,14 @@ class AutorizacionSerializer(serializers.ModelSerializer):
         model = AutorizacionEstudiante
         fields = (
             'id', 'practica', 'estudiante', 'estudiante_correo', 'estudiante_nombre',
-            'codigo_acceso', 'notificado', 'reintento_autorizado', 'fecha_creacion',
+            'codigo_acceso', 'notificado', 'reintento_autorizado',
+            'revocada', 'revocada_en', 'revocada_motivo',
+            'fecha_creacion',
         )
-        read_only_fields = ('id', 'codigo_acceso', 'fecha_creacion')
+        read_only_fields = (
+            'id', 'codigo_acceso', 'fecha_creacion',
+            'revocada', 'revocada_en', 'revocada_motivo',
+        )
 
 
 class PracticaListSerializer(serializers.ModelSerializer):
@@ -180,6 +185,11 @@ class AccesoEstudianteSerializer(serializers.Serializer):
             )
         except AutorizacionEstudiante.DoesNotExist:
             raise serializers.ValidationError('Código de acceso inválido para este correo.')
+        if auth.revocada:
+            raise serializers.ValidationError(
+                'Tu autorización para esta práctica fue revocada por el docente. '
+                'Si crees que es un error, contáctalo directamente.',
+            )
         attrs['estudiante'] = est
         attrs['autorizacion'] = auth
         return attrs

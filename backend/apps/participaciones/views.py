@@ -102,11 +102,28 @@ class ParticipacionViewSet(viewsets.GenericViewSet):
         )
         practica = autorizacion.practica
 
-        # Validaciones (RN15, RN16, RN13).
+        # Validaciones (RN15, RN16, RN13, RN17, RN26).
+        if autorizacion.revocada:
+            raise ValidationError(
+                'Tu autorización para esta práctica fue revocada por el docente.',
+            )
         if practica.estado == Practica.Estado.CANCELADA:
             raise ValidationError('La práctica fue cancelada.')
         if practica.estado == Practica.Estado.FINALIZADA or timezone.now() > practica.fecha_fin:
             raise ValidationError('La práctica ya finalizó.')
+
+        # RN17 — no permitir iniciar una práctica nueva si ya pasó más de la
+        # mitad de la ventana fecha_inicio→fecha_fin. Si ya hay participación
+        # previa (creada antes del punto medio), la deja continuar.
+        ya_existe = Participacion.objects.filter(autorizacion=autorizacion).exists()
+        if not ya_existe and practica.fecha_inicio and practica.fecha_fin:
+            mitad_ventana = practica.fecha_inicio + (practica.fecha_fin - practica.fecha_inicio) / 2
+            if timezone.now() > mitad_ventana:
+                raise ValidationError(
+                    'Ya pasó más de la mitad del tiempo de la práctica. '
+                    'Por reglamento ya no es posible iniciarla. '
+                    'Si necesitas un nuevo intento, pide a tu docente que lo habilite.',
+                )
 
         part, creada = Participacion.objects.get_or_create(
             autorizacion=autorizacion,

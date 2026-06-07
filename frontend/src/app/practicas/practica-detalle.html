@@ -127,24 +127,36 @@
                 </thead>
                 <tbody>
                   @for (a of p.autorizaciones; track a.id) {
-                    <tr>
+                    <tr [class.row-revoked]="a.revocada">
                       <td><strong>{{ a.estudiante_nombre }}</strong></td>
                       <td>{{ a.estudiante_correo }}</td>
                       <td><code>{{ a.codigo_acceso }}</code></td>
                       <td>
-                        @if (a.notificado) {
+                        @if (a.revocada) {
+                          <span class="badge badge--cancelado" [title]="a.revocada_motivo || ''">Revocada</span>
+                        } @else if (a.notificado) {
                           <span class="badge badge--activo">Enviada</span>
                         } @else {
                           <span class="badge badge--pendiente">No enviada</span>
                         }
                       </td>
                       <td class="col-actions">
-                        <button type="button" class="btn-ghost" (click)="copiar(a.codigo_acceso)">Copiar</button>
-                        <button type="button" class="btn-ghost" (click)="reenviarInvitacion(a.id)">
-                          {{ a.notificado ? 'Reenviar' : 'Enviar' }}
-                        </button>
-                        @if (a.reintento_autorizado) {
-                          <span class="muted">Reintento pendiente</span>
+                        @if (!a.revocada) {
+                          <button type="button" class="btn-ghost" (click)="copiar(a.codigo_acceso)">Copiar</button>
+                          <button type="button" class="btn-ghost" (click)="reenviarInvitacion(a.id)">
+                            {{ a.notificado ? 'Reenviar' : 'Enviar' }}
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-ghost btn-ghost--danger"
+                            (click)="desautorizar(a.id, a.estudiante_nombre)">
+                            Quitar
+                          </button>
+                          @if (a.reintento_autorizado) {
+                            <span class="muted">Reintento pendiente</span>
+                          }
+                        } @else {
+                          <span class="muted">Sin acceso desde {{ a.revocada_en | date:'short' }}</span>
                         }
                       </td>
                     </tr>

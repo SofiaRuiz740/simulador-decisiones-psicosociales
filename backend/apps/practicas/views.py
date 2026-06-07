@@ -148,6 +148,51 @@ class PracticaViewSet(viewsets.ModelViewSet):
         auth.save(update_fields=['reintento_autorizado'])
         return Response(AutorizacionSerializer(auth).data)
 
+    @action(
+        detail=True,
+        methods=['post'],
+        url_path='desautorizar-estudiante/(?P<autorizacion_id>[^/.]+)',
+    )
+    def desautorizar_estudiante(self, request, pk=None, autorizacion_id=None):
+        """Revoca la autorización de un estudiante en la práctica (RN26).
+
+        Body opcional: { "motivo": "...", "correo_smtp_password": "..." }
+        Envía notificación al estudiante usando el SMTP del docente. Si el
+        SMTP no está configurado, la revocación queda guardada igual y se
+        devuelve `email_enviado: false` para que la UI lo informe.
+        """
+        from .email import enviar_revocacion_practica
+
+        practica: Practica = self.get_object()
+        try:
+            auth = practica.autorizaciones.get(pk=autorizacion_id)
+        except AutorizacionEstudiante.DoesNotExist:
+            raise ValidationError('Autorización no encontrada en esta práctica.')
+
+        if auth.revocada:
+            raise ValidationError('Esta autorización ya estaba revocada.')
+
+        motivo = (request.data.get('motivo') or '').strip()[:300]
+        # Si el docente envía la clave SMTP en la petición la guardamos para
+        # esta sesión y todas las siguientes (mismo patrón que invitación).
+        guardar_clave_smtp_si_provista(
+            request.user,
+            request.data.get('correo_smtp_password'),
+        )
+
+        auth.revocada = True
+        auth.revocada_en = timezone.now()
+        auth.revocada_motivo = motivo
+        auth.save(update_fields=['revocada', 'revocada_en', 'revocada_motivo'])
+
+        email_enviado, email_error = enviar_revocacion_practica(auth, motivo=motivo)
+
+        return Response({
+            'autorizacion': AutorizacionSerializer(auth).data,
+            'email_enviado': email_enviado,
+            'email_error': email_error if not email_enviado else None,
+        })
+
     @action(detail=True, methods=['post'], url_path='reenviar-invitacion/(?P<autorizacion_id>[^/.]+)')
     def reenviar_invitacion(self, request, pk=None, autorizacion_id=None):
         """Reenvía el correo de invitación al estudiante."""

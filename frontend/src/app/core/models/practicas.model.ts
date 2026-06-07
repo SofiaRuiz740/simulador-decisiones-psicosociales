@@ -25,6 +25,9 @@ export interface Autorizacion {
   codigo_acceso: string;
   notificado: boolean;
   reintento_autorizado: boolean;
+  revocada: boolean;
+  revocada_en: string | null;
+  revocada_motivo: string;
   fecha_creacion: string;
 }
 

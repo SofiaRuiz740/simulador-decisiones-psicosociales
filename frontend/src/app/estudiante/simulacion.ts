@@ -15,6 +15,7 @@ import {
   Participacion,
 } from '../core/models/practicas.model';
 import { SimulacionService } from '../core/services/simulacion.service';
+import { UxService } from '../core/services/ux.service';
 
 interface PaginaSimulacion {
   tipo: 'intro' | 'escenario';
@@ -64,6 +65,7 @@ export class Simulacion implements OnInit, OnDestroy {
   private readonly servicio = inject(SimulacionService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly errorInicio = signal<string | null>(null);
@@ -190,11 +192,20 @@ export class Simulacion implements OnInit, OnDestroy {
     }
   }
 
-  finalizar(forzado = false) {
+  async finalizar(forzado = false): Promise<void> {
     const p = this.participacion();
     if (!p) return;
     if (p.estado === EstadoParticipacion.Finalizada) return;
-    if (!forzado && !confirm('¿Finalizar la práctica? No podrás cambiar respuestas después.')) return;
+    if (!forzado) {
+      const ok = await this.ux.confirm({
+        titulo: '¿Listo para entregar?',
+        mensaje: 'Una vez entregues, no podrás cambiar tus decisiones. Tu docente recibirá los resultados.',
+        variant: 'info',
+        textoConfirmar: 'Entregar práctica',
+        icono: 'flag',
+      });
+      if (!ok) return;
+    }
     this.servicio.finalizar(p.id).subscribe({
       next: (res) => {
         if (this.timerInterval) clearInterval(this.timerInterval);

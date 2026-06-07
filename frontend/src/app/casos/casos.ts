@@ -18,6 +18,8 @@ import { CasoListItem, EstadoCaso } from '../core/models/casos.model';
 
 import { CasosService } from '../core/services/casos.service';
 
+import { UxService } from '../core/services/ux.service';
+
 import { AcademicoService } from '../core/services/academico.service';
 
 import { Materia } from '../core/models/academico.model';
@@ -69,6 +71,8 @@ export class Casos implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   private readonly router = inject(Router);
+
+  private readonly ux = inject(UxService);
 
 
 
@@ -307,9 +311,16 @@ export class Casos implements OnInit {
 
 
 
-  eliminar(c: CasoListItem) {
+  async eliminar(c: CasoListItem): Promise<void> {
 
-    if (!confirm(`¿Eliminar el caso "${c.nombre}"? Se borrarán escenarios, preguntas y respuestas.`)) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar caso',
+      mensaje: `Se eliminará el caso "${c.nombre}" junto con todos sus escenarios, preguntas y respuestas.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar caso',
+    });
+
+    if (!ok) return;
 
     this.servicio.eliminarCaso(c.id).subscribe({
 

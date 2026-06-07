@@ -24,6 +24,7 @@ import { AcademicoService } from '../core/services/academico.service';
 import { ExtrasService } from '../core/services/extras.service';
 import { PracticasService } from '../core/services/practicas.service';
 import { SimulacionService } from '../core/services/simulacion.service';
+import { UxService } from '../core/services/ux.service';
 
 @Component({
   selector: 'app-practica-detalle',
@@ -46,6 +47,7 @@ export class PracticaDetallePage implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly auth = inject(AuthService);
   private readonly dialog = inject(MatDialog);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly practica = signal<PracticaDetalle | null>(null);
@@ -107,10 +109,17 @@ export class PracticaDetallePage implements OnInit {
     return estado === 'FINALIZADA' || estado === 'INCOMPLETA';
   }
 
-  autorizarReintento(autorizacionId: number) {
+  async autorizarReintento(autorizacionId: number): Promise<void> {
     const p = this.practica();
     if (!p) return;
-    if (!confirm('¿Autorizar un nuevo intento para este estudiante?')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Autorizar reintento',
+      mensaje: 'El estudiante podrá iniciar la práctica de nuevo aunque ya la haya finalizado.',
+      variant: 'info',
+      textoConfirmar: 'Autorizar',
+      icono: 'replay',
+    });
+    if (!ok) return;
     this.practicas.autorizarReintento(p.id, autorizacionId).subscribe({
       next: () => {
         this.snackBar.open('Reintento autorizado.', 'OK', { duration: 2500 });
@@ -212,10 +221,17 @@ export class PracticaDetallePage implements OnInit {
     });
   }
 
-  finalizar() {
+  async finalizar(): Promise<void> {
     const p = this.practica();
     if (!p) return;
-    if (!confirm('¿Finalizar esta práctica? No se podrán hacer más participaciones.')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Finalizar práctica',
+      mensaje: 'Los estudiantes ya no podrán enviar nuevas participaciones. Los resultados quedarán consolidados.',
+      variant: 'warn',
+      textoConfirmar: 'Finalizar',
+      icono: 'flag',
+    });
+    if (!ok) return;
     this.practicas.finalizar(p.id).subscribe({
       next: () => { this.snackBar.open('Práctica finalizada.', 'OK', { duration: 2500 }); this.cargar(p.id); },
     });

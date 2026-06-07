@@ -30,6 +30,8 @@ import { PracticasService } from '../core/services/practicas.service';
 
 import { SimulacionService } from '../core/services/simulacion.service';
 
+import { UxService } from '../core/services/ux.service';
+
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { PracticaFormDialog } from './dialogs/practica-form-dialog';
 
@@ -82,6 +84,8 @@ export class Practicas implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   private readonly router = inject(Router);
+
+  private readonly ux = inject(UxService);
 
 
 
@@ -461,13 +465,20 @@ export class Practicas implements OnInit {
 
 
 
-  eliminar(p: Practica, ev: Event) {
+  async eliminar(p: Practica, ev: Event): Promise<void> {
 
     ev.preventDefault();
 
     ev.stopPropagation();
 
-    if (!confirm(`¿Eliminar la práctica "${p.nombre}"? Se borrarán las autorizaciones y participaciones.`)) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar práctica',
+      mensaje: `Se eliminará "${p.nombre}" junto con sus autorizaciones y participaciones. Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar práctica',
+    });
+
+    if (!ok) return;
 
     this.servicio.eliminar(p.id).subscribe({
 

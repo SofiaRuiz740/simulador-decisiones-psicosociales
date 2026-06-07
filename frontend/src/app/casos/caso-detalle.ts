@@ -17,6 +17,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CasoDetalle, Escenario, Pregunta, Respuesta } from '../core/models/casos.model';
 import { CasosService, ProblemaValidacion } from '../core/services/casos.service';
+import { UxService } from '../core/services/ux.service';
 import { CasePreview, CasePreviewData } from '../shared/components/case-preview/case-preview';
 
 @Component({
@@ -36,6 +37,7 @@ export class CasoDetallePage implements OnInit {
   private readonly router = inject(Router);
   private readonly servicio = inject(CasosService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly caso = signal<CasoDetalle | null>(null);
@@ -233,10 +235,18 @@ export class CasoDetallePage implements OnInit {
 
   // ---------- Escenarios ----------
 
-  agregarEscenario(): void {
+  async agregarEscenario(): Promise<void> {
     const c = this.caso();
     if (!c) return;
-    const titulo = prompt('Título del nuevo escenario:');
+    const titulo = await this.ux.askInput({
+      titulo: 'Nuevo escenario',
+      mensaje: 'Dale un título descriptivo. La narrativa la podrás editar después.',
+      label: 'Título del escenario',
+      placeholder: 'Ej: Inicio del dilema',
+      icono: 'view_carousel',
+      required: true,
+      maxlength: 200,
+    });
     if (!titulo) return;
     this.servicio.crearEscenario({
       caso: c.id, orden: this.siguienteOrdenEscenario(),
@@ -256,15 +266,31 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  eliminarEscenario(esc: Escenario): void {
-    if (!confirm(`¿Eliminar escenario "${esc.titulo}" y todas sus preguntas?`)) return;
+  async eliminarEscenario(esc: Escenario): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar escenario',
+      mensaje: `Se eliminará "${esc.titulo}" junto con todas sus preguntas y respuestas. Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar',
+    });
+    if (!ok) return;
     this.servicio.eliminarEscenario(esc.id).subscribe(() => this.cargar(this.caso()!.id));
   }
 
   // ---------- Preguntas ----------
 
-  agregarPregunta(esc: Escenario): void {
-    const enunciado = prompt('Enunciado de la nueva pregunta:');
+  async agregarPregunta(esc: Escenario): Promise<void> {
+    const enunciado = await this.ux.askInput({
+      titulo: 'Nueva pregunta',
+      mensaje: 'Escribe la decisión que tendrá que tomar el estudiante.',
+      label: 'Enunciado',
+      placeholder: 'Ej: ¿Qué decisión tomas frente a la presión del grupo?',
+      icono: 'quiz',
+      multiline: true,
+      rows: 3,
+      required: true,
+      maxlength: 600,
+    });
     if (!enunciado) return;
     const orden = esc.preguntas.length === 0 ? 1 : Math.max(...esc.preguntas.map((p) => p.orden)) + 1;
     this.servicio.crearPregunta({ escenario: esc.id, orden, enunciado }).subscribe(() => this.cargar(this.caso()!.id));
@@ -280,15 +306,31 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  eliminarPregunta(p: Pregunta): void {
-    if (!confirm('¿Eliminar pregunta y sus respuestas?')) return;
+  async eliminarPregunta(p: Pregunta): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar pregunta',
+      mensaje: 'Se borrará la pregunta junto con todas sus opciones de respuesta.',
+      variant: 'danger',
+      textoConfirmar: 'Eliminar',
+    });
+    if (!ok) return;
     this.servicio.eliminarPregunta(p.id).subscribe(() => this.cargar(this.caso()!.id));
   }
 
   // ---------- Respuestas ----------
 
-  agregarRespuesta(p: Pregunta): void {
-    const texto = prompt('Texto de la nueva respuesta:');
+  async agregarRespuesta(p: Pregunta): Promise<void> {
+    const texto = await this.ux.askInput({
+      titulo: 'Nueva opción de respuesta',
+      mensaje: 'Describe una posible decisión del estudiante.',
+      label: 'Texto de la opción',
+      placeholder: 'Ej: Propones una alternativa al grupo',
+      icono: 'lightbulb',
+      multiline: true,
+      rows: 2,
+      required: true,
+      maxlength: 400,
+    });
     if (!texto) return;
     const orden = p.respuestas.length === 0 ? 1 : Math.max(...p.respuestas.map((r) => r.orden)) + 1;
     this.servicio.crearRespuesta({ pregunta: p.id, orden, texto, es_correcta: false }).subscribe(() => this.cargar(this.caso()!.id));
@@ -305,8 +347,14 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  eliminarRespuesta(r: Respuesta): void {
-    if (!confirm('¿Eliminar esta respuesta?')) return;
+  async eliminarRespuesta(r: Respuesta): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar opción',
+      mensaje: 'Esta opción de respuesta se eliminará del caso.',
+      variant: 'danger',
+      textoConfirmar: 'Eliminar',
+    });
+    if (!ok) return;
     this.servicio.eliminarRespuesta(r.id).subscribe(() => this.cargar(this.caso()!.id));
   }
 
@@ -332,10 +380,17 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  publicar(): void {
+  async publicar(): Promise<void> {
     const c = this.caso();
     if (!c) return;
-    if (!confirm('¿Publicar este caso? Quedará listo para asignarse a una práctica.')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Publicar caso',
+      mensaje: 'El caso quedará disponible para asignarse a una práctica. Podrás editarlo después.',
+      variant: 'info',
+      textoConfirmar: 'Publicar',
+      icono: 'rocket_launch',
+    });
+    if (!ok) return;
     this.servicio.publicarCaso(c.id).subscribe({
       next: (actualizado) => {
         this.caso.set(actualizado);
@@ -353,10 +408,17 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  archivar(): void {
+  async archivar(): Promise<void> {
     const c = this.caso();
     if (!c) return;
-    if (!confirm('¿Archivar el caso? Se ocultará de los listados activos.')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Archivar caso',
+      mensaje: 'El caso se ocultará de los listados activos. Podrás recuperarlo desde el filtro de archivados.',
+      variant: 'warn',
+      textoConfirmar: 'Archivar',
+      icono: 'inventory_2',
+    });
+    if (!ok) return;
     this.servicio.archivarCaso(c.id).subscribe({
       next: (actualizado) => {
         this.caso.set(actualizado);
@@ -366,10 +428,17 @@ export class CasoDetallePage implements OnInit {
     });
   }
 
-  duplicar(): void {
+  async duplicar(): Promise<void> {
     const c = this.caso();
     if (!c) return;
-    if (!confirm('¿Duplicar el caso? Se creará una copia en estado BORRADOR.')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Duplicar caso',
+      mensaje: 'Se creará una copia idéntica en estado borrador para que la edites por separado.',
+      variant: 'info',
+      textoConfirmar: 'Duplicar',
+      icono: 'content_copy',
+    });
+    if (!ok) return;
     this.servicio.duplicarCaso(c.id).subscribe({
       next: (nuevo) => {
         this.snackBar.open('Caso duplicado.', 'Abrir', { duration: 4000 })

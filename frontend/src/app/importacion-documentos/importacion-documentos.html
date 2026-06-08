@@ -1,0 +1,301 @@
+<section class="module page">
+
+  <header class="hero-glass">
+    <h1><em>Importar</em></h1>
+  </header>
+
+  <nav class="tabs" aria-label="Tipos de importación">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <!-- Caso -->
+  <div class="tab-panel" [class.active]="tab() === 'caso'">
+    <div class="tip-bar">
+      <strong>Antes de subir:</strong>
+      respeta los encabezados de sección (CONTEXTO, ESCENARIO 1, PREGUNTA 1, etc.) de la plantilla DOCX para que el parser extraiga la estructura. Si dudas, descarga primero la plantilla o el caso ejemplo.
+      <div class="tip-bar__actions">
+        <button type="button" class="btn-ghost"
+          (click)="descargarPlantilla({titulo: 'Plantilla caso', tipo: 'caso'})">
+          Descargar plantilla DOCX
+        </button>
+        <button type="button" class="btn-ghost"
+          (click)="descargarPlantilla({titulo: 'Caso ejemplo', tipo: 'ejemplo'})">
+          Ver ejemplo
+        </button>
+      </div>
+    </div>
+
+    <div class="dropzone" (click)="fileInput.click()">
+      <p class="dropzone__title">Subir documento</p>
+      <p class="dropzone__hint">PDF, DOCX o TXT — máx. 10 MB</p>
+    </div>
+    <input #fileInput type="file" accept=".pdf,.txt,.docx" hidden (change)="seleccionar($event)" />
+
+    @if (archivo(); as a) {
+      <div class="file-info">
+        <strong>{{ a.nombre_original }}</strong>
+        <span>{{ a.tipo }} · {{ a.estado_display }}</span>
+      </div>
+    }
+
+    @if (archivo() && !archivo()!.texto_extraido) {
+      <div class="builder-block" style="margin-top: 1rem">
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="procesar()" [disabled]="loading() || archivo()!.estado !== 'SUBIDO'">
+            Procesar documento
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="grid-2 import-grid">
+      <div class="template-preview">
+        <h4>Estructura esperada</h4>
+        <div class="doc-preview">
+          <h5>Datos generales</h5>
+          <p>Nombre, área psicosocial, tiempo estimado</p>
+          <h5>Contexto e historia</h5>
+          <p>Narrativa del caso…</p>
+          <h5>Escenarios y preguntas</h5>
+          <p>Escenario 1, Pregunta 1…</p>
+          <h5>Rúbrica</h5>
+          <p>Criterios y niveles</p>
+        </div>
+      </div>
+
+      <div class="template-preview">
+        <h4>Resultado</h4>
+        @if (archivo()?.texto_extraido) {
+          <div class="field">
+            <label for="nombreCaso">Nombre del caso</label>
+            <input id="nombreCaso" type="text" [(ngModel)]="nombreCasoVal" maxlength="200" required />
+          </div>
+          <div class="field">
+            <label for="areaCaso">Área psicosocial (opcional)</label>
+            <input id="areaCaso" type="text" [(ngModel)]="areaCasoVal" maxlength="150" />
+          </div>
+          @if (archivo()!.texto_extraido) {
+            <div class="doc-preview doc-preview--compact">
+              <pre>{{ vistaPrevia() }}</pre>
+            </div>
+          }
+          <div class="form-actions">
+            <button type="button" class="btn-primary" (click)="crearCaso()" [disabled]="loading() || !nombreCasoVal.trim()">
+              Crear caso en revisión
+            </button>
+          </div>
+
+          @if (problemasCasoCreado()?.length) {
+            <h4 style="margin-top: 1rem">Por completar antes de publicar (RF14)</h4>
+            <ul class="problem-list">
+              @for (prob of problemasCasoCreado(); track prob.codigo) {
+                <li>
+                  <strong>{{ prob.codigo }}</strong>
+                  <span>{{ prob.mensaje }}</span>
+                </li>
+              }
+            </ul>
+          } @else if (problemasCasoCreado() !== null) {
+            <ul class="problem-list">
+              <li class="problem-list__ok">
+                El caso cumple la validación básica.
+                Te llevaremos al editor para que añadas multimedia y rúbrica.
+              </li>
+            </ul>
+          }
+        } @else {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin resultado</strong>
+            Sube y procesa un documento para ver la vista previa y crear el caso.
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Estudiantes -->
+  <div class="tab-panel" [class.active]="tab() === 'estudiantes'">
+    <div class="tip-bar">
+      <strong>Antes de importar:</strong>
+      verifica que cada fila tenga un correo válido (es la llave para crear o vincular). Si la materia o el grupo no existen aún, se crean automáticamente.
+      <div class="tip-bar__actions">
+        <button type="button" class="btn-ghost"
+          (click)="descargarPlantilla({titulo: 'Plantilla estudiantes', tipo: 'estudiantes'})">
+          Descargar plantilla XLSX
+        </button>
+      </div>
+    </div>
+
+    <div class="dropzone" (click)="fileEstudiantes.click()">
+      <p class="dropzone__title">Subir Excel o CSV</p>
+      <p class="dropzone__hint">nombre, correo, identificación, materia, grupo</p>
+    </div>
+    <input #fileEstudiantes type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarEstudiantes($event)" />
+
+    @if (resultadoEstudiantes(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.estudiantes_creados }} creados · {{ r.estudiantes_vinculados }} vinculados ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <div class="template-preview" style="margin-top: 1rem">
+      <h4>Plantilla esperada</h4>
+      <table class="template-table">
+        <thead>
+          <tr><th>nombre</th><th>correo</th><th>identificacion</th><th>materia</th><th>grupo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ana López</td><td>ana@institucion.edu</td><td>20201234</td><td>Psicología social</td><td>Grupo A</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Grupos -->
+  <div class="tab-panel" [class.active]="tab() === 'grupos'">
+    <div class="tip-bar">
+      <strong>Antes de importar:</strong>
+      la columna "estudiantes" debe contener correos separados por ";". Los correos
+      que no estén creados aún se generarán automáticamente como estudiantes nuevos.
+      <div class="tip-bar__actions">
+        <button type="button" class="btn-ghost"
+          (click)="descargarPlantilla({titulo: 'Plantilla grupos', tipo: 'grupos'})">
+          Descargar plantilla XLSX
+        </button>
+      </div>
+    </div>
+
+    <div class="dropzone" (click)="fileGrupos.click()">
+      <p class="dropzone__title">Subir Excel o CSV de grupos</p>
+      <p class="dropzone__hint">grupo, materia, periodo, estudiantes (correos separados por ;)</p>
+    </div>
+    <input #fileGrupos type="file" accept=".xlsx,.xlsm,.csv" hidden (change)="seleccionarGrupos($event)" />
+
+    @if (resultadoGrupos(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>{{ r.filas_exitosas }} / {{ r.filas_procesadas }} filas ·
+          {{ r.grupos_creados }} grupos · {{ r.inscripciones }} inscripciones</p>
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.fila) {
+                <tr><td>{{ e.fila }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <div class="template-preview" style="margin-top: 1rem">
+      <h4>Plantilla esperada</h4>
+      <table class="template-table">
+        <thead>
+          <tr><th>grupo</th><th>materia</th><th>periodo</th><th>estudiantes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Grupo A</td><td>Psicología social</td><td>2026-1</td><td>ana@x.edu; pedro@x.edu</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Rúbrica -->
+  <div class="tab-panel" [class.active]="tab() === 'rubrica'">
+    <div class="tip-bar">
+      <strong>Antes de importar:</strong>
+      la plantilla XLSX debe tener una fila por criterio (columnas
+      <em>criterio · descripcion · peso · nivel_1_nombre · nivel_1_descriptor · …</em>).
+      Los pesos deben sumar 100 para que el cálculo de nota use la rúbrica. Si suman
+      otro valor la rúbrica se guarda igual pero el cálculo usará el modo plano.
+      <div class="tip-bar__actions">
+        <button type="button" class="btn-ghost"
+          (click)="descargarPlantilla({titulo: 'Plantilla rúbrica', tipo: 'rubrica'})">
+          Descargar plantilla XLSX
+        </button>
+      </div>
+    </div>
+
+    <div class="subnav-rubrica">
+      <select [(ngModel)]="rubricaCasoId" aria-label="Caso destino">
+        <option [ngValue]="null">— Selecciona el caso destino —</option>
+        @for (c of casosDisponibles(); track c.id) {
+          <option [ngValue]="c.id">{{ c.nombre }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="dropzone" [class.disabled]="!rubricaCasoId" (click)="rubricaCasoId && fileRubrica.click()">
+      <p class="dropzone__title">Subir rúbrica XLSX</p>
+      <p class="dropzone__hint">
+        @if (rubricaCasoId) {
+          La rúbrica reemplazará los criterios del caso seleccionado.
+        } @else {
+          Primero elige el caso destino arriba.
+        }
+      </p>
+    </div>
+    <input #fileRubrica type="file" accept=".xlsx" hidden (change)="seleccionarRubrica($event)" />
+
+    @if (resultadoRubrica(); as r) {
+      <div class="template-preview" style="margin-top: 1rem">
+        <h4>Resultado</h4>
+        <p>
+          {{ r.criterios_importados }} criterio(s) importados ·
+          {{ r.rubrica_creada ? 'rúbrica creada' : 'rúbrica actualizada' }}
+        </p>
+        @if (r.advertencias.length) {
+          <ul class="problem-list">
+            @for (a of r.advertencias; track a.mensaje) {
+              <li>{{ a.fila ? 'Fila ' + a.fila + ': ' : '' }}{{ a.mensaje }}</li>
+            }
+          </ul>
+        }
+        @if (r.errores.length) {
+          <table class="template-table">
+            <thead><tr><th>Fila</th><th>Error</th></tr></thead>
+            <tbody>
+              @for (e of r.errores; track e.mensaje) {
+                <tr><td>{{ e.fila || '—' }}</td><td>{{ e.mensaje }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Plantillas -->
+  <div class="tab-panel" [class.active]="tab() === 'plantillas'">
+    <div class="import-types">
+      @for (p of plantillas; track p.titulo) {
+        <button type="button" class="import-type" (click)="descargarPlantilla(p)">
+          <h4>{{ p.titulo }}</h4>
+          <p>{{ p.formato }}</p>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+</section>

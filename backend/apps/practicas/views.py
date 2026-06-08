@@ -4,27 +4,36 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.academico.models import Grupo
+from apps.usuarios.mail_utils import guardar_clave_smtp_si_provista
 from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
 
 from .models import AutorizacionEstudiante, Practica
 from .serializers import (
     AccesoEstudianteSerializer,
+    AutorizacionListSerializer,
     AutorizacionSerializer,
     AutorizarEstudiantesSerializer,
+    MisPracticaEstudianteSerializer,
     PracticaDetalleSerializer,
     PracticaListSerializer,
+    ReenviarInvitacionSerializer,
 )
+from .services import autorizar_estudiantes_en_practica, listar_autorizaciones_docente, listar_mis_practicas
 
 
 class PracticaViewSet(viewsets.ModelViewSet):
     permission_classes = [EsDocenteOAdmin]
+
+    def get_permissions(self):
+        if self.action == 'mis_practicas':
+            return [IsAuthenticated()]
+        return [EsDocenteOAdmin()]
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -32,15 +41,42 @@ class PracticaViewSet(viewsets.ModelViewSet):
         return PracticaListSerializer
 
     def get_queryset(self):
-        qs = Practica.objects.select_related('caso', 'docente').prefetch_related(
+        qs = Practica.objects.select_related(
+            'caso', 'caso__materia', 'materia', 'grupo', 'docente',
+        ).prefetch_related(
             'autorizaciones__estudiante',
         )
         if self.request.user.rol == Usuario.Rol.ADMIN:
             return qs
         return qs.filter(docente=self.request.user)
 
+    @transaction.atomic
     def perform_create(self, serializer):
-        serializer.save(docente=self.request.user)
+        practica = serializer.save(docente=self.request.user)
+        if practica.grupo_id:
+            autorizar_estudiantes_en_practica(
+                practica,
+                self.request.user,
+                grupo_ids=[practica.grupo_id],
+            )
+
+    @action(detail=False, methods=['get'], url_path='mis-practicas')
+    def mis_practicas(self, request):
+        """Prácticas autorizadas para el estudiante autenticado."""
+        if request.user.rol != Usuario.Rol.ESTUDIANTE:
+            raise PermissionDenied('Solo estudiantes pueden consultar sus prácticas.')
+        estudiante = getattr(request.user, 'perfil_estudiante', None)
+        if estudiante is None:
+            raise ValidationError('No hay perfil de estudiante vinculado a esta cuenta.')
+        rows = listar_mis_practicas(estudiante)
+        return Response(MisPracticaEstudianteSerializer(rows, many=True).data)
+
+    @action(detail=False, methods=['get'], url_path='autorizaciones')
+    def autorizaciones(self, request):
+        """Listado global de autorizaciones (docente/admin)."""
+        practica_id = request.query_params.get('practica')
+        rows = listar_autorizaciones_docente(request.user, practica_id=practica_id)
+        return Response(AutorizacionListSerializer(rows, many=True).data)
 
     @action(detail=True, methods=['post'], url_path='autorizar-estudiantes')
     @transaction.atomic
@@ -50,31 +86,35 @@ class PracticaViewSet(viewsets.ModelViewSet):
         ser = AutorizarEstudiantesSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
 
-        ids_directos = set(ser.validated_data.get('estudiante_ids') or [])
-        grupo_ids = ser.validated_data.get('grupo_ids') or []
+        if not guardar_clave_smtp_si_provista(
+            request.user,
+            ser.validated_data.get('correo_smtp_password'),
+        ):
+            raise ValidationError({
+                'correo_smtp_password': (
+                    'Indica la contraseña de aplicación de tu Gmail para enviar '
+                    'las invitaciones a los estudiantes.'
+                ),
+            })
 
-        # Sumar los estudiantes de los grupos especificados (scopeados al docente).
-        if grupo_ids:
-            grupos = Grupo.objects.filter(id__in=grupo_ids)
-            if request.user.rol == Usuario.Rol.DOCENTE:
-                grupos = grupos.filter(docente=request.user)
-            for g in grupos:
-                ids_directos.update(g.estudiantes.values_list('id', flat=True))
+        creadas = autorizar_estudiantes_en_practica(
+            practica,
+            request.user,
+            estudiante_ids=ser.validated_data.get('estudiante_ids') or [],
+            grupo_ids=ser.validated_data.get('grupo_ids') or [],
+        )
 
-        if not ids_directos:
-            raise ValidationError('Debes indicar al menos un estudiante o un grupo con estudiantes.')
-
-        # Crear autorizaciones (idempotente — si ya existe, la ignoramos).
-        creadas = []
-        for est_id in ids_directos:
-            auth, creada = AutorizacionEstudiante.objects.get_or_create(
-                practica=practica, estudiante_id=est_id,
-            )
-            if creada:
-                creadas.append(auth)
+        if creadas:
+            enviados = AutorizacionEstudiante.objects.filter(
+                pk__in=[a.pk for a in creadas], notificado=True,
+            ).count()
+        else:
+            enviados = 0
 
         return Response({
             'creadas': len(creadas),
+            'correos_enviados': enviados,
+            'correos_fallidos': len(creadas) - enviados,
             'autorizaciones': AutorizacionSerializer(
                 practica.autorizaciones.select_related('estudiante').all(), many=True,
             ).data,
@@ -89,9 +129,12 @@ class PracticaViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar(self, request, pk=None):
+        from apps.participaciones.services import cerrar_practica
+
         practica: Practica = self.get_object()
         practica.estado = Practica.Estado.FINALIZADA
         practica.save(update_fields=['estado', 'fecha_actualizacion'])
+        cerrar_practica(practica)
         return Response(PracticaDetalleSerializer(practica).data)
 
     @action(detail=True, methods=['post'], url_path='autorizar-reintento/(?P<autorizacion_id>[^/.]+)')
@@ -103,6 +146,81 @@ class PracticaViewSet(viewsets.ModelViewSet):
             raise ValidationError('Autorización no encontrada en esta práctica.')
         auth.reintento_autorizado = True
         auth.save(update_fields=['reintento_autorizado'])
+        return Response(AutorizacionSerializer(auth).data)
+
+    @action(
+        detail=True,
+        methods=['post'],
+        url_path='desautorizar-estudiante/(?P<autorizacion_id>[^/.]+)',
+    )
+    def desautorizar_estudiante(self, request, pk=None, autorizacion_id=None):
+        """Revoca la autorización de un estudiante en la práctica (RN26).
+
+        Body opcional: { "motivo": "...", "correo_smtp_password": "..." }
+        Envía notificación al estudiante usando el SMTP del docente. Si el
+        SMTP no está configurado, la revocación queda guardada igual y se
+        devuelve `email_enviado: false` para que la UI lo informe.
+        """
+        from .email import enviar_revocacion_practica
+
+        practica: Practica = self.get_object()
+        try:
+            auth = practica.autorizaciones.get(pk=autorizacion_id)
+        except AutorizacionEstudiante.DoesNotExist:
+            raise ValidationError('Autorización no encontrada en esta práctica.')
+
+        if auth.revocada:
+            raise ValidationError('Esta autorización ya estaba revocada.')
+
+        motivo = (request.data.get('motivo') or '').strip()[:300]
+        # Si el docente envía la clave SMTP en la petición la guardamos para
+        # esta sesión y todas las siguientes (mismo patrón que invitación).
+        guardar_clave_smtp_si_provista(
+            request.user,
+            request.data.get('correo_smtp_password'),
+        )
+
+        auth.revocada = True
+        auth.revocada_en = timezone.now()
+        auth.revocada_motivo = motivo
+        auth.save(update_fields=['revocada', 'revocada_en', 'revocada_motivo'])
+
+        email_enviado, email_error = enviar_revocacion_practica(auth, motivo=motivo)
+
+        return Response({
+            'autorizacion': AutorizacionSerializer(auth).data,
+            'email_enviado': email_enviado,
+            'email_error': email_error if not email_enviado else None,
+        })
+
+    @action(detail=True, methods=['post'], url_path='reenviar-invitacion/(?P<autorizacion_id>[^/.]+)')
+    def reenviar_invitacion(self, request, pk=None, autorizacion_id=None):
+        """Reenvía el correo de invitación al estudiante."""
+        from .email import enviar_invitacion_practica
+
+        practica: Practica = self.get_object()
+        try:
+            auth = practica.autorizaciones.get(pk=autorizacion_id)
+        except AutorizacionEstudiante.DoesNotExist:
+            raise ValidationError('Autorización no encontrada en esta práctica.')
+
+        ser = ReenviarInvitacionSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        if not guardar_clave_smtp_si_provista(
+            request.user,
+            ser.validated_data.get('correo_smtp_password'),
+        ):
+            raise ValidationError({
+                'correo_smtp_password': (
+                    'Indica la contraseña de aplicación de tu Gmail para enviar la invitación.'
+                ),
+            })
+
+        ok, error = enviar_invitacion_practica(auth, forzar=True)
+        if not ok:
+            raise ValidationError(error or 'No se pudo enviar el correo de invitación.')
+
+        auth.refresh_from_db()
         return Response(AutorizacionSerializer(auth).data)
 
 

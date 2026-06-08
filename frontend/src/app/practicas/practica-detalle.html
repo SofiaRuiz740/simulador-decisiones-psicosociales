@@ -1,103 +1,225 @@
-<section class="page">
-  <a routerLink="/practicas" class="back"><mat-icon>arrow_back</mat-icon>Volver</a>
+<section class="module page">
+
+  <a routerLink="/practicas" class="page-back">← Volver a prácticas</a>
 
   @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
 
   @if (practica(); as p) {
-    <header class="head">
-      <h1>{{ p.nombre }}</h1>
-      <div class="meta">
-        <span>Caso: {{ p.caso_nombre }}</span>
-        <span>Inicio: {{ p.fecha_inicio | date:'medium' }}</span>
-        <span>Fin: {{ p.fecha_fin | date:'medium' }}</span>
-        <span>Tiempo máx.: {{ p.tiempo_max_min }} min</span>
-        @if (p.lugar_fisico) { <span>Lugar: {{ p.lugar_fisico }}</span> }
-        <mat-chip>{{ p.estado_display }}</mat-chip>
-      </div>
-      @if (p.mensaje_personalizado) {
-        <p class="msg">{{ p.mensaje_personalizado }}</p>
-      }
-
-      <div class="actions">
-        @if (p.estado === EstadoPractica.SinIniciar) {
-          <button mat-flat-button color="primary" (click)="iniciar()">
-            <mat-icon>play_arrow</mat-icon> Iniciar práctica
-          </button>
-        }
-        @if (p.estado === EstadoPractica.EnCurso) {
-          <button mat-flat-button color="warn" (click)="finalizar()">
-            <mat-icon>stop</mat-icon> Finalizar
-          </button>
-        }
-        <button mat-stroked-button (click)="descargarPDF()">
-          <mat-icon>picture_as_pdf</mat-icon> Reporte PDF
-        </button>
-        <button mat-stroked-button (click)="descargarExcel()">
-          <mat-icon>table_view</mat-icon> Reporte Excel
-        </button>
+    <header class="hero-glass hero-glass--compact">
+      <div class="hero-glass__row">
+        <div>
+          <h1><em>{{ p.nombre }}</em></h1>
+          <p class="hero-glass__meta">
+            <span>Caso: {{ p.caso_nombre }}</span>
+            <span>{{ p.fecha_inicio | date:'mediumDate' }} — {{ p.fecha_fin | date:'mediumDate' }}</span>
+            <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
+          </p>
+        </div>
+        <div class="actions actions--end">
+          @if (p.estado === EstadoPractica.SinIniciar) {
+            <button type="button" class="btn-primary" (click)="iniciar()">Iniciar</button>
+          }
+          @if (p.estado === EstadoPractica.EnCurso) {
+            <button type="button" class="btn-ghost" (click)="finalizar()">Finalizar</button>
+          }
+          <button type="button" class="btn-ghost" (click)="descargarPDF()">PDF</button>
+          <button type="button" class="btn-ghost" (click)="descargarExcel()">Excel</button>
+        </div>
       </div>
     </header>
 
-    <!-- Autorización -->
-    <mat-card class="seccion">
-      <mat-card-header>
-        <mat-card-title>Autorizar estudiantes</mat-card-title>
-        <mat-card-subtitle>Selecciona estudiantes o grupos. Se generará un código de acceso único para cada uno.</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="cols">
-          <div>
-            <h3>Estudiantes</h3>
-            @if (estudiantes().length === 0) { <p class="empty">No tienes estudiantes.</p> }
-            <ul class="check-list">
-              @for (e of estudiantes(); track e.id) {
-                <li><mat-checkbox [(ngModel)]="seleccionEst[e.id]">{{ e.nombre_completo }} <span class="correo">{{ e.correo }}</span></mat-checkbox></li>
-              }
-            </ul>
+    <nav class="tabs" aria-label="Secciones práctica">
+      @for (t of tabs; track t.id) {
+        <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+      }
+    </nav>
+
+    <!-- Resumen -->
+    <div class="tab-panel" [class.active]="tab() === 'resumen'">
+      <div class="builder-block">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Tiempo máximo</label>
+            <input readonly [value]="p.tiempo_max_min + ' min'" />
           </div>
-          <div>
-            <h3>Grupos</h3>
-            @if (grupos().length === 0) { <p class="empty">No tienes grupos.</p> }
-            <ul class="check-list">
-              @for (g of grupos(); track g.id) {
-                <li><mat-checkbox [(ngModel)]="seleccionGrupo[g.id]">{{ g.nombre }} <span class="correo">{{ g.estudiantes_count }} estudiantes</span></mat-checkbox></li>
-              }
-            </ul>
+          <div class="form-group">
+            <label>Lugar</label>
+            <input readonly [value]="p.lugar_fisico || '—'" />
+          </div>
+          <div class="form-group full">
+            <label>Mensaje personalizado</label>
+            <textarea readonly rows="3">{{ p.mensaje_personalizado || '—' }}</textarea>
           </div>
         </div>
-        <button mat-flat-button color="primary" (click)="autorizar()">
-          <mat-icon>add</mat-icon> Autorizar seleccionados
-        </button>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
+
+    <!-- Participantes -->
+    <div class="tab-panel" [class.active]="tab() === 'participantes'">
+      <section class="panel">
+        <div class="panel__toolbar">
+          <div class="toolbar">
+            <span class="toolbar__hint">Selecciona estudiantes o grupos. Al autorizar se envía la invitación desde tu Gmail.</span>
+            <button type="button" class="btn-primary" (click)="autorizar()">Autorizar y enviar correo</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div class="grid-2 auth-grid">
+            <div class="form-card">
+              <div class="form-section__title">Estudiantes</div>
+              @if (estudiantes().length === 0) {
+                <div class="empty-state-mockup empty-state-mockup--compact">Sin estudiantes.</div>
+              } @else {
+                <ul class="check-list">
+                  @for (e of estudiantes(); track e.id) {
+                    <li>
+                      <mat-checkbox [(ngModel)]="seleccionEst[e.id]">
+                        {{ e.nombre_completo }}
+                        <span class="muted">{{ e.correo }}</span>
+                      </mat-checkbox>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+            <div class="form-card">
+              <div class="form-section__title">Grupos</div>
+              @if (grupos().length === 0) {
+                <div class="empty-state-mockup empty-state-mockup--compact">Sin grupos.</div>
+              } @else {
+                <ul class="check-list">
+                  @for (g of grupos(); track g.id) {
+                    <li>
+                      <mat-checkbox [(ngModel)]="seleccionGrupo[g.id]">
+                        {{ g.nombre }}
+                        <span class="muted">{{ g.estudiantes_count }} estudiantes</span>
+                      </mat-checkbox>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Códigos -->
-    <mat-card class="seccion">
-      <mat-card-header>
-        <mat-card-title>Estudiantes autorizados ({{ p.autorizaciones.length }})</mat-card-title>
-        <mat-card-subtitle>Comparte el código con cada estudiante para que pueda acceder a la simulación.</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (p.autorizaciones.length === 0) {
-          <p class="empty">Aún no has autorizado a nadie.</p>
-        }
-        <ul class="codigos">
-          @for (a of p.autorizaciones; track a.id) {
-            <li>
-              <div>
-                <strong>{{ a.estudiante_nombre }}</strong>
-                <span class="correo">{{ a.estudiante_correo }}</span>
-              </div>
-              <div class="codigo">
-                <code>{{ a.codigo_acceso }}</code>
-                <button mat-icon-button matTooltip="Copiar código" (click)="copiar(a.codigo_acceso)">
-                  <mat-icon>content_copy</mat-icon>
-                </button>
-              </div>
-            </li>
+    <div class="tab-panel" [class.active]="tab() === 'codigos'">
+      <section class="panel">
+        <div class="panel__body">
+          <div class="surface surface--flat note-box">
+            Genera un código por estudiante. Lo usarán en la pantalla de acceso del simulador junto con su correo.
+          </div>
+          @if (p.autorizaciones.length === 0) {
+            <div class="empty-state-mockup">Aún no has autorizado a nadie.</div>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Correo</th>
+                    <th>Código</th>
+                    <th>Invitación</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (a of p.autorizaciones; track a.id) {
+                    <tr [class.row-revoked]="a.revocada">
+                      <td><strong>{{ a.estudiante_nombre }}</strong></td>
+                      <td>{{ a.estudiante_correo }}</td>
+                      <td><code>{{ a.codigo_acceso }}</code></td>
+                      <td>
+                        @if (a.revocada) {
+                          <span class="badge badge--cancelado" [title]="a.revocada_motivo || ''">Revocada</span>
+                        } @else if (a.notificado) {
+                          <span class="badge badge--activo">Enviada</span>
+                        } @else {
+                          <span class="badge badge--pendiente">No enviada</span>
+                        }
+                      </td>
+                      <td class="col-actions">
+                        @if (!a.revocada) {
+                          <button type="button" class="btn-ghost" (click)="copiar(a.codigo_acceso)">Copiar</button>
+                          <button type="button" class="btn-ghost" (click)="reenviarInvitacion(a.id)">
+                            {{ a.notificado ? 'Reenviar' : 'Enviar' }}
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-ghost btn-ghost--danger"
+                            (click)="desautorizar(a.id, a.estudiante_nombre)">
+                            Quitar
+                          </button>
+                          @if (a.reintento_autorizado) {
+                            <span class="muted">Reintento pendiente</span>
+                          }
+                        } @else {
+                          <span class="muted">Sin acceso desde {{ a.revocada_en | date:'short' }}</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           }
-        </ul>
-      </mat-card-content>
-    </mat-card>
+        </div>
+      </section>
+    </div>
+
+    <!-- Seguimiento -->
+    <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
+      <section class="panel">
+        <div class="panel__body">
+          @if (seguimiento().length === 0) {
+            <div class="empty-state-mockup">
+              <strong>Sin participaciones aún</strong>
+              Autoriza estudiantes y espera a que inicien la simulación.
+            </div>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Estado</th>
+                    <th>Progreso</th>
+                    <th>Respondidas</th>
+                    <th>Tiempo</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of seguimiento(); track r.autorizacion_id) {
+                    <tr>
+                      <td><strong>{{ r.estudiante_nombre }}</strong></td>
+                      <td><span class="badge" [class]="seguimientoBadge(r.estado)">{{ r.estado_display }}</span></td>
+                      <td>{{ r.progreso_pct }}%</td>
+                      <td>{{ r.respondidas }}/{{ r.total_preguntas }}</td>
+                      <td>{{ r.tiempo_usado_seg }}s</td>
+                      <td class="col-actions">
+                        @if (puedeAutorizarReintento(r.estado)) {
+                          @if (reintentoAutorizado(r.autorizacion_id)) {
+                            <span class="muted">Reintento pendiente</span>
+                          } @else {
+                            <button type="button" class="btn-ghost" (click)="autorizarReintento(r.autorizacion_id)">
+                              Autorizar reintento
+                            </button>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+
   }
+
 </section>

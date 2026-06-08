@@ -29,13 +29,25 @@ export interface Pregunta {
   respuestas: Respuesta[];
 }
 
+export type RecursoMultimediaTipo = 'imagen' | 'audio' | 'video';
+
+export interface RecursoMultimedia {
+  tipo: RecursoMultimediaTipo;
+  url: string;
+  titulo?: string;
+}
+
 export interface Escenario {
   id: number;
   caso: number;
   orden: number;
   titulo: string;
   narrativa: string;
-  recursos_multimedia: string[];
+  /** Recursos asociados al escenario. Formato unificado:
+   * `{tipo: 'imagen'|'audio'|'video', url, titulo?}`.
+   * Mantiene retrocompat con strings antiguos (se interpretan como imagen).
+   */
+  recursos_multimedia: (RecursoMultimedia | string)[];
   preguntas: Pregunta[];
 }
 
@@ -86,6 +98,12 @@ export interface CasoListItem {
   docente_creador: number;
   docente_creador_username: string;
   escenarios_count: number;
+  preguntas_count: number;
+  tiene_rubrica: boolean;
+  rubrica_resumen: string | null;
+  completitud_pct: number;
+  materia: number | null;
+  materia_display: string | null;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }
@@ -105,6 +123,7 @@ export interface CasoInput {
   area_psicosocial?: string;
   tiempo_estimado_min?: number;
   estado?: EstadoCaso;
+  materia?: number | null;
 }
 
 export interface EscenarioInput {
@@ -112,7 +131,7 @@ export interface EscenarioInput {
   orden: number;
   titulo: string;
   narrativa?: string;
-  recursos_multimedia?: string[];
+  recursos_multimedia?: (RecursoMultimedia | string)[];
 }
 
 export interface PreguntaInput {

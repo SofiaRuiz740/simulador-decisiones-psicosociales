@@ -25,6 +25,9 @@ export interface Autorizacion {
   codigo_acceso: string;
   notificado: boolean;
   reintento_autorizado: boolean;
+  revocada: boolean;
+  revocada_en: string | null;
+  revocada_motivo: string;
   fecha_creacion: string;
 }
 
@@ -34,6 +37,10 @@ export interface Practica {
   caso: number;
   caso_nombre: string;
   docente: number;
+  materia: number | null;
+  grupo: number | null;
+  materia_display: string | null;
+  grupos_display: string | null;
   fecha_inicio: string;
   fecha_fin: string;
   tiempo_max_min: number;
@@ -53,11 +60,52 @@ export interface PracticaDetalle extends Practica {
 export interface PracticaInput {
   nombre: string;
   caso: number;
+  materia?: number | null;
+  grupo?: number | null;
   fecha_inicio: string;
   fecha_fin: string;
   tiempo_max_min?: number;
   lugar_fisico?: string;
   mensaje_personalizado?: string;
+}
+
+export interface MisPracticaEstudiante {
+  id: number | null;
+  autorizacion_id: number;
+  practica_id: number;
+  practica_nombre: string;
+  caso_nombre: string;
+  codigo_acceso: string;
+  materia_display: string | null;
+  fecha_inicio: string;
+  fecha_fin: string;
+  tiempo_max_min: number;
+  practica_estado: EstadoPractica | string;
+  practica_estado_display: string;
+  estado: EstadoParticipacion | string;
+  estado_display: string;
+  progreso_pct: number;
+  total_preguntas: number;
+  respondidas: number;
+  tiempo_usado_seg: number;
+  tiempo_restante_seg: number;
+  nota_final: number | null;
+}
+
+export interface AutorizacionListItem {
+  id: number;
+  practica_id: number;
+  practica_nombre: string;
+  practica_estado: EstadoPractica | string;
+  practica_estado_display: string;
+  estudiante_id: number;
+  estudiante_nombre: string;
+  estudiante_correo: string;
+  grupos_display: string | null;
+  codigo_acceso: string;
+  asignacion_display: string;
+  reintento_autorizado: boolean;
+  fecha_creacion: string;
 }
 
 // ---- Acceso estudiante ----
@@ -113,6 +161,35 @@ export interface ProgresoParticipacion {
   total_preguntas: number;
   respondidas: number;
   tiempo_usado_seg: number;
+  tiempo_restante_seg: number;
+}
+
+/** Fila de seguimiento docente (GET /participaciones/). */
+export interface SeguimientoParticipacion {
+  id: number | null;
+  autorizacion_id: number;
+  estudiante_id: number;
+  estudiante_nombre: string;
+  estudiante_correo: string;
+  practica_id: number;
+  practica_nombre: string;
+  caso_id: number;
+  caso_nombre: string;
+  estado: EstadoParticipacion | string;
+  estado_display: string;
+  progreso_pct: number;
+  total_preguntas: number;
+  respondidas: number;
+  tiempo_usado_seg: number;
+  tiempo_restante_seg: number;
+  intentos: number;
+}
+
+export interface MetricasParticipacion {
+  autorizados: number;
+  en_curso: number;
+  finalizados: number;
+  pendientes: number;
 }
 
 // ---- Resultados ----
@@ -148,6 +225,10 @@ export interface Resultado {
   practica_id: number;
   practica_nombre: string;
   caso_nombre: string;
+  materia_display: string | null;
+  grupos_display: string | null;
+  tiempo_usado_seg: number;
+  participacion_estado: string;
   correctas: number;
   incorrectas: number;
   no_respondidas: number;

@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Estudiante } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { UxService } from '../core/services/ux.service';
+import { mockupDialog } from '../shared/constants/dialog-config';
 import { AgregarPorCorreoDialog } from './dialogs/agregar-por-correo-dialog';
 import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
 
@@ -16,12 +16,10 @@ import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
   selector: 'app-estudiantes',
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
+    FormsModule,
     MatDialogModule,
     MatProgressBarModule,
     MatSnackBarModule,
-    MatTooltipModule,
   ],
   templateUrl: './estudiantes.html',
   styleUrl: './estudiantes.scss',
@@ -30,18 +28,31 @@ export class Estudiantes implements OnInit {
   private readonly servicio = inject(AcademicoService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly estudiantes = signal<Estudiante[]>([]);
   readonly total = signal(0);
   readonly activos = computed(() => this.estudiantes().filter((e) => e.activo).length);
+  readonly inactivos = computed(() => this.estudiantes().filter((e) => !e.activo).length);
+  readonly sinGrupo = computed(() => this.estudiantes().filter((e) => e.sin_grupo).length);
 
-  inicialesDe(nombre: string, correo: string): string {
-    const partes = (nombre || correo).split(/\s+/);
-    const a = partes[0]?.charAt(0) || '';
-    const b = partes[partes.length - 1]?.charAt(0) || '';
-    return (a + (partes.length > 1 ? b : '')).toUpperCase() || '?';
-  }
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
+
+  readonly filtrados = computed(() => {
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
+    return this.estudiantes().filter((e) => {
+      if (est === 'activo' && !e.activo) return false;
+      if (est === 'inactivo' && e.activo) return false;
+      if (!txt) return true;
+      return (
+        e.nombre_completo.toLowerCase().includes(txt) ||
+        e.correo.toLowerCase().includes(txt)
+      );
+    });
+  });
 
   ngOnInit(): void {
     this.cargar();
@@ -63,40 +74,35 @@ export class Estudiantes implements OnInit {
   }
 
   agregarPorCorreo(): void {
-    this.dialog
-      .open(AgregarPorCorreoDialog, { width: '500px', autoFocus: true })
-      .afterClosed()
+    this.dialog.open(AgregarPorCorreoDialog, mockupDialog('500px')).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });
   }
 
   crear(): void {
-    this.dialog
-      .open(EstudianteFormDialog, { width: '500px', data: {} })
-      .afterClosed()
+    this.dialog.open(EstudianteFormDialog, { ...mockupDialog('500px'), data: {} }).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });
   }
 
   editar(estudiante: Estudiante): void {
-    this.dialog
-      .open(EstudianteFormDialog, { width: '500px', data: { estudiante } })
-      .afterClosed()
+    this.dialog.open(EstudianteFormDialog, { ...mockupDialog('500px'), data: { estudiante } }).afterClosed()
       .subscribe((result) => {
         if (result) this.cargar();
       });
   }
 
-  desvincular(estudiante: Estudiante): void {
-    if (
-      !confirm(
-        `¿Desvincular a ${estudiante.nombre_completo} de tu lista? El estudiante seguirá existiendo en el sistema.`,
-      )
-    ) {
-      return;
-    }
+  async desvincular(estudiante: Estudiante): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Desvincular estudiante',
+      mensaje: `${estudiante.nombre_completo} dejará de aparecer en tu lista personal. La cuenta del estudiante se conserva en el sistema.`,
+      variant: 'warn',
+      textoConfirmar: 'Desvincular',
+      icono: 'link_off',
+    });
+    if (!ok) return;
     this.servicio.desvincularEstudiante(estudiante.id).subscribe({
       next: () => {
         this.snackBar.open(`Desvinculado: ${estudiante.correo}`, 'OK', { duration: 3000 });

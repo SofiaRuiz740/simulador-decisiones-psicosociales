@@ -71,6 +71,25 @@ def problemas_de_validacion(caso: Caso) -> list[dict]:
     return problemas
 
 
+def completitud_porcentaje(caso: Caso) -> int:
+    """Estimación 0–100 de qué tan listo está el caso para publicar."""
+    pts = 0
+    if (caso.contexto_historia or '').strip() or (caso.desarrollo_situacional or '').strip():
+        pts += 15
+    if caso.escenarios.exists():
+        pts += 20
+    if Pregunta.objects.filter(escenario__caso=caso).exists():
+        pts += 20
+    rub = getattr(caso, 'rubrica', None)
+    if rub is not None and (rub.criterios or []):
+        pts += 15 if rub.suma_pesos_criterios == 100 else 8
+    if not problemas_de_validacion(caso):
+        pts += 25
+    elif caso.estado == Caso.Estado.VALIDADO:
+        pts += 15
+    return min(100, pts)
+
+
 @transaction.atomic
 def duplicar_caso(original: Caso, docente) -> Caso:
     """Crea una copia profunda del caso: escenarios, preguntas, respuestas y rúbrica."""

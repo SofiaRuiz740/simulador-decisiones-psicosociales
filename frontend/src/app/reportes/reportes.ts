@@ -1,223 +1,233 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { forkJoin } from 'rxjs';
 
+import { Estudiante, Grupo, Materia } from '../core/models/academico.model';
 import { Practica } from '../core/models/practicas.model';
-import { ExtrasService } from '../core/services/extras.service';
+import { AcademicoService } from '../core/services/academico.service';
+import {
+  ExtrasService,
+  NotaRango,
+  ReporteTematicoTipo,
+  ReportesAnalitica,
+  ReportesFiltros,
+  ReportesResumen,
+} from '../core/services/extras.service';
 import { PracticasService } from '../core/services/practicas.service';
+
+interface CatalogoReporte {
+  titulo: string;
+  tipo: 'grupo' | 'materia' | 'estudiante' | 'tematico';
+  /** Slug del reporte temático (solo cuando tipo === 'tematico'). */
+  tematicoTipo?: ReporteTematicoTipo;
+  /** Descripción corta para mostrar al docente. */
+  descripcion?: string;
+  /** Icono Material referido en el HTML. */
+  icono?: string;
+}
 
 @Component({
   selector: 'app-reportes',
   imports: [
-    CommonModule, DatePipe,
-    MatButtonModule, MatIconModule, MatProgressBarModule,
-    MatSnackBarModule, MatTooltipModule,
+    CommonModule,
+    DatePipe,
+    FormsModule,
+    MatProgressBarModule,
+    MatSnackBarModule,
   ],
-  template: `
-    <section class="page">
-      <header class="hero-block anim-fade-up">
-        <div class="hero-text">
-          <span class="kicker">Análisis</span>
-          <h1>Reportes</h1>
-          <p>
-            Descarga reportes en PDF o Excel con los resultados de cada práctica:
-            participantes, decisiones, calificaciones y desglose por criterio.
-          </p>
-        </div>
-        <div class="hero-icon">
-          <mat-icon>description</mat-icon>
-        </div>
-      </header>
-
-      @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
-
-      @if (!loading() && practicas().length === 0) {
-        <div class="empty-state">
-          <mat-icon>folder_off</mat-icon>
-          <h3>Aún no hay prácticas disponibles</h3>
-          <p>Para generar reportes primero debes agendar y ejecutar prácticas con estudiantes.</p>
-        </div>
-      }
-
-      <div class="cards-grid">
-        @for (p of practicas(); track p.id) {
-          <article class="rep-card anim-fade-up">
-            <div class="head">
-              <div class="icono"><mat-icon>event</mat-icon></div>
-              <div class="info">
-                <strong>{{ p.nombre }}</strong>
-                <span>{{ p.caso_nombre }}</span>
-              </div>
-              <span class="ribbon" [class]="'estado-' + p.estado.toLowerCase()">{{ p.estado_display }}</span>
-            </div>
-
-            <div class="meta">
-              <span class="chip-meta"><mat-icon>play_arrow</mat-icon>{{ p.fecha_inicio | date:'short' }}</span>
-              <span class="chip-meta"><mat-icon>flag</mat-icon>{{ p.fecha_fin | date:'short' }}</span>
-              <span class="chip-meta"><mat-icon>group</mat-icon>{{ p.autorizaciones_count }} autorizados</span>
-            </div>
-
-            <div class="descargas">
-              <button mat-stroked-button color="primary" class="btn-d"
-                (click)="descargarPDF(p)"
-                [disabled]="descargando() === p.id + '-pdf'">
-                <mat-icon>picture_as_pdf</mat-icon>
-                <div class="d-text">
-                  <strong>PDF</strong>
-                  <span>Reporte narrativo</span>
-                </div>
-              </button>
-              <button mat-stroked-button color="primary" class="btn-d"
-                (click)="descargarExcel(p)"
-                [disabled]="descargando() === p.id + '-xlsx'">
-                <mat-icon>table_chart</mat-icon>
-                <div class="d-text">
-                  <strong>Excel</strong>
-                  <span>Datos para análisis</span>
-                </div>
-              </button>
-            </div>
-          </article>
-        }
-      </div>
-    </section>
-  `,
-  styles: [`
-    .page { display: flex; flex-direction: column; gap: 1.25rem; padding-bottom: 3rem; }
-
-    .hero-block .hero-icon {
-      flex-shrink: 0;
-      width: 80px; height: 80px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-      color: var(--mat-sys-on-primary);
-      display: inline-flex; align-items: center; justify-content: center;
-      box-shadow: 0 10px 30px color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
-      mat-icon { font-size: 40px; width: 40px; height: 40px; }
-    }
-
-    .rep-card {
-      display: flex; flex-direction: column; gap: 0.85rem;
-      padding: 1.15rem 1.2rem;
-      background: var(--mat-sys-surface);
-      border-radius: 18px;
-      border: 1px solid var(--mat-sys-outline-variant);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-    }
-
-    .head {
-      display: flex; align-items: center; gap: 0.65rem;
-
-      .icono {
-        flex-shrink: 0;
-        width: 44px; height: 44px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
-        color: var(--mat-sys-on-primary);
-        display: inline-flex; align-items: center; justify-content: center;
-        mat-icon { font-size: 22px; width: 22px; height: 22px; }
-      }
-      .info { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
-      .info strong {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-weight: 700; font-size: 1rem;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      }
-      .info span { font-size: 0.82rem; color: var(--mat-sys-on-surface-variant); }
-      .ribbon {
-        padding: 0.18rem 0.55rem; font-size: 0.7rem; font-weight: 800;
-        text-transform: uppercase; letter-spacing: 0.04em;
-        border-radius: 999px;
-        background: var(--mat-sys-surface-container);
-        &.estado-en_curso { background: color-mix(in srgb, var(--mat-sys-primary) 18%, transparent); color: var(--mat-sys-primary); }
-        &.estado-finalizada { background: color-mix(in srgb, #43a047 18%, transparent); color: #2e7d32; }
-        &.estado-cancelada { background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent); color: var(--mat-sys-error); }
-      }
-    }
-
-    .meta { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-
-    .descargas {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid var(--mat-sys-outline-variant);
-    }
-    .btn-d {
-      display: flex; align-items: center; gap: 0.55rem;
-      height: auto; min-height: 56px;
-      padding: 0.7rem 0.85rem !important;
-      border-radius: 14px;
-      mat-icon { font-size: 26px; width: 26px; height: 26px; color: var(--mat-sys-primary); }
-      .d-text {
-        display: flex; flex-direction: column;
-        text-align: left;
-        strong { font-size: 0.92rem; font-weight: 700; }
-        span { font-size: 0.7rem; color: var(--mat-sys-on-surface-variant); }
-      }
-    }
-
-    @media (max-width: 600px) {
-      .descargas { grid-template-columns: 1fr; }
-    }
-  `],
+  templateUrl: './reportes.html',
+  styleUrl: './reportes.scss',
 })
 export class Reportes implements OnInit {
   private readonly practicasSrv = inject(PracticasService);
+  private readonly academico = inject(AcademicoService);
   private readonly extras = inject(ExtrasService);
   private readonly snackBar = inject(MatSnackBar);
 
   readonly loading = signal(true);
   readonly practicas = signal<Practica[]>([]);
+  readonly resumen = signal<ReportesResumen | null>(null);
+  readonly analitica = signal<ReportesAnalitica | null>(null);
+  readonly materias = signal<Materia[]>([]);
+  readonly grupos = signal<Grupo[]>([]);
+  readonly estudiantes = signal<Estudiante[]>([]);
   readonly descargando = signal<string | null>(null);
 
+  readonly catalogoReportes: CatalogoReporte[] = [
+    { titulo: 'Reporte por grupo', tipo: 'grupo',
+      descripcion: 'Resultados consolidados de un grupo seleccionado.', icono: 'groups' },
+    { titulo: 'Reporte por materia', tipo: 'materia',
+      descripcion: 'Resultados de todas las prácticas de una materia.', icono: 'menu_book' },
+    { titulo: 'Reporte por estudiante', tipo: 'estudiante',
+      descripcion: 'Histórico de prácticas de un estudiante.', icono: 'person' },
+    { titulo: 'Participación', tipo: 'tematico', tematicoTipo: 'participacion',
+      descripcion: 'Cobertura de respuestas por estudiante y práctica.', icono: 'how_to_reg' },
+    { titulo: 'Desempeño', tipo: 'tematico', tematicoTipo: 'desempeno',
+      descripcion: 'Promedio por criterio de rúbrica.', icono: 'leaderboard' },
+    { titulo: 'Respuestas', tipo: 'tematico', tematicoTipo: 'respuestas',
+      descripcion: 'Correctas, incorrectas y sin responder por estudiante.', icono: 'fact_check' },
+    { titulo: 'Tiempos', tipo: 'tematico', tematicoTipo: 'tiempos',
+      descripcion: 'Duración vs tiempo máximo permitido.', icono: 'timer' },
+    { titulo: 'Notas', tipo: 'tematico', tematicoTipo: 'notas',
+      descripcion: 'Notas finales y distribución por rangos.', icono: 'grading' },
+    { titulo: 'Retroalimentaciones', tipo: 'tematico', tematicoTipo: 'retroalimentaciones',
+      descripcion: 'Feedback ya entregado por el docente.', icono: 'reviews' },
+    { titulo: 'Feedback pendiente', tipo: 'tematico', tematicoTipo: 'feedback',
+      descripcion: 'Resultados esperando retroalimentación del docente.', icono: 'pending_actions' },
+  ];
+
+  filtroDesde = '';
+  filtroHasta = '';
+  filtroMateriaId: number | null = null;
+  filtroGrupoId: number | null = null;
+  filtroEstudianteId: number | null = null;
+
   ngOnInit(): void {
-    this.practicasSrv.listar().subscribe({
-      next: (r) => { this.practicas.set(r.results); this.loading.set(false); },
-      error: () => {
-        this.loading.set(false);
-        this.snackBar.open('No se pudieron cargar las prácticas.', 'OK', { duration: 3500 });
+    forkJoin({
+      practicas: this.practicasSrv.listar(),
+      materias: this.academico.listarMaterias(),
+      grupos: this.academico.listarGrupos(),
+      estudiantes: this.academico.listarEstudiantes(),
+    }).subscribe({
+      next: ({ practicas, materias, grupos, estudiantes }) => {
+        this.practicas.set(practicas.results);
+        this.materias.set(materias.results);
+        this.grupos.set(grupos.results);
+        this.estudiantes.set(estudiantes.results);
+        this.cargarAgregados();
       },
+      error: () => this.loading.set(false),
     });
   }
 
+  filtrosActuales(): ReportesFiltros {
+    return {
+      desde: this.filtroDesde || undefined,
+      hasta: this.filtroHasta || undefined,
+      materia_id: this.filtroMateriaId ?? undefined,
+      grupo_id: this.filtroGrupoId ?? undefined,
+      estudiante_id: this.filtroEstudianteId ?? undefined,
+    };
+  }
+
+  aplicarFiltros(): void {
+    this.cargarAgregados();
+  }
+
+  private cargarAgregados(): void {
+    const filtros = this.filtrosActuales();
+    forkJoin({
+      resumen: this.extras.reportesResumen(filtros),
+      analitica: this.extras.reportesAnalitica(filtros),
+    }).subscribe({
+      next: ({ resumen, analitica }) => {
+        this.resumen.set(resumen);
+        this.analitica.set(analitica);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  maxNotas(dist: NotaRango[]): number {
+    return Math.max(1, ...dist.map((d) => d.cantidad));
+  }
+
   descargarPDF(p: Practica): void {
-    this.descargando.set(`${p.id}-pdf`);
+    const key = `${p.id}-pdf`;
+    this.descargando.set(key);
     this.extras.descargarReportePracticaPDF(p.id).subscribe({
-      next: (blob) => {
-        this.descargar(blob, `reporte-practica-${p.id}.pdf`);
-        this.descargando.set(null);
-      },
-      error: () => {
-        this.descargando.set(null);
-        this.snackBar.open('No se pudo generar el PDF.', 'OK', { duration: 3500 });
-      },
+      next: (blob) => this.guardarBlob(blob, `reporte-${p.id}.pdf`),
+      error: () => this.snackBar.open('No se pudo descargar el PDF.', 'OK', { duration: 3500 }),
+      complete: () => this.descargando.set(null),
     });
   }
 
   descargarExcel(p: Practica): void {
-    this.descargando.set(`${p.id}-xlsx`);
+    const key = `${p.id}-xlsx`;
+    this.descargando.set(key);
     this.extras.descargarReportePracticaExcel(p.id).subscribe({
-      next: (blob) => {
-        this.descargar(blob, `reporte-practica-${p.id}.xlsx`);
-        this.descargando.set(null);
-      },
-      error: () => {
-        this.descargando.set(null);
-        this.snackBar.open('No se pudo generar el Excel.', 'OK', { duration: 3500 });
-      },
+      next: (blob) => this.guardarBlob(blob, `reporte-${p.id}.xlsx`),
+      error: () => this.snackBar.open('No se pudo descargar el Excel.', 'OK', { duration: 3500 }),
+      complete: () => this.descargando.set(null),
     });
   }
 
-  private descargar(blob: Blob, nombre: string): void {
+  descargarCatalogoPDF(item: CatalogoReporte): void {
+    this.descargarCatalogo(item, 'pdf');
+  }
+
+  descargarCatalogoExcel(item: CatalogoReporte): void {
+    this.descargarCatalogo(item, 'excel');
+  }
+
+  private descargarCatalogo(item: CatalogoReporte, formato: 'pdf' | 'excel'): void {
+    if (item.tipo === 'tematico' && item.tematicoTipo) {
+      const ext = formato === 'pdf' ? 'pdf' : 'xlsx';
+      const key = `${item.tematicoTipo}-${formato}`;
+      this.descargando.set(key);
+      this.extras.descargarReporteTematico(item.tematicoTipo, formato, this.filtrosActuales())
+        .subscribe({
+          next: (blob) => this.guardarBlob(blob, `reporte-${item.tematicoTipo}.${ext}`),
+          error: () => this.snackBar.open(
+            `No se pudo descargar el ${formato.toUpperCase()}.`, 'OK', { duration: 3500 },
+          ),
+          complete: () => this.descargando.set(null),
+        });
+      return;
+    }
+
+    const id = this.idCatalogo(item.tipo);
+    if (!id) {
+      this.snackBar.open(
+        'Selecciona un registro en los filtros superiores.', 'OK', { duration: 3500 },
+      );
+      return;
+    }
+    const ext = formato === 'pdf' ? 'pdf' : 'xlsx';
+    const key = `${item.tipo}-${id}-${formato}`;
+    this.descargando.set(key);
+    const obs = formato === 'pdf'
+      ? (item.tipo === 'grupo' ? this.extras.descargarReporteGrupoPDF(id)
+        : item.tipo === 'materia' ? this.extras.descargarReporteMateriaPDF(id)
+        : this.extras.descargarReporteEstudiantePDF(id))
+      : (item.tipo === 'grupo' ? this.extras.descargarReporteGrupoExcel(id)
+        : item.tipo === 'materia' ? this.extras.descargarReporteMateriaExcel(id)
+        : this.extras.descargarReporteEstudianteExcel(id));
+    obs.subscribe({
+      next: (blob) => this.guardarBlob(blob, `reporte-${item.tipo}-${id}.${ext}`),
+      error: () => this.snackBar.open(
+        `No se pudo descargar el ${formato.toUpperCase()}.`, 'OK', { duration: 3500 },
+      ),
+      complete: () => this.descargando.set(null),
+    });
+  }
+
+  idCatalogo(tipo: CatalogoReporte['tipo']): number | null {
+    if (tipo === 'grupo') return this.filtroGrupoId;
+    if (tipo === 'materia') return this.filtroMateriaId;
+    if (tipo === 'estudiante') return this.filtroEstudianteId;
+    return null;
+  }
+
+  hintCatalogo(item: CatalogoReporte): string {
+    if (item.tipo === 'grupo' && !this.filtroGrupoId) return 'Elige un grupo arriba';
+    if (item.tipo === 'materia' && !this.filtroMateriaId) return 'Elige una materia arriba';
+    if (item.tipo === 'estudiante' && !this.filtroEstudianteId) return 'Elige un estudiante arriba';
+    if (item.tipo === 'tematico') return item.descripcion || 'Aplica los filtros y descarga.';
+    return 'Listo para descargar';
+  }
+
+  private guardarBlob(blob: Blob, nombre: string): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = nombre;
     a.click();
     URL.revokeObjectURL(url);
+    this.snackBar.open('Descarga iniciada.', 'OK', { duration: 2500 });
   }
 }

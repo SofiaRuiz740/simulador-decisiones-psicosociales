@@ -14,7 +14,7 @@ from apps.usuarios.permissions import EsDocenteOAdmin
 
 from .models import ArchivoFuente
 from .serializers import ArchivoFuenteSerializer, CrearCasoDesdeArchivoSerializer
-from .services import extraer_texto
+from .services import aplicar_estructura_a_caso, extraer_texto, parsear_estructura_caso
 
 TIPOS_PERMITIDOS = {
     'application/pdf': 'PDF',
@@ -79,16 +79,45 @@ class ArchivoFuenteViewSet(viewsets.ModelViewSet):
         ser = CrearCasoDesdeArchivoSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
 
+        # 1) Parsear estructura (escenarios/preguntas/respuestas/contexto).
+        estructura = parsear_estructura_caso(af.texto_extraido)
+        nombre_detectado = estructura['datos'].get('nombre') or ''
+        area_detectada = estructura['datos'].get('area') or ''
+        tiempo_detectado = estructura['datos'].get('tiempo_min')
+
+        nombre_final = (ser.validated_data.get('nombre') or '').strip() or nombre_detectado or af.nombre_original
+        area_final = (ser.validated_data.get('area_psicosocial') or '').strip() or area_detectada
+
+        # 2) Crear el caso (contexto inicial: texto plano; el parser lo
+        # sobreescribirá si detecta la sección CONTEXTO).
         caso = Caso.objects.create(
-            nombre=ser.validated_data['nombre'],
+            nombre=nombre_final,
             descripcion=f'Caso importado desde {af.nombre_original}.',
             contexto_historia=af.texto_extraido[:8000],
             desarrollo_situacional=af.texto_extraido[8000:16000] if len(af.texto_extraido) > 8000 else '',
-            area_psicosocial=ser.validated_data.get('area_psicosocial', '') or '',
+            area_psicosocial=area_final,
             estado=Caso.Estado.EN_REVISION,
             docente_creador=request.user,
+            tiempo_estimado_min=tiempo_detectado if tiempo_detectado else 30,
         )
+
+        # 3) Aplicar escenarios/preguntas/respuestas detectadas.
+        resumen_parser = aplicar_estructura_a_caso(caso, estructura)
+
         af.caso = caso
         af.estado = ArchivoFuente.Estado.CONVERTIDO_A_CASO
         af.save(update_fields=['caso', 'estado', 'fecha_actualizacion'])
-        return Response({'caso_id': caso.id, 'archivo': ArchivoFuenteSerializer(af).data})
+
+        return Response({
+            'caso_id': caso.id,
+            'archivo': ArchivoFuenteSerializer(af).data,
+            'estructura_detectada': {
+                'escenarios': resumen_parser['escenarios_creados'],
+                'preguntas': resumen_parser['preguntas_creadas'],
+                'respuestas': resumen_parser['respuestas_creadas'],
+                'contexto_detectado': bool(estructura.get('contexto')),
+                'nombre_detectado': nombre_detectado,
+                'area_detectada': area_detectada,
+                'tiempo_min_detectado': tiempo_detectado,
+            },
+        })

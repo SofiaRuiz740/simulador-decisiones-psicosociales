@@ -1,78 +1,91 @@
 // ============================================================
-// Theme Material 3 — Paleta académica
-// Azul profundo (azure) + Turquesa académico (cyan)
-// Evoca confianza, análisis, decisión, claridad.
+// Theme Material 3 — Paleta mockup (morado/lavanda + teal)
 // ============================================================
 @use '@angular/material' as mat;
+@use 'styles/mockup-auth';
+@use 'styles/mockup-ui';
 
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,    // azul profundo academico
-        tertiary: mat.$cyan-palette,    // turquesa
+        primary: mat.$violet-palette,
+        tertiary: mat.$green-palette,
       ),
       typography: (
-        plain-family: 'Manrope, Inter, system-ui, sans-serif',
-        brand-family: 'Fraunces, Plus Jakarta Sans, Georgia, serif',
+        plain-family: 'Inter, system-ui, sans-serif',
+        brand-family: 'Playfair Display, Georgia, serif',
       ),
       density: 0,
     )
   );
 }
 
-// Variables CSS para acentos académicos.
 :root {
-  // ---- Paleta core ----
-  --app-deep:        #1e3a8a;   // azul noche, autoridad
-  --app-deep-soft:   #3b5bdb;   // azul medio
-  --app-ink:         #0B1729;   // casi negro, headings
-  --app-violet-soft: #818cf8;   // indigo soft, analisis
-  --app-teal:        #0d9488;   // turquesa, exito/analitica
-  --app-teal-soft:   #2dd4bf;
-  --app-slate:       #475569;   // pizarra
-  --app-paper:       #FAFBFD;   // off-white
-  --app-paper-warm:  #F5F2EB;   // off-white warm (editorial)
-  --app-line:        #E3E8EF;   // hairline
-  --app-accent-soft: #EBF1FA;   // chip bg suave
+  --app-purple:       #9b72f3;
+  --app-purple-dark:  #6f52b8;
+  --app-purple-light: #d4b8f5;
+  --app-purple-soft:  rgba(155, 114, 243, 0.08);
+  --app-purple-icon:  #9b7fd4;
+  --app-deep:         #6f52b8;
+  --app-deep-soft:    #8b6fc9;
+  --app-ink:          #3d2b5a;
+  --app-text:         #524a63;
+  --app-text-muted:   #8b7fa0;
+  --app-violet-soft:  #9b72f3;
+  --app-teal:         #2a9d8f;
+  --app-teal-soft:    #80cbc4;
+  --app-slate:        #9a8fb0;
+  --app-paper:        #faf9fc;
+  --app-paper-warm:   #f0f0f2;
+  --app-line:         rgba(155, 114, 243, 0.12);
+  --app-border-input: #e4e0ea;
+  --app-border-focus: #b89ee8;
+  --app-accent-soft:  rgba(155, 114, 243, 0.08);
+  --app-link:         #8b6fc9;
+  --app-link-hover:   #6f52b8;
+  --grad-btn:         linear-gradient(90deg, #d4b8f5 0%, #a87ef0 55%, #9b72f3 100%);
+  --grad-btn-hover:   linear-gradient(90deg, #c9a7eb 0%, #9b72f3 100%);
 
-  // Estados
-  --app-success: #16a34a;
-  --app-warn:    #f59e0b;
-  --app-danger:  #dc2626;
+  --app-success: #2a9d8f;
+  --app-warn:    #d35400;
+  --app-danger:  #b71c1c;
 
-  // ---- Sombras stratified ----
-  --shadow-sm:    0 1px 2px rgba(11, 23, 41, 0.04);
-  --shadow-md:    0 4px 14px rgba(11, 23, 41, 0.06);
-  --shadow-lg:    0 12px 32px rgba(11, 23, 41, 0.10);
-  --shadow-glow:  0 8px 24px rgba(30, 58, 138, 0.18);
-  --shadow-teal:  0 8px 24px rgba(13, 148, 136, 0.20);
+  --shadow-sm:    0 1px 2px rgba(61, 43, 90, 0.04);
+  --shadow-md:    0 4px 14px rgba(61, 43, 90, 0.06);
+  --shadow-lg:    0 12px 40px rgba(61, 43, 90, 0.08);
+  --shadow-card:  0 12px 40px rgba(61, 43, 90, 0.08);
+  --shadow-glow:  0 8px 24px rgba(155, 114, 243, 0.18);
+  --shadow-teal:  0 8px 24px rgba(42, 157, 143, 0.2);
 
-  // ---- Radios ----
   --radius-sm:    10px;
-  --radius-md:    14px;
+  --radius-md:    12px;
   --radius-lg:    20px;
   --radius-xl:    28px;
+  --radius-card:  40px;
+  --radius-input: 14px;
   --radius-pill:  999px;
 
-  // ---- Motion ----
+  --sidebar-width: 248px;
+  --topbar-height: 72px;
+  --gap-page:      28px;
+
   --ease-out:     cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
   --t-fast:       160ms;
   --t-base:       220ms;
   --t-slow:       360ms;
 
-  // ---- Tipografía ----
-  --font-display: 'Fraunces', 'Plus Jakarta Sans', 'Georgia', serif;
-  --font-sans:    'Manrope', 'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', 'Georgia', serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', 'SF Mono', Menlo, monospace;
 }
 
 body {
   color-scheme: light;
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
+  background-color: var(--app-paper);
+  color: var(--app-text);
   font-family: var(--font-sans);
   font-size: 15.5px;
   line-height: 1.55;
@@ -81,7 +94,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: 'cv11', 'ss01';
+  background-image:
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(212, 184, 245, 0.25), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 10%, rgba(42, 157, 143, 0.08), transparent 45%),
+    radial-gradient(ellipse 50% 30% at 50% 100%, rgba(155, 114, 243, 0.06), transparent 50%);
 }
 
 // Selección de texto con la paleta nueva
@@ -94,21 +110,19 @@ body {
 // Fondos / decoraciones
 // ============================================================
 
-// Gradiente de fondo para pantallas "splash" (auth, estudiante acceso).
+// Gradiente de fondo para pantallas splash (estudiante acceso, etc.)
 .bg-gradient {
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--mat-sys-primary) 22%, transparent), transparent 55%),
-    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--mat-sys-tertiary) 18%, transparent), transparent 55%),
-    var(--mat-sys-surface-container-low);
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(212, 184, 245, 0.3), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 10%, rgba(42, 157, 143, 0.1), transparent 45%),
+    var(--app-paper);
 }
 
-// Gradiente "académico" más sobrio (azul deep + turquesa + violet soft).
 .bg-gradient-academic {
   background:
-    radial-gradient(circle at 8% 6%, rgba(30, 58, 138, 0.16), transparent 50%),
-    radial-gradient(circle at 95% 95%, rgba(13, 148, 136, 0.14), transparent 55%),
-    radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.08), transparent 60%),
-    var(--mat-sys-surface);
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(212, 184, 245, 0.25), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 10%, rgba(42, 157, 143, 0.08), transparent 45%),
+    var(--app-paper);
 }
 
 // Tarjeta con sombra suave y bordes generosos.
@@ -165,11 +179,16 @@ body {
   .hero-text { flex: 1 1 380px; }
   .hero-text h1 {
     margin: 0.45rem 0 0.2rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 2rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--app-ink);
     letter-spacing: -0.025em;
+
+    em {
+      font-style: italic;
+      color: var(--app-purple);
+    }
   }
   .hero-text p { margin: 0; max-width: 560px; color: var(--mat-sys-on-surface-variant); line-height: 1.55; }
 }
@@ -208,10 +227,11 @@ body {
     min-width: 110px; text-align: center;
     strong {
       display: block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 1.8rem; font-weight: 800; line-height: 1;
-      background: linear-gradient(135deg, var(--app-deep), var(--app-teal));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--app-ink);
     }
     span { font-size: 0.74rem; color: var(--mat-sys-on-surface-variant); text-transform: uppercase; letter-spacing: 0.04em; }
   }
@@ -224,8 +244,8 @@ body {
   border-radius: 18px;
   background: var(--mat-sys-surface);
 
-  > mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--app-deep); opacity: 0.55; }
-  h3 { margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', sans-serif; }
+  > mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--app-purple); opacity: 0.55; }
+  h3 { margin: 0.5rem 0 0.25rem; font-family: var(--font-display); }
   p { margin: 0 auto 1.25rem; max-width: 440px; color: var(--mat-sys-on-surface-variant); }
   button, a { display: inline-flex; align-items: center; gap: 0.4rem; }
 }
@@ -256,14 +276,14 @@ body {
               border-color var(--t-base) var(--ease-out);
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(30, 58, 138, 0.12);
+    box-shadow: 0 12px 28px rgba(155, 114, 243, 0.12);
   }
   &:active { transform: translateY(0); transition: transform 80ms; }
 }
 
 // Focus ring accesible.
 *:focus-visible {
-  outline: 2px solid var(--app-deep);
+  outline: 2px solid var(--app-purple);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -309,8 +329,8 @@ body {
   100% { background-position: -200% 0; }
 }
 @keyframes pulse-soft {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.35); }
-  50%      { box-shadow: 0 0 0 10px rgba(30, 58, 138, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(155, 114, 243, 0.35); }
+  50%      { box-shadow: 0 0 0 10px rgba(155, 114, 243, 0); }
 }
 @keyframes expand-card {
   from { opacity: 0; max-height: 0; }

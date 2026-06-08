@@ -5,8 +5,10 @@
 #   docker compose up --build -d
 #   docker compose logs -f backend
 #   docker compose exec backend python manage.py migrate
+#   docker compose exec backend python manage.py seed_admin
 #   docker compose exec backend python manage.py createsuperuser
-#   docker compose down
+#   docker compose down              # detener (datos persisten en el volumen)
+#   docker compose down -v           # detener y BORRAR datos (cuidado)
 # =========================================================
 
 name: simulador-destino

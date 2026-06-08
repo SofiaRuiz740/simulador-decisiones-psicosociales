@@ -10,6 +10,8 @@ import {
   Grupo,
   GrupoDetalle,
   GrupoInput,
+  Materia,
+  MateriaInput,
   Paginated,
 } from '../models/academico.model';
 
@@ -74,5 +76,23 @@ export class AcademicoService {
       `${this.api}/grupos/${grupoId}/remover-estudiantes/`,
       { estudiante_ids: estudianteIds },
     );
+  }
+
+  // ---------- Materias ----------
+
+  listarMaterias(page = 1): Observable<Paginated<Materia>> {
+    return this.http.get<Paginated<Materia>>(`${this.api}/materias/?page=${page}`);
+  }
+
+  crearMateria(data: MateriaInput): Observable<Materia> {
+    return this.http.post<Materia>(`${this.api}/materias/`, data);
+  }
+
+  actualizarMateria(id: number, data: Partial<MateriaInput>): Observable<Materia> {
+    return this.http.patch<Materia>(`${this.api}/materias/${id}/`, data);
+  }
+
+  eliminarMateria(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/materias/${id}/`);
   }
 }

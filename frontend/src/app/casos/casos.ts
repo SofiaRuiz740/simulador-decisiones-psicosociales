@@ -88,9 +88,9 @@ export class Casos implements OnInit {
 
   readonly materias = signal<Materia[]>([]);
 
-  filtroTexto = '';
+  readonly filtroTexto = signal('');
 
-  filtroEstado: EstadoCaso | '' = '';
+  readonly filtroEstado = signal<EstadoCaso | ''>('');
 
 
 
@@ -112,9 +112,9 @@ export class Casos implements OnInit {
 
   readonly filtrados = computed(() => {
 
-    const txt = (this.filtroTexto || '').toLowerCase().trim();
+    const txt = this.filtroTexto().toLowerCase().trim();
 
-    const est = this.filtroEstado;
+    const est = this.filtroEstado();
 
     return this.casos().filter((c) => {
 

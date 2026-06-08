@@ -113,9 +113,9 @@ export class Practicas implements OnInit {
 
   readonly tab = signal('agenda');
 
-  filtroTexto = '';
+  readonly filtroTexto = signal('');
 
-  filtroEstado: EstadoPractica | '' = '';
+  readonly filtroEstado = signal<EstadoPractica | ''>('');
 
 
 
@@ -173,9 +173,9 @@ export class Practicas implements OnInit {
 
   readonly filtradas = computed(() => {
 
-    const txt = this.filtroTexto.toLowerCase().trim();
+    const txt = this.filtroTexto().toLowerCase().trim();
 
-    const est = this.filtroEstado;
+    const est = this.filtroEstado();
 
     return this.practicas().filter((p) => {
 

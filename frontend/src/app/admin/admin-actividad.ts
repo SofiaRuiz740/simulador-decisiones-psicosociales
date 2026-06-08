@@ -26,8 +26,8 @@ import { EventoActividad, ExtrasService } from '../core/services/extras.service'
         <div class="panel__toolbar">
           <div class="toolbar">
             <div class="toolbar__filters">
-              <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
-              <select [(ngModel)]="filtroTipo">
+              <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
+              <select [ngModel]="filtroTipo()" (ngModelChange)="filtroTipo.set($event)">
                 <option value="">Todos los eventos</option>
                 @for (t of tiposEvento(); track t) {
                   <option [value]="t">{{ etiquetaTipo(t) }}</option>
@@ -79,16 +79,16 @@ export class AdminActividad implements OnInit {
 
   readonly loading = signal(true);
   readonly eventos = signal<EventoActividad[]>([]);
-  filtroTexto = '';
-  filtroTipo = '';
+  readonly filtroTexto = signal('');
+  readonly filtroTipo = signal('');
 
   readonly tiposEvento = computed(() =>
     [...new Set(this.eventos().map((e) => e.tipo))].sort(),
   );
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const tipo = this.filtroTipo;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const tipo = this.filtroTipo();
     return this.eventos().filter((e) => {
       if (tipo && e.tipo !== tipo) return false;
       if (!txt) return true;

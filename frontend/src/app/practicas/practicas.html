@@ -16,8 +16,8 @@
       <div class="panel__toolbar">
         <div class="toolbar">
           <div class="toolbar__filters">
-            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
-            <select [(ngModel)]="filtroEstado">
+            <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
+            <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
               <option value="">Todos</option>
               <option value="SIN_INICIAR">Sin iniciar</option>
               <option value="EN_CURSO">En curso</option>

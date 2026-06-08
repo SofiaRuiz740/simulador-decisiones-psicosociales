@@ -48,8 +48,8 @@ export class PropuestasListPage implements OnInit {
   readonly pasoIdx = signal(0);
   readonly propuestas = signal<PropuestaCasoIA[]>([]);
 
-  filtroTexto = '';
-  filtroEstado: EstadoPropuestaIA | '' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<EstadoPropuestaIA | ''>('');
 
   readonly form = this.fb.nonNullable.group({
     tema: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(300)]],
@@ -61,8 +61,8 @@ export class PropuestasListPage implements OnInit {
   });
 
   readonly filtradas = computed(() => {
-    const txt = (this.filtroTexto || '').toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.propuestas().filter((p) => {
       if (est && p.estado !== est) return false;
       if (!txt) return true;

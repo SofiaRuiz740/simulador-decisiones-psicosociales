@@ -34,10 +34,10 @@ export class Grupos implements OnInit {
   readonly grupoExpandidoId = signal<number | null>(null);
   readonly detalle = signal<import('../core/models/academico.model').GrupoDetalle | null>(null);
 
-  filtroTexto = '';
+  readonly filtroTexto = signal('');
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
+    const txt = this.filtroTexto().toLowerCase().trim();
     if (!txt) return this.grupos();
     return this.grupos().filter((g) =>
       g.nombre.toLowerCase().includes(txt) ||

@@ -12,9 +12,24 @@ def conexion_smtp_docente(docente: Usuario):
     """
     Abre SMTP con el correo y clave del docente.
     Retorna (connection, error_mensaje).
+
+    Modos:
+    - Si EMAIL_BACKEND=console (modo dev sin Gmail real): se usa el backend de
+      consola — el correo aparece en los logs del backend (`docker compose logs
+      backend`), no se envía a internet, y NO se exige clave configurada.
+    - Si EMAIL_BACKEND=smtp (modo producción): el docente debe tener una
+      contraseña de aplicación Gmail guardada (Perfil → Correo para invitaciones).
     """
     if not (docente.email or '').strip():
         return None, 'Tu usuario no tiene correo registrado.'
+
+    backend = settings.EMAIL_BACKEND
+    # Modo dev: console backend explícito. Imprime el correo en logs y devuelve OK.
+    if 'console' in backend:
+        try:
+            return get_connection(backend=backend), None
+        except Exception as exc:  # noqa: BLE001
+            return None, str(exc)
 
     clave = (docente.correo_smtp_password or '').strip()
     if not clave:
@@ -24,10 +39,6 @@ def conexion_smtp_docente(docente: Usuario):
         )
 
     host = settings.EMAIL_HOST or 'smtp.gmail.com'
-    backend = settings.EMAIL_BACKEND
-    if 'console' in backend and host:
-        backend = 'django.core.mail.backends.smtp.EmailBackend'
-
     try:
         conn = get_connection(
             backend=backend,

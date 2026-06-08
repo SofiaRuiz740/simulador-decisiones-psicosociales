@@ -37,12 +37,12 @@ export class Estudiantes implements OnInit {
   readonly inactivos = computed(() => this.estudiantes().filter((e) => !e.activo).length);
   readonly sinGrupo = computed(() => this.estudiantes().filter((e) => e.sin_grupo).length);
 
-  filtroTexto = '';
-  filtroEstado: '' | 'activo' | 'inactivo' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.estudiantes().filter((e) => {
       if (est === 'activo' && !e.activo) return false;
       if (est === 'inactivo' && e.activo) return false;

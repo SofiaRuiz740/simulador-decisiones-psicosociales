@@ -32,8 +32,8 @@ export class Materias implements OnInit {
   readonly loading = signal(true);
   readonly materias = signal<Materia[]>([]);
 
-  filtroTexto = '';
-  filtroEstado: '' | 'activo' | 'inactivo' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
 
   readonly activas = computed(() => this.materias().filter((m) => m.activo).length);
   readonly totalGrupos = computed(() =>
@@ -44,8 +44,8 @@ export class Materias implements OnInit {
   );
 
   readonly filtradas = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.materias().filter((m) => {
       if (est === 'activo' && !m.activo) return false;
       if (est === 'inactivo' && m.activo) return false;

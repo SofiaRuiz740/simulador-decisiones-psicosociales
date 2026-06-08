@@ -29,7 +29,7 @@
     <div class="panel__toolbar">
       <div class="toolbar">
         <div class="toolbar__filters">
-          <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
+          <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
         </div>
         <button type="button" class="btn-primary" (click)="crear()">Crear grupo</button>
       </div>

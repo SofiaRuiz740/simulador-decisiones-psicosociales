@@ -98,3 +98,39 @@
   flex-wrap: wrap;
   padding-top: 0.5rem;
 }
+
+.escenario-media {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0.95rem 0 1.3rem;
+
+  figure {
+    margin: 0;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+  }
+  img, video {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    display: block;
+  }
+  audio { width: 100%; padding: 0.55rem 0.85rem; background: white; }
+  figcaption {
+    padding: 0.6rem 0.95rem;
+    font-size: 0.86rem;
+    color: rgba(15, 23, 42, 0.7);
+    background: white;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+  }
+  iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    display: block;
+  }
+}

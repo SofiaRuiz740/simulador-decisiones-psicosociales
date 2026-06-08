@@ -60,6 +60,7 @@ class ParticipacionSeguimientoSerializer(serializers.Serializer):
     estudiante_correo = serializers.EmailField()
     practica_id = serializers.IntegerField()
     practica_nombre = serializers.CharField()
+    caso_id = serializers.IntegerField()
     caso_nombre = serializers.CharField()
     estado = serializers.CharField()
     estado_display = serializers.CharField()

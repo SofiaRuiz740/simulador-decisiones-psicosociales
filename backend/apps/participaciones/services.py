@@ -148,6 +148,7 @@ def fila_seguimiento(auth: AutorizacionEstudiante) -> dict:
         'estudiante_correo': auth.estudiante.correo,
         'practica_id': auth.practica_id,
         'practica_nombre': auth.practica.nombre,
+        'caso_id': auth.practica.caso_id,
         'caso_nombre': auth.practica.caso.nombre,
         'estado': estado,
         'estado_display': estado_display,

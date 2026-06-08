@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Grupo } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { UxService } from '../core/services/ux.service';
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { GrupoFormDialog } from './dialogs/grupo-form-dialog';
 
@@ -26,16 +27,17 @@ export class Grupos implements OnInit {
   private readonly servicio = inject(AcademicoService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly grupos = signal<Grupo[]>([]);
   readonly grupoExpandidoId = signal<number | null>(null);
   readonly detalle = signal<import('../core/models/academico.model').GrupoDetalle | null>(null);
 
-  filtroTexto = '';
+  readonly filtroTexto = signal('');
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
+    const txt = this.filtroTexto().toLowerCase().trim();
     if (!txt) return this.grupos();
     return this.grupos().filter((g) =>
       g.nombre.toLowerCase().includes(txt) ||
@@ -99,11 +101,15 @@ export class Grupos implements OnInit {
       });
   }
 
-  eliminar(g: Grupo, ev: Event): void {
+  async eliminar(g: Grupo, ev: Event): Promise<void> {
     ev.stopPropagation();
-    if (!confirm(`¿Eliminar el grupo "${g.nombre}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar grupo',
+      mensaje: `Se eliminará el grupo "${g.nombre}". Los estudiantes no se borran, pero perderán la vinculación a este grupo.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar grupo',
+    });
+    if (!ok) return;
     this.servicio.eliminarGrupo(g.id).subscribe({
       next: () => {
         this.snackBar.open(`Grupo eliminado: ${g.nombre}`, 'OK', { duration: 3000 });
@@ -134,10 +140,17 @@ export class Grupos implements OnInit {
       });
   }
 
-  removerEstudiante(estudianteId: number): void {
+  async removerEstudiante(estudianteId: number): Promise<void> {
     const detalle = this.detalle();
     if (!detalle) return;
-    if (!confirm('¿Remover este estudiante del grupo?')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Remover estudiante',
+      mensaje: 'El estudiante saldrá de este grupo. Su cuenta y su historial se conservan.',
+      variant: 'warn',
+      textoConfirmar: 'Remover',
+      icono: 'person_remove',
+    });
+    if (!ok) return;
     this.servicio
       .removerEstudiantesDeGrupo(detalle.id, [estudianteId])
       .subscribe({

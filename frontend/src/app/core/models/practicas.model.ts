@@ -25,6 +25,9 @@ export interface Autorizacion {
   codigo_acceso: string;
   notificado: boolean;
   reintento_autorizado: boolean;
+  revocada: boolean;
+  revocada_en: string | null;
+  revocada_motivo: string;
   fecha_creacion: string;
 }
 
@@ -170,6 +173,7 @@ export interface SeguimientoParticipacion {
   estudiante_correo: string;
   practica_id: number;
   practica_nombre: string;
+  caso_id: number;
   caso_nombre: string;
   estado: EstadoParticipacion | string;
   estado_display: string;

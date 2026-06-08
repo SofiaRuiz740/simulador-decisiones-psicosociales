@@ -10,6 +10,7 @@ import {
   PropuestaCasoIA,
 } from '../core/models/ia.model';
 import { IaService } from '../core/services/ia.service';
+import { UxService } from '../core/services/ux.service';
 import { GamePreview } from './components/game-preview/game-preview';
 import { RechazarPropuestaDialog } from './dialogs/rechazar-propuesta-dialog';
 import { mockupDialog } from '../shared/constants/dialog-config';
@@ -31,6 +32,7 @@ export class PropuestaDetallePage implements OnInit {
   private readonly ia = inject(IaService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly propuesta = signal<PropuestaCasoIA | null>(null);
@@ -118,10 +120,17 @@ export class PropuestaDetallePage implements OnInit {
     });
   }
 
-  convertir(): void {
+  async convertir(): Promise<void> {
     const p = this.propuesta();
     if (!p) return;
-    if (!confirm('¿Convertir la propuesta en un caso editable? Quedará en estado EN_REVISIÓN dentro de Casos.')) return;
+    const ok = await this.ux.confirm({
+      titulo: 'Convertir en caso editable',
+      mensaje: 'Se creará un caso nuevo en estado "En revisión" dentro de Casos. Podrás ajustar el contenido antes de publicarlo.',
+      variant: 'info',
+      textoConfirmar: 'Convertir',
+      icono: 'auto_awesome',
+    });
+    if (!ok) return;
     this.ia.convertirEnCaso(p.id).subscribe({
       next: (res) => {
         this.snackBar.open(`Caso creado: "${res.caso_nombre}".`, 'Abrir', { duration: 4500 })

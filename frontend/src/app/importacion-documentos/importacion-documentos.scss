@@ -27,3 +27,57 @@
 .tab-empty {
   padding: 0;
 }
+
+.tip-bar {
+  margin: 0 0 1.25rem;
+  padding: 0.9rem 1.1rem;
+  background: color-mix(in srgb, var(--mat-sys-primary, #1e3a8a) 8%, white);
+  border-left: 3px solid var(--mat-sys-primary, #1e3a8a);
+  border-radius: 12px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--mat-sys-on-surface, #0f172a);
+
+  strong { margin-right: 0.35rem; }
+
+  &__actions {
+    margin-top: 0.65rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.problem-list {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    padding: 0.55rem 0.85rem;
+    border-radius: 10px;
+    background: rgba(220, 38, 38, 0.06);
+    border-left: 3px solid #dc2626;
+    margin-bottom: 0.45rem;
+    font-size: 0.86rem;
+    color: #7f1d1d;
+  }
+  li.problem-list__ok {
+    background: rgba(16, 185, 129, 0.08);
+    border-left-color: #059669;
+    color: #064e3b;
+  }
+}
+
+.subnav-rubrica {
+  display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+  select, input[type="number"] {
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--mat-sys-outline-variant, #e2e8f0);
+    font-size: 0.88rem;
+  }
+}

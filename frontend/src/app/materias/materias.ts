@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Materia } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { UxService } from '../core/services/ux.service';
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { MateriaFormDialog } from './dialogs/materia-form-dialog';
 
@@ -26,12 +27,13 @@ export class Materias implements OnInit {
   private readonly servicio = inject(AcademicoService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly materias = signal<Materia[]>([]);
 
-  filtroTexto = '';
-  filtroEstado: '' | 'activo' | 'inactivo' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
 
   readonly activas = computed(() => this.materias().filter((m) => m.activo).length);
   readonly totalGrupos = computed(() =>
@@ -42,8 +44,8 @@ export class Materias implements OnInit {
   );
 
   readonly filtradas = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.materias().filter((m) => {
       if (est === 'activo' && !m.activo) return false;
       if (est === 'inactivo' && m.activo) return false;
@@ -88,8 +90,14 @@ export class Materias implements OnInit {
       });
   }
 
-  eliminar(materia: Materia): void {
-    if (!confirm(`¿Eliminar la materia "${materia.nombre}"?`)) return;
+  async eliminar(materia: Materia): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar materia',
+      mensaje: `Se eliminará "${materia.nombre}". Los grupos asociados perderán su materia.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar materia',
+    });
+    if (!ok) return;
     this.servicio.eliminarMateria(materia.id).subscribe({
       next: () => {
         this.snackBar.open(`Materia eliminada: ${materia.nombre}`, 'OK', { duration: 3000 });

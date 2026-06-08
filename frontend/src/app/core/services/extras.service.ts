@@ -88,6 +88,8 @@ export interface ReportesFiltros {
   hasta?: string;
   materia_id?: number;
   grupo_id?: number;
+  /** Solo usado por reportes temáticos. */
+  estudiante_id?: number;
 }
 
 export interface ArchivoFuente {
@@ -111,6 +113,14 @@ export interface ResultadoImportacion {
   grupos_creados: number;
   inscripciones: number;
   materias_creadas: number;
+  errores: { fila: number | null; mensaje: string }[];
+  advertencias: { fila: number | null; mensaje: string }[];
+}
+
+export interface ResultadoImportacionRubrica {
+  caso_id: number;
+  criterios_importados: number;
+  rubrica_creada: boolean;
   errores: { fila: number | null; mensaje: string }[];
   advertencias: { fila: number | null; mensaje: string }[];
 }
@@ -254,4 +264,44 @@ export class ExtrasService {
   descargarReporteEstudianteExcel(estudianteId: number) {
     return this.http.get(`${this.api}/reportes/estudiante/${estudianteId}/excel/`, { responseType: 'blob' });
   }
+
+  importarRubrica(casoId: number, file: File) {
+    const fd = new FormData();
+    fd.append('archivo', file);
+    return this.http.post<ResultadoImportacionRubrica>(
+      `${this.api}/importacion/masiva/importar-rubrica/${casoId}/`,
+      fd,
+    );
+  }
+
+  /**
+   * Descarga un reporte temático (P1).
+   * tipo: 'participacion' | 'desempeno' | 'respuestas' | 'tiempos' | 'notas' |
+   *       'retroalimentaciones' | 'feedback'
+   * formato: 'pdf' | 'excel'
+   */
+  descargarReporteTematico(
+    tipo: ReporteTematicoTipo,
+    formato: 'pdf' | 'excel',
+    filtros: ReportesFiltros = {},
+  ) {
+    const params = new URLSearchParams();
+    if (filtros.desde) params.set('desde', filtros.desde);
+    if (filtros.hasta) params.set('hasta', filtros.hasta);
+    if (filtros.materia_id) params.set('materia_id', String(filtros.materia_id));
+    if (filtros.grupo_id) params.set('grupo_id', String(filtros.grupo_id));
+    if (filtros.estudiante_id) params.set('estudiante_id', String(filtros.estudiante_id));
+    const q = params.toString();
+    const url = `${this.api}/reportes/tematico/${tipo}/${formato}/${q ? `?${q}` : ''}`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
 }
+
+export type ReporteTematicoTipo =
+  | 'participacion'
+  | 'desempeno'
+  | 'respuestas'
+  | 'tiempos'
+  | 'notas'
+  | 'retroalimentaciones'
+  | 'feedback';

@@ -29,20 +29,29 @@ export interface CorreoInvitacionesDialogData {
     <div class="mockup-dialog__shell">
       <h2 class="mockup-dialog__title">{{ titulo }}</h2>
       <p class="dialog-hint">
-        Las invitaciones se envían desde <strong>{{ email }}</strong> (tu Gmail).
+        <strong>¿Para qué sirve esto?</strong> Cuando autorizas un estudiante en una
+        práctica, el sistema le envía un correo con su <strong>código de acceso</strong>.
+        Ese correo sale desde <strong>tu propia cuenta Gmail</strong>
+        (<em>{{ email }}</em>), no desde un servidor del sistema. Así el estudiante
+        ve el mensaje firmado por ti.
+      </p>
+      <p class="dialog-hint">
+        Google exige una <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">contraseña de aplicación</a>
+        (16 caracteres) para que apps externas envíen desde tu Gmail. La generas
+        una vez en tu cuenta de Google y la pegas aquí.
         @if (modo === 'enviar' && yaConfigurado) {
-          Ya tienes una clave guardada: déjala vacía para usarla o escribe una nueva.
-        } @else {
-          Ingresa la
-          <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">contraseña de aplicación Gmail</a>
-          de esa cuenta. Si no tienes verificación en 2 pasos, puedes probar con tu contraseña de acceso.
+          <br><strong>Ya tienes una guardada</strong>: deja vacío para reutilizarla o escribe una nueva.
         }
       </p>
       @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Contraseña Gmail</mat-label>
-        <input matInput type="password" [(ngModel)]="clave" autocomplete="off" />
+        <mat-label>Contraseña de aplicación Gmail (16 caracteres)</mat-label>
+        <input matInput type="password" [(ngModel)]="clave" autocomplete="off" placeholder="abcd efgh ijkl mnop" />
       </mat-form-field>
+      <p class="dialog-tip">
+        💡 En modo de desarrollo (sin Gmail real), los correos se imprimen en los logs
+        del backend en lugar de enviarse. No necesitas configurar nada para probar.
+      </p>
       <div class="mockup-dialog__actions">
         <button type="button" class="btn-secondary" (click)="cerrar()">Cancelar</button>
         <button type="button" class="btn-primary" [disabled]="!puedeConfirmar() || loading()" (click)="confirmar()">
@@ -52,7 +61,13 @@ export interface CorreoInvitacionesDialogData {
     </div>
   `,
   styles: [`
-    .dialog-hint { font-size: 0.84rem; color: var(--app-slate); line-height: 1.5; margin: 0 0 1rem; }
+    .dialog-hint { font-size: 0.84rem; color: var(--app-slate); line-height: 1.55; margin: 0 0 0.8rem; }
+    .dialog-tip {
+      font-size: 0.78rem; color: var(--app-slate); line-height: 1.45;
+      background: rgba(13, 148, 136, 0.08);
+      border-left: 3px solid var(--app-teal, #0d9488);
+      padding: 0.5rem 0.75rem; border-radius: 6px; margin: 0.5rem 0 1rem;
+    }
     .full { width: 100%; }
   `],
 })

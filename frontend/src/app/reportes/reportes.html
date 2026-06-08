@@ -78,7 +78,7 @@
 
       <div class="form-section__title report-catalog-title">Otros reportes</div>
       @for (r of catalogoReportes; track r.titulo) {
-        <article class="report-item" [class.report-item--disabled]="r.tipo === 'proximamente'">
+        <article class="report-item">
           <div>
             <h3>{{ r.titulo }}</h3>
             <p class="muted">{{ hintCatalogo(r) }}</p>
@@ -87,13 +87,13 @@
             <button
               type="button"
               class="btn-ghost"
-              [disabled]="r.tipo === 'proximamente' || descargando() === r.tipo + '-' + idCatalogo(r.tipo) + '-pdf'"
+              [disabled]="descargando() && descargando()!.includes(r.tematicoTipo || r.tipo) && descargando()!.endsWith('pdf')"
               (click)="descargarCatalogoPDF(r)"
             >PDF</button>
             <button
               type="button"
               class="btn-ghost"
-              [disabled]="r.tipo === 'proximamente' || descargando() === r.tipo + '-' + idCatalogo(r.tipo) + '-xlsx'"
+              [disabled]="descargando() && descargando()!.includes(r.tematicoTipo || r.tipo) && (descargando()!.endsWith('excel') || descargando()!.endsWith('xlsx'))"
               (click)="descargarCatalogoExcel(r)"
             >Excel</button>
           </div>

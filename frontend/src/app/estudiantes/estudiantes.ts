@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Estudiante } from '../core/models/academico.model';
 import { AcademicoService } from '../core/services/academico.service';
+import { UxService } from '../core/services/ux.service';
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { AgregarPorCorreoDialog } from './dialogs/agregar-por-correo-dialog';
 import { EstudianteFormDialog } from './dialogs/estudiante-form-dialog';
@@ -27,6 +28,7 @@ export class Estudiantes implements OnInit {
   private readonly servicio = inject(AcademicoService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly estudiantes = signal<Estudiante[]>([]);
@@ -35,12 +37,12 @@ export class Estudiantes implements OnInit {
   readonly inactivos = computed(() => this.estudiantes().filter((e) => !e.activo).length);
   readonly sinGrupo = computed(() => this.estudiantes().filter((e) => e.sin_grupo).length);
 
-  filtroTexto = '';
-  filtroEstado: '' | 'activo' | 'inactivo' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.estudiantes().filter((e) => {
       if (est === 'activo' && !e.activo) return false;
       if (est === 'inactivo' && e.activo) return false;
@@ -92,14 +94,15 @@ export class Estudiantes implements OnInit {
       });
   }
 
-  desvincular(estudiante: Estudiante): void {
-    if (
-      !confirm(
-        `¿Desvincular a ${estudiante.nombre_completo} de tu lista? El estudiante seguirá existiendo en el sistema.`,
-      )
-    ) {
-      return;
-    }
+  async desvincular(estudiante: Estudiante): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Desvincular estudiante',
+      mensaje: `${estudiante.nombre_completo} dejará de aparecer en tu lista personal. La cuenta del estudiante se conserva en el sistema.`,
+      variant: 'warn',
+      textoConfirmar: 'Desvincular',
+      icono: 'link_off',
+    });
+    if (!ok) return;
     this.servicio.desvincularEstudiante(estudiante.id).subscribe({
       next: () => {
         this.snackBar.open(`Desvinculado: ${estudiante.correo}`, 'OK', { duration: 3000 });

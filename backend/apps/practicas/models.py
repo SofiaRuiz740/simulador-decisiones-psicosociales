@@ -79,6 +79,9 @@ class AutorizacionEstudiante(models.Model):
     codigo_acceso = models.CharField('código de acceso', max_length=16, unique=True)
     notificado = models.BooleanField('notificado', default=False)
     reintento_autorizado = models.BooleanField('puede reintentar', default=False)
+    revocada = models.BooleanField('autorización revocada', default=False)
+    revocada_en = models.DateTimeField('fecha de revocación', null=True, blank=True)
+    revocada_motivo = models.CharField('motivo de revocación', max_length=300, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:

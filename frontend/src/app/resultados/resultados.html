@@ -40,8 +40,8 @@
         <div class="panel__toolbar">
           <div class="toolbar">
             <div class="toolbar__filters">
-              <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
-              <select [(ngModel)]="filtroPractica">
+              <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
+              <select [ngModel]="filtroPractica()" (ngModelChange)="filtroPractica.set($event)">
                 <option value="">Todas las prácticas</option>
                 @for (p of practicasUnicas(); track p.id) {
                   <option [value]="p.id">{{ p.nombre }}</option>

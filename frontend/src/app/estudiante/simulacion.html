@@ -84,6 +84,32 @@
                 }
               </div>
 
+              <!-- Recursos multimedia del escenario (P3) -->
+              @if (recursosVisibles(esc).length) {
+                <div class="escenario-media">
+                  @for (r of recursosVisibles(esc); track $index) {
+                    <figure>
+                      @switch (r.tipo) {
+                        @case ('imagen') {
+                          <img [src]="r.url" [alt]="r.titulo || 'Imagen del escenario'" loading="lazy" />
+                        }
+                        @case ('audio') {
+                          <audio [src]="r.url" controls preload="metadata"></audio>
+                        }
+                        @case ('video') {
+                          @if (esEmbed(r.url)) {
+                            <iframe [src]="urlSegura(r.url)" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                          } @else {
+                            <video [src]="r.url" controls preload="metadata"></video>
+                          }
+                        }
+                      }
+                      @if (r.titulo) { <figcaption>{{ r.titulo }}</figcaption> }
+                    </figure>
+                  }
+                </div>
+              }
+
               @if (esc.preguntas.length === 0) {
                 <p class="sim-preview__question">Este escenario no tiene preguntas.</p>
               }

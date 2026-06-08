@@ -134,6 +134,117 @@ def generar_plantilla_rubrica() -> bytes:
     return buffer.getvalue()
 
 
+def parsear_plantilla_rubrica(archivo_excel) -> dict:
+    """Lee un XLSX con el formato de `generar_plantilla_rubrica()` y devuelve
+    `{'criterios': [...], 'errores': [...], 'advertencias': [...]}` listo
+    para asignarse a `Rubrica.criterios`.
+
+    Columnas requeridas: criterio, descripcion, peso,
+                         nivel_1_nombre, nivel_1_descriptor,
+                         nivel_2_nombre, nivel_2_descriptor,
+                         nivel_3_nombre, nivel_3_descriptor,
+                         nivel_4_nombre, nivel_4_descriptor.
+
+    Acepta hasta 4 niveles (extiende si la plantilla añade nivel_5 en futuro).
+    """
+    from openpyxl import load_workbook
+
+    errores: list[dict] = []
+    advertencias: list[dict] = []
+
+    try:
+        wb = load_workbook(archivo_excel, data_only=True)
+    except Exception as exc:
+        return {
+            'criterios': [],
+            'errores': [{'fila': None, 'mensaje': f'No se pudo abrir el Excel: {exc}'}],
+            'advertencias': [],
+        }
+
+    ws = wb.active
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        return {
+            'criterios': [],
+            'errores': [{'fila': None, 'mensaje': 'El archivo está vacío.'}],
+            'advertencias': [],
+        }
+
+    encabezados = [str(c or '').strip().lower() for c in rows[0]]
+    requeridas = {'criterio', 'peso'}
+    faltantes = requeridas - set(encabezados)
+    if faltantes:
+        return {
+            'criterios': [],
+            'errores': [{
+                'fila': 1,
+                'mensaje': f'Faltan columnas obligatorias: {", ".join(sorted(faltantes))}.',
+            }],
+            'advertencias': [],
+        }
+
+    def col(nombre: str) -> int | None:
+        try:
+            return encabezados.index(nombre)
+        except ValueError:
+            return None
+
+    criterios = []
+    for nro_fila, fila in enumerate(rows[1:], start=2):
+        nombre = (fila[col('criterio')] or '').strip() if col('criterio') is not None else ''
+        if not nombre:
+            continue  # fila vacía, se ignora
+
+        desc_idx = col('descripcion')
+        peso_idx = col('peso')
+        descripcion = (fila[desc_idx] or '').strip() if desc_idx is not None and desc_idx < len(fila) else ''
+
+        try:
+            peso = int(fila[peso_idx] or 0) if peso_idx is not None and peso_idx < len(fila) else 0
+        except (TypeError, ValueError):
+            errores.append({'fila': nro_fila, 'mensaje': f'Peso inválido en criterio "{nombre}".'})
+            peso = 0
+
+        niveles = []
+        for n in range(1, 5):
+            cn = col(f'nivel_{n}_nombre')
+            cd = col(f'nivel_{n}_descriptor')
+            nombre_n = (fila[cn] or '').strip() if cn is not None and cn < len(fila) else ''
+            descriptor_n = (fila[cd] or '').strip() if cd is not None and cd < len(fila) else ''
+            if nombre_n or descriptor_n:
+                niveles.append({
+                    'nivel': n,
+                    'nombre': nombre_n or f'Nivel {n}',
+                    'descriptor': descriptor_n,
+                })
+
+        if not niveles:
+            advertencias.append({
+                'fila': nro_fila,
+                'mensaje': f'Criterio "{nombre}" no tiene niveles; se aplicarán los globales.',
+            })
+
+        criterios.append({
+            'id': f'c{nro_fila - 1}',
+            'nombre': nombre,
+            'descripcion': descripcion,
+            'peso': peso,
+            'niveles': niveles,
+        })
+
+    suma_pesos = sum(c['peso'] for c in criterios)
+    if criterios and suma_pesos != 100:
+        advertencias.append({
+            'fila': None,
+            'mensaje': (
+                f'La suma de pesos es {suma_pesos}, no 100. '
+                'La rúbrica se guardará pero el cálculo de nota usará el modo plano.'
+            ),
+        })
+
+    return {'criterios': criterios, 'errores': errores, 'advertencias': advertencias}
+
+
 def generar_guia_importacion() -> bytes:
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, title='Guía de importación')

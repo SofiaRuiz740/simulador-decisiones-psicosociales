@@ -47,8 +47,8 @@ import { DocenteAdmin, ExtrasService } from '../core/services/extras.service';
         <div class="panel__toolbar">
           <div class="toolbar">
             <div class="toolbar__filters">
-              <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" />
-              <select [(ngModel)]="filtroEstado">
+              <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
+              <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
                 <option value="">Todos</option>
                 <option value="activo">Activos</option>
                 <option value="inactivo">Inactivos</option>
@@ -113,16 +113,16 @@ export class AdminDocentes implements OnInit {
 
   readonly loading = signal(true);
   readonly docentes = signal<DocenteAdmin[]>([]);
-  filtroTexto = '';
-  filtroEstado: '' | 'activo' | 'inactivo' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroEstado = signal<'' | 'activo' | 'inactivo'>('');
 
   readonly activos = computed(() => this.docentes().filter((d) => d.is_active).length);
   readonly totalCasos = computed(() => this.docentes().reduce((a, d) => a + d.casos_count, 0));
   readonly totalPracticas = computed(() => this.docentes().reduce((a, d) => a + d.practicas_count, 0));
 
   readonly filtrados = computed(() => {
-    const txt = this.filtroTexto.toLowerCase().trim();
-    const est = this.filtroEstado;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const est = this.filtroEstado();
     return this.docentes().filter((d) => {
       if (est === 'activo' && !d.is_active) return false;
       if (est === 'inactivo' && d.is_active) return false;

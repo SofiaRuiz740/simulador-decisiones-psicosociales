@@ -7,15 +7,19 @@ criterios definidos (o las preguntas no apuntan a ninguno), se usa el
 cálculo plano histórico: peso_obtenido / peso_total * escala_maxima.
 """
 
+import logging
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
 
 from apps.casos.models import Pregunta
 from apps.participaciones.models import Participacion, RespuestaSeleccionada
+from apps.usuarios.mail import conexion_smtp_docente
 
 from .models import Resultado
+
+logger = logging.getLogger(__name__)
 
 
 def _nivel_alcanzado(porcentaje: float, niveles: list) -> dict | None:
@@ -37,33 +41,86 @@ def _nivel_alcanzado(porcentaje: float, niveles: list) -> dict | None:
     return ordenados[idx]
 
 
-def notificar_resultado_estudiante(resultado: Resultado) -> None:
-    """Envía correo con la nota al estudiante (RF42). Marca notificado si el envío sale bien."""
+def notificar_resultado_estudiante(resultado: Resultado) -> tuple[bool, str | None]:
+    """Envía correo con la nota al estudiante (RF42).
+
+    Prioriza el SMTP del docente que dictó la práctica para que el remitente
+    real sea el docente (mismo flujo que las invitaciones). Si el docente no
+    tiene SMTP configurado, hace fallback a DEFAULT_FROM_EMAIL del sistema y
+    deja log de advertencia. Solo marca `notificado_estudiante=True` si el
+    envío sale bien.
+
+    Devuelve `(ok, error?)`.
+    """
     if resultado.notificado_estudiante:
-        return
+        return True, None
+
     estudiante = resultado.participacion.estudiante
     practica = resultado.participacion.practica
-    asunto = f'Resultado de la práctica: {practica.nombre}'
+    docente = practica.docente
+
+    if not estudiante.correo:
+        return False, 'El estudiante no tiene correo registrado.'
+
+    asunto = f'Resultado de tu práctica: {practica.nombre}'
     cuerpo = (
         f'Hola {estudiante.nombre_completo},\n\n'
-        f'Tu participación en la práctica «{practica.nombre}» fue calificada.\n'
+        f'Tu participación en la práctica «{practica.nombre}» fue calificada.\n\n'
         f'  • Nota final: {resultado.nota_final}\n'
         f'  • Estado: {"Aprobado" if resultado.aprobado else "No aprobado"}\n'
-        f'  • Correctas: {resultado.correctas} · Incorrectas: {resultado.incorrectas}\n\n'
-        f'Consulta el detalle en el simulador.\n'
+        f'  • Correctas: {resultado.correctas} · Incorrectas: {resultado.incorrectas} · '
+        f'Sin responder: {resultado.no_respondidas}\n\n'
+        f'Consulta el detalle entrando al simulador con tu correo.\n\n'
     )
+    if resultado.feedback_docente:
+        cuerpo += f'Retroalimentación del docente:\n{resultado.feedback_docente}\n\n'
+    cuerpo += '—\n'
+
+    # 1) intento con SMTP del docente
+    conexion = None
+    from_email = settings.DEFAULT_FROM_EMAIL
+    reply_to = []
+    if docente.email and getattr(docente, 'correo_smtp_password', ''):
+        conexion, err = conexion_smtp_docente(docente)
+        if conexion:
+            nombre = docente.get_full_name() or docente.username
+            from_email = f'"{nombre}" <{docente.email}>'
+            reply_to = [docente.email]
+        else:
+            logger.warning(
+                'Resultado %s: SMTP docente no disponible (%s). Usaré DEFAULT_FROM_EMAIL.',
+                resultado.id, err,
+            )
+
     try:
-        send_mail(
-            asunto,
-            cuerpo,
-            settings.DEFAULT_FROM_EMAIL,
-            [estudiante.correo],
-            fail_silently=True,
-        )
+        if conexion is not None:
+            mensaje = EmailMessage(
+                subject=asunto, body=cuerpo,
+                from_email=from_email, to=[estudiante.correo],
+                reply_to=reply_to, connection=conexion,
+            )
+            mensaje.send(fail_silently=False)
+        else:
+            # Fallback explícito y NO silencioso (al menos logueado).
+            send_mail(
+                asunto, cuerpo,
+                settings.DEFAULT_FROM_EMAIL,
+                [estudiante.correo],
+                fail_silently=False,
+            )
         resultado.notificado_estudiante = True
         resultado.save(update_fields=['notificado_estudiante'])
-    except Exception:
-        pass
+        logger.info(
+            'Notificación nota enviada: resultado=%s estudiante=%s practica=%s',
+            resultado.id, estudiante.correo, practica.id,
+        )
+        return True, None
+    except Exception as exc:  # noqa: BLE001
+        logger.exception(
+            'Error notificando nota: resultado=%s estudiante=%s',
+            resultado.id, estudiante.correo,
+        )
+        return False, str(exc)
 
 
 def calcular_resultado(participacion: Participacion) -> Resultado:

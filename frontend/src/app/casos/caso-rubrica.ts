@@ -15,6 +15,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CriterioRubrica, NivelDesempeno, Rubrica } from '../core/models/casos.model';
 import { CasosService } from '../core/services/casos.service';
+import { UxService } from '../core/services/ux.service';
 
 function nuevoId(): string {
   return 'c' + Math.random().toString(36).slice(2, 8);
@@ -55,6 +56,7 @@ export class CasoRubricaPage implements OnInit {
   private readonly router = inject(Router);
   private readonly servicio = inject(CasosService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly guardando = signal(false);
@@ -101,9 +103,16 @@ export class CasoRubricaPage implements OnInit {
     this.rubrica.set({ ...rub, criterios: [...rub.criterios, c] });
   }
 
-  eliminarCriterio(idx: number): void {
+  async eliminarCriterio(idx: number): Promise<void> {
     const rub = this.rubrica();
-    if (!confirm(`¿Eliminar el criterio "${rub.criterios[idx].nombre || 'sin nombre'}"?`)) return;
+    const nombre = rub.criterios[idx].nombre || 'sin nombre';
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar criterio',
+      mensaje: `Se eliminará el criterio "${nombre}" y todos sus niveles.`,
+      variant: 'danger',
+      textoConfirmar: 'Eliminar',
+    });
+    if (!ok) return;
     const nuevos = rub.criterios.filter((_, i) => i !== idx);
     this.rubrica.set({ ...rub, criterios: nuevos });
   }
@@ -146,14 +155,17 @@ export class CasoRubricaPage implements OnInit {
     this.rubrica.set({ ...rub, criterios });
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
     const id = this.casoId();
     if (!id) return;
     if (!this.pesosOk()) {
-      const ok = confirm(
-        `La suma de pesos es ${this.sumaPesos()}, no 100. ` +
-        `Se guardará igual pero el cálculo de nota usará el modo plano. ¿Continuar?`,
-      );
+      const ok = await this.ux.confirm({
+        titulo: 'Los pesos no suman 100',
+        mensaje: `La suma actual es ${this.sumaPesos()}. Si guardas, el cálculo de nota usará un modo plano (promedio).`,
+        variant: 'warn',
+        textoConfirmar: 'Guardar igualmente',
+        icono: 'rule',
+      });
       if (!ok) return;
     }
     const r = this.rubrica();

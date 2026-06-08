@@ -26,7 +26,9 @@ from apps.usuarios.permissions import EsAdmin, EsDocenteOAdmin
 
 from .serializers import DocenteAdminSerializer, EventoActividadSerializer
 from .services import (
+    REPORTES_TEMATICOS,
     analitica_reportes,
+    datos_reporte_tematico,
     eventos_actividad,
     eventos_actividad_docente,
     filtrar_resultados,
@@ -396,3 +398,119 @@ def reporte_practica_excel(request, practica_id: int):
     )
     resp['Content-Disposition'] = f'attachment; filename="reporte-practica-{practica_id}.xlsx"'
     return resp
+
+
+# =============================================================================
+# Reportes temáticos (P1) — Participación, Desempeño, Respuestas, Tiempos,
+# Notas, Retroalimentaciones, Feedback pendiente.
+# =============================================================================
+
+def _renderizar_pdf(data: dict, filename: str) -> HttpResponse:
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=letter, title=data['titulo'])
+    styles = getSampleStyleSheet()
+    elements = [
+        Paragraph(f'<b>{data["titulo"]}</b>', styles['Title']),
+        Paragraph(data.get('subtitulo', ''), styles['Normal']),
+        Spacer(1, 14),
+    ]
+    if not data['filas']:
+        elements.append(Paragraph('<i>Aún no hay datos para este reporte.</i>', styles['Italic']))
+    else:
+        tabla_data = [data['columnas']] + [
+            [str(v) if v is not None else '—' for v in fila] for fila in data['filas']
+        ]
+        tbl = Table(tabla_data, repeatRows=1)
+        tbl.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f1f5f9')]),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        elements.append(tbl)
+    doc.build(elements)
+    resp = HttpResponse(buf.getvalue(), content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return resp
+
+
+def _renderizar_excel(data: dict, filename: str) -> HttpResponse:
+    wb = Workbook()
+    ws = wb.active
+    ws.title = data['titulo'][:30]
+    ws.append(data['columnas'])
+    for fila in data['filas']:
+        ws.append([v if v is not None else '' for v in fila])
+    buf = io.BytesIO()
+    wb.save(buf)
+    resp = HttpResponse(
+        buf.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return resp
+
+
+def _parse_filtros_tematico(request):
+    def _date(name):
+        raw = request.GET.get(name)
+        if not raw:
+            return None
+        try:
+            return datetime.strptime(raw, '%Y-%m-%d').date()
+        except ValueError:
+            return None
+
+    def _int(name):
+        raw = request.GET.get(name)
+        try:
+            return int(raw) if raw else None
+        except (TypeError, ValueError):
+            return None
+
+    return {
+        'desde': _date('desde'),
+        'hasta': _date('hasta'),
+        'materia_id': _int('materia_id'),
+        'grupo_id': _int('grupo_id'),
+        'estudiante_id': _int('estudiante_id'),
+    }
+
+
+@api_view(['GET'])
+@permission_classes([EsDocenteOAdmin])
+def reporte_tematico(request, tipo: str, formato: str):
+    """GET /api/reportes/tematico/{tipo}/{formato}/
+
+    `tipo`    ∈ participacion | desempeno | respuestas | tiempos | notas |
+                retroalimentaciones | feedback
+    `formato` ∈ pdf | excel
+    Filtros opcionales: ?desde=YYYY-MM-DD&hasta=YYYY-MM-DD&materia_id=&grupo_id=&estudiante_id=
+    """
+    tipo = (tipo or '').lower()
+    formato = (formato or '').lower()
+
+    if tipo not in REPORTES_TEMATICOS:
+        return Response(
+            {'detail': f'Tipo de reporte inválido: "{tipo}".',
+             'tipos_validos': list(REPORTES_TEMATICOS.keys())},
+            status=400,
+        )
+    if formato not in {'pdf', 'excel'}:
+        return Response(
+            {'detail': 'Formato inválido. Debe ser "pdf" o "excel".'},
+            status=400,
+        )
+
+    filtros = _parse_filtros_tematico(request)
+    data = datos_reporte_tematico(tipo, request.user, **filtros)
+    if data is None:
+        return Response({'detail': 'Tipo no soportado.'}, status=400)
+
+    ext = 'xlsx' if formato == 'excel' else 'pdf'
+    filename = f'reporte-{tipo}.{ext}'
+    return (_renderizar_excel if formato == 'excel' else _renderizar_pdf)(data, filename)

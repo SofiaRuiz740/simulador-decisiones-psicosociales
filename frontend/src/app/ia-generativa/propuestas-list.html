@@ -91,8 +91,8 @@
       <div class="panel__toolbar">
         <div class="toolbar">
           <div class="toolbar__filters">
-            <input type="search" placeholder="Buscar…" [(ngModel)]="filtroTexto" [ngModelOptions]="{standalone: true}" />
-            <select [(ngModel)]="filtroEstado" [ngModelOptions]="{standalone: true}">
+            <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" [ngModelOptions]="{standalone: true}" />
+            <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" [ngModelOptions]="{standalone: true}">
               <option value="">Todos</option>
               <option [value]="EstadoPropuestaIA.Borrador">Borrador</option>
               <option [value]="EstadoPropuestaIA.EnRevision">En revisión</option>

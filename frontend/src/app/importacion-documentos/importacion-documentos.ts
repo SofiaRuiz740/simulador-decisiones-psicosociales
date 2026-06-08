@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -9,7 +9,9 @@ import {
   ArchivoFuente,
   ExtrasService,
   ResultadoImportacion,
+  ResultadoImportacionRubrica,
 } from '../core/services/extras.service';
+import { CasosService } from '../core/services/casos.service';
 
 @Component({
   selector: 'app-importacion-documentos',
@@ -24,6 +26,7 @@ import {
 })
 export class ImportacionDocumentos {
   private readonly servicio = inject(ExtrasService);
+  private readonly casos = inject(CasosService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
 
@@ -32,6 +35,12 @@ export class ImportacionDocumentos {
   readonly tab = signal('caso');
   readonly resultadoEstudiantes = signal<ResultadoImportacion | null>(null);
   readonly resultadoGrupos = signal<ResultadoImportacion | null>(null);
+  readonly resultadoRubrica = signal<ResultadoImportacionRubrica | null>(null);
+  /** Problemas detectados al crear caso desde archivo (RF14/RN11). */
+  readonly problemasCasoCreado = signal<{ codigo: string; mensaje: string }[] | null>(null);
+  /** Casos del docente para el selector de rúbrica. */
+  readonly casosDisponibles = signal<{ id: number; nombre: string }[]>([]);
+  rubricaCasoId: number | null = null;
   nombreCasoVal = '';
   areaCasoVal = '';
 
@@ -39,6 +48,7 @@ export class ImportacionDocumentos {
     { id: 'caso', label: 'Caso' },
     { id: 'estudiantes', label: 'Estudiantes' },
     { id: 'grupos', label: 'Grupos' },
+    { id: 'rubrica', label: 'Rúbrica' },
     { id: 'plantillas', label: 'Plantillas' },
   ];
 
@@ -50,6 +60,11 @@ export class ImportacionDocumentos {
     { titulo: 'Guía de importación', formato: 'PDF', tipo: 'guia' as const },
     { titulo: 'Caso ejemplo', formato: 'DOCX', tipo: 'ejemplo' as const },
   ];
+
+  // Carga lazy de casos al entrar a la tab rúbrica.
+  private readonly _loadCasosOnRubrica = effect(() => {
+    if (this.tab() === 'rubrica') this.cargarCasosParaRubrica();
+  });
 
   readonly pasoActual = computed(() => {
     const a = this.archivo();
@@ -149,17 +164,78 @@ export class ImportacionDocumentos {
     const a = this.archivo();
     if (!a) return;
     this.loading.set(true);
+    this.problemasCasoCreado.set(null);
     this.servicio.crearCasoDesdeArchivo(a.id, this.nombreCasoVal, this.areaCasoVal).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.snackBar.open('Caso creado. Te llevamos al editor.', 'OK', { duration: 2500 });
-        this.router.navigate(['/casos', res.caso_id]);
+        this.snackBar.open('Caso creado en estado revisión.', 'OK', { duration: 2500 });
+        // Tras crear, validamos para mostrar lo que falta antes de redirigir.
+        this.casos.validarCaso(res.caso_id).subscribe({
+          next: (val) => {
+            this.problemasCasoCreado.set(val.problemas);
+            // Si el caso quedó bien, vamos al editor; si hay problemas, los mostramos
+            // en el panel para que el docente complete antes de seguir.
+            if (val.valido) {
+              this.router.navigate(['/casos', res.caso_id]);
+            } else {
+              this.snackBar.open(
+                `${val.problemas.length} elemento(s) por completar. Revisa el panel.`,
+                'Abrir caso',
+                { duration: 6000 },
+              ).onAction().subscribe(() => this.router.navigate(['/casos', res.caso_id]));
+            }
+          },
+          error: () => this.router.navigate(['/casos', res.caso_id]),
+        });
       },
       error: () => {
         this.loading.set(false);
         this.snackBar.open('No se pudo crear el caso.', 'OK', { duration: 3500 });
       },
     });
+  }
+
+  /** Carga la lista de casos cuando el docente entra a la tab Rúbrica. */
+  cargarCasosParaRubrica(): void {
+    if (this.casosDisponibles().length) return;
+    this.casos.listarCasos().subscribe({
+      next: (resp) => this.casosDisponibles.set(
+        resp.results.map((c) => ({ id: c.id, nombre: c.nombre })),
+      ),
+      error: () => this.snackBar.open(
+        'No se pudieron cargar los casos.', 'OK', { duration: 3500 },
+      ),
+    });
+  }
+
+  seleccionarRubrica(ev: Event): void {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file || !this.rubricaCasoId) {
+      this.snackBar.open(
+        'Selecciona primero un caso destino para asociar la rúbrica.',
+        'OK', { duration: 3500 },
+      );
+      (ev.target as HTMLInputElement).value = '';
+      return;
+    }
+    this.loading.set(true);
+    this.resultadoRubrica.set(null);
+    this.servicio.importarRubrica(this.rubricaCasoId, file).subscribe({
+      next: (res) => {
+        this.resultadoRubrica.set(res);
+        this.loading.set(false);
+        const msg = res.errores.length
+          ? `Importación parcial: ${res.criterios_importados} criterio(s) cargados, ${res.errores.length} error(es).`
+          : `${res.criterios_importados} criterio(s) importados a la rúbrica.`;
+        this.snackBar.open(msg, 'OK', { duration: 4500 });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        const msg = err?.error?.detail || err?.error?.archivo?.[0] || 'No se pudo importar la rúbrica.';
+        this.snackBar.open(msg, 'OK', { duration: 4500 });
+      },
+    });
+    (ev.target as HTMLInputElement).value = '';
   }
 
   descargarPlantilla(p: { titulo: string; tipo: 'estudiantes' | 'grupos' | 'caso' | 'rubrica' | 'guia' | 'ejemplo' }): void {

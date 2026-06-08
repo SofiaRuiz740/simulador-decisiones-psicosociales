@@ -52,8 +52,8 @@ export class Resultados implements OnInit {
   readonly retroResultado = signal<Resultado | null>(null);
 
   // Filtros
-  filtroTexto = '';
-  filtroPractica: string | '' = '';
+  readonly filtroTexto = signal('');
+  readonly filtroPractica = signal<string | ''>('');
 
   readonly practicasUnicas = computed(() => {
     const set = new Map<number, string>();
@@ -62,8 +62,8 @@ export class Resultados implements OnInit {
   });
 
   readonly filtrados = computed(() => {
-    const txt = (this.filtroTexto || '').toLowerCase().trim();
-    const prac = this.filtroPractica;
+    const txt = this.filtroTexto().toLowerCase().trim();
+    const prac = this.filtroPractica();
     return this.resultados().filter((r) => {
       if (prac && String(r.practica_id) !== prac) return false;
       if (!txt) return true;

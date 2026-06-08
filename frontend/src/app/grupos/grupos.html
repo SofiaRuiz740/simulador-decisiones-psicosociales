@@ -1,142 +1,94 @@
-<section class="page">
+<section class="module page">
 
-  <!-- HERO -->
-  <header class="hero anim-fade-up">
-    <div class="hero-cap">
-      <span class="edition-num">№ Gestión</span>
-      <span class="dot">·</span>
-      <span class="lbl">Grupos académicos</span>
-    </div>
-    <h1 class="hero-title display">
-      Agrupa estudiantes,
-      <em>simplifica</em> tus prácticas.
-    </h1>
-    <p class="hero-lead">
-      Organiza a tus estudiantes en grupos para asignar prácticas en lote.
-      Toca un grupo para ver y gestionar sus integrantes.
-    </p>
-
-    <div class="hero-stats">
-      <div class="stat">
-        <strong class="mono">{{ grupos().length }}</strong>
-        <span>Grupos</span>
-      </div>
-      <div class="stat">
-        <strong class="mono">{{ totalEstudiantes() }}</strong>
-        <span>Estudiantes</span>
-      </div>
-      <div class="stat">
-        <strong class="mono">{{ gruposVacios() }}</strong>
-        <span>Sin integrantes</span>
-      </div>
-    </div>
+  <header class="hero-glass">
+    <h1><em>Grupos</em></h1>
   </header>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <button mat-flat-button (click)="crear()" class="btn-create">
-      <mat-icon>add</mat-icon>
-      Crear grupo
-    </button>
-  </div>
-
-  @if (loading()) { <mat-progress-bar mode="indeterminate" class="prog" /> }
-
-  <!-- Empty state -->
-  @if (!loading() && grupos().length === 0) {
-    <div class="empty">
-      <div class="empty-glyph"><mat-icon>workspaces</mat-icon></div>
-      <h3 class="display">Aún no tienes <em>grupos</em></h3>
-      <p>Agrupa estudiantes para asignar prácticas en lote y mantener orden.</p>
-      <button mat-flat-button (click)="crear()" class="btn-create">
-        <mat-icon>add</mat-icon>
-        Crear el primer grupo
-      </button>
-    </div>
+  @if (!loading()) {
+    <section class="metrics">
+      <article class="metric">
+        <div class="metric__value">{{ grupos().length }}</div>
+        <div class="metric__label">Total grupos</div>
+      </article>
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ totalEstudiantes() }}</div>
+        <div class="metric__label">Estudiantes vinculados</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ gruposVacios() }}</div>
+        <div class="metric__label">Grupos sin integrantes</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ grupos().length - gruposVacios() }}</div>
+        <div class="metric__label">Grupos activos</div>
+      </article>
+    </section>
   }
 
-  <!-- Grid de grupos -->
-  <div class="grid">
-    @for (g of grupos(); track g.id) {
-      <article
-        class="grupo-card anim-fade-up"
-        [class.expanded]="grupoExpandidoId() === g.id"
-        [attr.data-size]="variantPor(g.estudiantes_count)"
-        (click)="expandir(g)">
+  <section class="panel">
+    <div class="panel__toolbar">
+      <div class="toolbar">
+        <div class="toolbar__filters">
+          <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
+        </div>
+        <button type="button" class="btn-primary" (click)="crear()">Crear grupo</button>
+      </div>
+    </div>
 
-        <!-- Ribbon lateral por variante -->
-        <span class="ribbon" aria-hidden="true"></span>
-
-        <header class="head">
-          <div class="head-icon">
-            <mat-icon>workspaces</mat-icon>
-          </div>
-          <div class="head-info">
-            <strong class="name">{{ g.nombre }}</strong>
-            <span class="meta">
-              <span class="mono">{{ g.estudiantes_count }}</span>
-              {{ g.estudiantes_count === 1 ? 'estudiante' : 'estudiantes' }}
-            </span>
-          </div>
-          <div class="head-actions">
-            <button mat-icon-button matTooltip="Editar" (click)="editar(g, $event)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button matTooltip="Eliminar" (click)="eliminar(g, $event)" class="btn-danger">
-              <mat-icon>delete_outline</mat-icon>
-            </button>
-          </div>
-        </header>
-
-        @if (g.descripcion) {
-          <p class="desc">{{ g.descripcion }}</p>
-        }
-
-        <!-- Hint expand cuando NO está expandido -->
-        @if (grupoExpandidoId() !== g.id) {
-          <div class="hint">
-            <mat-icon>expand_more</mat-icon>
-            <span>Ver integrantes</span>
-          </div>
-        }
-
-        <!-- Detalle expandido -->
-        @if (grupoExpandidoId() === g.id && detalle()) {
-          <div class="detalle anim-fade-up" (click)="$event.stopPropagation()">
-            <div class="det-head">
-              <span class="kicker-deep">Integrantes</span>
-              <button mat-stroked-button (click)="agregarEstudiantes()" class="btn-add">
-                <mat-icon>person_add</mat-icon>
-                Agregar
-              </button>
-            </div>
-
-            @if (detalle()!.estudiantes.length === 0) {
-              <p class="vacio">Este grupo aún no tiene integrantes.</p>
-            } @else {
-              <ul class="estu-list">
-                @for (e of detalle()!.estudiantes; track e.id) {
-                  <li>
-                    <span class="ava">{{ inicialesDe(e.nombre_completo, e.correo) }}</span>
-                    <div class="estu-info">
-                      <strong>{{ e.nombre_completo }}</strong>
-                      <span>{{ e.correo }}</span>
-                    </div>
-                    <button
-                      mat-icon-button
-                      class="btn-remove"
-                      matTooltip="Remover del grupo"
-                      (click)="removerEstudiante(e.id)">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  </li>
+    <div class="panel__body">
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (filtrados().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Aún no hay grupos</strong>
+          Crea un grupo para organizar estudiantes y asignar prácticas en lote.
+        </div>
+      } @else {
+        <div class="surface surface--flat">
+          @for (g of filtrados(); track g.id) {
+            <article class="list-row" [class.list-row--expanded]="grupoExpandidoId() === g.id">
+              <div (click)="expandir(g)" role="button" tabindex="0" (keyup.enter)="expandir(g)">
+                <div class="list-row__title">{{ g.nombre }}</div>
+                <div class="list-row__meta">{{ g.materia_display?.trim() || '—' }} · {{ g.periodo_display?.trim() || '—' }}</div>
+                @if (g.descripcion) {
+                  <div class="list-row__meta list-row__meta--sub">{{ g.descripcion }}</div>
                 }
-              </ul>
+              </div>
+              <div class="list-row__side">
+                <span class="badge badge--activo">Activo</span>
+                <div class="list-row__count">{{ g.estudiantes_count }}<span>est.</span></div>
+                <div class="actions actions--end">
+                  <button type="button" class="btn-ghost" (click)="editar(g, $event)">Editar</button>
+                  <button type="button" class="btn-ghost" (click)="eliminar(g, $event)">Eliminar</button>
+                  <button type="button" class="btn-ghost" (click)="expandir(g); $event.stopPropagation()">
+                    {{ grupoExpandidoId() === g.id ? 'Ocultar' : 'Integrantes' }}
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            @if (grupoExpandidoId() === g.id && detalle()) {
+              <div class="row-detail" (click)="$event.stopPropagation()">
+                @if (detalle()!.estudiantes.length === 0) {
+                  <p class="empty-inline">Este grupo aún no tiene integrantes.</p>
+                } @else {
+                  <ul class="integrantes-list">
+                    @for (e of detalle()!.estudiantes; track e.id) {
+                      <li>
+                        <strong>{{ e.nombre_completo }}</strong>
+                        <span>{{ e.correo }}</span>
+                        <button type="button" class="btn-ghost" (click)="removerEstudiante(e.id)">Quitar</button>
+                      </li>
+                    }
+                  </ul>
+                }
+                <button type="button" class="btn-secondary" (click)="agregarEstudiantes()">Agregar estudiantes</button>
+              </div>
             }
-          </div>
-        }
-      </article>
-    }
-  </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
 
 </section>

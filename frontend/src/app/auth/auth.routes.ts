@@ -12,14 +12,13 @@ export const AUTH_ROUTES: Routes = [
       },
       {
         path: 'login',
-        loadComponent: () => import('./login/login').then((m) => m.Login),
+        loadComponent: () => import('./auth-entry/auth-entry').then((m) => m.AuthEntry),
         title: 'Iniciar sesión · Simulador',
       },
       {
         path: 'registro-docente',
-        loadComponent: () =>
-          import('./registro-docente/registro-docente').then((m) => m.RegistroDocente),
-        title: 'Registro de docente · Simulador',
+        redirectTo: 'login?register=1',
+        pathMatch: 'full',
       },
     ],
   },

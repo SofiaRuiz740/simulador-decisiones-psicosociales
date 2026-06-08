@@ -19,6 +19,8 @@ export interface Usuario {
   nombre_completo: string;
   rol: Rol;
   date_joined?: string;
+  /** True si el docente guardó la clave Gmail para enviar invitaciones. */
+  correo_smtp_configurado?: boolean;
 }
 
 /** Respuesta del endpoint /api/auth/token/ de SimpleJWT. */

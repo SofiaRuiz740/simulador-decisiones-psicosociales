@@ -1,0 +1,66 @@
+<section class="module page">
+
+  <a routerLink="/ia-generativa" class="page-back">← Volver a IA generativa</a>
+
+  @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
+
+  @if (propuesta(); as p) {
+    <header class="hero-glass hero-glass--compact">
+      <div class="hero-glass__row">
+        <div>
+          <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
+          <h1><em>{{ p.titulo }}</em></h1>
+          <p class="hero-glass__meta">
+            <span>{{ p.tema }}</span>
+            <span>{{ p.nivel_dificultad }}</span>
+            <span>{{ p.numero_escenarios }} escenarios</span>
+            @if (!p.generada_con_llm) { <span>Plantilla pedagógica</span> }
+          </p>
+        </div>
+        <div class="actions actions--end">
+          @if (puedeEditar()) {
+            <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id, 'editar']">Editar</a>
+          }
+          @if (puedeAprobar()) {
+            <button type="button" class="btn-ghost" (click)="aprobar()">Aprobar</button>
+          }
+          @if (puedeRechazar()) {
+            <button type="button" class="btn-ghost" (click)="rechazar()">Rechazar</button>
+          }
+          @if (puedeConvertir()) {
+            <button type="button" class="btn-primary" (click)="convertir()">Convertir en caso</button>
+          }
+          @if (p.caso_resultante_id) {
+            <a class="btn-primary" [routerLink]="['/casos', p.caso_resultante_id]">Abrir caso</a>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (p.motivo_rechazo) {
+      <div class="surface surface--warn">
+        <strong>Motivo de rechazo</strong>
+        <p>{{ p.motivo_rechazo }}</p>
+      </div>
+    }
+
+    @if (p.objetivo_aprendizaje) {
+      <div class="builder-block builder-block--intro">
+        <div class="form-section__title">Objetivo de aprendizaje</div>
+        <p>{{ p.objetivo_aprendizaje }}</p>
+      </div>
+    }
+
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <h2 class="panel-title">Vista previa del caso</h2>
+        </div>
+      </div>
+      <div class="panel__body">
+        <app-game-preview [contenido]="p.contenido_json" />
+      </div>
+    </section>
+  }
+
+</section>

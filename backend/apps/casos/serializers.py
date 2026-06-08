@@ -2,7 +2,10 @@
 
 from rest_framework import serializers
 
+from apps.academico.validators import validar_materia_docente
+
 from .models import Caso, Escenario, Pregunta, Respuesta, Rubrica
+from .services import completitud_porcentaje
 
 
 class RespuestaSerializer(serializers.ModelSerializer):
@@ -76,7 +79,12 @@ class RubricaSerializer(serializers.ModelSerializer):
 
 class CasoListSerializer(serializers.ModelSerializer):
     docente_creador_username = serializers.CharField(source='docente_creador.username', read_only=True)
-    escenarios_count = serializers.SerializerMethodField()
+    escenarios_count = serializers.IntegerField(read_only=True)
+    preguntas_count = serializers.IntegerField(read_only=True)
+    tiene_rubrica = serializers.BooleanField(read_only=True)
+    rubrica_resumen = serializers.SerializerMethodField()
+    completitud_pct = serializers.SerializerMethodField()
+    materia_display = serializers.SerializerMethodField()
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
 
     class Meta:
@@ -84,17 +92,40 @@ class CasoListSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'nombre', 'descripcion', 'area_psicosocial',
             'tiempo_estimado_min', 'estado', 'estado_display',
-            'docente_creador', 'docente_creador_username',
-            'escenarios_count', 'fecha_creacion', 'fecha_actualizacion',
+            'docente_creador', 'docente_creador_username', 'materia',
+            'escenarios_count', 'preguntas_count', 'tiene_rubrica', 'rubrica_resumen',
+            'completitud_pct', 'materia_display',
+            'fecha_creacion', 'fecha_actualizacion',
         )
         read_only_fields = (
             'id', 'docente_creador', 'docente_creador_username',
-            'escenarios_count', 'estado_display',
+            'escenarios_count', 'preguntas_count', 'tiene_rubrica', 'rubrica_resumen',
+            'completitud_pct', 'materia_display', 'estado_display',
             'fecha_creacion', 'fecha_actualizacion',
         )
 
-    def get_escenarios_count(self, obj: Caso) -> int:
-        return obj.escenarios.count()
+    def validate_materia(self, value):
+        request = self.context.get('request')
+        if request:
+            validar_materia_docente(value, request.user)
+        return value
+
+    def get_rubrica_resumen(self, obj: Caso) -> str | None:
+        rub = getattr(obj, 'rubrica', None)
+        if rub is None:
+            return None
+        n = len(rub.criterios or [])
+        if n == 0:
+            return 'Sin criterios'
+        return f'{n} criterio{"s" if n != 1 else ""}'
+
+    def get_completitud_pct(self, obj: Caso) -> int:
+        return completitud_porcentaje(obj)
+
+    def get_materia_display(self, obj: Caso) -> str | None:
+        if obj.materia_id:
+            return obj.materia.nombre
+        return (obj.area_psicosocial or '').strip() or None
 
 
 class CasoDetalleSerializer(CasoListSerializer):

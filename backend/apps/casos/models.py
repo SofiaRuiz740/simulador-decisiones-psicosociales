@@ -30,6 +30,15 @@ class Caso(models.Model):
         related_name='casos_creados',
     )
 
+    materia = models.ForeignKey(
+        'academico.Materia',
+        verbose_name='materia',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='casos',
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 

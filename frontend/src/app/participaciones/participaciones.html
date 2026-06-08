@@ -1,0 +1,173 @@
+<section class="module page">
+  <header class="hero-glass">
+    <h1><em>Participaciones</em></h1>
+  </header>
+
+  <section class="metrics">
+    <article class="metric">
+      <div class="metric__value">{{ metricas().autorizados }}</div>
+      <div class="metric__label">Autorizados</div>
+    </article>
+    <article class="metric metric--accent">
+      <div class="metric__value">{{ metricas().en_curso }}</div>
+      <div class="metric__label">En curso</div>
+    </article>
+    <article class="metric metric--teal">
+      <div class="metric__value">{{ metricas().finalizados }}</div>
+      <div class="metric__label">Finalizados</div>
+    </article>
+    <article class="metric">
+      <div class="metric__value">{{ metricas().pendientes }}</div>
+      <div class="metric__label">Pendientes</div>
+    </article>
+  </section>
+
+  <nav class="tabs" aria-label="Secciones participaciones">
+    @for (t of tabs; track t.id) {
+      <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
+    }
+  </nav>
+
+  <div class="tab-panel" [class.active]="tab() === 'seguimiento'">
+    <section class="panel">
+      <div class="panel__body">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" />
+        } @else if (filas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin participaciones</strong>
+            Autoriza estudiantes en una práctica para ver el seguimiento aquí.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  @for (col of columnasSeguimiento; track col) {
+                    <th>{{ col }}</th>
+                  }
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of filas(); track f.autorizacion_id) {
+                  <tr>
+                    <td><strong>{{ f.estudiante_nombre }}</strong></td>
+                    <td>{{ f.practica_nombre }}</td>
+                    <td>{{ f.caso_nombre }}</td>
+                    <td><span [class]="badgeClass(f.estado)">{{ f.estado_display }}</span></td>
+                    <td>
+                      <div class="progress-inline">
+                        <div class="progress-bar progress-bar--inline">
+                          <div class="progress-bar__fill" [style.width.%]="f.progreso_pct"></div>
+                        </div>
+                        <span class="progress-inline__pct">{{ f.progreso_pct }}%</span>
+                      </div>
+                    </td>
+                    <td>{{ formatoTiempo(f.tiempo_usado_seg) }}</td>
+                    <td>{{ formatoTiempo(f.tiempo_restante_seg) }}</td>
+                    <td>{{ f.intentos }}</td>
+                    <td>{{ f.respondidas }}</td>
+                    <td class="col-actions">
+                      <button type="button" class="btn-ghost"
+                              (click)="verDetalle(f)"
+                              title="Ver caso de esta participación">
+                        Detalle
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <div class="tab-panel" [class.active]="tab() === 'simulacion'">
+    @if (!seleccionada()) {
+      <div class="empty-state-mockup">
+        <strong>Sin participación seleccionada</strong>
+        Ve a la pestaña <em>Seguimiento docente</em> y pulsa <em>Detalle</em>
+        en una fila para previsualizar el caso real que está respondiendo el
+        estudiante.
+      </div>
+    } @else if (cargandoCaso()) {
+      <mat-progress-bar mode="indeterminate" />
+    } @else if (!casoSeleccionado()) {
+      <div class="empty-state-mockup">
+        <strong>No se pudo cargar el caso</strong>
+        Verifica que el caso siga existiendo y que tengas permiso para verlo.
+        <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">Volver</button>
+      </div>
+    } @else if (casoSeleccionado(); as c) {
+      <div class="surface preview-real">
+        <header class="preview-real__head">
+          <div>
+            <h3>Vista previa del caso: {{ c.nombre }}</h3>
+            @if (resumenSeleccion(); as r) {
+              <p class="muted">
+                {{ r.estudiante }} · {{ r.practica }} · {{ r.escenarios }} escenario(s) · {{ r.preguntas }} pregunta(s).
+                Solo lectura: ningún cambio aquí afecta la participación del estudiante.
+              </p>
+            }
+          </div>
+          <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">
+            Cerrar vista
+          </button>
+        </header>
+
+        @if (c.contexto_historia) {
+          <div class="preview-real__contexto">
+            <strong>Contexto</strong>
+            <p>{{ c.contexto_historia }}</p>
+          </div>
+        }
+
+        @if (c.escenarios.length === 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            Este caso aún no tiene escenarios cargados.
+          </div>
+        }
+
+        @for (esc of c.escenarios; track esc.id) {
+          <article class="preview-real__esc">
+            <header>
+              <span class="badge">Escenario {{ esc.orden }}</span>
+              <h4>{{ esc.titulo }}</h4>
+            </header>
+            @if (esc.narrativa) {
+              <p class="preview-real__narrativa">{{ esc.narrativa }}</p>
+            }
+
+            @if (recursosVisibles(esc.recursos_multimedia).length) {
+              <div class="preview-real__medios">
+                @for (r of recursosVisibles(esc.recursos_multimedia); track $index) {
+                  <span class="preview-real__media-pill">
+                    {{ r.tipo === 'imagen' ? '🖼️' : r.tipo === 'audio' ? '🔊' : '🎬' }}
+                    {{ r.titulo || r.url }}
+                  </span>
+                }
+              </div>
+            }
+
+            @for (preg of esc.preguntas; track preg.id; let pi = $index) {
+              <section class="preview-real__pregunta">
+                <p><strong>P{{ pi + 1 }}.</strong> {{ preg.enunciado }}</p>
+                <ul class="preview-real__respuestas">
+                  @for (resp of preg.respuestas; track resp.id) {
+                    <li [class.correcta]="resp.es_correcta">
+                      {{ resp.texto }}
+                      @if (resp.es_correcta) { <span class="check">✓ correcta</span> }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>

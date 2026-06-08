@@ -1,0 +1,10 @@
+.page {
+  padding-bottom: 0;
+}
+
+.toolbar__filters input:disabled,
+.toolbar__filters select:disabled,
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

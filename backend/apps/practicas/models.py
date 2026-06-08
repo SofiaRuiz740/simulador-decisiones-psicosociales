@@ -32,6 +32,22 @@ class Practica(models.Model):
         on_delete=models.PROTECT,
         related_name='practicas',
     )
+    materia = models.ForeignKey(
+        'academico.Materia',
+        verbose_name='materia',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='practicas',
+    )
+    grupo = models.ForeignKey(
+        'academico.Grupo',
+        verbose_name='grupo',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='practicas',
+    )
     fecha_inicio = models.DateTimeField('fecha y hora de inicio')
     fecha_fin = models.DateTimeField('fecha y hora de finalización')
     tiempo_max_min = models.PositiveIntegerField('tiempo máximo de participación (min)', default=30)
@@ -63,6 +79,9 @@ class AutorizacionEstudiante(models.Model):
     codigo_acceso = models.CharField('código de acceso', max_length=16, unique=True)
     notificado = models.BooleanField('notificado', default=False)
     reintento_autorizado = models.BooleanField('puede reintentar', default=False)
+    revocada = models.BooleanField('autorización revocada', default=False)
+    revocada_en = models.DateTimeField('fecha de revocación', null=True, blank=True)
+    revocada_motivo = models.CharField('motivo de revocación', max_length=300, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:

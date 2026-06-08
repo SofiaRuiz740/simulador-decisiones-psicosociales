@@ -4,9 +4,11 @@ import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Paginated } from '../models/academico.model';
 import {
+  MetricasParticipacion,
   Participacion,
   ProgresoParticipacion,
   Resultado,
+  SeguimientoParticipacion,
 } from '../models/practicas.model';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +35,19 @@ export class SimulacionService {
   }
   progreso(id: number) {
     return this.http.get<ProgresoParticipacion>(`${this.api}/participaciones/${id}/progreso/`);
+  }
+
+  listarSeguimiento(params?: { practica?: number; estado?: string }) {
+    const q = new URLSearchParams();
+    if (params?.practica) q.set('practica', String(params.practica));
+    if (params?.estado) q.set('estado', params.estado);
+    const qs = q.toString();
+    const url = qs ? `${this.api}/participaciones/?${qs}` : `${this.api}/participaciones/`;
+    return this.http.get<SeguimientoParticipacion[]>(url);
+  }
+
+  metricasSeguimiento() {
+    return this.http.get<MetricasParticipacion>(`${this.api}/participaciones/metricas/`);
   }
 
   // Resultados

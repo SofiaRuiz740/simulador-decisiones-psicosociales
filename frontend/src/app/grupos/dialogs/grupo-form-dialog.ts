@@ -1,18 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, inject, signal } from '@angular/core';
+import { Component, Inject, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AcademicoService } from '../../core/services/academico.service';
-import { Grupo } from '../../core/models/academico.model';
+import { Grupo, Materia } from '../../core/models/academico.model';
 
 interface DialogData {
   grupo?: Grupo;
@@ -21,60 +15,57 @@ interface DialogData {
 @Component({
   selector: 'app-grupo-form-dialog',
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatProgressBarModule,
+    CommonModule, ReactiveFormsModule,
+    MatDialogModule, MatButtonModule, MatProgressBarModule,
   ],
   template: `
-    <h2 mat-dialog-title>{{ esEdicion ? 'Editar grupo' : 'Crear grupo' }}</h2>
+    <div class="mockup-dialog__shell">
+      <h2 class="mockup-dialog__title">{{ esEdicion ? 'Editar grupo' : 'Crear grupo' }}</h2>
+      @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
 
-    @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
-
-    <mat-dialog-content>
-      <form [formGroup]="form" class="form">
-        <mat-form-field appearance="outline">
-          <mat-label>Nombre del grupo</mat-label>
-          <input matInput formControlName="nombre" required maxlength="150" />
-          @if (form.controls.nombre.touched && form.controls.nombre.hasError('required')) {
-            <mat-error>El nombre es obligatorio.</mat-error>
-          }
-          @for (e of fieldErrors('nombre'); track e) { <mat-error>{{ e }}</mat-error> }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Descripción</mat-label>
-          <textarea matInput formControlName="descripcion" rows="3"></textarea>
-          @for (e of fieldErrors('descripcion'); track e) { <mat-error>{{ e }}</mat-error> }
-        </mat-form-field>
+      <form [formGroup]="form" class="form-grid">
+        <div class="form-group full">
+          <label>Nombre del grupo</label>
+          <input formControlName="nombre" required maxlength="150" />
+          @for (e of fieldErrors('nombre'); track e) { <span class="field-error">{{ e }}</span> }
+        </div>
+        <div class="form-group full">
+          <label>Materia</label>
+          <select formControlName="materia">
+            <option [ngValue]="null">— Sin materia —</option>
+            @for (m of materias(); track m.id) {
+              <option [ngValue]="m.id">{{ m.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Periodo</label>
+          <input formControlName="periodo" maxlength="50" placeholder="Ej. 2026-1" />
+        </div>
+        <div class="form-group full">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion" rows="3"></textarea>
+        </div>
       </form>
-    </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="cerrar()">Cancelar</button>
-      <button mat-flat-button color="primary"
-        [disabled]="form.invalid || loading()" (click)="guardar()">
-        {{ esEdicion ? 'Guardar' : 'Crear' }}
-      </button>
-    </mat-dialog-actions>
+      <div class="mockup-dialog__actions">
+        <button type="button" class="btn-secondary" (click)="cerrar()">Cancelar</button>
+        <button type="button" class="btn-primary" [disabled]="form.invalid || loading()" (click)="guardar()">
+          {{ esEdicion ? 'Guardar' : 'Crear' }}
+        </button>
+      </div>
+    </div>
   `,
-  styles: [
-    `
-      .form { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.5rem; min-width: min(440px, 90vw); }
-    `,
-  ],
+  styles: [`.field-error { font-size: 0.75rem; color: var(--app-danger); }`],
 })
-export class GrupoFormDialog {
+export class GrupoFormDialog implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly servicio = inject(AcademicoService);
   private readonly dialogRef = inject(MatDialogRef<GrupoFormDialog>);
 
   readonly loading = signal(false);
+  readonly materias = signal<Materia[]>([]);
   readonly serverErrors = signal<Record<string, string[]>>({});
-
   readonly esEdicion: boolean;
   readonly form;
 
@@ -82,7 +73,15 @@ export class GrupoFormDialog {
     this.esEdicion = !!data.grupo;
     this.form = this.fb.nonNullable.group({
       nombre: [data.grupo?.nombre ?? '', [Validators.required, Validators.maxLength(150)]],
+      materia: [data.grupo?.materia ?? null as number | null],
+      periodo: [data.grupo?.periodo ?? ''],
       descripcion: [data.grupo?.descripcion ?? ''],
+    });
+  }
+
+  ngOnInit(): void {
+    this.servicio.listarMaterias().subscribe({
+      next: (resp) => this.materias.set(resp.results.filter((m) => m.activo)),
     });
   }
 
@@ -95,7 +94,6 @@ export class GrupoFormDialog {
     this.loading.set(true);
     this.serverErrors.set({});
     const payload = this.form.getRawValue();
-
     const obs$ = this.esEdicion
       ? this.servicio.actualizarGrupo(this.data.grupo!.id, payload)
       : this.servicio.crearGrupo(payload);
@@ -109,14 +107,10 @@ export class GrupoFormDialog {
     });
   }
 
-  cerrar(): void {
-    this.dialogRef.close(null);
-  }
+  cerrar(): void { this.dialogRef.close(null); }
 
   private parse(body: unknown): Record<string, string[]> {
-    if (!body || typeof body !== 'object') {
-      return { non_field_errors: ['Error inesperado.'] };
-    }
+    if (!body || typeof body !== 'object') return { non_field_errors: ['Error inesperado.'] };
     const out: Record<string, string[]> = {};
     for (const [k, v] of Object.entries(body)) {
       out[k] = Array.isArray(v) ? (v as string[]) : [String(v)];

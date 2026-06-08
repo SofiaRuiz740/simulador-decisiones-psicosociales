@@ -9,12 +9,14 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 
-import { Escenario, Pregunta, Respuesta } from '../core/models/casos.model';
+import { Escenario, Pregunta, RecursoMultimedia, Respuesta } from '../core/models/casos.model';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   EstadoParticipacion,
   Participacion,
 } from '../core/models/practicas.model';
 import { SimulacionService } from '../core/services/simulacion.service';
+import { UxService } from '../core/services/ux.service';
 
 interface PaginaSimulacion {
   tipo: 'intro' | 'escenario';
@@ -25,8 +27,7 @@ interface PaginaSimulacion {
   selector: 'app-simulacion',
   imports: [
     CommonModule, RouterLink,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatProgressBarModule, MatRadioModule, MatSnackBarModule,
+    MatProgressBarModule, MatSnackBarModule,
   ],
   templateUrl: './simulacion.html',
   styleUrl: './simulacion.scss',
@@ -65,6 +66,8 @@ export class Simulacion implements OnInit, OnDestroy {
   private readonly servicio = inject(SimulacionService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly loading = signal(true);
   readonly errorInicio = signal<string | null>(null);
@@ -140,22 +143,20 @@ export class Simulacion implements OnInit, OnDestroy {
   }
 
   private iniciarTimer(p: Participacion) {
-    const practicaActiva = JSON.parse(localStorage.getItem('simulador.practica_activa') || '{}');
-    const tiempoMaxMin: number = practicaActiva.tiempo_max_min || 30;
-    const inicio = p.inicio ? new Date(p.inicio).getTime() : Date.now();
-    const finEsperado = inicio + tiempoMaxMin * 60 * 1000;
-
-    const tick = () => {
-      const restante = Math.max(0, Math.floor((finEsperado - Date.now()) / 1000));
-      this.tiempoRestanteSeg.set(restante);
-      if (restante <= 0) {
-        clearInterval(this.timerInterval);
-        this.snackBar.open('Tiempo agotado. Finalizando…', 'OK', { duration: 3000 });
-        this.finalizar(true);
-      }
+    const sync = () => {
+      this.servicio.progreso(p.id).subscribe({
+        next: (prog) => {
+          this.tiempoRestanteSeg.set(prog.tiempo_restante_seg);
+          if (prog.tiempo_restante_seg <= 0 && prog.estado === 'EN_CURSO') {
+            if (this.timerInterval) clearInterval(this.timerInterval);
+            this.snackBar.open('Tiempo agotado. Finalizando…', 'OK', { duration: 3000 });
+            this.finalizar(true);
+          }
+        },
+      });
     };
-    tick();
-    this.timerInterval = setInterval(tick, 1000);
+    sync();
+    this.timerInterval = setInterval(sync, 1000);
   }
 
   tiempoFormato(): string {
@@ -193,11 +194,20 @@ export class Simulacion implements OnInit, OnDestroy {
     }
   }
 
-  finalizar(forzado = false) {
+  async finalizar(forzado = false): Promise<void> {
     const p = this.participacion();
     if (!p) return;
     if (p.estado === EstadoParticipacion.Finalizada) return;
-    if (!forzado && !confirm('¿Finalizar la práctica? No podrás cambiar respuestas después.')) return;
+    if (!forzado) {
+      const ok = await this.ux.confirm({
+        titulo: '¿Listo para entregar?',
+        mensaje: 'Una vez entregues, no podrás cambiar tus decisiones. Tu docente recibirá los resultados.',
+        variant: 'info',
+        textoConfirmar: 'Entregar práctica',
+        icono: 'flag',
+      });
+      if (!ok) return;
+    }
     this.servicio.finalizar(p.id).subscribe({
       next: (res) => {
         if (this.timerInterval) clearInterval(this.timerInterval);
@@ -205,5 +215,49 @@ export class Simulacion implements OnInit, OnDestroy {
       },
       error: () => this.snackBar.open('No se pudo finalizar.', 'OK', { duration: 3500 }),
     });
+  }
+
+  /**
+   * Devuelve los recursos del escenario normalizados como objetos con tipo
+   * detectado (heurística por extensión si vienen como string puro).
+   */
+  recursosVisibles(esc: Escenario): RecursoMultimedia[] {
+    const lista = esc?.recursos_multimedia || [];
+    return lista
+      .map((r): RecursoMultimedia => {
+        if (typeof r === 'string') {
+          return { tipo: this.detectarTipo(r), url: r };
+        }
+        return r;
+      })
+      .filter((r) => !!r.url?.trim());
+  }
+
+  private detectarTipo(url: string): RecursoMultimedia['tipo'] {
+    const u = url.toLowerCase();
+    if (/\.(mp3|wav|ogg|m4a|aac)(\?|$)/.test(u)) return 'audio';
+    if (/\.(mp4|webm|mov|ogv|mkv)(\?|$)/.test(u) || this.esEmbed(url)) return 'video';
+    return 'imagen';
+  }
+
+  /** True si la URL es un embed reconocido (YouTube, Vimeo, Loom). */
+  esEmbed(url: string): boolean {
+    if (!url) return false;
+    return /(?:youtube\.com|youtu\.be|vimeo\.com|loom\.com)/i.test(url);
+  }
+
+  /** Convierte URL pública a forma embed segura (whitelist: YouTube/Vimeo/Loom). */
+  urlSegura(url: string): SafeResourceUrl {
+    let embedUrl = url;
+    // YouTube
+    const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^?&/]+)/);
+    if (yt) embedUrl = `https://www.youtube.com/embed/${yt[1]}`;
+    // Vimeo
+    const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vm) embedUrl = `https://player.vimeo.com/video/${vm[1]}`;
+    // Loom
+    const lm = url.match(/loom\.com\/share\/([a-f0-9]+)/);
+    if (lm) embedUrl = `https://www.loom.com/embed/${lm[1]}`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
 }

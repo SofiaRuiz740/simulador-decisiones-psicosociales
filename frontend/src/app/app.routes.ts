@@ -49,6 +49,13 @@ export const routes: Routes = [
         data: { roles: [Rol.Admin] },
       },
       {
+        path: 'panel-estudiante',
+        loadChildren: () =>
+          import('./panel-estudiante/panel-estudiante.routes').then((m) => m.PANEL_ESTUDIANTE_ROUTES),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Estudiante] },
+      },
+      {
         path: 'docente',
         loadChildren: () =>
           import('./docente/docente.routes').then((m) => m.DOCENTE_ROUTES),
@@ -65,6 +72,12 @@ export const routes: Routes = [
       {
         path: 'grupos',
         loadChildren: () => import('./grupos/grupos.routes').then((m) => m.GRUPOS_ROUTES),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Docente, Rol.Admin] },
+      },
+      {
+        path: 'materias',
+        loadChildren: () => import('./materias/materias.routes').then((m) => m.MATERIAS_ROUTES),
         canActivate: [roleGuard],
         data: { roles: [Rol.Docente, Rol.Admin] },
       },
@@ -104,7 +117,7 @@ export const routes: Routes = [
             (m) => m.PARTICIPACIONES_ROUTES,
           ),
         canActivate: [roleGuard],
-        data: { roles: [Rol.Docente, Rol.Estudiante] },
+        data: { roles: [Rol.Docente, Rol.Admin] },
       },
       {
         path: 'resultados',

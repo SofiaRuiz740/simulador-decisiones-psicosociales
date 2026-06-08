@@ -1,0 +1,121 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  background: #0f172a;
+}
+
+:host:not(:has(> app-estudiante-shell)) {
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+:host > app-estudiante-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: calc(100dvh - 4.75rem);
+  height: calc(100dvh - 4.75rem);
+  max-height: calc(100dvh - 4.75rem);
+}
+
+.simulacion-carga,
+.simulacion-error {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  background: #f3f1ec;
+  color: #475569;
+  text-align: center;
+}
+
+.simulacion-error mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #b45309;
+}
+
+.simulacion-viewport {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  isolation: isolate;
+  background: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.12);
+}
+
+.simulacion-viewport.intro-activa {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.simulacion-viewport:fullscreen,
+.simulacion-viewport:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  max-height: none;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.control-ambiente-intro {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 50;
+}
+
+.simulacion-stage {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  justify-content: stretch;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.simulacion-stage-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.simulacion-stage-canvas app-exploracion-visual,
+.simulacion-stage-canvas app-introduccion-narrativa {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+@media (max-width: 900px) {
+  .simulacion-viewport {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}

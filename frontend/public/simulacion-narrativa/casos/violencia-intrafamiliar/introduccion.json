@@ -1,0 +1,33 @@
+{
+  "id": "intro-violencia-intrafamiliar",
+  "casoId": "violencia-intrafamiliar",
+  "version": "1.1.0",
+  "duracionEscenaMs": 5000,
+  "duracionTransicionFinalMs": 2000,
+  "advertencia": {
+    "titulo": "CONTENIDO SENSIBLE",
+    "texto": "Esta práctica académica aborda situaciones relacionadas con violencia intrafamiliar, conflictos familiares y vulneración de derechos.\n\nNo se mostrarán escenas explícitas de violencia.\n\nLas situaciones presentadas tienen fines exclusivamente educativos y formativos para el análisis psicosocial de casos.\n\nSe recomienda discreción durante el desarrollo de la actividad.",
+    "botonAceptar": "Aceptar y continuar"
+  },
+  "escenas": [
+    {
+      "imagen": "escenarios/fondo1.png",
+      "texto": "Barrio El Progreso — 10:47 p.m."
+    },
+    {
+      "imagen": "escenarios/fondo2.png",
+      "texto": "Los vecinos reportan una situación de conflicto al interior de una vivienda."
+    },
+    {
+      "imagen": "escenarios/fondo3.png",
+      "texto": "La víctima es trasladada para recibir atención médica."
+    }
+  ],
+  "transicionFinal": {
+    "lineas": [
+      "HOSPITAL SAN JOSÉ",
+      "Área de Urgencias",
+      "Psicólogo Investigador Asignado"
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "id": "revisita-lucia-informe",
+  "titulo": "Acercamiento a la paciente en UCI",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "lucia",
+  "nodoInicialId": "saludo-revisita",
+  "noConsumeConversacionUtil": true,
+  "requisitosAcceso": [
+    {
+      "tipo": "evidencia_descubierta",
+      "parametros": { "evidenciaId": "informe-urgencias" }
+    }
+  ],
+  "requisitosRevisita": [
+    {
+      "tipo": "evidencia_descubierta",
+      "parametros": { "evidenciaId": "informe-urgencias" }
+    }
+  ],
+  "nodos": [
+    {
+      "id": "saludo-revisita",
+      "emisor": "narrador",
+      "texto": "La paciente abre los ojos un momento. El monitor cardíaco marca un ritmo estable. Respira con dificultad.",
+      "siguienteNodoId": "lucia-semiconsciente"
+    },
+    {
+      "id": "lucia-semiconsciente",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "¿Mi hija…? No la veo…",
+      "siguienteNodoId": "decision-noticia-hija"
+    },
+    {
+      "id": "decision-noticia-hija",
+      "emisor": "jugador",
+      "texto": "Cómo responder sobre la menor fallecida",
+      "opciones": [
+        {
+          "id": "informar-con-contencion",
+          "texto": "Informar con claridad y contención sobre el fallecimiento de su hija.",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "lucia-duelo",
+          "modificadoresMetricas": { "confianza": 8, "ansiedad": 5 }
+        },
+        {
+          "id": "posponer-noticia",
+          "texto": "Posponer la noticia hasta estabilizar emocionalmente y centrarse en su estado actual.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "lucia-suspira"
+        },
+        {
+          "id": "evadir-noticia",
+          "texto": "Desviar la pregunta hacia el informe médico sin responder sobre la niña.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-sospecha",
+          "modificadoresMetricas": { "confianza": -8 }
+        }
+      ]
+    },
+    {
+      "id": "lucia-duelo",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "No… no puede ser… Yo trataba de protegerla…",
+      "siguienteNodoId": "decision-informe"
+    },
+    {
+      "id": "lucia-suspira",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Estoy muy cansada… ¿Por qué me duele tanto la cabeza?",
+      "siguienteNodoId": "decision-informe"
+    },
+    {
+      "id": "lucia-sospecha",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "¿Por qué no me responde sobre mi hija? ¿Pasó algo?",
+      "siguienteNodoId": "decision-informe"
+    },
+    {
+      "id": "decision-informe",
+      "emisor": "jugador",
+      "texto": "Cómo abordar el informe de urgencias",
+      "opciones": [
+        {
+          "id": "explorar-con-empatia",
+          "texto": "«Revisé el informe. Quiero entender qué ocurrió ese día, a su ritmo.»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "cierre-revisita"
+        },
+        {
+          "id": "explorar-hechos",
+          "texto": "«El informe menciona lesiones compatibles con defensa. ¿Recuerda ese momento?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-revisita"
+        },
+        {
+          "id": "confrontar-version",
+          "texto": "«El relato de caída accidental no coincide con las lesiones. Necesito la verdad.»",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "cierre-revisita",
+          "modificadoresMetricas": { "confianza": -12, "colaboracion": -8 }
+        }
+      ]
+    },
+    {
+      "id": "cierre-revisita",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Él empujó… yo traté de cubrirme… No quiero que le pase algo a mi familia por hablar.",
+      "testimonio": {
+        "id": "testimonio-lucia-revisita-empujon",
+        "tema": "mecanismo_lesion",
+        "valor": "empujon_agresion",
+        "descripcion": "En UCI confirma empujón durante agresión",
+        "personajeId": "lucia"
+      },
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "revisita-lucia-informe" }
+        }
+      ]
+    }
+  ]
+}

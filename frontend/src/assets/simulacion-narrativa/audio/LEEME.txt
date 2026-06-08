@@ -1,0 +1,24 @@
+Pistas de ambientación sonora
+=============================
+
+Coloque aquí las pistas instrumentales en loop:
+
+  ambiente-hospital.mp3   (obligatoria — simulación clínica)
+  ambiente-intro.mp3      (opcional — introducción narrativa)
+
+Recomendaciones de perfil sonoro:
+- Piano ambiental suave, pads, cuerdas discretas.
+- Texturas hospitalarias muy ligeras (sin alarmas ni beeps).
+- Seriedad, reflexión y sensibilidad humana.
+- Evitar suspenso exagerado, terror, drama épico o tristeza invasiva.
+- Duración mínima 2–4 minutos con puntos de loop limpios.
+- Formato MP3, 128–192 kbps.
+
+Comportamiento del reproductor:
+- Volumen por defecto: 13 % (rango ajustable 10–30 %).
+- Fade-in de 2,5 s al iniciar.
+- Crossfade de 1,75 s al pasar de intro → hospital (si hay pista distinta).
+- Crossfade interno de 2 s para ocultar el loop.
+- Modulación de volumen muy sutil (~±2 %) para evitar repetición evidente.
+
+Si ambiente-hospital.mp3 no está presente, se usa una capa sintética suave como respaldo.

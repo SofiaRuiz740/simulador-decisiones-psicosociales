@@ -1,0 +1,40 @@
+<div class="exploracion" [class.entrevista-activa]="!!conversacionActivaId()">
+  @if (cargandoEscenas()) {
+    <div class="exploracion-carga">
+      <mat-progress-bar mode="indeterminate" />
+      <p>Preparando escena…</p>
+    </div>
+  }
+
+  @if (escenaActual(); as escena) {
+    <header class="exploracion-hud">
+      <div class="hud-ubicacion">
+        <h1>{{ escena.titulo }}</h1>
+      </div>
+      @if (tiempoNarrativo(); as tiempo) {
+        <div class="hud-tiempo">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ tiempo }}</span>
+        </div>
+      }
+    </header>
+
+    <app-escena-visual
+      [escena]="escena"
+      [conversacionActivaId]="conversacionActivaId()"
+      (abrirConversacion)="abrirConversacion($event)"
+      (abrirDocumento)="abrirDocumento($event)"
+      (mensaje)="mostrarMensaje($event)" />
+  }
+
+  @if (evidenciaAbierta(); as evidencia) {
+    <app-documento-evidencia [evidencia]="evidencia" (cerrar)="cerrarDocumento()" />
+  }
+
+  @if (conversacionActivaId(); as conversacionId) {
+    <app-dialogo-narrativo
+      [conversacionId]="conversacionId"
+      [modoAcercamiento]="modoAcercamiento()"
+      (cerrar)="cerrarConversacion()" />
+  }
+</div>

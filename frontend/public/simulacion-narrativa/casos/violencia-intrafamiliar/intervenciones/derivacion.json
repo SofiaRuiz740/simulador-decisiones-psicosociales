@@ -1,0 +1,39 @@
+{
+  "id": "derivacion",
+  "titulo": "Derivación a servicios especializados",
+  "descripcion": "Coordinar derivación a equipo de violencia de género y valoración legal si la usuaria lo autoriza.",
+  "tipo": "derivacion",
+  "enfoqueTeorico": "Trabajo en red interinstitucional",
+  "pasos": [
+    {
+      "orden": 1,
+      "descripcion": "Informar opciones de derivación y consentimiento informado."
+    },
+    {
+      "orden": 2,
+      "descripcion": "Contactar servicio especializado con acompañamiento."
+    }
+  ],
+  "personajesObjetivo": ["lucia"],
+  "requisitosActivacion": [
+    {
+      "tipo": "o",
+      "condiciones": [
+        {
+          "tipo": "hipotesis_formulada",
+          "parametros": { "hipotesisId": "riesgo-escalada" }
+        },
+        {
+          "tipo": "contradiccion_identificada",
+          "parametros": { "contradiccionId": "version-agresion" }
+        }
+      ]
+    }
+  ],
+  "efectosNarrativos": [
+    {
+      "tipo": "establecer_flag",
+      "parametros": { "clave": "derivacion_activada", "valor": true }
+    }
+  ]
+}

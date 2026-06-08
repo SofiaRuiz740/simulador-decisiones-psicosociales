@@ -1,0 +1,82 @@
+{
+  "id": "entrevista-policia-entrada",
+  "titulo": "Funcionario en el acceso",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "policia",
+  "nodoInicialId": "apertura",
+  "cuentaComoUtil": true,
+  "nodos": [
+    {
+      "id": "apertura",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Estamos tomando antecedentes del ingreso. ¿Usted viene en representación del servicio de salud mental?",
+      "siguienteNodoId": "decision-enfoque"
+    },
+    {
+      "id": "decision-enfoque",
+      "emisor": "jugador",
+      "texto": "Cómo iniciar el contacto institucional",
+      "opciones": [
+        {
+          "id": "presentar-rol-clinico",
+          "texto": "«Soy psicóloga del equipo. Necesito comprender qué ocurrió antes del traslado.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "policia-contexto"
+        },
+        {
+          "id": "priorizar-seguridad",
+          "texto": "«Primero quiero saber si hay riesgo inmediato para la paciente o la familia presente.»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "policia-riesgo",
+          "modificadoresMetricas": { "confianza": 5 }
+        }
+      ]
+    },
+    {
+      "id": "policia-contexto",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "El agresor presunto fue identificado. Hay versión de forcejeo doméstico, pero la familia minimiza.",
+      "siguienteNodoId": "decision-registro"
+    },
+    {
+      "id": "policia-riesgo",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "No hay detenido en el hospital. Recomendamos no informar ubicación de la paciente a terceros no autorizados.",
+      "siguienteNodoId": "decision-registro"
+    },
+    {
+      "id": "decision-registro",
+      "emisor": "jugador",
+      "texto": "Qué hacer con la información policial",
+      "opciones": [
+        {
+          "id": "solicitar-registro-formal",
+          "texto": "Pedir acceso al registro preliminar para contrastarlo con la historia clínica.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-policia"
+        },
+        {
+          "id": "posponer-registro",
+          "texto": "Agradecer y continuar la evaluación clínica antes de revisar el registro.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-policia"
+        }
+      ]
+    },
+    {
+      "id": "cierre-policia",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Queda anotado. Si surge nueva información de riesgo, avísenos de inmediato.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "entrevista-policia-entrada" }
+        }
+      ]
+    }
+  ]
+}

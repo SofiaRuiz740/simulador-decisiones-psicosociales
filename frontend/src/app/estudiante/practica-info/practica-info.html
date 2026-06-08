@@ -1,0 +1,98 @@
+@if (practica(); as p) {
+  <app-estudiante-shell [titulo]="p.nombre">
+    <header class="page-header">
+      <a routerLink="/estudiante/practicas" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Mis prácticas
+      </a>
+      <h1>{{ p.nombre }}</h1>
+      <p class="subtitulo">{{ subtituloCaso() }}</p>
+    </header>
+
+    <div class="layout">
+      <section class="info-card elevated-card">
+        <h2>Información de la práctica</h2>
+
+        <dl class="datos">
+          <div>
+            <dt>Estado</dt>
+            <dd>{{ etiquetaEstado(p.progreso.estado) }}</dd>
+          </div>
+          <div>
+            <dt>Caso académico</dt>
+            <dd>{{ p.caso_nombre }}</dd>
+          </div>
+          <div>
+            <dt>Tiempo estimado</dt>
+            <dd>{{ p.tiempo_max_min }} minutos</dd>
+          </div>
+          <div>
+            <dt>Fecha de asignación</dt>
+            <dd>{{ p.fecha_inicio | date:'fullDate' }}</dd>
+          </div>
+          <div>
+            <dt>Fecha límite</dt>
+            <dd>{{ p.fecha_fin | date:'fullDate' }}</dd>
+          </div>
+        </dl>
+
+        @if (p.mensaje_personalizado) {
+          <div class="mensaje-docente">
+            <mat-icon>mail</mat-icon>
+            <div>
+              <strong>Mensaje del docente</strong>
+              <p>{{ p.mensaje_personalizado }}</p>
+            </div>
+          </div>
+        }
+
+        <div class="progreso">
+          <div class="progreso-head">
+            <span>Progreso registrado</span>
+            <strong>{{ p.progreso.porcentaje }}%</strong>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="p.progreso.porcentaje" />
+          @if (p.progreso.conversacionesTotales > 0) {
+            <p class="progreso-detalle">
+              {{ p.progreso.conversacionesCompletadas }} de
+              {{ p.progreso.conversacionesTotales }} entrevistas exploradas
+            </p>
+          }
+        </div>
+      </section>
+
+      <aside class="acciones-card elevated-card">
+        <h2>Iniciar actividad</h2>
+        <p>
+          La simulación narrativa se abrirá dentro de la plataforma. Podrás activar
+          pantalla completa cuando quieras una experiencia más inmersiva.
+        </p>
+
+        @if (catalogo(); as cat) {
+          <ul class="objetivos">
+            <li><mat-icon>explore</mat-icon> Exploración clínica guiada</li>
+            <li><mat-icon>groups</mat-icon> Entrevistas con actores del caso</li>
+            <li><mat-icon>menu_book</mat-icon> Libreta de registro psicosocial</li>
+          </ul>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="btn-iniciar"
+          [disabled]="!puedeIniciar()"
+          (click)="iniciarSimulacion()">
+          <mat-icon>play_arrow</mat-icon>
+          Iniciar simulación
+        </button>
+
+        @if (!puedeIniciar()) {
+          <p class="aviso">Esta práctica estará disponible próximamente.</p>
+        }
+
+        <a mat-stroked-button routerLink="/estudiante/panel">Volver al panel</a>
+      </aside>
+    </div>
+  </app-estudiante-shell>
+}

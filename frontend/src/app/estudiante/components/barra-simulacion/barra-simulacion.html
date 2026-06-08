@@ -1,0 +1,59 @@
+<header class="barra-simulacion">
+  <div class="barra-meta">
+    <div class="meta-item">
+      <span class="meta-label">Práctica</span>
+      <span class="meta-valor">{{ nombrePractica() }}</span>
+    </div>
+    <span class="meta-sep" aria-hidden="true">·</span>
+    <div class="meta-item">
+      <span class="meta-label">Caso</span>
+      <span class="meta-valor">{{ nombreCaso() }}</span>
+    </div>
+    <span class="meta-sep" aria-hidden="true">·</span>
+    <div class="meta-item">
+      <span class="meta-label">Estado</span>
+      <span class="meta-valor meta-estado">{{ estadoLabel() }}</span>
+    </div>
+  </div>
+
+  <div class="barra-acciones">
+    <app-control-ambiente-audio />
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="accion-barra"
+      matTooltip="Libreta clínica"
+      (click)="libreta.emit()">
+      <mat-icon>menu_book</mat-icon>
+      <span class="accion-texto">Libreta</span>
+    </button>
+    <button
+      mat-stroked-button
+      type="button"
+      class="accion-barra"
+      matTooltip="Mapa de escenas"
+      (click)="mapa.emit()">
+      <mat-icon>map</mat-icon>
+      <span class="accion-texto">Mapa</span>
+    </button>
+    <button
+      mat-stroked-button
+      type="button"
+      class="accion-barra"
+      [matTooltip]="pantallaCompletaActiva() ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'"
+      (click)="pantallaCompleta.emit()">
+      <mat-icon>{{ pantallaCompletaActiva() ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
+      <span class="accion-texto">{{ pantallaCompletaActiva() ? 'Salir' : 'Pantalla completa' }}</span>
+    </button>
+    <button
+      mat-stroked-button
+      type="button"
+      class="accion-barra accion-salir"
+      matTooltip="Salir de la práctica"
+      (click)="salir.emit()">
+      <mat-icon>logout</mat-icon>
+      <span class="accion-texto">Salir</span>
+    </button>
+  </div>
+</header>

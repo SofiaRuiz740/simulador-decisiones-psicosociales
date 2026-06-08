@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "casos": [
+    {
+      "id": "violencia-intrafamiliar",
+      "titulo": "Intervención en violencia intrafamiliar",
+      "descripcion": "Asumes el rol de psicóloga en un caso de violencia en el núcleo familiar. Explora evidencias, formula hipótesis y decide intervenciones sin respuestas correctas predefinidas.",
+      "areaTematica": "violencia_intrafamiliar",
+      "manifestPath": "casos/violencia-intrafamiliar/manifest.json"
+    }
+  ]
+}

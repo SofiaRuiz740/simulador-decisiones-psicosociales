@@ -1,0 +1,55 @@
+<div class="intro" role="presentation">
+  @if (fase() === 'cargando') {
+    <div class="intro-carga">
+      <mat-progress-bar mode="indeterminate" />
+    </div>
+  }
+
+  @if (fase() === 'advertencia' && config(); as cfg) {
+    <div
+      class="intro-advertencia"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="advertencia-titulo">
+      <div class="intro-advertencia-panel">
+        <h2 id="advertencia-titulo" class="advertencia-titulo">{{ cfg.advertencia.titulo }}</h2>
+        <p class="advertencia-texto">{{ cfg.advertencia.texto }}</p>
+        <button type="button" class="btn-aceptar" (click)="aceptarAdvertencia()">
+          {{ cfg.advertencia.botonAceptar }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (fase() === 'secuencia' && escenaActual(); as escena) {
+    <div class="intro-fondos" [class.transicionando]="transicionando()">
+      @if (fondoActualUrl(); as urlActual) {
+        <img
+          class="intro-fondo intro-fondo-actual"
+          [class.saliendo]="transicionando()"
+          [src]="urlActual"
+          alt="" />
+      }
+      @if (transicionando() && fondoSiguienteUrl(); as urlSiguiente) {
+        <img
+          class="intro-fondo intro-fondo-siguiente"
+          [src]="urlSiguiente"
+          alt="" />
+      }
+    </div>
+
+    <div class="intro-vineta" aria-hidden="true"></div>
+
+    <div class="intro-texto-caja" role="region" aria-live="polite">
+      <p class="intro-texto">{{ escena.texto }}</p>
+    </div>
+  }
+
+  @if (fase() === 'transicion') {
+    <div class="intro-transicion-final">
+      @for (linea of lineasTransicion(); track linea) {
+        <p class="linea-transicion" [class.principal]="$first">{{ linea }}</p>
+      }
+    </div>
+  }
+</div>

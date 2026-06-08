@@ -1,0 +1,18 @@
+{
+  "id": "ciclo-violencia",
+  "titulo": "Ciclo de violencia en fase de tensión",
+  "descripcion": "Los episodios parecen seguir un patrón de acumulación de tensión previo a agresiones verbales o físicas.",
+  "categoria": "dinamica_familiar",
+  "evidenciasSoporte": ["informe-urgencias", "mensajes-sofi"],
+  "personajesRelacionados": ["lucia", "miguel"],
+  "requisitosFormulacion": [
+    {
+      "tipo": "alguna_evidencia_descubierta",
+      "parametros": { "evidenciaIds": ["informe-urgencias", "mensajes-sofi"] }
+    }
+  ],
+  "indicadoresNarrativos": [
+    "Minimización recurrente por parte de Lucía",
+    "Miguel redefine los hechos como conflictos mutuos"
+  ]
+}

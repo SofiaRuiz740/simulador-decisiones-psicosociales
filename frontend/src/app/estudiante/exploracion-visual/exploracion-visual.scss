@@ -1,0 +1,105 @@
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.exploracion {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+
+.exploracion-carga {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #f3f1ec;
+  color: #475569;
+}
+
+.exploracion-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(15, 23, 42, 0.42), transparent);
+  transition: opacity 0.32s ease;
+}
+
+.exploracion.entrevista-activa .exploracion-hud {
+  opacity: 0.35;
+}
+
+.hud-ubicacion {
+  .hud-caso {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+  }
+}
+
+.hud-tiempo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.85rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+app-escena-visual {
+  display: block;
+  position: absolute;
+  inset: 0;
+  transition: filter 0.28s ease;
+}
+
+.exploracion.entrevista-activa app-escena-visual {
+  filter: blur(7px);
+  transition: filter 0.28s ease;
+}
+
+@media (max-width: 640px) {
+  .exploracion-hud {
+    padding: 14px 16px;
+    flex-direction: column;
+  }
+}

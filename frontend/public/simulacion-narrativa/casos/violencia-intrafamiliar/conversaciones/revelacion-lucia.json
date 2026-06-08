@@ -1,0 +1,68 @@
+{
+  "id": "revelacion-lucia",
+  "titulo": "Revelación de Lucía",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "lucia",
+  "nodoInicialId": "inicio-revelacion",
+  "cuentaComoUtil": true,
+  "requisitosAcceso": [
+    {
+      "tipo": "personaje_metrica_minima",
+      "parametros": {
+        "personajeId": "lucia",
+        "metrica": "confianza",
+        "valorMinimo": 50
+      }
+    },
+    {
+      "tipo": "conversacion_completada",
+      "parametros": { "conversacionId": "consulta-lucia" }
+    }
+  ],
+  "nodos": [
+    {
+      "id": "inicio-revelacion",
+      "emisor": "jugador",
+      "texto": "Lucía parece más receptiva. ¿Cómo profundizas?",
+      "opciones": [
+        {
+          "id": "validar-emocion",
+          "texto": "Validar su miedo y normalizar la dificultad para hablar.",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "lucia-revela"
+        },
+        {
+          "id": "escucha-silencio",
+          "texto": "Mantener escucha activa en silencio, esperando su ritmo.",
+          "estrategiaClinica": "escucha_activa",
+          "siguienteNodoId": "lucia-revela"
+        }
+      ]
+    },
+    {
+      "id": "lucia-revela",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "A veces me empuja cuando discutimos. La última vez me dejó moretones... pero él dice que fue mi culpa.",
+      "testimonio": {
+        "id": "testimonio-lucia-empujon",
+        "tema": "mecanismo_lesion",
+        "valor": "empujon_agresion",
+        "descripcion": "Relata empujón y lesiones en contexto de discusión",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-revelacion"
+    },
+    {
+      "id": "cierre-revelacion",
+      "emisor": "narrador",
+      "texto": "Lucía comparte información sensible. Debes decidir cómo continuar la intervención.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "revelacion-lucia" }
+        }
+      ]
+    }
+  ]
+}

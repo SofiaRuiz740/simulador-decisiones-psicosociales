@@ -1,0 +1,18 @@
+{
+  "id": "miguel",
+  "nombre": "Miguel Ríos",
+  "rol": "agresor_presunto",
+  "edad": 37,
+  "relacionFamilia": "Pareja de Lucía y padre de Sofi",
+  "descripcion": "Describe los conflictos como 'discusiones normales de pareja'. Niega violencia física.",
+  "personalidad": "Controlador en el discurso, externaliza responsabilidad.",
+  "metricasIniciales": {
+    "confianza": 15,
+    "ansiedad": 45,
+    "colaboracion": 25,
+    "aperturaEmocional": 10
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 3
+  }
+}

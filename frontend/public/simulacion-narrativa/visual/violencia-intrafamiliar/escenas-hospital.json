@@ -1,0 +1,249 @@
+{
+  "id": "hospital-violencia-intrafamiliar",
+  "version": "2.4.0",
+  "casoId": "violencia-intrafamiliar",
+  "escenaInicialId": "entrada-hospital",
+  "mapeoRolesVisuales": {
+    "lucia": "madre-victima",
+    "hermano": "hermano-familiar",
+    "enfermera": "enfermera",
+    "medico-urgencias": "medico-urgencias",
+    "policia": "policia"
+  },
+  "escenas": [
+    {
+      "id": "entrada-hospital",
+      "titulo": "Exterior del hospital — urgencias",
+      "escenarioNarrativoId": "consulta-inicial",
+      "hotspots": [
+        {
+          "id": "entrar-hospital",
+          "etiqueta": "Entrar al hospital",
+          "tipo": "navegacion",
+          "destinoEscenaId": "sala-espera",
+          "posicion": { "x": 44, "y": 40, "ancho": 14, "alto": 16 }
+        },
+        {
+          "id": "ir-comisaria",
+          "etiqueta": "Trasladarse a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "requisitosAcceso": [
+            {
+              "tipo": "escenario_conversaciones_completadas",
+              "parametros": { "escenarioId": "consulta-inicial" }
+            }
+          ],
+          "posicion": { "x": 78, "y": 42, "ancho": 12, "alto": 14 }
+        }
+      ],
+      "sprites": [
+        {
+          "id": "hotspot-policia-entrada",
+          "personajeId": "policia",
+          "rolVisual": "policia",
+          "conversacionId": "entrevista-policia-entrada",
+          "etiquetaInteraccion": "Funcionario policial",
+          "modoAcercamiento": true,
+          "posicion": { "x": 9, "y": 34, "ancho": 10, "alto": 38 }
+        }
+      ]
+    },
+    {
+      "id": "sala-espera",
+      "titulo": "Sala de espera — familia en crisis",
+      "escenarioNarrativoId": "consulta-inicial",
+      "hotspots": [
+        {
+          "id": "ir-pasillo",
+          "etiqueta": "Ir al pasillo de urgencias",
+          "tipo": "navegacion",
+          "destinoEscenaId": "pasillo-urgencias",
+          "posicion": { "x": 78, "y": 34, "ancho": 12, "alto": 14 }
+        },
+        {
+          "id": "regreso-exterior",
+          "etiqueta": "Regresar al exterior",
+          "tipo": "navegacion",
+          "destinoEscenaId": "entrada-hospital",
+          "esRegreso": true,
+          "posicion": { "x": 6, "y": 72, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": [
+        {
+          "id": "hotspot-madre-espera",
+          "personajeId": "lucia",
+          "rolVisual": "madre-victima",
+          "conversacionId": "entrevista-madre-espera",
+          "etiquetaInteraccion": "Madre (víctima)",
+          "modoAcercamiento": true,
+          "posicion": { "x": 46, "y": 36, "ancho": 15, "alto": 54 }
+        },
+        {
+          "id": "hotspot-hermano-espera",
+          "personajeId": "hermano",
+          "rolVisual": "hermano-familiar",
+          "conversacionId": "entrevista-hermano-espera",
+          "etiquetaInteraccion": "Hermano",
+          "modoAcercamiento": true,
+          "posicion": { "x": 18, "y": 24, "ancho": 14, "alto": 42 }
+        }
+      ]
+    },
+    {
+      "id": "pasillo-urgencias",
+      "titulo": "Pasillo de urgencias",
+      "escenarioNarrativoId": "consulta-inicial",
+      "hotspots": [
+        {
+          "id": "ir-estacion",
+          "etiqueta": "Estación médica",
+          "tipo": "navegacion",
+          "destinoEscenaId": "estacion-medica",
+          "posicion": { "x": 12, "y": 38, "ancho": 12, "alto": 14 }
+        },
+        {
+          "id": "ir-uci",
+          "etiqueta": "UCI — paciente crítica",
+          "tipo": "navegacion",
+          "destinoEscenaId": "cuidados-intensivos",
+          "posicion": { "x": 82, "y": 36, "ancho": 10, "alto": 14 }
+        },
+        {
+          "id": "regreso-sala",
+          "etiqueta": "Regresar a sala de espera",
+          "tipo": "navegacion",
+          "destinoEscenaId": "sala-espera",
+          "esRegreso": true,
+          "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": [
+        {
+          "id": "hotspot-enfermera-pasillo",
+          "personajeId": "enfermera",
+          "rolVisual": "enfermera",
+          "conversacionId": "entrevista-enfermera-pasillo",
+          "etiquetaInteraccion": "Enfermera jefe",
+          "modoAcercamiento": true,
+          "posicion": { "x": 16, "y": 28, "ancho": 14, "alto": 58 }
+        }
+      ]
+    },
+    {
+      "id": "estacion-medica",
+      "titulo": "Estación médica",
+      "escenarioNarrativoId": "consulta-inicial",
+      "hotspots": [
+        {
+          "id": "revisar-informe",
+          "etiqueta": "Historia clínica de urgencias",
+          "tipo": "evidencia",
+          "evidenciaId": "informe-urgencias",
+          "posicion": { "x": 46, "y": 48, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "revisar-registro-menor",
+          "etiqueta": "Registro de la menor fallecida",
+          "tipo": "evidencia",
+          "evidenciaId": "mensajes-sofi",
+          "posicion": { "x": 58, "y": 52, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "regreso-pasillo-estacion",
+          "etiqueta": "Regresar al pasillo",
+          "tipo": "navegacion",
+          "destinoEscenaId": "pasillo-urgencias",
+          "esRegreso": true,
+          "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": []
+    },
+    {
+      "id": "cuidados-intensivos",
+      "titulo": "UCI — paciente en estado crítico",
+      "escenarioNarrativoId": "consulta-inicial",
+      "hotspots": [
+        {
+          "id": "regreso-pasillo-uci",
+          "etiqueta": "Regresar al pasillo",
+          "tipo": "navegacion",
+          "destinoEscenaId": "pasillo-urgencias",
+          "esRegreso": true,
+          "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": [
+        {
+          "id": "hotspot-lucia-uci",
+          "personajeId": "lucia",
+          "rolVisual": "madre-victima",
+          "conversacionId": "revisita-lucia-informe",
+          "etiquetaInteraccion": "Madre (víctima)",
+          "modoAcercamiento": true,
+          "posicion": { "x": 20, "y": 26, "ancho": 22, "alto": 50 }
+        },
+        {
+          "id": "hotspot-medico-uci",
+          "personajeId": "medico-urgencias",
+          "rolVisual": "medico-urgencias",
+          "conversacionId": "entrevista-medico-urgencias",
+          "etiquetaInteraccion": "Médico tratante",
+          "modoAcercamiento": true,
+          "posicion": { "x": 42, "y": 12, "ancho": 16, "alto": 58 }
+        }
+      ]
+    },
+    {
+      "id": "exterior-comisaria",
+      "titulo": "Exterior de la comisaría",
+      "requisitosAcceso": [
+        {
+          "tipo": "escenario_conversaciones_completadas",
+          "parametros": { "escenarioId": "consulta-inicial" }
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "entrar-comisaria",
+          "etiqueta": "Entrar a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "interior-comisaria",
+          "posicion": { "x": 46, "y": 38, "ancho": 14, "alto": 16 }
+        },
+        {
+          "id": "regreso-hospital-desde-comisaria",
+          "etiqueta": "Regresar al hospital",
+          "tipo": "navegacion",
+          "destinoEscenaId": "entrada-hospital",
+          "esRegreso": true,
+          "posicion": { "x": 8, "y": 72, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": []
+    },
+    {
+      "id": "interior-comisaria",
+      "titulo": "Interior de la comisaría",
+      "requisitosAcceso": [
+        {
+          "tipo": "escenario_conversaciones_completadas",
+          "parametros": { "escenarioId": "consulta-inicial" }
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "salir-comisaria",
+          "etiqueta": "Salir al exterior",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "esRegreso": true,
+          "posicion": { "x": 8, "y": 72, "ancho": 10, "alto": 12 }
+        }
+      ],
+      "sprites": []
+    }
+  ]
+}

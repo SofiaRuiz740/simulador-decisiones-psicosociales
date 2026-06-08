@@ -1,0 +1,89 @@
+{
+  "id": "entrevista-hermano-espera",
+  "titulo": "Hermano en recepción",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "hermano",
+  "nodoInicialId": "apertura",
+  "cuentaComoUtil": true,
+  "nodos": [
+    {
+      "id": "apertura",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "¿Puedo hablar con usted un momento? Vi cuando empujó a mi hermana… pero nadie quiere decirlo.",
+      "siguienteNodoId": "decision-apertura"
+    },
+    {
+      "id": "decision-apertura",
+      "emisor": "jugador",
+      "texto": "Cómo sostener el testimonio emergente",
+      "opciones": [
+        {
+          "id": "escuchar-sin-interrumpir",
+          "texto": "«Cuénteme con sus palabras lo que vio, sin apuro.»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "hermano-relato",
+          "modificadoresMetricas": { "confianza": 12, "aperturaEmocional": 10 }
+        },
+        {
+          "id": "aclarar-hechos",
+          "texto": "Pedir secuencia concreta: hora, lugar, quién estaba presente.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-relato"
+        }
+      ]
+    },
+    {
+      "id": "hermano-relato",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Gritaban por la niña… Mi cuñado la empujó contra la pared. Mi hermana intentó cubrirse y cayó.",
+      "testimonio": {
+        "id": "testimonio-hermano-empujon",
+        "tema": "mecanismo_lesion",
+        "valor": "empujon_agresion",
+        "descripcion": "Hermano confirma empujón durante agresión",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-miedo"
+    },
+    {
+      "id": "decision-miedo",
+      "emisor": "jugador",
+      "texto": "Cómo abordar el temor a represalias",
+      "opciones": [
+        {
+          "id": "explorar-seguridad",
+          "texto": "Preguntar si se siente seguro hablando aquí, en el hospital.",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "cierre-hermano"
+        },
+        {
+          "id": "normalizar-miedo",
+          "texto": "Validar que hablar puede ser peligroso y preguntar qué necesitaría para sentirse protegido.",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "cierre-hermano"
+        },
+        {
+          "id": "presionar-detalles",
+          "texto": "Insistir en nombres y detalles forenses de inmediato.",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "cierre-hermano",
+          "modificadoresMetricas": { "confianza": -15, "ansiedad": 10 }
+        }
+      ]
+    },
+    {
+      "id": "cierre-hermano",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "No quiero que le pase algo a mi hermana por lo que diga… pero tampoco puedo callar para siempre.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "entrevista-hermano-espera" }
+        }
+      ]
+    }
+  ]
+}

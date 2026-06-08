@@ -1,0 +1,243 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 0 1rem;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.hero-cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  color: var(--app-slate);
+
+  .edition {
+    font-weight: 600;
+    color: var(--app-deep);
+  }
+
+  .dot { opacity: 0.45; }
+  .today { text-transform: capitalize; font-style: italic; }
+}
+
+.hero-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: -0.02em;
+
+  em {
+    font-style: italic;
+    color: var(--app-teal);
+  }
+}
+
+.hero-lead {
+  margin: 0;
+  max-width: 640px;
+  line-height: 1.55;
+  color: var(--app-slate);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.kpi {
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--app-deep) 6%, white);
+  border: 1px solid var(--app-line);
+
+  .kpi-num {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--app-deep);
+  }
+
+  .kpi-label {
+    font-size: 0.85rem;
+    color: var(--app-slate);
+  }
+}
+
+.seccion {
+  margin-top: 2rem;
+}
+
+.seccion-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--app-slate);
+    font-size: 0.92rem;
+  }
+}
+
+.vacio {
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--app-teal);
+  }
+}
+
+.practicas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.practica-card {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .caso {
+    margin: 0;
+    color: var(--app-slate);
+    font-size: 0.9rem;
+  }
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-icon {
+  color: var(--app-teal);
+  opacity: 0.85;
+}
+
+.estado-chip {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--app-slate) 12%, transparent);
+  color: var(--app-slate);
+
+  &.en_progreso {
+    background: color-mix(in srgb, var(--app-teal) 14%, transparent);
+    color: var(--app-teal);
+  }
+
+  &.completada {
+    background: color-mix(in srgb, var(--app-deep) 12%, transparent);
+    color: var(--app-deep);
+  }
+}
+
+.progreso-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-bottom: 0.25rem;
+  color: var(--app-slate);
+}
+
+.fechas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--app-slate);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.card-cta {
+  margin-top: 0.25rem;
+  align-self: flex-start;
+}
+
+.proximas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.proxima-card {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px dashed var(--app-line);
+  background: color-mix(in srgb, var(--app-slate) 4%, white);
+  opacity: 0.85;
+
+  h3 {
+    margin: 0.35rem 0 0.25rem;
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--app-slate);
+  }
+}
+
+.proxima-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-slate);
+}
+
+@media (max-width: 720px) {
+  .kpis { grid-template-columns: 1fr; }
+  .seccion-header { flex-direction: column; }
+}

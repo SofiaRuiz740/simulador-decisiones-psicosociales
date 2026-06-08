@@ -1,0 +1,19 @@
+{
+  "id": "informe-urgencias",
+  "titulo": "Historia clínica — informe de urgencias",
+  "descripcion": "Documento médico de atención por contusión en brazo izquierdo.",
+  "tipo": "registro_clinico",
+  "contenido": "Paciente refiere caída accidental. Observación: hematoma de 4 cm compatible con posible mecanismo de defensa.",
+  "fuentePersonajeId": "lucia",
+  "escenarioDescubrimientoId": "consulta-inicial",
+  "etiquetas": ["lesion", "minimizacion"],
+  "afirmaciones": [
+    {
+      "id": "afirm-ev-urgencias-mecanismo",
+      "tema": "mecanismo_lesion",
+      "valor": "compatible_con_defensa",
+      "descripcion": "Hematoma compatible con mecanismo de defensa, no con caída simple",
+      "personajeId": "lucia"
+    }
+  ]
+}

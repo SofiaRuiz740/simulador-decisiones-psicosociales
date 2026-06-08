@@ -1,0 +1,13 @@
+{
+  "id": "contradicciones-relevantes",
+  "titulo": "Encontrar contradicciones relevantes",
+  "descripcion": "Meta interna: identificar al menos una contradicción significativa en el caso.",
+  "categoria": "contradicciones",
+  "requisitosCumplimiento": [
+    {
+      "tipo": "contradiccion_identificada",
+      "parametros": { "contradiccionId": "version-agresion" }
+    }
+  ],
+  "pesoAnalisis": 1.3
+}

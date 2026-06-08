@@ -1,0 +1,24 @@
+{
+  "id": "informe-medico-recibido",
+  "titulo": "Recepción del informe médico",
+  "descripcion": "El informe de urgencias queda disponible para revisión en el expediente.",
+  "requisitosActivacion": [
+    {
+      "tipo": "evidencia_descubierta",
+      "parametros": { "evidenciaId": "informe-urgencias" }
+    }
+  ],
+  "efectos": [
+    {
+      "tipo": "establecer_flag",
+      "parametros": { "clave": "informe_medico_disponible", "valor": true }
+    },
+    {
+      "tipo": "avanzar_tiempo_narrativo",
+      "parametros": { "minutos": 15 }
+    }
+  ],
+  "activableUnaVez": true,
+  "prioridad": 10,
+  "avanceTiempoMinutos": 0
+}

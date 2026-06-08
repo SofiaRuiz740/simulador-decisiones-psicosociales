@@ -189,7 +189,7 @@ import { SimulacionService } from '../core/services/simulacion.service';
 
         <div class="actions">
           <button mat-flat-button color="primary" class="salir-btn" (click)="salir()">
-            <mat-icon>logout</mat-icon> Cerrar sesión
+            <mat-icon>dashboard</mat-icon> Volver al panel
           </button>
         </div>
       }
@@ -528,15 +528,14 @@ export class ResultadoEstudiante implements OnInit {
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!id) { this.router.navigate(['/estudiante']); return; }
+    if (!id) { this.router.navigate(['/estudiante/panel']); return; }
     this.servicio.obtenerResultado(id).subscribe({
       next: (r) => { this.resultado.set(r); this.loading.set(false); },
-      error: () => { this.router.navigate(['/estudiante']); },
+      error: () => { this.router.navigate(['/estudiante/panel']); },
     });
   }
 
   salir() {
-    localStorage.clear();
-    this.router.navigate(['/estudiante']);
+    this.router.navigate(['/estudiante/panel']);
   }
 }

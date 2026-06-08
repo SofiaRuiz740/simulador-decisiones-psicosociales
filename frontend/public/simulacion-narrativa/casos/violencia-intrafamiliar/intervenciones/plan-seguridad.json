@@ -1,0 +1,40 @@
+{
+  "id": "plan-seguridad",
+  "titulo": "Elaborar plan de seguridad",
+  "descripcion": "Construir con la consultante un plan con señales de alerta, redes de apoyo y rutas de protección.",
+  "tipo": "plan_seguridad",
+  "enfoqueTeorico": "Intervención en crisis y protección",
+  "pasos": [
+    {
+      "orden": 1,
+      "descripcion": "Identificar señales previas a episodios de violencia.",
+      "orientacionClinica": "Validar experiencia sin forzar relato detallado."
+    },
+    {
+      "orden": 2,
+      "descripcion": "Mapear personas y lugares seguros.",
+      "orientacionClinica": "Incluir recursos para la menor si aplica."
+    }
+  ],
+  "personajesObjetivo": ["lucia", "sofi"],
+  "requisitosActivacion": [
+    {
+      "tipo": "escenario_visitado",
+      "parametros": { "escenarioId": "entrevista-familiar" }
+    }
+  ],
+  "efectosNarrativos": [
+    {
+      "tipo": "establecer_flag",
+      "parametros": { "clave": "plan_seguridad_iniciado", "valor": true }
+    },
+    {
+      "tipo": "cambiar_estado_personaje",
+      "parametros": { "personajeId": "lucia", "clave": "miedo", "valor": false }
+    }
+  ],
+  "consideracionesEticas": [
+    "Evaluar confidencialidad vs. deber de protección de la menor",
+    "Documentar acuerdos sin revictimizar"
+  ]
+}

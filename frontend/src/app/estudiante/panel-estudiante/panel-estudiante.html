@@ -1,0 +1,100 @@
+<app-estudiante-shell titulo="Panel del estudiante">
+  <section class="hero">
+    <p class="hero-cap">
+      <span class="edition">Espacio académico</span>
+      <span class="dot">·</span>
+      <span class="today">{{ hoy }}</span>
+    </p>
+    <h1 class="hero-title">{{ saludo() }}, <em>{{ nombre() }}</em></h1>
+    <p class="hero-lead">
+      Desde aquí gestionas tus prácticas asignadas. Elige cuándo iniciar cada simulación
+      y retoma tu avance cuando lo necesites.
+    </p>
+  </section>
+
+  <section class="kpis">
+    <article class="kpi">
+      <span class="kpi-num">{{ resumen().total }}</span>
+      <span class="kpi-label">Prácticas asignadas</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi-num">{{ resumen().activas }}</span>
+      <span class="kpi-label">En curso</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi-num">{{ resumen().completadas }}</span>
+      <span class="kpi-label">Completadas</span>
+    </article>
+  </section>
+
+  <section class="seccion">
+    <header class="seccion-header">
+      <div>
+        <h2>Mis prácticas</h2>
+        <p>Selecciona una práctica para ver su información e iniciar la simulación.</p>
+      </div>
+      <a mat-stroked-button routerLink="/estudiante/practicas">
+        <mat-icon>list</mat-icon>
+        Ver listado
+      </a>
+    </header>
+
+    @if (practicas().length === 0) {
+      <div class="vacio elevated-card">
+        <mat-icon>school</mat-icon>
+        <p>Aún no tienes prácticas registradas. Ingresa con el código que te entregó tu docente.</p>
+        <a mat-flat-button color="primary" routerLink="/estudiante">Ingresar con código</a>
+      </div>
+    } @else {
+      <div class="practicas-grid">
+        @for (practica of practicas(); track practica.id) {
+          <article class="practica-card elevated-card" (click)="abrirPractica(practica.id)">
+            <div class="card-top">
+              <span class="estado-chip" [ngClass]="practica.progreso.estado">
+                {{ etiquetaEstado(practica.progreso.estado) }}
+              </span>
+              <mat-icon class="card-icon">psychology</mat-icon>
+            </div>
+            <h3>{{ practica.nombre }}</h3>
+            <p class="caso">{{ practica.caso_nombre }}</p>
+            <div class="progreso">
+              <div class="progreso-label">
+                <span>Avance</span>
+                <strong>{{ practica.progreso.porcentaje }}%</strong>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="practica.progreso.porcentaje" />
+            </div>
+            <ul class="fechas">
+              <li><mat-icon>event</mat-icon> Asignada: {{ practica.fecha_inicio | date:'mediumDate' }}</li>
+              <li><mat-icon>event_busy</mat-icon> Límite: {{ practica.fecha_fin | date:'mediumDate' }}</li>
+            </ul>
+            <button mat-flat-button color="primary" type="button" class="card-cta">
+              Ver práctica
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  @if (proximasPracticas.length) {
+    <section class="seccion proximas">
+      <header class="seccion-header">
+        <div>
+          <h2>Próximas áreas de formación</h2>
+          <p>Casos en preparación para ampliar tu experiencia académica.</p>
+        </div>
+      </header>
+      <div class="proximas-grid">
+        @for (caso of proximasPracticas; track caso.slug) {
+          <article class="proxima-card">
+            <span class="proxima-tag">Próximamente</span>
+            <h3>{{ caso.tituloPractica }}</h3>
+            <p>{{ caso.areaTematica }}</p>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</app-estudiante-shell>

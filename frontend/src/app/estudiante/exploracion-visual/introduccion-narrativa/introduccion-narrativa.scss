@@ -1,0 +1,265 @@
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 950;
+}
+
+.intro {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080c14;
+  cursor: default;
+  user-select: none;
+}
+
+.intro-carga {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #080c14;
+}
+
+/* —— Fase 1: advertencia —— */
+.intro-advertencia {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(160deg, #0a0f18 0%, #121a28 45%, #0d1119 100%);
+  animation: fade-in 0.55s ease both;
+}
+
+.intro-advertencia-panel {
+  width: min(560px, 100%);
+  padding: clamp(28px, 4vw, 40px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 20, 32, 0.96);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  text-align: center;
+}
+
+.advertencia-titulo {
+  margin: 0 0 20px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(212, 196, 168, 0.95);
+}
+
+.advertencia-texto {
+  margin: 0 0 28px;
+  font-size: clamp(0.9rem, 1.45vw, 0.98rem);
+  line-height: 1.7;
+  color: rgba(226, 232, 240, 0.88);
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.btn-aceptar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: 13px 32px;
+  border: 1px solid rgba(212, 196, 168, 0.4);
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.8);
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(212, 196, 168, 0.65);
+    background: rgba(51, 65, 85, 0.9);
+    outline: none;
+  }
+}
+
+/* —— Fase 2: secuencia —— */
+.intro-fondos {
+  position: absolute;
+  inset: 0;
+}
+
+.intro-fondo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.intro-fondo-actual {
+  animation: fondo-fade-in 0.85s ease both;
+
+  &.saliendo {
+    animation: fondo-fade-out 0.7s ease forwards;
+  }
+}
+
+.intro-fondo-siguiente {
+  animation: fondo-fade-in 0.85s ease both;
+}
+
+@keyframes fondo-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fondo-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.intro-vineta {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(to bottom, rgba(8, 12, 20, 0.35), transparent 18%),
+    linear-gradient(to top, rgba(8, 12, 20, 0.55), transparent 38%);
+}
+
+.intro-texto-caja {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 5vh, 48px);
+  transform: translateX(-50%);
+  z-index: 10;
+  width: min(92%, 720px);
+  padding: clamp(16px, 2.5vw, 22px) clamp(20px, 3vw, 28px);
+  border-radius: 12px;
+  background: rgba(10, 15, 24, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  animation: caja-entrada 0.6s ease both;
+}
+
+@keyframes caja-entrada {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.intro-texto {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: clamp(0.95rem, 1.7vw, 1.08rem);
+  font-weight: 500;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: #f1f5f9;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+/* —— Fase 3: transición al hospital —— */
+.intro-transicion-final {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 24px;
+  background: #000;
+  animation: fundido-negro 0.8s ease both;
+  text-align: center;
+}
+
+@keyframes fundido-negro {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.linea-transicion {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(203, 213, 225, 0.75);
+  animation: linea-aparece 0.9s ease both;
+
+  &.principal {
+    font-size: clamp(1.2rem, 2.8vw, 1.65rem);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #f8fafc;
+    margin-bottom: 0.35rem;
+  }
+
+  &:nth-child(2) { animation-delay: 0.15s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+}
+
+@keyframes linea-aparece {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .intro-texto-caja {
+    width: 94%;
+    bottom: 16px;
+  }
+}

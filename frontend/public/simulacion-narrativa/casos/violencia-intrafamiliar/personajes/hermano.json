@@ -1,0 +1,17 @@
+{
+  "id": "hermano",
+  "nombre": "Diego Morales",
+  "rol": "familiar",
+  "edad": 22,
+  "relacionFamilia": "Hermano de la paciente. Presenció parte del episodio agresivo.",
+  "descripcion": "Joven visiblemente agitado. Oscila entre querer hablar y temer represalias familiares.",
+  "metricasIniciales": {
+    "confianza": 20,
+    "ansiedad": 75,
+    "colaboracion": 35,
+    "aperturaEmocional": 30
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2
+  }
+}

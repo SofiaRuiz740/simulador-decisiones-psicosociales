@@ -1,0 +1,326 @@
+<mat-drawer-container class="libreta-host" autosize>
+  <mat-drawer
+    #panel
+    class="libreta-panel"
+    mode="over"
+    position="end"
+    (closed)="abierta.set(false)"
+    (opened)="abierta.set(true)">
+    <header class="panel-header">
+      <div class="panel-titulo">
+        <mat-icon aria-hidden="true">menu_book</mat-icon>
+        <div>
+          <h2>Libreta clínica</h2>
+          <p>Registro de trabajo psicosocial</p>
+        </div>
+      </div>
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Cerrar libreta"
+        (click)="cerrarPanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <div class="panel-body">
+      @if (!libreta()) {
+        <div class="estado-vacio">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>La libreta estará disponible cuando inicie la simulación.</p>
+        </div>
+      } @else {
+        <mat-accordion multi class="secciones">
+          <!-- 1. Personas entrevistadas -->
+          <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>groups</mat-icon>
+                Personas entrevistadas
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.personasEntrevistadas.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (libreta()!.personasEntrevistadas.length === 0) {
+              <p class="vacio-seccion">Aún no has completado conversaciones con personajes del caso.</p>
+            } @else {
+              <mat-list class="lista-clinica">
+                @for (persona of libreta()!.personasEntrevistadas; track persona.personajeId) {
+                  <mat-list-item class="item-clinico">
+                    <div class="item-contenido">
+                      <strong>{{ persona.nombre ?? persona.personajeId }}</strong>
+                      <span class="meta">{{ rolPersonaje(persona.personajeId) }}</span>
+                      <span class="detalle">
+                        {{ persona.conversacionesIds.length }}
+                        {{ persona.conversacionesIds.length === 1 ? 'conversación' : 'conversaciones' }}
+                      </span>
+                    </div>
+                  </mat-list-item>
+                }
+              </mat-list>
+            }
+          </mat-expansion-panel>
+
+          <!-- 2. Evidencias encontradas -->
+          <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>fact_check</mat-icon>
+                Evidencias encontradas
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.evidenciasEncontradas.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (libreta()!.evidenciasEncontradas.length === 0) {
+              <p class="vacio-seccion">No has registrado evidencias descubiertas.</p>
+            } @else {
+              @for (evidencia of libreta()!.evidenciasEncontradas; track evidencia.evidenciaId) {
+                <article class="tarjeta-clinica">
+                  <h3>{{ evidencia.titulo ?? evidencia.evidenciaId }}</h3>
+                  <p class="descripcion">{{ descripcionEvidencia(evidencia.evidenciaId) }}</p>
+                  <div class="meta-fila">
+                    <mat-icon>schedule</mat-icon>
+                    <span>
+                      @if (fechaNarrativaEvidencia(evidencia.evidenciaId); as fecha) {
+                        {{ fecha }}
+                      } @else {
+                        Fecha narrativa no registrada
+                      }
+                    </span>
+                  </div>
+                </article>
+              }
+            }
+          </mat-expansion-panel>
+
+          <!-- 3. Contradicciones -->
+          <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>compare_arrows</mat-icon>
+                Contradicciones
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ libreta()!.contradiccionesDetectadas.length + pendientesAnalisis() }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (contradiccionesPosibles().length > 0) {
+              <p class="subtitulo-seccion">Pendientes de análisis</p>
+              @for (posible of contradiccionesPosibles(); track posible.id) {
+                <article class="tarjeta-clinica tarjeta-pendiente">
+                  <div class="tarjeta-encabezado">
+                    <h3>{{ posible.titulo }}</h3>
+                    <span class="estado-chip pendiente">{{ etiquetaEstado('posible') }}</span>
+                  </div>
+                  <p class="descripcion">{{ posible.descripcion }}</p>
+                  <div class="fuentes">
+                    <span class="fuentes-label">Fuentes involucradas</span>
+                    <ul>
+                      @for (fuente of fuentesPosible(posible.id); track fuente) {
+                        <li>{{ fuente }}</li>
+                      }
+                    </ul>
+                  </div>
+                  <button
+                    mat-stroked-button
+                    color="primary"
+                    type="button"
+                    class="accion-analizar"
+                    (click)="analizarContradiccion(posible.id)">
+                    <mat-icon>psychology</mat-icon>
+                    Analizar contradicción
+                  </button>
+                </article>
+              }
+            }
+
+            @if (libreta()!.contradiccionesDetectadas.length > 0) {
+              <p class="subtitulo-seccion">Detectadas</p>
+              @for (contradiccion of libreta()!.contradiccionesDetectadas; track contradiccion.instanciaId) {
+                <article class="tarjeta-clinica">
+                  <div class="tarjeta-encabezado">
+                    <h3>{{ contradiccion.titulo }}</h3>
+                    <span class="estado-chip">{{ etiquetaEstado(contradiccion.estado) }}</span>
+                  </div>
+                  <p class="descripcion">{{ contradiccion.descripcion }}</p>
+                  <div class="fuentes">
+                    <span class="fuentes-label">Fuentes involucradas</span>
+                    <ul>
+                      @for (
+                        fuente of fuentesContradiccion(contradiccion.instanciaId, contradiccion.afirmacionIds);
+                        track fuente
+                      ) {
+                        <li>{{ fuente }}</li>
+                      }
+                    </ul>
+                  </div>
+                </article>
+              }
+            }
+
+            @if (contradiccionesPosibles().length === 0 && libreta()!.contradiccionesDetectadas.length === 0) {
+              <p class="vacio-seccion">No hay contradicciones registradas ni señales pendientes.</p>
+            }
+          </mat-expansion-panel>
+
+          <!-- 4. Hipótesis -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>lightbulb</mat-icon>
+                Hipótesis
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.hipotesisFormuladas.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (libreta()!.hipotesisFormuladas.length === 0) {
+              <p class="vacio-seccion">Aún no has formulado hipótesis clínicas.</p>
+            } @else {
+              @for (hipotesis of libreta()!.hipotesisFormuladas; track hipotesis.hipotesisId) {
+                <article class="tarjeta-clinica">
+                  <h3>{{ hipotesis.titulo ?? hipotesis.hipotesisId }}</h3>
+                  @if (hipotesis.soportes.length) {
+                    <mat-chip-set class="soportes">
+                      @for (soporte of hipotesis.soportes; track soporte.tipo + soporte.entidadId) {
+                        <mat-chip [highlighted]="soporte.tipo === 'contradiccion'">
+                          {{ soporte.tipo === 'evidencia' ? 'Evidencia' : soporte.tipo === 'testimonio' ? 'Testimonio' : 'Contradicción' }}:
+                          {{ etiquetaSoporte(soporte.tipo, soporte.entidadId) }}
+                        </mat-chip>
+                      }
+                    </mat-chip-set>
+                  }
+                </article>
+              }
+            }
+          </mat-expansion-panel>
+
+          <!-- 5. Estado emocional percibido -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>monitor_heart</mat-icon>
+                Estado emocional percibido
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.estadosEmocionalesPercibidos.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (libreta()!.estadosEmocionalesPercibidos.length === 0) {
+              <p class="vacio-seccion">Las métricas aparecerán conforme interactúes con los personajes.</p>
+            } @else {
+              @for (estado of libreta()!.estadosEmocionalesPercibidos; track estado.personajeId) {
+                <article class="tarjeta-clinica">
+                  <h3>{{ estado.nombre ?? estado.personajeId }}</h3>
+                  <div class="metricas-grid">
+                    @for (metrica of metricasVisibles(); track metrica) {
+                      <div class="metrica-item">
+                        <span class="metrica-nombre">{{ etiquetaMetrica(metrica) }}</span>
+                        <span class="metrica-categoria" [class]="claseMetrica(estado.metricas[metrica])">
+                          {{ categoriaMetrica(estado.metricas[metrica]) }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            }
+          </mat-expansion-panel>
+
+          <!-- 6. Línea temporal -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>timeline</mat-icon>
+                Línea temporal
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.lineaTemporal.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (libreta()!.lineaTemporal.length === 0) {
+              <p class="vacio-seccion">Los eventos del caso aparecerán aquí en orden cronológico.</p>
+            } @else {
+              <ol class="linea-temporal">
+                @for (evento of libreta()!.lineaTemporal; track evento.id) {
+                  <li class="evento-temporal">
+                    <div class="evento-marca"></div>
+                    <div class="evento-cuerpo">
+                      <span class="evento-tipo">{{ etiquetaTipoLinea(evento.tipo) }}</span>
+                      <strong>{{ evento.titulo ?? evento.entidadId }}</strong>
+                      @if (evento.tiempoNarrativo) {
+                        <span class="evento-tiempo">{{ evento.tiempoNarrativo }}</span>
+                      }
+                      <span class="evento-fecha">{{ evento.timestamp | date: 'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                  </li>
+                }
+              </ol>
+            }
+          </mat-expansion-panel>
+
+          <!-- 7. Notas personales -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>edit_note</mat-icon>
+                Notas personales
+              </mat-panel-title>
+              <mat-panel-description>{{ libreta()!.notasEstudiante.length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="notas-acciones">
+              <button mat-stroked-button type="button" (click)="crearNota()">
+                <mat-icon>add</mat-icon>
+                Nueva nota
+              </button>
+            </div>
+
+            @if (libreta()!.notasEstudiante.length === 0) {
+              <p class="vacio-seccion">Usa las notas para registrar observaciones propias del proceso clínico.</p>
+            } @else {
+              @for (nota of libreta()!.notasEstudiante; track nota.id) {
+                <article class="tarjeta-clinica tarjeta-nota">
+                  <p class="nota-contenido">{{ nota.contenido }}</p>
+                  <div class="nota-meta">
+                    <span>{{ nota.creadaEn | date: 'dd/MM/yyyy HH:mm' }}</span>
+                    <div class="nota-botones">
+                      <button mat-icon-button type="button" aria-label="Editar nota" (click)="editarNota(nota)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" aria-label="Eliminar nota" (click)="eliminarNota(nota.id)">
+                        <mat-icon>delete_outline</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              }
+            }
+          </mat-expansion-panel>
+        </mat-accordion>
+      }
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content class="libreta-content"></mat-drawer-content>
+</mat-drawer-container>
+
+@if (abierta()) {
+  <div class="libreta-backdrop" (click)="cerrarPanel()" aria-hidden="true"></div>
+}
+
+@if (mostrarFab()) {
+<button
+  mat-fab
+  extended
+  type="button"
+  class="libreta-fab"
+  aria-label="Abrir libreta clínica"
+  matTooltip="Libreta clínica"
+  [matBadge]="pendientesAnalisis() || null"
+  matBadgeColor="warn"
+  matBadgeSize="small"
+  [matBadgeHidden]="pendientesAnalisis() === 0"
+  (click)="togglePanel()">
+  <mat-icon>menu_book</mat-icon>
+  Libreta
+</button>
+}

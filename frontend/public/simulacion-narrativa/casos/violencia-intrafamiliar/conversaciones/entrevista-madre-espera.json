@@ -1,0 +1,95 @@
+{
+  "id": "entrevista-madre-espera",
+  "titulo": "Madre víctima en sala de espera",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "lucia",
+  "nodoInicialId": "apertura",
+  "cuentaComoUtil": true,
+  "nodos": [
+    {
+      "id": "apertura",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Doctora… perdí a mi hija hace unas horas. Yo también estoy muy mal… no sé si me van a operar. Por favor, dígame qué está pasando.",
+      "siguienteNodoId": "decision-noticia"
+    },
+    {
+      "id": "decision-noticia",
+      "emisor": "jugador",
+      "texto": "Cómo responder ante la pérdida reciente",
+      "opciones": [
+        {
+          "id": "validar-duelo",
+          "texto": "Reconocer el dolor y el impacto de la muerte de su hija antes de indagar.",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "lucia-alivia",
+          "modificadoresMetricas": { "confianza": 10, "aperturaEmocional": 8 }
+        },
+        {
+          "id": "indagar-hechos",
+          "texto": "Explorar qué recuerda del episodio que originó el ingreso.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-defensiva"
+        },
+        {
+          "id": "contener-silencio",
+          "texto": "Ofrecer presencia en silencio y esperar a que ella elija qué contar.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "lucia-pausa"
+        }
+      ]
+    },
+    {
+      "id": "lucia-alivia",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Ella no merecía esto… En casa siempre había gritos, yo pensé que algún día pasaría algo peor.",
+      "siguienteNodoId": "decision-proteccion"
+    },
+    {
+      "id": "lucia-defensiva",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "No fue a propósito… Miguel nunca haría algo así a propósito.",
+      "siguienteNodoId": "decision-proteccion"
+    },
+    {
+      "id": "lucia-pausa",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Perdón… no sé por dónde empezar. Tengo miedo de empeorar las cosas.",
+      "siguienteNodoId": "decision-proteccion"
+    },
+    {
+      "id": "decision-proteccion",
+      "emisor": "jugador",
+      "texto": "Cómo profundizar sin retraumatizar",
+      "opciones": [
+        {
+          "id": "explorar-roles-familia",
+          "texto": "Preguntar quién convivía en el hogar y quién presenció la agresión.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-madre"
+        },
+        {
+          "id": "explorar-miedo",
+          "texto": "Indagar a quién teme proteger con su silencio.",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "cierre-madre"
+        }
+      ]
+    },
+    {
+      "id": "cierre-madre",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Mi hijo sabe más de lo que dice… pero tiene miedo de señalar a su cuñado.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "entrevista-madre-espera" }
+        }
+      ]
+    }
+  ]
+}

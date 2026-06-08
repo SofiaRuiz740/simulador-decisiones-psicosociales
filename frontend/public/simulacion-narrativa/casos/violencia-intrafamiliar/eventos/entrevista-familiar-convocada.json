@@ -1,0 +1,31 @@
+{
+  "id": "entrevista-familiar-convocada",
+  "titulo": "Convocatoria a entrevista familiar",
+  "descripcion": "Se coordina la entrevista con los miembros del núcleo familiar.",
+  "requisitosActivacion": [
+    {
+      "tipo": "conversacion_completada",
+      "parametros": { "conversacionId": "consulta-lucia" }
+    },
+    {
+      "tipo": "personaje_metrica_minima",
+      "parametros": {
+        "personajeId": "lucia",
+        "metrica": "confianza",
+        "valorMinimo": 40
+      }
+    }
+  ],
+  "efectos": [
+    {
+      "tipo": "establecer_flag",
+      "parametros": { "clave": "entrevista_familiar_convocada", "valor": true }
+    },
+    {
+      "tipo": "establecer_tiempo_narrativo",
+      "parametros": { "dia": 2, "hora": 16, "minuto": 0, "etiqueta": "Día 2 — 16:00" }
+    }
+  ],
+  "activableUnaVez": true,
+  "prioridad": 20
+}

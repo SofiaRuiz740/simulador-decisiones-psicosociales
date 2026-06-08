@@ -1,0 +1,12 @@
+{
+  "id": "policia",
+  "nombre": "Funcionario policial",
+  "rol": "profesional",
+  "descripcion": "Uniformado en el acceso del hospital. Recoge antecedentes preliminares del episodio.",
+  "metricasIniciales": {
+    "confianza": 40,
+    "ansiedad": 20,
+    "colaboracion": 55,
+    "aperturaEmocional": 25
+  }
+}

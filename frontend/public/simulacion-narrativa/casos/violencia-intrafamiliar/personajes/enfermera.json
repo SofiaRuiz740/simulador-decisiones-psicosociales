@@ -1,0 +1,12 @@
+{
+  "id": "enfermera",
+  "nombre": "Enfermera de turno",
+  "rol": "profesional",
+  "descripcion": "Personal de enfermería del pasillo de urgencias. Conoce el estado de ingreso y las restricciones de visita.",
+  "metricasIniciales": {
+    "confianza": 50,
+    "ansiedad": 30,
+    "colaboracion": 70,
+    "aperturaEmocional": 40
+  }
+}

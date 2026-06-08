@@ -1,0 +1,121 @@
+{
+  "id": "consulta-lucia",
+  "titulo": "Entrevista inicial con Lucía",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "lucia",
+  "nodoInicialId": "saludo",
+  "cuentaComoUtil": true,
+  "saludoMemoria": {
+    "confianza_alta": "saludo-confianza-alta",
+    "confianza_baja": "saludo-tension",
+    "tension": "saludo-tension",
+    "neutral": "saludo"
+  },
+  "nodos": [
+    {
+      "id": "saludo",
+      "emisor": "narrador",
+      "texto": "Lucía llega puntual, evita el contacto visual al inicio. Respira profundo antes de sentarse.",
+      "siguienteNodoId": "apertura-psicologa"
+    },
+    {
+      "id": "saludo-confianza-alta",
+      "emisor": "narrador",
+      "texto": "Lucía te reconoce y parece más tranquila. «Me alegra volver a hablar con usted», murmura al sentarse.",
+      "siguienteNodoId": "apertura-psicologa"
+    },
+    {
+      "id": "saludo-tension",
+      "emisor": "narrador",
+      "texto": "Lucía llega tensa, mira hacia la puerta. «No sé si quiero seguir hablando», dice antes de sentarse.",
+      "siguienteNodoId": "apertura-psicologa"
+    },
+    {
+      "id": "apertura-psicologa",
+      "emisor": "jugador",
+      "texto": "¿Cómo deseas abordar la consulta?",
+      "opciones": [
+        {
+          "id": "explorar-sintomas",
+          "texto": "Explorar los síntomas físicos y su relación con el estrés.",
+          "estrategiaClinica": "exploracion",
+          "enfoque": "Enfoque psicosomático inicial",
+          "siguienteNodoId": "lucia-sintomas"
+        },
+        {
+          "id": "preguntar-directo-hogar",
+          "texto": "Preguntar directamente sobre la situación en el hogar.",
+          "estrategiaClinica": "confrontacion",
+          "enfoque": "Exploración directa del contexto",
+          "siguienteNodoId": "lucia-defensiva"
+        },
+        {
+          "id": "psicoeducacion-confidencialidad",
+          "texto": "Explicar confidencialidad y límites de la intervención.",
+          "estrategiaClinica": "psicoeducacion",
+          "enfoque": "Marco ético y contención",
+          "siguienteNodoId": "lucia-confianza",
+          "efectos": [
+            {
+              "tipo": "descubrir_evidencia",
+              "parametros": { "evidenciaId": "informe-urgencias" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucia-sintomas",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Los dolores de cabeza empeoran cuando hay gritos en casa... pero no es para tanto.",
+      "testimonio": {
+        "id": "testimonio-lucia-gritos",
+        "tema": "violencia_verbal",
+        "valor": "presente_minimizada",
+        "descripcion": "Refiere gritos en casa pero los minimiza",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-consulta"
+    },
+    {
+      "id": "lucia-defensiva",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "En casa todo está bien. Solo estoy muy cansada del trabajo y de criar sola.",
+      "testimonio": {
+        "id": "testimonio-lucia-todo-bien",
+        "tema": "clima_familiar",
+        "valor": "sin_problemas",
+        "descripcion": "Niega problemas en el hogar",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-consulta"
+    },
+    {
+      "id": "lucia-confianza",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Gracias por explicarme eso. La semana pasada fui a urgencias... tengo el informe aquí.",
+      "testimonio": {
+        "id": "testimonio-lucia-urgencias",
+        "tema": "mecanismo_lesion",
+        "valor": "caida_accidental",
+        "descripcion": "Refiere caída accidental según relato a urgencias",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-consulta"
+    },
+    {
+      "id": "cierre-consulta",
+      "emisor": "narrador",
+      "texto": "La sesión concluye. Tienes material para revisar y decidir los próximos pasos.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "consulta-lucia" }
+        }
+      ]
+    }
+  ]
+}

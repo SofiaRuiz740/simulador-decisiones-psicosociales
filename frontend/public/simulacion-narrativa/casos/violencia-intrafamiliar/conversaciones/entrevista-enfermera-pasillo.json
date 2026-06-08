@@ -1,0 +1,87 @@
+{
+  "id": "entrevista-enfermera-pasillo",
+  "titulo": "Enfermera de urgencias",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "enfermera",
+  "nodoInicialId": "apertura",
+  "cuentaComoUtil": true,
+  "nodos": [
+    {
+      "id": "apertura",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "La paciente llegó inconsciente. Familia muy alterada. ¿Viene a coordinar contención emocional?",
+      "siguienteNodoId": "decision-enfoque"
+    },
+    {
+      "id": "decision-enfoque",
+      "emisor": "jugador",
+      "texto": "Qué información priorizar con enfermería",
+      "opciones": [
+        {
+          "id": "estado-vital",
+          "texto": "Preguntar por signos de alerta y restricciones de visita en UCI.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enfermera-estado"
+        },
+        {
+          "id": "dinamica-familiar",
+          "texto": "Indagar cómo se comportó la familia durante el ingreso.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enfermera-familia"
+        }
+      ]
+    },
+    {
+      "id": "enfermera-estado",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Estable hemodinámicamente, pero sedada. Solo personal autorizado puede acercarse al box.",
+      "siguienteNodoId": "decision-visita"
+    },
+    {
+      "id": "enfermera-familia",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Hubo discusión entre familiares sobre ‘quién tuvo la culpa’. Un hombre fue retirado del área.",
+      "siguienteNodoId": "decision-visita"
+    },
+    {
+      "id": "decision-visita",
+      "emisor": "jugador",
+      "texto": "Cómo proceder con el acceso clínico",
+      "opciones": [
+        {
+          "id": "solicitar-reporte",
+          "texto": "Solicitar el reporte de enfermería del ingreso para revisarlo.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-enfermera",
+          "efectos": [
+            {
+              "tipo": "descubrir_evidencia",
+              "parametros": { "evidenciaId": "informe-urgencias" }
+            }
+          ]
+        },
+        {
+          "id": "posponer-acercamiento",
+          "texto": "Coordinar contención familiar antes de solicitar documentos.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-enfermera"
+        }
+      ]
+    },
+    {
+      "id": "cierre-enfermera",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Le dejo copia del reporte en estación médica cuando esté disponible.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "entrevista-enfermera-pasillo" }
+        }
+      ]
+    }
+  ]
+}

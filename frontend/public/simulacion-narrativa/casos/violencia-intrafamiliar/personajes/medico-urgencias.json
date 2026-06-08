@@ -1,0 +1,12 @@
+{
+  "id": "medico-urgencias",
+  "nombre": "Médico de urgencias",
+  "rol": "profesional",
+  "descripcion": "Médico que atendió el ingreso. Puede contextualizar lesiones y el cuadro crítico actual.",
+  "metricasIniciales": {
+    "confianza": 45,
+    "ansiedad": 25,
+    "colaboracion": 65,
+    "aperturaEmocional": 35
+  }
+}

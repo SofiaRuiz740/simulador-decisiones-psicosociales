@@ -1,0 +1,28 @@
+<div class="shell bg-gradient">
+  <header class="shell-top">
+    <div class="brand">
+      <mat-icon>school</mat-icon>
+      <div>
+        <strong>Simulador psicosocial</strong>
+        <span>{{ titulo() }}</span>
+      </div>
+    </div>
+
+    <nav class="shell-nav">
+      <a routerLink="/estudiante/panel" routerLinkActive="activo">Panel</a>
+      <a routerLink="/estudiante/practicas" routerLinkActive="activo">Mis prácticas</a>
+    </nav>
+
+    <div class="shell-user">
+      <span class="nombre">{{ estudianteSession.nombreEstudiante() }}</span>
+      <button mat-stroked-button type="button" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        Salir
+      </button>
+    </div>
+  </header>
+
+  <main class="shell-main">
+    <ng-content />
+  </main>
+</div>

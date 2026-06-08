@@ -1,0 +1,94 @@
+{
+  "id": "entrevista-medico-urgencias",
+  "titulo": "Médico de urgencias",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "medico-urgencias",
+  "nodoInicialId": "apertura",
+  "cuentaComoUtil": true,
+  "nodos": [
+    {
+      "id": "apertura",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Traumatismo craneoencefálico moderado. La familia relató caída accidental; el patrón de lesiones no coincide del todo.",
+      "siguienteNodoId": "decision-enfoque"
+    },
+    {
+      "id": "decision-enfoque",
+      "emisor": "jugador",
+      "texto": "Cómo explorar el informe médico",
+      "opciones": [
+        {
+          "id": "lesiones-defensivas",
+          "texto": "Preguntar si hay hallazgos compatibles con mecanismo de defensa.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "medico-hallazgos"
+        },
+        {
+          "id": "contexto-ingreso",
+          "texto": "Explorar quién acompañaba a la paciente y qué versión dieron al ingreso.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "medico-contexto"
+        }
+      ]
+    },
+    {
+      "id": "medico-hallazgos",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Hematomas en antebrazos compatibles con bloqueo. Ya quedó registrado en urgencias.",
+      "siguienteNodoId": "decision-derivacion"
+    },
+    {
+      "id": "medico-contexto",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Ingresó con su madre y hermano. El agresor presunto no estaba presente al traslado.",
+      "siguienteNodoId": "decision-derivacion"
+    },
+    {
+      "id": "decision-derivacion",
+      "emisor": "jugador",
+      "texto": "Próximo paso institucional",
+      "opciones": [
+        {
+          "id": "activar-ruta-violencia",
+          "texto": "Solicitar activación de protocolo de sospecha de violencia intrafamiliar.",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "cierre-medico",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": { "clave": "protocolo_violencia_solicitado", "valor": true }
+            }
+          ]
+        },
+        {
+          "id": "seguir-evaluacion",
+          "texto": "Continuar evaluación psicosocial antes de activar rutas formales.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-medico"
+        },
+        {
+          "id": "confrontar-version",
+          "texto": "Cuestionar al médico por qué no activó el protocolo al ingreso.",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "cierre-medico",
+          "modificadoresMetricas": { "colaboracion": -10 }
+        }
+      ]
+    },
+    {
+      "id": "cierre-medico",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "El informe completo está en estación médica. Avísenme si necesitan interconsulta psiquiátrica.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": { "conversacionId": "entrevista-medico-urgencias" }
+        }
+      ]
+    }
+  ]
+}

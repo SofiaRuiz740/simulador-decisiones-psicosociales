@@ -1,0 +1,27 @@
+{
+  "id": "version-agresion",
+  "titulo": "Versiones contradictorias del episisodio",
+  "descripcion": "Lucía describe empujón y golpe en brazo; Miguel habla de 'forcejeo mutuo' sin agresión.",
+  "evidenciasInvolucradas": ["informe-urgencias", "mensajes-sofi"],
+  "personajesInvolucrados": ["lucia", "miguel"],
+  "requisitosRevelacion": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "evidencia_descubierta",
+          "parametros": { "evidenciaId": "informe-urgencias" }
+        },
+        {
+          "tipo": "escenario_visitado",
+          "parametros": { "escenarioId": "entrevista-familiar" }
+        }
+      ]
+    }
+  ],
+  "severidad": "moderada",
+  "preguntasReflexion": [
+    "¿Qué elementos del relato minimizan la violencia?",
+    "¿Cómo impacta la presencia de la menor en la dinámica de la entrevista?"
+  ]
+}

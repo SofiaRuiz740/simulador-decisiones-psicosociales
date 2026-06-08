@@ -1,0 +1,144 @@
+.page-header {
+  padding: 1.25rem 0 1rem;
+
+  h1 {
+    margin: 0.35rem 0 0.15rem;
+    font-size: 1.7rem;
+  }
+
+  .subtitulo {
+    margin: 0;
+    color: var(--app-slate);
+  }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  color: var(--app-slate);
+  font-size: 0.88rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.info-card,
+.acciones-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--app-slate);
+    margin-bottom: 0.15rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.mensaje-docente {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-teal) 8%, white);
+  border: 1px solid var(--app-line);
+
+  mat-icon {
+    color: var(--app-teal);
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    line-height: 1.5;
+    color: var(--app-slate);
+  }
+}
+
+.progreso-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  margin-bottom: 0.25rem;
+}
+
+.progreso-detalle {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--app-slate);
+}
+
+.acciones-card p {
+  margin: 0;
+  color: var(--app-slate);
+  line-height: 1.55;
+}
+
+.objetivos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--app-teal);
+  }
+}
+
+.btn-iniciar {
+  margin-top: 0.25rem;
+  height: 48px;
+}
+
+.aviso {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-slate);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .datos {
+    grid-template-columns: 1fr;
+  }
+}

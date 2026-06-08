@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,12 +10,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router, RouterLink } from '@angular/router';
 
 import { environment } from '../../environments/environment';
-import { Rol } from '../core/models/usuario.model';
 import { PracticasService } from '../core/services/practicas.service';
-
-const ACCESS_KEY = 'simulador.access';
-const REFRESH_KEY = 'simulador.refresh';
-const USER_KEY = 'simulador.user';
+import { EstudianteSessionService } from '../core/services/estudiante-session.service';
 
 @Component({
   selector: 'app-estudiante',
@@ -35,16 +31,16 @@ const USER_KEY = 'simulador.user';
       <div class="content">
         <section class="hero">
           <span class="badge"><mat-icon>school</mat-icon> Estudiante</span>
-          <h1 class="display">Tu práctica te espera</h1>
+          <h1 class="display">Tu espacio académico</h1>
           <p class="lead">
-            Vas a entrar a un caso narrativo donde tus decisiones cuentan.
-            Lee con calma, decide con criterio.
+            Ingresa con el código de tu docente para acceder a tus prácticas asignadas
+            y decidir cuándo iniciar cada simulación.
           </p>
 
           <ul class="tips">
-            <li><mat-icon>schedule</mat-icon> Tendrás un tiempo límite — el reloj corre al iniciar.</li>
-            <li><mat-icon>edit</mat-icon> Puedes cambiar tus respuestas antes de finalizar.</li>
-            <li><mat-icon>lightbulb</mat-icon> Verás la retroalimentación cuando termines.</li>
+            <li><mat-icon>dashboard</mat-icon> Verás tus prácticas, avance y fechas límite en el panel.</li>
+            <li><mat-icon>play_circle</mat-icon> La simulación inicia solo cuando tú la selecciones.</li>
+            <li><mat-icon>fullscreen</mat-icon> Podrás activar pantalla completa de forma opcional.</li>
           </ul>
         </section>
 
@@ -87,7 +83,7 @@ const USER_KEY = 'simulador.user';
             <button mat-flat-button color="primary" type="submit"
               [disabled]="form.invalid || loading()" class="submit-btn">
               <mat-icon>arrow_forward</mat-icon>
-              <span>Empezar práctica</span>
+              <span>Ingresar al panel</span>
             </button>
           </form>
         </section>
@@ -201,9 +197,10 @@ const USER_KEY = 'simulador.user';
     }
   `],
 })
-export class Estudiante {
+export class Estudiante implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly practicas = inject(PracticasService);
+  private readonly session = inject(EstudianteSessionService);
   private readonly router = inject(Router);
 
   readonly appName = environment.appName;
@@ -215,6 +212,12 @@ export class Estudiante {
     codigo: ['', [Validators.required]],
   });
 
+  ngOnInit(): void {
+    if (this.session.autenticado()) {
+      this.router.navigate(['/estudiante/panel']);
+    }
+  }
+
   ingresar() {
     if (this.form.invalid || this.loading()) return;
     this.loading.set(true);
@@ -225,17 +228,8 @@ export class Estudiante {
 
     this.practicas.accesoEstudiante(correo, codigo).subscribe({
       next: (res) => {
-        localStorage.setItem(ACCESS_KEY, res.access);
-        localStorage.setItem(REFRESH_KEY, res.refresh);
-        localStorage.setItem(USER_KEY, JSON.stringify({
-          id: res.estudiante.id,
-          username: res.estudiante.correo,
-          email: res.estudiante.correo,
-          nombre_completo: res.estudiante.nombre_completo,
-          rol: Rol.Estudiante,
-        }));
-        localStorage.setItem('simulador.practica_activa', JSON.stringify(res.practica));
-        this.router.navigate(['/estudiante/simulacion']);
+        this.session.registrarAcceso(res);
+        this.router.navigate(['/estudiante/panel']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

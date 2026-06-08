@@ -1,0 +1,22 @@
+{
+  "id": "identificar-riesgo",
+  "titulo": "Identificar factores de riesgo",
+  "descripcion": "Meta interna: detectar indicios de riesgo y violencia en el núcleo familiar.",
+  "categoria": "factores_riesgo",
+  "requisitosCumplimiento": [
+    {
+      "tipo": "o",
+      "condiciones": [
+        {
+          "tipo": "hipotesis_formulada",
+          "parametros": { "hipotesisId": "riesgo-escalada" }
+        },
+        {
+          "tipo": "contradiccion_identificada",
+          "parametros": { "contradiccionId": "version-agresion" }
+        }
+      ]
+    }
+  ],
+  "pesoAnalisis": 1.5
+}

@@ -1,0 +1,19 @@
+{
+  "id": "mensajes-sofi",
+  "titulo": "Registro documental — exposición de la menor fallecida",
+  "descripcion": "Mensajes recuperados del dispositivo de la hija fallecida antes del ingreso. No hay entrevista posible: la menor murió previo al momento jugable.",
+  "tipo": "comunicacion",
+  "contenido": "Otra vez gritaron toda la noche. Me encierro en el cuarto con auriculares.",
+  "fuentePersonajeId": "sofi",
+  "escenarioDescubrimientoId": "consulta-inicial",
+  "etiquetas": ["menor_fallecida", "exposicion_menor", "miedo", "solo_evidencia"],
+  "afirmaciones": [
+    {
+      "id": "afirm-ev-sofi-miedo",
+      "tema": "clima_familiar",
+      "valor": "miedo_y_violencia_verbal",
+      "descripcion": "Registro postumo: la menor describía miedo y gritos recurrentes antes del deceso",
+      "personajeId": "sofi"
+    }
+  ]
+}

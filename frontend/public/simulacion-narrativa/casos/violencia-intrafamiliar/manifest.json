@@ -1,0 +1,96 @@
+{
+  "id": "violencia-intrafamiliar",
+  "version": "2.0.0",
+  "titulo": "Urgencia vital — violencia intrafamiliar",
+  "descripcion": "Evaluación psicosocial en hospital por tentativa de feminicidio. La paciente está en UCI; la menor falleció antes del ingreso.",
+  "areaTematica": "violencia_intrafamiliar",
+  "tiempoEstimadoMin": 50,
+  "rolJugador": "Psicóloga clínica en equipo de salud mental hospitalaria",
+  "introduccion": "introduccion.json",
+  "escenarioInicialId": "consulta-inicial",
+  "escenarios": [
+    "escenarios/consulta-inicial.json",
+    "escenarios/entrevista-familiar.json"
+  ],
+  "personajes": [
+    "personajes/lucia.json",
+    "personajes/miguel.json",
+    "personajes/sofi.json",
+    "personajes/hermano.json",
+    "personajes/enfermera.json",
+    "personajes/medico-urgencias.json",
+    "personajes/policia.json"
+  ],
+  "conversaciones": [
+    "conversaciones/entrevista-policia-entrada.json",
+    "conversaciones/entrevista-madre-espera.json",
+    "conversaciones/entrevista-hermano-espera.json",
+    "conversaciones/entrevista-enfermera-pasillo.json",
+    "conversaciones/entrevista-medico-urgencias.json",
+    "conversaciones/revisita-lucia-informe.json",
+    "conversaciones/consulta-lucia.json",
+    "conversaciones/revelacion-lucia.json"
+  ],
+  "evidencias": [
+    "evidencias/informe-urgencias.json",
+    "evidencias/mensajes-sofi.json"
+  ],
+  "contradicciones": [
+    "contradicciones/version-agresion.json"
+  ],
+  "hipotesis": [
+    "hipotesis/ciclo-violencia.json",
+    "hipotesis/riesgo-escalada.json"
+  ],
+  "intervenciones": [
+    "intervenciones/plan-seguridad.json",
+    "intervenciones/derivacion.json"
+  ],
+  "eventos": [
+    "eventos/informe-medico-recibido.json",
+    "eventos/entrevista-familiar-convocada.json"
+  ],
+  "objetivos": [
+    "objetivos/vinculo-terapeutico.json",
+    "objetivos/identificar-riesgo.json",
+    "objetivos/contradicciones-relevantes.json",
+    "objetivos/activar-proteccion.json"
+  ],
+  "tiempoNarrativo": {
+    "inicio": { "dia": 1, "hora": 23, "minuto": 50, "etiqueta": "23:50" },
+    "minutosPorAccion": 10
+  },
+  "desbloqueosRevisita": [
+    {
+      "id": "revisita-lucia-tras-informe",
+      "personajeId": "lucia",
+      "conversacionId": "revisita-lucia-informe",
+      "requisitos": [
+        {
+          "tipo": "evidencia_descubierta",
+          "parametros": { "evidenciaId": "informe-urgencias" }
+        }
+      ],
+      "conversacionesUtilesExtra": 1,
+      "exentaFatiga": true
+    }
+  ],
+  "reglasContradiccion": [
+    {
+      "id": "regla-mecanismo-lesion",
+      "titulo": "Versiones opuestas sobre el mecanismo de la lesión",
+      "descripcion": "El informe médico y los relatos familiares no coinciden sobre cómo ocurrió la lesión.",
+      "origen": "evidencia_testimonio",
+      "tema": "mecanismo_lesion",
+      "severidad": "moderada"
+    },
+    {
+      "id": "regla-clima-familiar",
+      "titulo": "Negación del clima familiar frente a indicios de violencia",
+      "descripcion": "La familia minimiza mientras emergen relatos de gritos y miedo.",
+      "origen": "testimonio_testimonio",
+      "tema": "clima_familiar",
+      "severidad": "leve"
+    }
+  ]
+}

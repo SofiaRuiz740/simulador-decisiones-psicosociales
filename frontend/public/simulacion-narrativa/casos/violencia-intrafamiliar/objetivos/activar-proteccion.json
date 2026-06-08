@@ -1,0 +1,22 @@
+{
+  "id": "activar-proteccion",
+  "titulo": "Activar medidas de protección",
+  "descripcion": "Meta interna: se inicia un plan de seguridad o derivación especializada.",
+  "categoria": "proteccion",
+  "requisitosCumplimiento": [
+    {
+      "tipo": "o",
+      "condiciones": [
+        {
+          "tipo": "intervencion_aplicada",
+          "parametros": { "intervencionId": "plan-seguridad" }
+        },
+        {
+          "tipo": "intervencion_aplicada",
+          "parametros": { "intervencionId": "derivacion" }
+        }
+      ]
+    }
+  ],
+  "pesoAnalisis": 1.8
+}

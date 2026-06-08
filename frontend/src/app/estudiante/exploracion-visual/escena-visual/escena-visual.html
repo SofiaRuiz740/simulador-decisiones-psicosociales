@@ -1,0 +1,23 @@
+<section
+  class="escena"
+  [class.transicionando]="transicionando()"
+  [style.backgroundImage]="'url(' + fondoUrl() + ')'"
+  [style]="estiloEscena()">
+  <div class="escena-suelo" aria-hidden="true"></div>
+  <div class="escena-vineta" aria-hidden="true"></div>
+
+  @for (item of hotspotsPersonaje(); track item.hotspot.id) {
+    <app-hotspot-personaje
+      [area]="item.hotspot.posicion"
+      [etiqueta]="etiquetaHotspotPersonaje(item.hotspot)"
+      [interactuable]="item.interactuable && !hotspotAgotado(item.hotspot.conversacionId)"
+      [agotado]="hotspotAgotado(item.hotspot.conversacionId)"
+      [activo]="conversacionActivaId() === item.hotspot.conversacionId"
+      (activar)="onHotspotPersonaje(item.hotspot.conversacionId, item.interactuable, item.hotspot.modoAcercamiento ?? true)"
+      (intentoBloqueado)="onPersonajeIntegrado(item.hotspot.conversacionId, false)" />
+  }
+
+  @for (hotspot of hotspotsVisibles(); track hotspot.id) {
+    <app-hotspot-lupa [hotspot]="hotspot" (activar)="onHotspot(hotspot)" />
+  }
+</section>

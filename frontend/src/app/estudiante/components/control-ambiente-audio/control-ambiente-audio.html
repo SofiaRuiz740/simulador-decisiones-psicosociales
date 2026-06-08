@@ -1,0 +1,58 @@
+<button
+  mat-stroked-button
+  type="button"
+  class="control-ambiente-trigger"
+  [class.requiere-interaccion]="ambiente.requiereInteraccion()"
+  [matMenuTriggerFor]="menuAmbiente"
+  [matTooltip]="
+    ambiente.requiereInteraccion()
+      ? 'Activar ambientación sonora'
+      : ambiente.silenciado()
+        ? 'Ambientación silenciada'
+        : 'Ambientación sonora (' + ambiente.volumenPorcentaje() + '%)'
+  "
+  (menuOpened)="onMenuAbierto()"
+  aria-label="Control de ambientación sonora"
+  aria-haspopup="menu">
+  <mat-icon>{{ iconoVolumen() }}</mat-icon>
+  <span class="control-ambiente-texto">Audio</span>
+</button>
+
+<mat-menu #menuAmbiente="matMenu" class="menu-ambiente-panel" xPosition="before">
+  <div class="menu-ambiente" role="group" aria-label="Volumen ambiental" (click)="$event.stopPropagation()">
+    <div class="menu-ambiente-encabezado">
+      <span class="menu-ambiente-titulo">Ambientación</span>
+      <span class="menu-ambiente-sub">Investigación clínica · hospital</span>
+    </div>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="menu-ambiente-toggle"
+      (click)="alternarSilencio($event)">
+      <mat-icon>{{ ambiente.silenciado() ? 'volume_up' : 'volume_off' }}</mat-icon>
+      {{ ambiente.silenciado() ? 'Activar sonido' : 'Silenciar' }}
+    </button>
+
+    <label class="menu-ambiente-slider">
+      <span class="slider-etiqueta">Volumen</span>
+      <input
+        type="range"
+        class="slider-volumen"
+        [min]="volumenMinPct"
+        [max]="volumenMaxPct"
+        step="1"
+        [value]="ambiente.volumenPorcentaje()"
+        [disabled]="ambiente.silenciado()"
+        (input)="onVolumenInput($event)"
+        aria-valuemin="{{ volumenMinPct }}"
+        aria-valuemax="{{ volumenMaxPct }}"
+        [attr.aria-valuenow]="ambiente.volumenPorcentaje()" />
+      <span class="slider-valor">{{ ambiente.volumenPorcentaje() }}%</span>
+    </label>
+
+    @if (ambiente.enDialogo()) {
+      <p class="menu-ambiente-nota">Volumen reducido durante entrevistas.</p>
+    }
+  </div>
+</mat-menu>

@@ -1,0 +1,23 @@
+{
+  "id": "lucia",
+  "nombre": "Lucía Morales",
+  "rol": "consultante",
+  "edad": 34,
+  "relacionFamilia": "Madre de la menor fallecida; víctima de violencia intrafamiliar",
+  "descripcion": "Madre hospitalizada en crisis tras la muerte de su hija. Refiere malestar somático y dificultad para hablar de la dinámica familiar.",
+  "personalidad": "Reservada, minimiza conflictos, busca aprobación.",
+  "metricasIniciales": {
+    "confianza": 25,
+    "ansiedad": 70,
+    "colaboracion": 35,
+    "aperturaEmocional": 20
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 3,
+    "mensajesAgotamiento": [
+      "No tengo nada más que agregar.",
+      "No recuerdo más detalles.",
+      "Prefiero no seguir hablando."
+    ]
+  }
+}

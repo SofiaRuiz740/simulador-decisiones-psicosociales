@@ -1,0 +1,14 @@
+{
+  "id": "riesgo-escalada",
+  "titulo": "Riesgo de escalada y exposición de la menor",
+  "descripcion": "La exposición repetida de Sofi a episodios violentos incrementa el riesgo psicosocial.",
+  "categoria": "riesgo",
+  "evidenciasSoporte": ["mensajes-sofi"],
+  "personajesRelacionados": ["sofi"],
+  "requisitosFormulacion": [
+    {
+      "tipo": "evidencia_descubierta",
+      "parametros": { "evidenciaId": "mensajes-sofi" }
+    }
+  ]
+}

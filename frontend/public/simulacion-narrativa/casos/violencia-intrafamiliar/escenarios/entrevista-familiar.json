@@ -1,0 +1,71 @@
+{
+  "id": "entrevista-familiar",
+  "orden": 2,
+  "titulo": "Entrevista familiar",
+  "narrativa": "La sala de entrevista familiar permanece cerrada. Aún no hay autorización para convocar al núcleo.",
+  "ubicacion": "Sala de entrevista familiar",
+  "momentoTemporal": "Pendiente de convocatoria",
+  "personajesPresentes": [],
+  "evidenciasDisponibles": [],
+  "intervencionesDisponibles": [],
+  "requisitosAcceso": [
+    {
+      "tipo": "flag_activo",
+      "parametros": { "clave": "entrevista_familiar_convocada" }
+    }
+  ],
+  "variantes": [
+    {
+      "id": "sala-cerrada",
+      "titulo": "Entrevista familiar — acceso restringido",
+      "narrativa": "La puerta de la sala de entrevista familiar está cerrada. Todavía no se ha autorizado la convocatoria.",
+      "ubicacion": "Pasillo de salas de entrevista",
+      "momentoTemporal": "Acceso restringido",
+      "requisitos": [
+        {
+          "tipo": "no",
+          "condiciones": [
+            {
+              "tipo": "flag_activo",
+              "parametros": { "clave": "entrevista_familiar_convocada" }
+            }
+          ]
+        }
+      ],
+      "personajesPresentes": [],
+      "prioridad": 1
+    },
+    {
+      "id": "entrevista-autorizada",
+      "titulo": "Entrevista familiar",
+      "narrativa": "Lucía, Miguel y Sofi están en la sala. Las versiones sobre los episodios recientes comienzan a divergir.",
+      "ubicacion": "Sala de entrevista familiar",
+      "momentoTemporal": "Día 2 — 16:00",
+      "requisitos": [
+        {
+          "tipo": "flag_activo",
+          "parametros": { "clave": "entrevista_familiar_convocada" }
+        }
+      ],
+      "personajesPresentes": ["lucia", "miguel", "sofi"],
+      "evidenciasDisponibles": ["mensajes-sofi"],
+      "intervencionesDisponibles": ["plan-seguridad", "derivacion"],
+      "prioridad": 10
+    },
+    {
+      "id": "entrevista-con-evidencia-menor",
+      "titulo": "Entrevista familiar — nueva evidencia",
+      "narrativa": "Durante la entrevista familiar surgen indicios sobre la exposición de la menor. El clima es tenso.",
+      "requisitos": [
+        {
+          "tipo": "evidencia_descubierta",
+          "parametros": { "evidenciaId": "mensajes-sofi" }
+        }
+      ],
+      "personajesPresentes": ["lucia", "miguel", "sofi"],
+      "evidenciasDisponibles": ["mensajes-sofi"],
+      "intervencionesDisponibles": ["plan-seguridad", "derivacion"],
+      "prioridad": 20
+    }
+  ]
+}

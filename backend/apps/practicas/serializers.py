@@ -110,21 +110,6 @@ class AutorizarEstudiantesSerializer(serializers.Serializer):
     grupo_ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1), required=False, default=list,
     )
-    correo_smtp_password = serializers.CharField(
-        write_only=True,
-        required=False,
-        allow_blank=True,
-        style={'input_type': 'password'},
-    )
-
-
-class ReenviarInvitacionSerializer(serializers.Serializer):
-    correo_smtp_password = serializers.CharField(
-        write_only=True,
-        required=False,
-        allow_blank=True,
-        style={'input_type': 'password'},
-    )
 
 
 class MisPracticaEstudianteSerializer(serializers.Serializer):

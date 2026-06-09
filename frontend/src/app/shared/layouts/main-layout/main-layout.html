@@ -216,16 +216,6 @@
 
             <mat-divider />
 
-            @if (showDocenteActions()) {
-              <button mat-menu-item (click)="abrirCorreoInvitaciones()">
-                <mat-icon>mail</mat-icon>
-                <span>Correo para invitaciones</span>
-                @if (!correoInvitacionesOk()) {
-                  <span class="menu-badge">!</span>
-                }
-              </button>
-            }
-
             <button mat-menu-item (click)="logout()">
 
               <mat-icon>logout</mat-icon>

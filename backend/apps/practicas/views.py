@@ -9,7 +9,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.usuarios.mail_utils import guardar_clave_smtp_si_provista
 from apps.usuarios.models import Usuario
 from apps.usuarios.permissions import EsDocenteOAdmin
 
@@ -22,7 +21,6 @@ from .serializers import (
     MisPracticaEstudianteSerializer,
     PracticaDetalleSerializer,
     PracticaListSerializer,
-    ReenviarInvitacionSerializer,
 )
 from .services import autorizar_estudiantes_en_practica, listar_autorizaciones_docente, listar_mis_practicas
 
@@ -85,17 +83,6 @@ class PracticaViewSet(viewsets.ModelViewSet):
         practica: Practica = self.get_object()
         ser = AutorizarEstudiantesSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-
-        if not guardar_clave_smtp_si_provista(
-            request.user,
-            ser.validated_data.get('correo_smtp_password'),
-        ):
-            raise ValidationError({
-                'correo_smtp_password': (
-                    'Indica la contraseña de aplicación de tu Gmail para enviar '
-                    'las invitaciones a los estudiantes.'
-                ),
-            })
 
         creadas = autorizar_estudiantes_en_practica(
             practica,
@@ -173,12 +160,6 @@ class PracticaViewSet(viewsets.ModelViewSet):
             raise ValidationError('Esta autorización ya estaba revocada.')
 
         motivo = (request.data.get('motivo') or '').strip()[:300]
-        # Si el docente envía la clave SMTP en la petición la guardamos para
-        # esta sesión y todas las siguientes (mismo patrón que invitación).
-        guardar_clave_smtp_si_provista(
-            request.user,
-            request.data.get('correo_smtp_password'),
-        )
 
         auth.revocada = True
         auth.revocada_en = timezone.now()
@@ -203,18 +184,6 @@ class PracticaViewSet(viewsets.ModelViewSet):
             auth = practica.autorizaciones.get(pk=autorizacion_id)
         except AutorizacionEstudiante.DoesNotExist:
             raise ValidationError('Autorización no encontrada en esta práctica.')
-
-        ser = ReenviarInvitacionSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        if not guardar_clave_smtp_si_provista(
-            request.user,
-            ser.validated_data.get('correo_smtp_password'),
-        ):
-            raise ValidationError({
-                'correo_smtp_password': (
-                    'Indica la contraseña de aplicación de tu Gmail para enviar la invitación.'
-                ),
-            })
 
         ok, error = enviar_invitacion_practica(auth, forzar=True)
         if not ok:

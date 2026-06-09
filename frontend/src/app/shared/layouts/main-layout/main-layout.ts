@@ -22,7 +22,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
@@ -37,8 +36,6 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Rol } from '../../../core/models/usuario.model';
 
 import { NavIcon } from '../../components/nav-icon/nav-icon';
-import { CorreoInvitacionesDialog } from '../../dialogs/correo-invitaciones-dialog';
-import { mockupDialog } from '../../constants/dialog-config';
 
 
 
@@ -98,8 +95,6 @@ interface NavGroup {
 
     MatTooltipModule,
 
-    MatDialogModule,
-
     NavIcon,
 
   ],
@@ -115,8 +110,6 @@ export class MainLayout {
   private readonly breakpointObserver = inject(BreakpointObserver);
 
   private readonly auth = inject(AuthService);
-
-  private readonly dialog = inject(MatDialog);
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -284,14 +277,6 @@ export class MainLayout {
 
 
   readonly showDocenteActions = computed(() => this.rol() === Rol.Docente);
-
-  readonly correoInvitacionesOk = computed(() => this.usuario()?.correo_smtp_configurado === true);
-
-  abrirCorreoInvitaciones(): void {
-    this.dialog.open(CorreoInvitacionesDialog, mockupDialog('480px')).afterClosed().subscribe((clave) => {
-      if (clave) this.auth.cargarPerfil().subscribe();
-    });
-  }
 
 
 

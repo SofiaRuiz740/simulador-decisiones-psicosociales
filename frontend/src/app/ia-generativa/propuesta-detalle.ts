@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -20,7 +21,7 @@ import { mockupDialog } from '../shared/constants/dialog-config';
   imports: [
     CommonModule, RouterLink,
     MatProgressBarModule, MatSnackBarModule,
-    MatDialogModule,
+    MatDialogModule, MatIconModule,
     GamePreview,
   ],
   templateUrl: './propuesta-detalle.html',

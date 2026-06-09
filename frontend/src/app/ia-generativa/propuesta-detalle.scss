@@ -46,3 +46,33 @@
   font-size: 1rem;
   font-weight: 600;
 }
+
+.ia-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.ia-chip-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(120deg, rgba(30, 58, 138, 0.1), rgba(13, 148, 136, 0.1));
+  color: #1e3a8a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 58, 138, 0.2);
+
+  mat-icon {
+    font-size: 0.9rem;
+    width: 0.9rem;
+    height: 0.9rem;
+    color: #f59e0b;
+  }
+}

@@ -1,99 +1,263 @@
-<section class="module page">
+<section class="module page ia-studio">
 
-  <header class="hero-glass">
-    <h1><em>IA</em> generativa</h1>
+  <!-- ============ HERO ============ -->
+  <header class="ia-hero">
+    <div class="ia-hero__bg" aria-hidden="true">
+      <span class="ia-hero__orb ia-hero__orb--1"></span>
+      <span class="ia-hero__orb ia-hero__orb--2"></span>
+      <span class="ia-hero__orb ia-hero__orb--3"></span>
+    </div>
+    <div class="ia-hero__content">
+      <span class="ia-chip">
+        <mat-icon>auto_awesome</mat-icon>
+        IA generativa
+      </span>
+      <h1>
+        Generador inteligente de <em>casos psicosociales</em>
+      </h1>
+      <p class="ia-hero__sub">
+        Describe el tema y la IA construye un caso completo con escenarios, decisiones éticas,
+        preguntas y rúbrica. Tú revisas, ajustas y publicas.
+      </p>
+      <ul class="ia-hero__bullets">
+        <li><mat-icon>flash_on</mat-icon> En menos de 30 segundos</li>
+        <li><mat-icon>school</mat-icon> Alineado a teorías de psicología social</li>
+        <li><mat-icon>tune</mat-icon> Editable antes de convertirlo en caso real</li>
+      </ul>
+    </div>
   </header>
 
-  <nav class="tabs" aria-label="Secciones IA">
-    <button type="button" class="tab" [class.active]="tab() === 'nueva'" (click)="setTab('nueva')">Nueva propuesta</button>
-    <button type="button" class="tab" [class.active]="tab() === 'borradores'" (click)="setTab('borradores')">Borradores</button>
-    <button type="button" class="tab" [class.active]="tab() === 'historial'" (click)="setTab('historial')">Historial</button>
+  <!-- ============ TABS ============ -->
+  <nav class="ia-tabs" aria-label="Secciones IA">
+    <button type="button" class="ia-tab" [class.active]="tab() === 'nueva'" (click)="setTab('nueva')">
+      <mat-icon>add_circle</mat-icon> Nueva propuesta
+    </button>
+    <button type="button" class="ia-tab" [class.active]="tab() === 'borradores'" (click)="setTab('borradores')">
+      <mat-icon>drafts</mat-icon> Borradores
+    </button>
+    <button type="button" class="ia-tab" [class.active]="tab() === 'historial'" (click)="setTab('historial')">
+      <mat-icon>history</mat-icon> Historial
+    </button>
   </nav>
 
-  <!-- Tab: Nueva propuesta -->
+  <!-- ====================================================== -->
+  <!-- TAB: NUEVA PROPUESTA                                    -->
+  <!-- ====================================================== -->
   <div class="tab-panel" [class.active]="tab() === 'nueva'">
-    <div class="builder-block">
-      <div class="builder-header">
-        <h3 class="card__title">Nueva propuesta</h3>
-      </div>
 
-      <form class="form-panel" [formGroup]="form" (ngSubmit)="generar()">
-        <div class="field">
-          <label for="iaTema">Tema del caso <span>*</span></label>
+    <form class="ia-form" [formGroup]="form" (ngSubmit)="generar()">
+
+      <!-- SECCIÓN 1 — Concepto -->
+      <article class="ia-card">
+        <header class="ia-card__head">
+          <span class="ia-card__icon"><mat-icon>lightbulb</mat-icon></span>
+          <div>
+            <h3>Concepto del caso</h3>
+            <p>Define el tema y el objetivo formativo. La IA se basa en esto para construir todo el escenario.</p>
+          </div>
+        </header>
+
+        <div class="ia-field">
+          <label for="iaTema">Tema del caso <span class="req">*</span></label>
           <input
             id="iaTema"
             type="text"
             formControlName="tema"
             placeholder="Ej: Conflicto comunitario por uso del espacio público"
-            maxlength="300" />
-          <div class="field-counter">{{ form.controls.tema.value.length }}/300</div>
+            maxlength="300"
+            [disabled]="generando()" />
+          <div class="ia-field__foot">
+            <span class="hint">Frase corta y específica — funciona mejor.</span>
+            <span class="counter">{{ form.controls.tema.value.length }}/300</span>
+          </div>
+
+          <div class="ia-prompts">
+            <span class="ia-prompts__label">
+              <mat-icon>auto_awesome</mat-icon> Inspírate:
+            </span>
+            @for (p of promptsInspiracion; track p) {
+              <button type="button" class="ia-prompts__chip"
+                      [disabled]="generando()"
+                      (click)="aplicarPrompt(p)">
+                {{ p }}
+              </button>
+            }
+          </div>
         </div>
 
-        <div class="field">
-          <label for="iaObjetivo">Objetivo de aprendizaje <span>*</span></label>
+        <div class="ia-field">
+          <label for="iaObjetivo">Objetivo de aprendizaje <span class="req">*</span></label>
           <textarea
             id="iaObjetivo"
             formControlName="objetivo_aprendizaje"
-            placeholder="Competencias psicosociales a desarrollar…"
-            rows="4"></textarea>
+            placeholder="Ej: Evaluar la toma de decisiones éticas ante presión grupal en contextos comunitarios."
+            rows="4"
+            [disabled]="generando()"></textarea>
+          <div class="ia-field__foot">
+            <span class="hint">¿Qué competencia debe desarrollar el estudiante al terminar el caso?</span>
+          </div>
         </div>
+      </article>
 
-        <div class="field-row">
-          <div class="field">
-            <label for="iaDificultad">Dificultad <span>*</span></label>
-            <select id="iaDificultad" formControlName="nivel_dificultad">
-              <option value="bajo">Básico</option>
-              <option value="medio">Medio</option>
-              <option value="alto">Avanzado</option>
+      <!-- SECCIÓN 2 — Estructura -->
+      <article class="ia-card">
+        <header class="ia-card__head">
+          <span class="ia-card__icon ia-card__icon--teal"><mat-icon>view_module</mat-icon></span>
+          <div>
+            <h3>Estructura del caso</h3>
+            <p>Configura el tamaño y la profundidad del caso generado.</p>
+          </div>
+        </header>
+
+        <div class="ia-grid-3">
+          <div class="ia-field">
+            <label for="iaDificultad">
+              <mat-icon class="lab">trending_up</mat-icon>
+              Nivel de dificultad
+            </label>
+            <select id="iaDificultad" formControlName="nivel_dificultad" [disabled]="generando()">
+              <option value="bajo">Básico — primer contacto</option>
+              <option value="medio">Medio — aplicación de conceptos</option>
+              <option value="alto">Avanzado — dilemas complejos</option>
             </select>
           </div>
-          <div class="field">
-            <label for="iaEscenarios">Escenarios <span>*</span></label>
-            <select id="iaEscenarios" formControlName="numero_escenarios">
+
+          <div class="ia-field">
+            <label for="iaEscenarios">
+              <mat-icon class="lab">auto_stories</mat-icon>
+              Escenarios narrativos
+            </label>
+            <select id="iaEscenarios" formControlName="numero_escenarios" [disabled]="generando()">
               @for (n of [1,2,3,4,5,6,7,8]; track n) {
-                <option [value]="n">{{ n }}</option>
+                <option [value]="n">{{ n }} escenario{{ n > 1 ? 's' : '' }}</option>
               }
             </select>
           </div>
-          <div class="field">
-            <label for="iaPreguntas">Preguntas / escenario <span>*</span></label>
-            <select id="iaPreguntas" formControlName="numero_preguntas_por_escenario">
+
+          <div class="ia-field">
+            <label for="iaPreguntas">
+              <mat-icon class="lab">quiz</mat-icon>
+              Preguntas por escenario
+            </label>
+            <select id="iaPreguntas" formControlName="numero_preguntas_por_escenario" [disabled]="generando()">
               @for (n of [1,2,3,4,5,6]; track n) {
-                <option [value]="n">{{ n }}</option>
+                <option [value]="n">{{ n }} pregunta{{ n > 1 ? 's' : '' }}</option>
               }
             </select>
           </div>
         </div>
+      </article>
 
-        <div class="field">
-          <label for="iaTono">Tono narrativo</label>
-          <input id="iaTono" type="text" formControlName="tono" />
-        </div>
-
-        @if (generando()) {
-          <div class="progress-bar">
-            <div class="progress-bar__fill" [style.width.%]="pctPasos()"></div>
+      <!-- SECCIÓN 3 — Tono -->
+      <article class="ia-card">
+        <header class="ia-card__head">
+          <span class="ia-card__icon ia-card__icon--violet"><mat-icon>palette</mat-icon></span>
+          <div>
+            <h3>Tono narrativo</h3>
+            <p>Cómo quieres que se sienta el caso. Opcional pero recomendado.</p>
           </div>
-        }
+        </header>
 
-        <div class="form-actions">
-          <button type="submit" class="btn-primary" [disabled]="form.invalid || generando()">
-            {{ generando() ? 'Generando…' : 'Generar caso' }}
+        <div class="ia-field">
+          <label for="iaTono">Tono</label>
+          <input id="iaTono" type="text" formControlName="tono" [disabled]="generando()" />
+          <div class="ia-field__foot">
+            <span class="hint">Ej: "académico, narrativo e interactivo" · "reflexivo y realista" · "directo y profesional"</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ERROR INLINE -->
+      @if (errorGeneracion(); as err) {
+        <div class="ia-error" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <div>
+            <strong>No se pudo generar la propuesta.</strong>
+            <p>{{ err }}</p>
+          </div>
+          <button type="button" class="ia-error__close" (click)="errorGeneracion.set(null)" aria-label="Cerrar">
+            <mat-icon>close</mat-icon>
           </button>
         </div>
-      </form>
-    </div>
+      }
+
+      <!-- BOTÓN CTA -->
+      <div class="ia-cta">
+        <button type="submit" class="ia-cta__btn" [disabled]="form.invalid || generando()">
+          <mat-icon>auto_awesome</mat-icon>
+          <span>{{ generando() ? 'La IA está creando tu caso…' : 'Generar caso con IA' }}</span>
+          @if (!generando()) {
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+          }
+        </button>
+        <p class="ia-cta__hint">
+          <mat-icon>lock</mat-icon>
+          Tu prompt no se comparte públicamente · El caso queda como borrador editable
+        </p>
+      </div>
+    </form>
+
+    <!-- ============ MODAL DE PROGRESO ============ -->
+    @if (generando()) {
+      <div class="ia-loading-overlay" role="status" aria-live="polite">
+        <div class="ia-loading-card">
+          <div class="ia-loading-card__head">
+            <span class="ia-loading-card__pulse">
+              <mat-icon>auto_awesome</mat-icon>
+            </span>
+            <div>
+              <h3>Generando tu caso</h3>
+              <p>{{ pctPasos() }}% completado</p>
+            </div>
+          </div>
+
+          <div class="ia-loading-card__bar">
+            <div class="ia-loading-card__bar-fill" [style.width.%]="pctPasos()"></div>
+          </div>
+
+          <ul class="ia-steps">
+            @for (paso of pasosGen; track paso.label; let i = $index) {
+              <li class="ia-step"
+                  [class.done]="pasoIdx() > i"
+                  [class.active]="pasoIdx() === i">
+                <span class="ia-step__icon">
+                  @if (pasoIdx() > i) {
+                    <mat-icon>check_circle</mat-icon>
+                  } @else if (pasoIdx() === i) {
+                    <span class="spinner"></span>
+                  } @else {
+                    <mat-icon>{{ paso.icon }}</mat-icon>
+                  }
+                </span>
+                <span class="ia-step__label">{{ paso.label }}</span>
+              </li>
+            }
+          </ul>
+
+          <p class="ia-loading-card__foot">
+            <mat-icon>info</mat-icon>
+            Esto puede tardar entre 8 y 25 segundos según el modelo configurado.
+          </p>
+        </div>
+      </div>
+    }
+
   </div>
 
-  <!-- Tab: Borradores -->
+  <!-- ====================================================== -->
+  <!-- TAB: BORRADORES                                         -->
+  <!-- ====================================================== -->
   <div class="tab-panel" [class.active]="tab() === 'borradores'">
-    <section class="panel">
+    <section class="panel ia-borradores">
       <div class="panel__toolbar">
         <div class="toolbar">
           <div class="toolbar__filters">
-            <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" [ngModelOptions]="{standalone: true}" />
-            <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" [ngModelOptions]="{standalone: true}">
-              <option value="">Todos</option>
+            <input type="search" placeholder="Buscar por título, tema u objetivo…"
+                   [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)"
+                   [ngModelOptions]="{standalone: true}" />
+            <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)"
+                    [ngModelOptions]="{standalone: true}">
+              <option value="">Todos los estados</option>
               <option [value]="EstadoPropuestaIA.Borrador">Borrador</option>
               <option [value]="EstadoPropuestaIA.EnRevision">En revisión</option>
               <option [value]="EstadoPropuestaIA.Aprobado">Aprobado</option>
@@ -107,17 +271,28 @@
         @if (loadingLista()) {
           <mat-progress-bar mode="indeterminate" />
         } @else if (filtradas().length === 0) {
-          <div class="empty-state-mockup">
-            <strong>Sin borradores</strong>
-            Genera una propuesta en la pestaña «Nueva propuesta».
+          <div class="ia-empty">
+            <mat-icon>auto_awesome</mat-icon>
+            <strong>Aún no hay propuestas generadas</strong>
+            <p>Cuando generes un caso en la pestaña «Nueva propuesta» aparecerá aquí como borrador editable.</p>
+            <button type="button" class="btn-ghost" (click)="setTab('nueva')">
+              <mat-icon>add</mat-icon> Generar mi primera propuesta
+            </button>
           </div>
         } @else {
           <div class="surface surface--flat">
             @for (p of filtradas(); track p.id) {
-              <article class="list-row">
-                <div>
-                  <div class="list-row__title">{{ p.titulo }}</div>
-                  <div class="list-row__meta">{{ p.fecha_creacion | date:'mediumDate' }}</div>
+              <article class="list-row ia-row">
+                <div class="ia-row__main">
+                  <div class="ia-row__title">
+                    <mat-icon class="ia-row__star">auto_awesome</mat-icon>
+                    {{ p.titulo }}
+                  </div>
+                  <div class="ia-row__meta">
+                    <span>{{ p.fecha_creacion | date:'mediumDate' }}</span>
+                    <span>·</span>
+                    <span>{{ p.numero_escenarios }} escenarios</span>
+                  </div>
                 </div>
                 <div class="list-row__side">
                   <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
@@ -134,13 +309,14 @@
     </section>
   </div>
 
-  <!-- Tab: Historial -->
+  <!-- ====================================================== -->
+  <!-- TAB: HISTORIAL                                          -->
+  <!-- ====================================================== -->
   <div class="tab-panel" [class.active]="tab() === 'historial'">
-    <div class="surface">
-      <div class="empty-state-mockup">
-        <strong>Sin historial disponible</strong>
-        El registro de actividad de propuestas IA aparecerá aquí cuando el backend lo exponga.
-      </div>
+    <div class="ia-empty">
+      <mat-icon>history</mat-icon>
+      <strong>Historial de actividad</strong>
+      <p>Aquí verás un registro de cada generación, aprobación y conversión cuando el backend exponga el log.</p>
     </div>
   </div>
 

@@ -8,13 +8,18 @@
     <header class="hero-glass hero-glass--compact">
       <div class="hero-glass__row">
         <div>
-          <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
+          <div class="ia-chips">
+            <span class="ia-chip-ai">
+              <mat-icon>auto_awesome</mat-icon>
+              {{ p.generada_con_llm ? 'Generado por IA' : 'Plantilla pedagógica' }}
+            </span>
+            <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
+          </div>
           <h1><em>{{ p.titulo }}</em></h1>
           <p class="hero-glass__meta">
             <span>{{ p.tema }}</span>
             <span>{{ p.nivel_dificultad }}</span>
             <span>{{ p.numero_escenarios }} escenarios</span>
-            @if (!p.generada_con_llm) { <span>Plantilla pedagógica</span> }
           </p>
         </div>
         <div class="actions actions--end">

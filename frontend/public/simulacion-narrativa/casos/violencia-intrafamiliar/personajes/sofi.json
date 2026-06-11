@@ -3,8 +3,8 @@
   "nombre": "Sofi Morales",
   "rol": "menor",
   "edad": 12,
-  "relacionFamilia": "Hija de Lucía. Falleció antes del ingreso hospitalario actual.",
-  "descripcion": "Menor fallecida previo al momento jugable. Solo presente como evidencia documental (mensajes, informes, registros). No es personaje interactivo.",
+  "relacionFamilia": "Hija de Lucía; nieta de Carmen Morales (madre de Lucía en sala de espera). Falleció antes del ingreso hospitalario actual.",
+  "descripcion": "Menor víctima fatal del episodio. Solo presente como evidencia documental (mensajes, informes, registros). No es personaje interactivo.",
   "metricasIniciales": {
     "confianza": 0,
     "ansiedad": 0,

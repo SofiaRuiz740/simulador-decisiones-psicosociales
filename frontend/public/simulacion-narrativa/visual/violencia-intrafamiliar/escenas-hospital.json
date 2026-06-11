@@ -1,14 +1,17 @@
 {
   "id": "hospital-violencia-intrafamiliar",
-  "version": "2.4.0",
+  "version": "2.9.0",
   "casoId": "violencia-intrafamiliar",
   "escenaInicialId": "entrada-hospital",
   "mapeoRolesVisuales": {
-    "lucia": "madre-victima",
+    "lucia": "victima",
+    "madre-lucia": "madre-victima",
     "hermano": "hermano-familiar",
     "enfermera": "enfermera",
     "medico-urgencias": "medico-urgencias",
-    "policia": "policia"
+    "policia": "policia",
+    "comisario": "comisario",
+    "trabajadora-social-comisaria": "trabajadora-social"
   },
   "escenas": [
     {
@@ -31,7 +34,35 @@
           "requisitosAcceso": [
             {
               "tipo": "escenario_conversaciones_completadas",
-              "parametros": { "escenarioId": "consulta-inicial" }
+              "parametros": {
+                "escenarioId": "consulta-inicial",
+                "conversacionIds": [
+                  "entrevista-policia-entrada",
+                  "entrevista-madre-espera",
+                  "entrevista-hermano-espera",
+                  "entrevista-enfermera-pasillo",
+                  "entrevista-medico-urgencias",
+                  "revisita-lucia-informe"
+                ]
+              }
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "escenario_visitado",
+                  "parametros": { "escenarioId": "investigacion-comisaria" }
+                }
+              ]
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "flag_activo",
+                  "parametros": { "clave": "caso_completado" }
+                }
+              ]
             }
           ],
           "posicion": { "x": 78, "y": 42, "ancho": 12, "alto": 14 }
@@ -45,7 +76,7 @@
           "conversacionId": "entrevista-policia-entrada",
           "etiquetaInteraccion": "Funcionario policial",
           "modoAcercamiento": true,
-          "posicion": { "x": 9, "y": 34, "ancho": 10, "alto": 38 }
+          "posicion": { "x": 10.2, "y": 54.7, "ancho": 23.6, "alto": 33.3 }
         }
       ]
     },
@@ -68,17 +99,76 @@
           "destinoEscenaId": "entrada-hospital",
           "esRegreso": true,
           "posicion": { "x": 6, "y": 72, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "ir-comisaria-sala",
+          "etiqueta": "Trasladarse a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "requisitosAcceso": [
+            {
+              "tipo": "escenario_conversaciones_completadas",
+              "parametros": {
+                "escenarioId": "consulta-inicial",
+                "conversacionIds": [
+                  "entrevista-policia-entrada",
+                  "entrevista-madre-espera",
+                  "entrevista-hermano-espera",
+                  "entrevista-enfermera-pasillo",
+                  "entrevista-medico-urgencias",
+                  "revisita-lucia-informe"
+                ]
+              }
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "escenario_visitado",
+                  "parametros": { "escenarioId": "investigacion-comisaria" }
+                }
+              ]
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "flag_activo",
+                  "parametros": { "clave": "caso_completado" }
+                }
+              ]
+            }
+          ],
+          "posicion": { "x": 78, "y": 72, "ancho": 12, "alto": 12 }
         }
       ],
       "sprites": [
         {
+          "id": "hotspot-madre-revisita-ts",
+          "personajeId": "madre-lucia",
+          "rolVisual": "madre-victima",
+          "conversacionId": "revisita-madre-tras-ts",
+          "etiquetaInteraccion": "Madre (seguimiento)",
+          "modoAcercamiento": true,
+          "posicion": { "x": 35.9, "y": 47.1, "ancho": 28.2, "alto": 39.9 }
+        },
+        {
           "id": "hotspot-madre-espera",
-          "personajeId": "lucia",
+          "personajeId": "madre-lucia",
           "rolVisual": "madre-victima",
           "conversacionId": "entrevista-madre-espera",
-          "etiquetaInteraccion": "Madre (víctima)",
+          "etiquetaInteraccion": "Madre (sala de espera)",
           "modoAcercamiento": true,
-          "posicion": { "x": 46, "y": 36, "ancho": 15, "alto": 54 }
+          "posicion": { "x": 49, "y": 41, "ancho": 7, "alto": 25 }
+        },
+        {
+          "id": "hotspot-hermano-revisita-policia",
+          "personajeId": "hermano",
+          "rolVisual": "hermano-familiar",
+          "conversacionId": "revisita-hermano-tras-policia",
+          "etiquetaInteraccion": "Hermano (seguimiento)",
+          "modoAcercamiento": true,
+          "posicion": { "x": 23, "y": 16, "ancho": 7, "alto": 35 }
         },
         {
           "id": "hotspot-hermano-espera",
@@ -87,7 +177,7 @@
           "conversacionId": "entrevista-hermano-espera",
           "etiquetaInteraccion": "Hermano",
           "modoAcercamiento": true,
-          "posicion": { "x": 18, "y": 24, "ancho": 14, "alto": 42 }
+          "posicion": { "x": 23, "y": 16, "ancho": 7, "alto": 35 }
         }
       ]
     },
@@ -117,6 +207,47 @@
           "destinoEscenaId": "sala-espera",
           "esRegreso": true,
           "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "ir-comisaria-pasillo",
+          "etiqueta": "Trasladarse a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "requisitosAcceso": [
+            {
+              "tipo": "escenario_conversaciones_completadas",
+              "parametros": {
+                "escenarioId": "consulta-inicial",
+                "conversacionIds": [
+                  "entrevista-policia-entrada",
+                  "entrevista-madre-espera",
+                  "entrevista-hermano-espera",
+                  "entrevista-enfermera-pasillo",
+                  "entrevista-medico-urgencias",
+                  "revisita-lucia-informe"
+                ]
+              }
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "escenario_visitado",
+                  "parametros": { "escenarioId": "investigacion-comisaria" }
+                }
+              ]
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "flag_activo",
+                  "parametros": { "clave": "caso_completado" }
+                }
+              ]
+            }
+          ],
+          "posicion": { "x": 88, "y": 18, "ancho": 10, "alto": 12 }
         }
       ],
       "sprites": [
@@ -127,7 +258,7 @@
           "conversacionId": "entrevista-enfermera-pasillo",
           "etiquetaInteraccion": "Enfermera jefe",
           "modoAcercamiento": true,
-          "posicion": { "x": 16, "y": 28, "ancho": 14, "alto": 58 }
+          "posicion": { "x": 21.5, "y": 26, "ancho": 6.5, "alto": 32 }
         }
       ]
     },
@@ -157,6 +288,47 @@
           "destinoEscenaId": "pasillo-urgencias",
           "esRegreso": true,
           "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "ir-comisaria-estacion",
+          "etiqueta": "Trasladarse a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "requisitosAcceso": [
+            {
+              "tipo": "escenario_conversaciones_completadas",
+              "parametros": {
+                "escenarioId": "consulta-inicial",
+                "conversacionIds": [
+                  "entrevista-policia-entrada",
+                  "entrevista-madre-espera",
+                  "entrevista-hermano-espera",
+                  "entrevista-enfermera-pasillo",
+                  "entrevista-medico-urgencias",
+                  "revisita-lucia-informe"
+                ]
+              }
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "escenario_visitado",
+                  "parametros": { "escenarioId": "investigacion-comisaria" }
+                }
+              ]
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "flag_activo",
+                  "parametros": { "clave": "caso_completado" }
+                }
+              ]
+            }
+          ],
+          "posicion": { "x": 78, "y": 18, "ancho": 10, "alto": 12 }
         }
       ],
       "sprites": []
@@ -173,17 +345,67 @@
           "destinoEscenaId": "pasillo-urgencias",
           "esRegreso": true,
           "posicion": { "x": 6, "y": 74, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "ir-comisaria-uci",
+          "etiqueta": "Trasladarse a la comisaría",
+          "tipo": "navegacion",
+          "destinoEscenaId": "exterior-comisaria",
+          "requisitosAcceso": [
+            {
+              "tipo": "escenario_conversaciones_completadas",
+              "parametros": {
+                "escenarioId": "consulta-inicial",
+                "conversacionIds": [
+                  "entrevista-policia-entrada",
+                  "entrevista-madre-espera",
+                  "entrevista-hermano-espera",
+                  "entrevista-enfermera-pasillo",
+                  "entrevista-medico-urgencias",
+                  "revisita-lucia-informe"
+                ]
+              }
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "escenario_visitado",
+                  "parametros": { "escenarioId": "investigacion-comisaria" }
+                }
+              ]
+            },
+            {
+              "tipo": "no",
+              "condiciones": [
+                {
+                  "tipo": "flag_activo",
+                  "parametros": { "clave": "caso_completado" }
+                }
+              ]
+            }
+          ],
+          "posicion": { "x": 88, "y": 18, "ancho": 10, "alto": 12 }
         }
       ],
       "sprites": [
         {
+          "id": "hotspot-lucia-revisita-medico",
+          "personajeId": "lucia",
+          "rolVisual": "victima",
+          "conversacionId": "revisita-lucia-tras-medico",
+          "etiquetaInteraccion": "Lucía (contraste clínico)",
+          "modoAcercamiento": true,
+          "posicion": { "x": 28, "y": 38, "ancho": 7, "alto": 18 }
+        },
+        {
           "id": "hotspot-lucia-uci",
           "personajeId": "lucia",
-          "rolVisual": "madre-victima",
+          "rolVisual": "victima",
           "conversacionId": "revisita-lucia-informe",
-          "etiquetaInteraccion": "Madre (víctima)",
+          "etiquetaInteraccion": "Lucía (UCI)",
           "modoAcercamiento": true,
-          "posicion": { "x": 20, "y": 26, "ancho": 22, "alto": 50 }
+          "posicion": { "x": 28, "y": 38, "ancho": 7, "alto": 18 }
         },
         {
           "id": "hotspot-medico-uci",
@@ -192,17 +414,28 @@
           "conversacionId": "entrevista-medico-urgencias",
           "etiquetaInteraccion": "Médico tratante",
           "modoAcercamiento": true,
-          "posicion": { "x": 42, "y": 12, "ancho": 16, "alto": 58 }
+          "posicion": { "x": 43, "y": 20, "ancho": 14, "alto": 38 }
         }
       ]
     },
     {
       "id": "exterior-comisaria",
       "titulo": "Exterior de la comisaría",
+      "escenarioNarrativoId": "investigacion-comisaria",
       "requisitosAcceso": [
         {
           "tipo": "escenario_conversaciones_completadas",
-          "parametros": { "escenarioId": "consulta-inicial" }
+          "parametros": {
+            "escenarioId": "consulta-inicial",
+            "conversacionIds": [
+              "entrevista-policia-entrada",
+              "entrevista-madre-espera",
+              "entrevista-hermano-espera",
+              "entrevista-enfermera-pasillo",
+              "entrevista-medico-urgencias",
+              "revisita-lucia-informe"
+            ]
+          }
         }
       ],
       "hotspots": [
@@ -227,10 +460,21 @@
     {
       "id": "interior-comisaria",
       "titulo": "Interior de la comisaría",
+      "escenarioNarrativoId": "investigacion-comisaria",
       "requisitosAcceso": [
         {
           "tipo": "escenario_conversaciones_completadas",
-          "parametros": { "escenarioId": "consulta-inicial" }
+          "parametros": {
+            "escenarioId": "consulta-inicial",
+            "conversacionIds": [
+              "entrevista-policia-entrada",
+              "entrevista-madre-espera",
+              "entrevista-hermano-espera",
+              "entrevista-enfermera-pasillo",
+              "entrevista-medico-urgencias",
+              "revisita-lucia-informe"
+            ]
+          }
         }
       ],
       "hotspots": [
@@ -241,9 +485,45 @@
           "destinoEscenaId": "exterior-comisaria",
           "esRegreso": true,
           "posicion": { "x": 8, "y": 72, "ancho": 10, "alto": 12 }
+        },
+        {
+          "id": "cierre-investigacion-hotspot",
+          "etiqueta": "Conclusión de la investigación",
+          "tipo": "conversacion",
+          "conversacionId": "cierre-investigacion",
+          "requisitosAcceso": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-comisario" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-trabajadora-social-comisaria" }
+            }
+          ],
+          "posicion": { "x": 44, "y": 52, "ancho": 12, "alto": 12 }
         }
       ],
-      "sprites": []
+      "sprites": [
+        {
+          "id": "hotspot-comisario",
+          "personajeId": "comisario",
+          "rolVisual": "comisario",
+          "conversacionId": "entrevista-comisario",
+          "etiquetaInteraccion": "Comisario",
+          "modoAcercamiento": true,
+          "posicion": { "x": 35, "y": 35, "ancho": 7.5, "alto": 16 }
+        },
+        {
+          "id": "hotspot-trabajadora-social",
+          "personajeId": "trabajadora-social-comisaria",
+          "rolVisual": "trabajadora-social",
+          "conversacionId": "entrevista-trabajadora-social-comisaria",
+          "etiquetaInteraccion": "Trabajadora social",
+          "modoAcercamiento": true,
+          "posicion": { "x": 66.5, "y": 20, "ancho": 7, "alto": 24 }
+        }
+      ]
     }
   ]
 }

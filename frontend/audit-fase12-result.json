@@ -1,0 +1,306 @@
+{
+  "timestamp": "2026-06-08T21:10:48.240Z",
+  "baseUrl": "http://localhost:8080",
+  "pruebas": [
+    {
+      "nombre": "1366x768_normal",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 608
+      },
+      "escena": {
+        "w": 1058,
+        "h": 553
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 553,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1366x768_entrar_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1366,
+        "h": 768
+      },
+      "escena": {
+        "w": 1366,
+        "h": 715
+      },
+      "exploracion": {
+        "w": 1366,
+        "h": 715,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1366x768_layout_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1366,
+        "h": 768
+      },
+      "escena": {
+        "w": 1366,
+        "h": 715
+      },
+      "exploracion": {
+        "w": 1366,
+        "h": 715,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1366x768_salir_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 608
+      },
+      "escena": {
+        "w": 1058,
+        "h": 553
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 553,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1366x768_toggle_repetido",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 608
+      },
+      "escena": {
+        "w": 1058,
+        "h": 553
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 553,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1600x900_normal",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 740
+      },
+      "escena": {
+        "w": 1058,
+        "h": 685
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 685,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1600x900_entrar_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1600,
+        "h": 900
+      },
+      "escena": {
+        "w": 1600,
+        "h": 847
+      },
+      "exploracion": {
+        "w": 1600,
+        "h": 847,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1600x900_layout_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1600,
+        "h": 900
+      },
+      "escena": {
+        "w": 1600,
+        "h": 847
+      },
+      "exploracion": {
+        "w": 1600,
+        "h": 847,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1600x900_salir_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 740
+      },
+      "escena": {
+        "w": 1058,
+        "h": 685
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 685,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1600x900_toggle_repetido",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 740
+      },
+      "escena": {
+        "w": 1058,
+        "h": 685
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 685,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1920x1080_normal",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 920
+      },
+      "escena": {
+        "w": 1058,
+        "h": 865
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 865,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1920x1080_entrar_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "escena": {
+        "w": 1920,
+        "h": 1027
+      },
+      "exploracion": {
+        "w": 1920,
+        "h": 1027,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1920x1080_layout_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "escena": {
+        "w": 1920,
+        "h": 1027
+      },
+      "exploracion": {
+        "w": 1920,
+        "h": 1027,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": true
+    },
+    {
+      "nombre": "1920x1080_salir_fs",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 920
+      },
+      "escena": {
+        "w": 1058,
+        "h": 865
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 865,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    },
+    {
+      "nombre": "1920x1080_toggle_repetido",
+      "ok": true,
+      "viewport": {
+        "w": 1060,
+        "h": 920
+      },
+      "escena": {
+        "w": 1058,
+        "h": 865
+      },
+      "exploracion": {
+        "w": 1058,
+        "h": 865,
+        "position": "absolute"
+      },
+      "backgroundImage": "url(\"http://localhost:8080/assets/simulacion-narrativa/escenarios/entrada.png\")",
+      "fullscreen": false
+    }
+  ],
+  "fallos": [],
+  "resumen": {
+    "total": 15,
+    "ok": 15,
+    "fallos": 0,
+    "aprobado": true,
+    "causaRaiz": "Reglas :fullscreen sobrescribían app-exploracion-visual con position:relative, colapsando el canvas (inset:0).",
+    "archivosModificados": [
+      "simulacion-narrativa/simulacion-narrativa.scss"
+    ],
+    "capturas": [
+      "audit-fase12-screenshots/1920x1080_normal.png",
+      "audit-fase12-screenshots/1920x1080_fullscreen.png"
+    ]
+  }
+}

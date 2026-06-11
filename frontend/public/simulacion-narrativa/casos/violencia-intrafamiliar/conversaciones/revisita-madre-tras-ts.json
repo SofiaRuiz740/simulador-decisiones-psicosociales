@@ -1,0 +1,152 @@
+{
+  "id": "revisita-madre-tras-ts",
+  "titulo": "Madre de Lucía — seguimiento tras articulación social",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "madre-lucia",
+  "nodoInicialId": "apertura-madre-ts",
+  "noConsumeConversacionUtil": true,
+  "requisitosAcceso": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-trabajadora-social-comisaria"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-madre-espera"
+          }
+        }
+      ]
+    }
+  ],
+  "requisitosRevisita": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-trabajadora-social-comisaria"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-madre-espera"
+          }
+        }
+      ]
+    }
+  ],
+  "nodos": [
+    {
+      "id": "apertura-madre-ts",
+      "emisor": "personaje",
+      "personajeId": "madre-lucia",
+      "texto": "Volvió… La señora de la comisaría me dijo que quieren entrevistarme por separado de mi hijo. ¿Qué descubrieron ustedes sobre lo de Lucía?",
+      "siguienteNodoId": "decision-enfoque-ts"
+    },
+    {
+      "id": "decision-enfoque-ts",
+      "emisor": "jugador",
+      "texto": "Carmen regresa con inquietud tras la articulación social. Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "opciones": [
+        {
+          "id": "contrastar-antecedentes",
+          "texto": "«¿Sabía que hubo dos partes policiales previos en la casa de Lucía?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "madre-antecedentes"
+        },
+        {
+          "id": "contrastar-version",
+          "texto": "«Usted habló de una caída; otros relatos mencionan un empujón contra Lucía.»",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "madre-version",
+          "modificadoresMetricas": {
+            "confianza": -6,
+            "aperturaEmocional": 8
+          }
+        },
+        {
+          "id": "explorar-proteccion",
+          "texto": "«¿Qué teme perder si se aclara la verdad?»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "madre-temor"
+        }
+      ]
+    },
+    {
+      "id": "madre-antecedentes",
+      "emisor": "personaje",
+      "personajeId": "madre-lucia",
+      "texto": "La policía vino… sí, una vez por ruidos. Yo pensé que era exageración de los vecinos. No sabía que quedó tan… tan formal en un registro.",
+      "testimonio": {
+        "id": "testimonio-madre-antecedentes-parcial",
+        "tema": "clima_familiar",
+        "valor": "desconocimiento_registro_formal",
+        "descripcion": "Madre de Lucía minimiza antecedentes policiales previos",
+        "personajeId": "madre-lucia"
+      },
+      "siguienteNodoId": "decision-cierre-madre-ts"
+    },
+    {
+      "id": "madre-version",
+      "emisor": "personaje",
+      "personajeId": "madre-lucia",
+      "texto": "En el momento pensé que decir ‘se cayó’ protegería a Lucía de más escándalo… Mi hijo vio otra cosa y yo lo sé. Me da vergüenza haber mentido.",
+      "testimonio": {
+        "id": "testimonio-madre-admite-minimizacion",
+        "tema": "mecanismo_lesion",
+        "valor": "version_caida_accidental",
+        "descripcion": "Madre admite haber repetido versión de caída para evitar escándalo",
+        "personajeId": "madre-lucia"
+      },
+      "siguienteNodoId": "decision-cierre-madre-ts"
+    },
+    {
+      "id": "madre-temor",
+      "emisor": "personaje",
+      "personajeId": "madre-lucia",
+      "texto": "Temo que si Miguel cae preso, Lucía se quede sola con las cuentas… Sofi ya no está. Perdí a mi nieta y no quiero perder también el control de lo que pase con mi hija.",
+      "siguienteNodoId": "decision-cierre-madre-ts"
+    },
+    {
+      "id": "decision-cierre-madre-ts",
+      "emisor": "jugador",
+      "texto": "La entrevista puede orientarse hacia el cierre; reflexiona sobre cómo acompañarla.",
+      "opciones": [
+        {
+          "id": "separar-entrevistas",
+          "texto": "«Las entrevistas separadas buscan protegerla a usted y a Diego, no separarlos.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-madre-ts"
+        },
+        {
+          "id": "invitar-correccion",
+          "texto": "«Si lo desea, puede corregir en libreta lo que dijo sobre la caída de Lucía.»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "cierre-madre-ts"
+        }
+      ]
+    },
+    {
+      "id": "cierre-madre-ts",
+      "emisor": "personaje",
+      "personajeId": "madre-lucia",
+      "texto": "Haga lo que tenga que hacer… pero no dejen sola a Lucía allá arriba en UCI. Yo quiero decir la verdad, pero me falta valor.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": {
+            "conversacionId": "revisita-madre-tras-ts"
+          }
+        }
+      ]
+    }
+  ]
+}

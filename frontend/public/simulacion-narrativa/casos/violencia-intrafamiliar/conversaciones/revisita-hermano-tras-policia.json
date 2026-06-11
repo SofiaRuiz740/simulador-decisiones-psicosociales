@@ -1,0 +1,169 @@
+{
+  "id": "revisita-hermano-tras-policia",
+  "titulo": "Hermano de Lucía — cruce con versión policial",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "hermano",
+  "nodoInicialId": "apertura-hermano-policia",
+  "noConsumeConversacionUtil": true,
+  "requisitosAcceso": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-policia-entrada"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-hermano-espera"
+          }
+        }
+      ]
+    }
+  ],
+  "requisitosRevisita": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-policia-entrada"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-hermano-espera"
+          }
+        }
+      ]
+    }
+  ],
+  "nodos": [
+    {
+      "id": "apertura-hermano-policia",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "¿Habló con la policía?… Escuché que anotaron otra versión distinta a la mía.",
+      "siguienteNodoId": "decision-cruzar-policia"
+    },
+    {
+      "id": "decision-cruzar-policia",
+      "emisor": "jugador",
+      "texto": "Diego percibe discrepancias con el registro policial. Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "opciones": [
+        {
+          "id": "mencionar-resbalon",
+          "texto": "«En el ingreso dijeron que Lucía resbaló. Usted habló de un empujón.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-explica-resbalon"
+        },
+        {
+          "id": "mencionar-antecedentes",
+          "texto": "«Hay partes previos en ese domicilio. ¿Lo sabían?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-antecedentes"
+        },
+        {
+          "id": "mencionar-hora",
+          "texto": "«Usted dijo diez y media; vecinos hablaron de casi las once.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-hora"
+        }
+      ]
+    },
+    {
+      "id": "hermano-explica-resbalon",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Mi mamá lo dijo primero… yo bajé la cabeza. Vi el empujón, pero en el pasillo del hospital nadie quería pelear con Miguel.",
+      "testimonio": {
+        "id": "testimonio-hermano-coherencia-empujon",
+        "tema": "mecanismo_lesion",
+        "valor": "empujon_agresion",
+        "descripcion": "Hermano mantiene empujón y explica versión de resbalón en ingreso",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-compromiso-policia"
+    },
+    {
+      "id": "hermano-antecedentes",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Yo sabía que la policía había venido antes… una vez por gritos, otra por golpes en la pared. Lucía no quería denunciar. Mi mamá decía que era ‘asunto de pareja’.",
+      "testimonio": {
+        "id": "testimonio-hermano-antecedentes-conocidos",
+        "tema": "clima_familiar",
+        "valor": "antecedentes_conocidos_familiar",
+        "descripcion": "Hermano conocía intervenciones previas; madre las normalizaba",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-compromiso-policia"
+    },
+    {
+      "id": "hermano-hora",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Yo miré el celular cuando empezó… 10:32. Puede que afuera hayan oído gritos más tarde, cuando ya estábamos en el pasillo y Sofi…",
+      "testimonio": {
+        "id": "testimonio-hermano-hora-2232",
+        "tema": "cronologia_episodio",
+        "valor": "hora_2232",
+        "descripcion": "Hermano precisa inicio del forcejeo a las 22:32",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-compromiso-policia"
+    },
+    {
+      "id": "decision-compromiso-policia",
+      "emisor": "jugador",
+      "texto": "El cruce de versiones abre un espacio de cierre; reflexiona sobre cómo sostenerlo.",
+      "opciones": [
+        {
+          "id": "validar-valentia",
+          "texto": "«Su relato corrige la minimización del ingreso. Eso tiene valor clínico.»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "cierre-hermano-policia"
+        },
+        {
+          "id": "explorar-percepcion",
+          "texto": "«¿Cree que Miguel percibió el episodio como un ‘forcejeo mutuo’?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-percepcion-miguel"
+        }
+      ]
+    },
+    {
+      "id": "hermano-percepcion-miguel",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Él siempre dice que ella ‘exageró’ y que se tropezó sola. Yo vi sus manos en el pecho de mi hermana; eso no es tropezar.",
+      "testimonio": {
+        "id": "testimonio-hermano-percepcion-agresion",
+        "tema": "percepcion_agresion",
+        "valor": "empujon_intencional",
+        "descripcion": "Hermano niega forcejeo mutuo; describe empujón intencional",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "cierre-hermano-policia"
+    },
+    {
+      "id": "cierre-hermano-policia",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Si va a usar esto… que sirva para que no vuelva cerca de Lucía. Yo firmo lo que haga falta cuando me lo pidan.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": {
+            "conversacionId": "revisita-hermano-tras-policia"
+          }
+        }
+      ]
+    }
+  ]
+}

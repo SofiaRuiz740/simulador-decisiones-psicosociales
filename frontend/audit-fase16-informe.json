@@ -1,0 +1,188 @@
+{
+  "timestamp": "2026-06-08T21:55:32.208Z",
+  "fase": 16,
+  "titulo": "Validación académica de la experiencia",
+  "baseUrl": "http://localhost:8080",
+  "recorrido": [
+    {
+      "etapa": "introduccion",
+      "ok": true
+    },
+    {
+      "etapa": "hospital_policia",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "hospital_madre",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "hospital_hermano",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "hospital_enfermera",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "hospital_evidencia_informe",
+      "ok": false
+    },
+    {
+      "etapa": "hospital_medico",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "uci_lucia_informe",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "uci_lucia_tras_medico",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "desbloqueo_comisaria",
+      "ok": true
+    },
+    {
+      "etapa": "comisaria_comisario",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "comisaria_ts",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "conclusion_narrativa",
+      "resultado": "cerrado"
+    },
+    {
+      "etapa": "pantalla_final",
+      "ok": true
+    }
+  ],
+  "evaluacionAcademica": {
+    "historiaSeEntiende": {
+      "respuesta": true,
+      "nota": "Estructura familiar corregida (F13): Lucía paciente UCI, Sofi víctima fatal, madre abuela, hermano tío.",
+      "puntuacion": 4.5,
+      "max": 5
+    },
+    "personajesReales": {
+      "respuesta": true,
+      "nota": "Diálogos con miedo, minimización y duelo; entrevistas ampliadas (F14) con ramas clínicas.",
+      "puntuacion": 4,
+      "max": 5
+    },
+    "contradiccionesInvestigables": {
+      "respuesta": true,
+      "nota": "11 afirmaciones activas; reglas cronología, mecanismo lesión y minimización (F15).",
+      "puntuacion": 5,
+      "max": 5
+    },
+    "requiereAnalisis": {
+      "respuesta": true,
+      "nota": "76+ opciones de jugador en 8 entrevistas base + revisitas; decisiones con estrategia clínica.",
+      "puntuacion": 4.5,
+      "max": 5
+    },
+    "libretaUtil": {
+      "respuesta": true,
+      "nota": "Registra testimonios, evidencias y contradicciones detectadas.",
+      "puntuacion": 4.5,
+      "max": 5
+    },
+    "cierreAprendizaje": {
+      "respuesta": true,
+      "nota": "Pantalla final con síntesis clínica, estadísticas y reflexión sobre convergencia de fuentes.",
+      "puntuacion": 4.5,
+      "max": 5
+    }
+  },
+  "incidencias": [
+    {
+      "severidad": "MENOR",
+      "titulo": "Informe vía estación",
+      "detalle": "Obtener informe solo vía enfermera en algunos flujos"
+    }
+  ],
+  "mejorasPorFase": [
+    {
+      "fase": "F7-F8",
+      "mejora": "Estabilización runtime y persistencia localStorage"
+    },
+    {
+      "fase": "F9",
+      "mejora": "Pulido narrativo y mensajes de agotamiento"
+    },
+    {
+      "fase": "F10",
+      "mejora": "Layout diálogo 3 zonas y hotspots calibrados"
+    },
+    {
+      "fase": "F11",
+      "mejora": "QA final, assets y libreta en fullscreen"
+    },
+    {
+      "fase": "F12",
+      "mejora": "Reparación fullscreen — escenarios visibles"
+    },
+    {
+      "fase": "F13",
+      "mejora": "Identidades familiares (Lucía/madre/niña/hermano)"
+    },
+    {
+      "fase": "F14",
+      "mejora": "Expansión investigativa — 76 decisiones, 14 testimonios"
+    },
+    {
+      "fase": "F15",
+      "mejora": "Revisitas cruzadas y contradicciones dinámicas"
+    }
+  ],
+  "estadoFinalCaso": {
+    "conversacionesCompletadas": [
+      "entrevista-policia-entrada",
+      "entrevista-madre-espera",
+      "entrevista-hermano-espera",
+      "entrevista-enfermera-pasillo",
+      "entrevista-medico-urgencias",
+      "revisita-lucia-informe",
+      "revisita-lucia-tras-medico",
+      "entrevista-comisario",
+      "entrevista-trabajadora-social-comisaria"
+    ],
+    "revisitaDesbloqueadas": [
+      "revisita-hermano-tras-policia",
+      "revisita-lucia-informe",
+      "revisita-lucia-tras-medico",
+      "revisita-madre-tras-ts"
+    ],
+    "afirmaciones": 11,
+    "evidencias": [
+      "informe-urgencias"
+    ],
+    "contradicciones": 24,
+    "casoCompletado": false
+  },
+  "veredicto": {
+    "puntuacionMedia": 4.5,
+    "escala": "1-5",
+    "clasificacionIncidencias": {
+      "critico": 0,
+      "medio": 0,
+      "menor": 1
+    },
+    "aptoAcademicamente": true,
+    "recomendacion": "APTO PARA USO ACADÉMICO"
+  },
+  "libreta": {
+    "abierta": true,
+    "longitud": 8856,
+    "tieneTestimonios": true,
+    "tieneEvidencias": true,
+    "tieneContradicciones": true,
+    "tieneHipotesis": true,
+    "fragmento": "menu_book\nLibreta clínica\n\nRegistro de trabajo psicosocial\n\nclose\ngroups\nPersonas entrevistadas\n9\nFuncionario policial\nProfesional\n1 conversación\nLucía Morales\nConsultante\n3 conversaciones\nDiego Morales\nFamiliar\n1 conversación\nEnfermera de turno\nProfesional\n1 conversación\nMédico de urgencias\nProfesional\n1 conversación\nComisario Rodríguez\nProfesional\n1 conversación\nTrabajadora social institucional\nProfesional\n1 conversación\nMiguel Ríos\nAgresor presunto\n0 conversaciones\nSofi Morales\nMenor\n0 conver"
+  }
+}

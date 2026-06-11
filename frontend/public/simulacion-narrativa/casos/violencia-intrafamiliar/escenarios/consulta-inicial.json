@@ -2,17 +2,20 @@
   "id": "consulta-inicial",
   "orden": 1,
   "titulo": "Hospital — urgencia vital",
-  "narrativa": "Ingresas al servicio de urgencias. Una mujer en estado crítico fue trasladada a UCI tras un episodio de violencia intrafamiliar. Su hija menor falleció antes del ingreso. La familia aguarda en sala de espera.",
+  "narrativa": "Ingresas al servicio de urgencias. Lucía Morales, en estado crítico, fue trasladada a UCI tras un episodio de violencia intrafamiliar. Su hija Sofi falleció en el mismo episodio. Carmen Morales, madre de Lucía y abuela de Sofi, aguarda en sala de espera junto a su hijo Diego.",
   "ubicacion": "Hospital — servicio de urgencias",
   "momentoTemporal": "Noche — 23:50",
-  "personajesPresentes": ["lucia", "hermano", "enfermera", "medico-urgencias", "policia"],
+  "personajesPresentes": ["lucia", "madre-lucia", "hermano", "enfermera", "medico-urgencias", "policia"],
   "conversacionesDisponibles": [
     "entrevista-policia-entrada",
     "entrevista-madre-espera",
     "entrevista-hermano-espera",
     "entrevista-enfermera-pasillo",
     "entrevista-medico-urgencias",
-    "revisita-lucia-informe"
+    "revisita-lucia-informe",
+    "revisita-lucia-tras-medico",
+    "revisita-hermano-tras-policia",
+    "revisita-madre-tras-ts"
   ],
   "evidenciasDisponibles": ["informe-urgencias", "mensajes-sofi"],
   "intervencionesDisponibles": [],

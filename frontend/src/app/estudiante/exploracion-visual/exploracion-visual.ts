@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -42,6 +42,20 @@ export class ExploracionVisualComponent implements OnInit {
   readonly escenaActual = this.escenas.escenaActual;
   readonly tiempoNarrativo = this.facade.tiempoNarrativoFormateado;
   readonly tituloCaso = computed(() => this.facade.caso()?.manifest.titulo ?? '');
+
+  constructor() {
+    effect(() => {
+      const escena = this.escenaActual();
+      if (!escena) return;
+      if (escena.id === 'exterior-comisaria' || escena.id === 'interior-comisaria') {
+        void this.ambiente.transicionHospitalAComisaria();
+        return;
+      }
+      if (escena.escenarioNarrativoId === 'consulta-inicial') {
+        void this.ambiente.transicionComisariaAHospital();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.escenas.cargarConfiguracion(this.casoId()).subscribe({

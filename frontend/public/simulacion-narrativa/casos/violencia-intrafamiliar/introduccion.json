@@ -16,16 +16,16 @@
     },
     {
       "imagen": "escenarios/fondo2.png",
-      "texto": "Los vecinos reportan una situación de conflicto al interior de una vivienda."
+      "texto": "Los vecinos alertan a la policía: al interior de la vivienda hay gritos y forcejeo."
     },
     {
       "imagen": "escenarios/fondo3.png",
-      "texto": "La víctima es trasladada para recibir atención médica."
+      "texto": "Lucía Morales es trasladada de urgencia en estado crítico; su hija Sofi murió en el mismo episodio. Usted llega al hospital como psicóloga del equipo."
     }
   ],
   "transicionFinal": {
     "lineas": [
-      "HOSPITAL SAN JOSÉ",
+      "HOSPITAL SAN JUAN DE DIOS",
       "Área de Urgencias",
       "Psicólogo Investigador Asignado"
     ]

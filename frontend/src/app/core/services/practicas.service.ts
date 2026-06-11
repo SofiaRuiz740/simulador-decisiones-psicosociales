@@ -10,6 +10,9 @@ import {
   Practica,
   PracticaDetalle,
   PracticaInput,
+  RegistroReinicio,
+  ResultadoNarrativo,
+  SolicitudReapertura,
 } from '../models/practicas.model';
 
 @Injectable({ providedIn: 'root' })
@@ -91,5 +94,60 @@ export class PracticasService {
   // Acceso publico estudiante
   accesoEstudiante(correo: string, codigo: string) {
     return this.http.post<AccesoEstudianteRespuesta>(`${this.api}/auth/estudiante-acceso/`, { correo, codigo });
+  }
+
+  // --- Fase 13: solicitudes de reapertura ---
+
+  listarSolicitudesReapertura() {
+    return this.http.get<SolicitudReapertura[]>(`${this.api}/practicas/solicitudes-reapertura/`);
+  }
+
+  solicitarReapertura(autorizacionId: number, motivo = '') {
+    return this.http.post<SolicitudReapertura>(`${this.api}/practicas/solicitudes-reapertura/`, {
+      autorizacion_id: autorizacionId,
+      motivo,
+    });
+  }
+
+  aprobarSolicitudReapertura(id: number) {
+    return this.http.post<SolicitudReapertura>(
+      `${this.api}/practicas/solicitudes-reapertura/${id}/aprobar/`,
+      {},
+    );
+  }
+
+  rechazarSolicitudReapertura(id: number, mensaje = '') {
+    return this.http.post<SolicitudReapertura>(
+      `${this.api}/practicas/solicitudes-reapertura/${id}/rechazar/`,
+      { mensaje },
+    );
+  }
+
+  reiniciarEstudiante(practicaId: number, autorizacionId: number, motivo = '') {
+    return this.http.post<{ detail: string; reintento_autorizado: boolean }>(
+      `${this.api}/practicas/reinicios/${practicaId}/reiniciar-estudiante/`,
+      { autorizacion_id: autorizacionId, confirmacion: 'REINICIAR', motivo },
+    );
+  }
+
+  reiniciarTodos(practicaId: number, motivo = '') {
+    return this.http.post<{ detail: string; estudiantes_afectados: number }>(
+      `${this.api}/practicas/reinicios/${practicaId}/reiniciar-todos/`,
+      { confirmacion: 'REINICIAR TODOS', motivo },
+    );
+  }
+
+  listarRegistrosReinicio(practicaId?: number) {
+    const url = practicaId
+      ? `${this.api}/practicas/reinicios/registros/?practica=${practicaId}`
+      : `${this.api}/practicas/reinicios/registros/`;
+    return this.http.get<RegistroReinicio[]>(url);
+  }
+
+  estadoAutorizacion(autorizacionId?: number) {
+    const url = autorizacionId
+      ? `${this.api}/practicas/reinicios/estado-autorizacion/?autorizacion_id=${autorizacionId}`
+      : `${this.api}/practicas/reinicios/estado-autorizacion/`;
+    return this.http.get<{ autorizacion_id: number; practica_id: number; reintento_autorizado: boolean }>(url);
   }
 }

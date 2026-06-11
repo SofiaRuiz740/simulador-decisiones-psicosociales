@@ -2,7 +2,7 @@
   "id": "violencia-intrafamiliar",
   "version": "2.0.0",
   "titulo": "Urgencia vital — violencia intrafamiliar",
-  "descripcion": "Evaluación psicosocial en hospital por tentativa de feminicidio. La paciente está en UCI; la menor falleció antes del ingreso.",
+  "descripcion": "Evaluación psicosocial en hospital por tentativa de feminicidio. Lucía, paciente en UCI; su hija menor falleció en el mismo episodio.",
   "areaTematica": "violencia_intrafamiliar",
   "tiempoEstimadoMin": 50,
   "rolJugador": "Psicóloga clínica en equipo de salud mental hospitalaria",
@@ -10,16 +10,20 @@
   "escenarioInicialId": "consulta-inicial",
   "escenarios": [
     "escenarios/consulta-inicial.json",
-    "escenarios/entrevista-familiar.json"
+    "escenarios/entrevista-familiar.json",
+    "escenarios/investigacion-comisaria.json"
   ],
   "personajes": [
     "personajes/lucia.json",
+    "personajes/madre-lucia.json",
     "personajes/miguel.json",
     "personajes/sofi.json",
     "personajes/hermano.json",
     "personajes/enfermera.json",
     "personajes/medico-urgencias.json",
-    "personajes/policia.json"
+    "personajes/policia.json",
+    "personajes/comisario.json",
+    "personajes/trabajadora-social-comisaria.json"
   ],
   "conversaciones": [
     "conversaciones/entrevista-policia-entrada.json",
@@ -28,15 +32,23 @@
     "conversaciones/entrevista-enfermera-pasillo.json",
     "conversaciones/entrevista-medico-urgencias.json",
     "conversaciones/revisita-lucia-informe.json",
+    "conversaciones/revisita-lucia-tras-medico.json",
+    "conversaciones/revisita-hermano-tras-policia.json",
+    "conversaciones/revisita-madre-tras-ts.json",
     "conversaciones/consulta-lucia.json",
-    "conversaciones/revelacion-lucia.json"
+    "conversaciones/revelacion-lucia.json",
+    "conversaciones/entrevista-comisario.json",
+    "conversaciones/entrevista-trabajadora-social-comisaria.json",
+    "conversaciones/cierre-investigacion.json"
   ],
   "evidencias": [
     "evidencias/informe-urgencias.json",
     "evidencias/mensajes-sofi.json"
   ],
   "contradicciones": [
-    "contradicciones/version-agresion.json"
+    "contradicciones/version-agresion.json",
+    "contradicciones/cronologia-episodio.json",
+    "contradicciones/minimizacion-familiar.json"
   ],
   "hipotesis": [
     "hipotesis/ciclo-violencia.json",
@@ -73,6 +85,72 @@
       ],
       "conversacionesUtilesExtra": 1,
       "exentaFatiga": true
+    },
+    {
+      "id": "revisita-lucia-tras-medico",
+      "personajeId": "lucia",
+      "conversacionId": "revisita-lucia-tras-medico",
+      "requisitos": [
+        {
+          "tipo": "y",
+          "condiciones": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-medico-urgencias" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "revisita-lucia-informe" }
+            }
+          ]
+        }
+      ],
+      "conversacionesUtilesExtra": 1,
+      "exentaFatiga": true
+    },
+    {
+      "id": "revisita-hermano-tras-policia",
+      "personajeId": "hermano",
+      "conversacionId": "revisita-hermano-tras-policia",
+      "requisitos": [
+        {
+          "tipo": "y",
+          "condiciones": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-policia-entrada" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-hermano-espera" }
+            }
+          ]
+        }
+      ],
+      "conversacionesUtilesExtra": 1,
+      "exentaFatiga": true
+    },
+    {
+      "id": "revisita-madre-tras-ts",
+      "personajeId": "madre-lucia",
+      "conversacionId": "revisita-madre-tras-ts",
+      "requisitos": [
+        {
+          "tipo": "y",
+          "condiciones": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-trabajadora-social-comisaria" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-madre-espera" }
+            }
+          ]
+        }
+      ],
+      "conversacionesUtilesExtra": 1,
+      "exentaFatiga": true
     }
   ],
   "reglasContradiccion": [
@@ -91,6 +169,22 @@
       "origen": "testimonio_testimonio",
       "tema": "clima_familiar",
       "severidad": "leve"
+    },
+    {
+      "id": "regla-cronologia-episodio",
+      "titulo": "Memorias discrepantes sobre la hora del episodio",
+      "descripcion": "Relatos familiares y vecinales ubican el forcejeo en franjas cercanas pero no idénticas.",
+      "origen": "testimonio_testimonio",
+      "tema": "cronologia_episodio",
+      "severidad": "leve"
+    },
+    {
+      "id": "regla-percepcion-agresion",
+      "titulo": "Percepción distinta del mecanismo de agresión",
+      "descripcion": "Unos relatos describen forcejeo o caída; otros un empujón intencional hacia la pared.",
+      "origen": "testimonio_testimonio",
+      "tema": "percepcion_agresion",
+      "severidad": "moderada"
     }
   ]
 }

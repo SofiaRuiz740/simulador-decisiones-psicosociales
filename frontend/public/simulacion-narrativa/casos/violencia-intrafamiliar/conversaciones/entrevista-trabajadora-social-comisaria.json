@@ -1,0 +1,805 @@
+{
+  "id": "entrevista-trabajadora-social-comisaria",
+  "titulo": "Entrevista con trabajadora social",
+  "escenarioId": "investigacion-comisaria",
+  "personajeId": "trabajadora-social-comisaria",
+  "nodoInicialId": "apertura-ts",
+  "requisitosAcceso": [
+    {
+      "tipo": "escenario_conversaciones_completadas",
+      "parametros": {
+        "escenarioId": "consulta-inicial",
+        "conversacionIds": [
+          "entrevista-policia-entrada",
+          "entrevista-madre-espera",
+          "entrevista-hermano-espera",
+          "entrevista-enfermera-pasillo",
+          "entrevista-medico-urgencias",
+          "revisita-lucia-informe"
+        ]
+      }
+    }
+  ],
+  "nodos": [
+    {
+      "id": "apertura-ts",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Gracias por venir. Han pasado quince días desde el ingreso; coordinamos con el hospital la articulación de seguimiento. ¿Viene a cerrar la valoración psicosocial o a definir el plan?",
+      "siguienteNodoId": "decision-prep-apertura"
+    },
+    {
+      "id": "decision-prep-apertura",
+      "emisor": "jugador",
+      "texto": "Antes de hablar con trabajo social, la profesional repasa cómo quiere presentarse.",
+      "opciones": [
+        {
+          "id": "prep-slot-ts-apertura-1",
+          "texto": "«Soy psicóloga del hospital. Traigo la valoración para articular con la comisaría.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_apertura",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-apertura-2",
+          "texto": "«Antes de profundizar, ¿cómo está organizado el seguimiento institucional desde aquí?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_apertura",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-apertura-3",
+          "texto": "«Entiendo que ya revisaron el caso con el equipo de salud. ¿Qué información tienen disponible?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_apertura",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ts-acuse-recibo",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Entendido. Podemos articular red de apoyo, factores de riesgo y necesidades familiares cuando usted indique por dónde quiere comenzar.",
+      "siguienteNodoId": "decision-prep-exploracion-inicial"
+    },
+    {
+      "id": "decision-prep-exploracion-inicial",
+      "emisor": "jugador",
+      "texto": "La articulación interinstitucional está abierta; organiza mentalmente cómo encuadrar la exploración inicial.",
+      "opciones": [
+        {
+          "id": "prep-slot-ts-exploracion-1",
+          "texto": "«¿Qué red de apoyo institucional pueden activar para la familia en esta etapa?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-explor-red",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-exploracion-2",
+          "texto": "«¿Qué seguimiento psicosocial proponen para la familia sobreviviente?»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "ts-explor-seguimiento",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-exploracion-3",
+          "texto": "«¿Qué necesidades familiares identificaron en la primera revisión del caso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-explor-necesidades-teaser",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ts-explor-red",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Tenemos articulación con salud, comisaría y, si hace falta, refugio temporal. Carmen y Diego cuentan con seguimiento profesional desde aquí.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "ts-explor-seguimiento",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Activaremos acompañamiento para el hermano de Lucía y contención para su madre. Lucía ya está fuera de UCI, con recuperación física parcial; necesita evaluación sostenida y cuidado de no retraumatizarla.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "ts-explor-necesidades-teaser",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Hay duelo, miedo a represalias y dudas sobre retorno seguro al domicilio. Lucía está en recuperación parcial, fuera de UCI. Puedo ampliar según lo recogido en el hospital.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "decision-prep-profundizacion",
+      "emisor": "jugador",
+      "texto": "Puede profundizar en factores de riesgo y protección. Considera qué indagar a continuación.",
+      "opciones": [
+        {
+          "id": "prep-slot-ts-profundizacion-1",
+          "texto": "«Necesito articular con ustedes la derivación interdisciplinaria y el plan de seguridad.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-articulacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_profundizacion",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_derivacion_interdisciplinaria",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-profundizacion-2",
+          "texto": "«¿Qué factores de riesgo y protectores identifican en el núcleo familiar?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "ts-profun-factores",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-profundizacion-3",
+          "texto": "«¿Qué protocolo existe para duelo de la madre de Lucía y contención del hermano?»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "ts-duelo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-profundizacion-4",
+          "texto": "«¿Cómo evalúan el sistema familiar y su capacidad de afrontamiento en este momento?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "ts-evaluacion-familiar",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_profundizacion",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_eval_psicosocial_familiar",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ts-evaluacion-familiar",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Hay duelo agudo en madre e hijo, con culpa cruzada. Lucía estará en recuperación prolongada. Necesitan apoyo para el duelo sin presión investigativa, y contención separada para no revictimizarlos.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "ts-articulacion",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Enviaré el formulario de articulación interinstitucional. Documente en su libreta las decisiones clínicas que sustenten la derivación; eso nos ayuda a sostener la protección.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "ts-profun-factores",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Riesgo acumulativo documentado: agresor con antecedentes, amenazas y control. Protector: madre e hijo dispuestos a acompañar, red activa. Puedo detallar vulnerabilidades si lo requiere.",
+      "siguienteNodoId": "ts-profun-factores-detalle"
+    },
+    {
+      "id": "ts-profun-factores-detalle",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Aislamiento progresivo, exposición de la menor, miedo declarado y dependencia económica completan el cuadro. Durante aquel episodio se vulneró su integridad; sin medidas sostenidas, el patrón puede repetirse.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "ts-duelo",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Carmen, la madre de Lucía, está en shock; el hermano culpa su silencio. Evaluamos capacidad de afrontamiento del duelo: ambos requieren espacios separados y apoyo profesional sostenido. Lucía necesitará contención cuando comprenda plenamente la muerte de su hija.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "decision-prep-info-critica",
+      "emisor": "jugador",
+      "texto": "El plan de protección puede precisarse; considera cuál aspecto abordar ahora.",
+      "opciones": [
+        {
+          "id": "prep-slot-ts-critica-1",
+          "texto": "«¿Qué medidas de protección y restablecimiento de derechos contemplan para Lucía al alta?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "ts-plan-lucia",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_medidas_proteccion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-critica-2",
+          "texto": "«¿Cómo garantizarán protección económica y evitarán que el agresor contacte a la familia en sala?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "ts-plan-familia",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_proteccion_economica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-critica-3",
+          "texto": "«¿Qué acompañamiento institucional existe vinculado a la menor fallecida?»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "ts-plan-menor",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-critica-4",
+          "texto": "«¿Qué derechos consideran vulnerados en este caso y cómo los restablecen?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "ts-derechos-vulnerados",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_vulneracion_derechos",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-critica-5",
+          "texto": "«¿Quién cuidará a Lucía en la recuperación y cuál es su situación económica?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "ts-dependientes-vulnerables",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_personas_dependientes",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ts-derechos-vulnerados",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Lucía llegó con la integridad física comprometida hace quince días y sin poder sentirse segura en su propio hogar. Sofi perdió la vida en el mismo episodio. Nuestro trabajo es restablecer esos derechos con medidas concretas ya en curso, no solo documentarlos.",
+      "siguienteNodoId": "decision-cierre-ts"
+    },
+    {
+      "id": "ts-dependientes-vulnerables",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Lucía trabajaba medio tiempo y sostenía parte del hogar; Carmen ayuda, pero no alcanza. Diego estudia y depende de ellas. Al alta, Lucía necesitará cuidados prolongados: evaluamos quién puede acompañarla, apoyo económico de emergencia y seguimiento domiciliario si no es seguro volver.",
+      "siguienteNodoId": "decision-cierre-ts"
+    },
+    {
+      "id": "ts-plan-lucia",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Evaluaremos refugio temporal y apoyo económico de emergencia si no es seguro volver al domicilio — es un derecho económico básico en estos casos. Necesitamos su registro clínico sobre miedo y mecanismo de agresión para activar la red de protección y el seguimiento institucional.",
+      "siguienteNodoId": "decision-cierre-ts"
+    },
+    {
+      "id": "ts-plan-familia",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Coordinamos con seguridad hospitalaria y policía. Diego y la madre recibirán orientación sobre no compartir ubicación ni horarios de visita.",
+      "siguienteNodoId": "decision-cierre-ts"
+    },
+    {
+      "id": "ts-plan-menor",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Hay protocolo de acompañamiento en duelo vinculado a la Ley 1098 de 2006 por la edad de Sofi, articulado con protección integral. La Ley 2126 y la Ley 1257 sostienen las medidas contra el agresor. La familia debe recibir información sin presionar a Lucía en su recuperación.",
+      "siguienteNodoId": "decision-cierre-ts"
+    },
+    {
+      "id": "decision-cierre-ts",
+      "emisor": "jugador",
+      "texto": "Es momento de cerrar la articulación; reflexiona sobre cómo concretarla.",
+      "opciones": [
+        {
+          "id": "prep-slot-ts-cierre-1",
+          "texto": "«Confirmo la derivación. ¿Podemos acordar plazos concretos de seguimiento?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "sintesis-eval-comisaria",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_cierre",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-cierre-2",
+          "texto": "«¿Qué apoyo psicológico y psiquiátrico consideran necesarios para Lucía cuando evolucione?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "ts-derivacion-clinica",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_cierre",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_psicoterapia",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_psiquiatria",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_derivacion_interdisciplinaria",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-ts-cierre-3",
+          "texto": "«¿Qué hallazgos clínicos deben quedar registrados antes del cierre?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "sintesis-eval-comisaria",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_ts_cierre",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ts-derivacion-clinica",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "En esta etapa de recuperación, derivaremos a psicología para trauma y valoración psiquiátrica si hay síntomas severos. Usted puede anticipar en su informe la necesidad de psicoterapia sostenida.",
+      "siguienteNodoId": "sintesis-eval-comisaria"
+    },
+    {
+      "id": "sintesis-eval-comisaria",
+      "emisor": "narrador",
+      "texto": "Ha articulado con comisaría y trabajo social. Antes de cerrar, considere su criterio profesional sobre la intervención psicosocial en este escenario.",
+      "siguienteNodoId": "decision-academica-comisaria-4"
+    },
+    {
+      "id": "decision-academica-comisaria-4",
+      "emisor": "jugador",
+      "texto": "En la comisaría, la profesional reflexiona sobre cuál debe ser la prioridad psicosocial de la intervención.",
+      "opciones": [
+        {
+          "id": "eval-com-d4-a",
+          "texto": "Mediación y reconciliación entre las partes.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d4",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d4",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d4-b",
+          "texto": "Valoración de riesgo de feminicidio y activación de medidas de protección.",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "registro-eval-com-d4",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d4",
+                "valor": "B"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d4_correcta",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d4-c",
+          "texto": "Psicoterapia centrada exclusivamente en la infancia, sin valorar riesgo actual.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "registro-eval-com-d4",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d4",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-com-d4",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. La articulación continúa.",
+      "siguienteNodoId": "decision-academica-comisaria-5"
+    },
+    {
+      "id": "decision-academica-comisaria-5",
+      "emisor": "jugador",
+      "texto": "Con la información institucional disponible, considera qué conjunto normativo resulta pertinente para la protección integral.",
+      "opciones": [
+        {
+          "id": "eval-com-d5-a",
+          "texto": "Ley 2126 de 2021, Ley 1098 de 2006 y Ley 1257 de 2008.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d5",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d5",
+                "valor": "A"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d5_correcta",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d5-b",
+          "texto": "Ley 1098 de 2006 y Ley 1257 de 2008.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d5",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d5",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d5-c",
+          "texto": "Ley 1098 de 2006, Ley 1257 de 2008 y Ley 1448 de 2011.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d5",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d5",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-com-d5",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. La articulación continúa.",
+      "siguienteNodoId": "decision-academica-comisaria-6"
+    },
+    {
+      "id": "decision-academica-comisaria-6",
+      "emisor": "jugador",
+      "texto": "Repasando lo recogido en comisaría, reflexiona sobre cuál describe mejor la actuación técnica adecuada del profesional de salud mental.",
+      "opciones": [
+        {
+          "id": "eval-com-d6-a",
+          "texto": "Promover acercamiento entre la pareja para facilitar reconciliación familiar.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d6",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d6",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d6-b",
+          "texto": "Limitarse a derivar a psicoterapia infantil sin valorar riesgo ni medidas de protección.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "registro-eval-com-d6",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d6",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d6-c",
+          "texto": "Valorar emocionalmente a la víctima y personas dependientes, identificar vulneración de derechos, aplicar valoración de riesgo de feminicidio y activar rutas de salud y salud mental.",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "registro-eval-com-d6",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d6",
+                "valor": "C"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d6_correcta",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-com-d6-d",
+          "texto": "Priorizar solo la denuncia penal sin medidas provisionales de protección.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-com-d6",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_comisaria_d6",
+                "valor": "D"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-com-d6",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. Cierra la articulación con trabajo social.",
+      "siguienteNodoId": "format-ref-d5-ts"
+    },
+    {
+      "id": "format-ref-d5-ts",
+      "emisor": "jugador",
+      "texto": "Ha articulado el plan con trabajo social. Organiza mentalmente qué aspecto requiere seguimiento prioritario.",
+      "opciones": [
+        {
+          "id": "format-d5-a",
+          "texto": "Factores de riesgo y red de apoyo.",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "feedback-format-d5-a",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d5",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d5-b",
+          "texto": "Reconciliación de pareja.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d5-b",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d5",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d5-c",
+          "texto": "Minimizar intervención institucional.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d5-c",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d5",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feedback-format-d5-a",
+      "emisor": "narrador",
+      "texto": "El seguimiento de riesgo y red de apoyo es uno de los ejes del plan institucional en curso.",
+      "siguienteNodoId": "cierre-ts"
+    },
+    {
+      "id": "feedback-format-d5-b",
+      "emisor": "narrador",
+      "texto": "La reconciliación de pareja no es el objetivo del plan de protección vigente.",
+      "siguienteNodoId": "cierre-ts"
+    },
+    {
+      "id": "feedback-format-d5-c",
+      "emisor": "narrador",
+      "texto": "Reducir la intervención institucional dejaría sin sostén a una familia aún en recuperación.",
+      "siguienteNodoId": "cierre-ts"
+    },
+    {
+      "id": "cierre-ts",
+      "emisor": "personaje",
+      "personajeId": "trabajadora-social-comisaria",
+      "texto": "Gracias por el trabajo conjunto. La protección mejora cuando clínica e institución hablan el mismo lenguaje. Cuando cierre aquí, revise su libreta antes de salir.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": {
+            "conversacionId": "entrevista-trabajadora-social-comisaria"
+          }
+        }
+      ]
+    }
+  ]
+}

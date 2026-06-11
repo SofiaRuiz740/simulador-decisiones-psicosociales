@@ -120,6 +120,24 @@ export const routes: Routes = [
         data: { roles: [Rol.Docente, Rol.Admin] },
       },
       {
+        path: 'solicitudes-reapertura',
+        loadChildren: () =>
+          import('./solicitudes-reapertura/solicitudes-reapertura.routes').then(
+            (m) => m.SOLICITUDES_REAPERTURA_ROUTES,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Docente, Rol.Admin] },
+      },
+      {
+        path: 'reinicio-practicas',
+        loadChildren: () =>
+          import('./reinicio-practicas/reinicio-practicas.routes').then(
+            (m) => m.REINICIO_PRACTICAS_ROUTES,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Docente] },
+      },
+      {
         path: 'resultados',
         loadChildren: () =>
           import('./resultados/resultados.routes').then((m) => m.RESULTADOS_ROUTES),

@@ -17,12 +17,18 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
 import { FullscreenService } from '../../core/services/fullscreen.service';
+import { ResultadosNarrativosService } from '../../core/services/resultados-narrativos.service';
 import { AmbienteAudioService } from '../../core/simulacion-narrativa/services/ambiente-audio.service';
 import { NarrativaFacadeService } from '../../core/simulacion-narrativa/services/narrativa-facade.service';
 import {
   marcarIntroduccionVista,
   resolverFaseIntro,
 } from '../../core/simulacion-narrativa/utils/introduccion-narrativa.util';
+import {
+  clavePartidaPersistida,
+  leerPartidaPersistida,
+} from '../../core/simulacion-narrativa/utils/partida-persistencia.util';
+import { evaluarCompetenciasFinales } from '../../core/simulacion-narrativa/utils/evaluacion-academica.util';
 import {
   resolverCasoNarrativoId,
   subtituloCasoParaPractica,
@@ -67,6 +73,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly session = inject(EstudianteSessionService);
   private readonly fullscreen = inject(FullscreenService);
+  private readonly resultadosNarrativos = inject(ResultadosNarrativosService);
   private readonly dialog = inject(MatDialog);
   private readonly ambiente = inject(AmbienteAudioService);
 
@@ -93,10 +100,24 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
   });
 
   readonly estadoLabel = computed(() => {
+    if (this.casoCompletado()) return 'Completada';
     const estado = this.practica()?.progreso.estado;
     if (estado === 'completada') return 'Completada';
     if (estado === 'no_iniciada') return 'Sin iniciar';
     return 'En progreso';
+  });
+
+  readonly casoCompletado = computed(
+    () => !!this.facade.estado()?.flags['caso_completado'],
+  );
+
+  readonly resumenCierre = computed(() => this.facade.generarResumenPedagogico());
+
+  readonly competenciasEvaluadas = computed(() => {
+    const estado = this.facade.estado();
+    const resumen = this.resumenCierre();
+    if (!estado || !resumen) return [];
+    return evaluarCompetenciasFinales(estado, resumen);
   });
 
   ngOnInit(): void {
@@ -128,12 +149,32 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
 
     const casoId = this.casoId();
     const estudianteId = this.session.estudianteId();
+    const practicaIdVal = this.practicaId();
+    this.facade.establecerContextoPersistencia({
+      casoId,
+      estudianteId,
+      practicaId: practicaIdVal,
+    });
+
+    const partidaPreexistente =
+      practicaIdVal != null && typeof estudianteId === 'number'
+        ? leerPartidaPersistida(
+            clavePartidaPersistida({
+              casoId,
+              estudianteId,
+              practicaId: practicaIdVal,
+            }),
+          ) != null
+        : false;
+
     this.facade.iniciarCaso(casoId).subscribe({
       next: () => {
         if (this.practicaId()) {
           this.session.marcarEnProgreso(this.practicaId()!);
         }
-        const faseInicial = resolverFaseIntro(casoId, estudianteId);
+        const faseInicial = resolverFaseIntro(casoId, estudianteId, practicaIdVal, {
+          partidaPreexistente,
+        });
         this.fase.set(faseInicial);
         void this.ambiente.iniciar(faseInicial === 'intro' ? 'intro' : 'simulacion');
       },
@@ -142,6 +183,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.facade.persistirPartida(this.escenas.escenaActualId());
     this.ambiente.detener();
     void this.fullscreen.salir();
   }
@@ -151,7 +193,8 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
   }
 
   onIntroduccionCompleta(): void {
-    marcarIntroduccionVista(this.casoId(), this.session.estudianteId());
+    marcarIntroduccionVista(this.casoId(), this.session.estudianteId(), this.practicaId());
+    this.facade.persistirPartida(this.escenas.escenaActualId());
     this.fase.set('simulacion');
     void this.ambiente.transicionIntroAHospital();
   }
@@ -199,12 +242,15 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
     ref.afterClosed().subscribe((salir) => {
       if (!salir) return;
       this.persistirProgreso();
+      this.sincronizarResultadoAcademico();
       void this.fullscreen.salir();
       this.router.navigate(['/estudiante/panel']);
     });
   }
 
   private persistirProgreso(): void {
+    this.facade.persistirPartida(this.escenas.escenaActualId());
+
     const practicaId = this.practicaId();
     if (!practicaId) return;
 
@@ -216,6 +262,41 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
     this.session.guardarProgreso(practicaId, {
       conversacionesCompletadas: completadas,
       conversacionesTotales: totales,
+      resultadoId: estado?.flags['caso_completado'] ? practicaId : undefined,
     });
+  }
+
+  finalizarPractica(): void {
+    this.persistirProgreso();
+    this.sincronizarResultadoAcademico();
+    void this.fullscreen.salir();
+    this.router.navigate(['/estudiante/panel']);
+  }
+
+  private sincronizarResultadoAcademico(): void {
+    const practicaId = this.practicaId();
+    const practica = practicaId ? this.session.obtenerPractica(practicaId) : null;
+    const estado = this.facade.estado();
+    if (!practica || !estado?.flags['caso_completado']) return;
+
+    const resumen = this.facade.generarResumenPedagogico();
+    if (!resumen) return;
+
+    const caso = this.facade.caso();
+    const completadas = estado.conversacionesCompletadas.length;
+    const totales = caso ? Object.keys(caso.conversaciones).length : 0;
+    const porcentaje = totales > 0 ? Math.round((completadas / totales) * 100) : 100;
+
+    this.resultadosNarrativos.guardar({
+      autorizacion_id: practica.autorizacion_id,
+      porcentaje,
+      entrevistas_realizadas: resumen.totalConversaciones,
+      entrevistas_totales: totales,
+      evidencias_encontradas: resumen.totalEvidencias,
+      contradicciones_detectadas: resumen.totalContradicciones,
+      hipotesis_formuladas: resumen.totalHipotesis,
+      estado_final: 'completada',
+      resumen_pedagogico: resumen,
+    }).subscribe();
   }
 }

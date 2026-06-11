@@ -13,7 +13,7 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
   {
     slug: 'violencia-intrafamiliar',
     tituloPractica: 'Violencia intrafamiliar',
-    subtituloCaso: 'Hospital San José — urgencias',
+    subtituloCaso: 'Hospital San Juan De Dios — urgencias',
     areaTematica: 'Crisis y protección',
     disponible: true,
   },

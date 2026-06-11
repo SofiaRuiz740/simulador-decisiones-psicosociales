@@ -1,0 +1,126 @@
+<section class="module page">
+  <header class="hero-glass">
+    <h1><em>Reinicio de prácticas</em></h1>
+    <p>Reinicia el progreso académico de una práctica para un estudiante o para todos los inscritos.</p>
+  </header>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else {
+    <div class="grid">
+      <section class="panel">
+        <div class="panel__head"><h2>Reinicio individual</h2></div>
+        <div class="panel__body form-stack">
+          <label>
+            Práctica
+            <select
+              [ngModel]="practicaSeleccionada()"
+              (ngModelChange)="practicaSeleccionada.set($event); cargarAutorizaciones()">
+              <option [ngValue]="null">— Seleccionar —</option>
+              @for (p of practicas(); track p.id) {
+                <option [ngValue]="p.id">{{ p.nombre }}</option>
+              }
+            </select>
+          </label>
+
+          @if (practicaSeleccionada()) {
+            <label>
+              Autorización (estudiante)
+              <input
+                type="number"
+                [ngModel]="autorizacionSeleccionada()"
+                (ngModelChange)="autorizacionSeleccionada.set($event)"
+                placeholder="ID de autorización" />
+              <span class="hint">Consulta el ID en la ficha de la práctica → Participantes.</span>
+            </label>
+          }
+
+          <label>
+            Motivo (opcional)
+            <input type="text" [ngModel]="motivo()" (ngModelChange)="motivo.set($event)" />
+          </label>
+
+          <label>
+            Confirmación — escribe <strong>REINICIAR</strong>
+            <input type="text" [ngModel]="confirmacionIndividual()" (ngModelChange)="confirmacionIndividual.set($event)" />
+          </label>
+
+          <button
+            mat-flat-button
+            color="warn"
+            type="button"
+            [disabled]="procesando()"
+            (click)="reiniciarIndividual()">
+            Reiniciar estudiante
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head"><h2>Reinicio global</h2></div>
+        <div class="panel__body form-stack">
+          <p class="aviso">
+            <mat-icon>warning</mat-icon>
+            Esta acción reinicia la práctica para <strong>todos</strong> los estudiantes autorizados.
+          </p>
+
+          <label>
+            Práctica
+            <select [ngModel]="practicaSeleccionada()" (ngModelChange)="practicaSeleccionada.set($event)">
+              <option [ngValue]="null">— Seleccionar —</option>
+              @for (p of practicas(); track p.id) {
+                <option [ngValue]="p.id">{{ p.nombre }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            Confirmación — escribe <strong>REINICIAR TODOS</strong>
+            <input type="text" [ngModel]="confirmacionGlobal()" (ngModelChange)="confirmacionGlobal.set($event)" />
+          </label>
+
+          <button
+            mat-flat-button
+            color="warn"
+            type="button"
+            [disabled]="procesando()"
+            (click)="reiniciarGlobal()">
+            Reiniciar todos
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="panel__head"><h2>Registro de reinicios</h2></div>
+      <div class="panel__body">
+        @if (registros().length === 0) {
+          <div class="empty-state-mockup">Aún no hay reinicios registrados.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Práctica</th>
+                <th>Alcance</th>
+                <th>Docente</th>
+                <th>Afectados</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of registros(); track r.id) {
+                <tr>
+                  <td>{{ r.fecha | date:'medium' }}</td>
+                  <td>{{ r.practica_nombre }}</td>
+                  <td>{{ r.alcance_display }}</td>
+                  <td>{{ r.docente_nombre }}</td>
+                  <td>{{ r.estudiantes_afectados }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </section>
+  }
+</section>

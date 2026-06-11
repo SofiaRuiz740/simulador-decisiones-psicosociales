@@ -10,83 +10,408 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Traumatismo craneoencefálico moderado. La familia relató caída accidental; el patrón de lesiones no coincide del todo.",
-      "siguienteNodoId": "decision-enfoque"
+      "texto": "Buenas. Estoy con la paciente de trauma ingresada esta noche. ¿Viene por la valoración psicosocial del caso?",
+      "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
-      "id": "decision-enfoque",
+      "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "Cómo explorar el informe médico",
+      "texto": "El médico puede orientar sobre el caso. Antes de profundizar, ordena mentalmente cómo quiere encuadrar la entrevista.",
       "opciones": [
         {
-          "id": "lesiones-defensivas",
-          "texto": "Preguntar si hay hallazgos compatibles con mecanismo de defensa.",
+          "id": "prep-slot-med-exploracion-1",
+          "texto": "«Sí. ¿Podría orientarme sobre el estado general actual de la paciente?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "medico-hallazgos"
+          "siguienteNodoId": "med-explor-estado",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_exploracion",
+                "valor": true
+              }
+            }
+          ]
         },
         {
-          "id": "contexto-ingreso",
-          "texto": "Explorar quién acompañaba a la paciente y qué versión dieron al ingreso.",
+          "id": "prep-slot-med-exploracion-2",
+          "texto": "«¿Quién acompañó el ingreso y cómo fue la coordinación con enfermería?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "medico-contexto"
+          "siguienteNodoId": "med-explor-ingreso",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-med-exploracion-3",
+          "texto": "«Antes de profundizar, ¿qué aspectos clínicos considera prioritarios para mi evaluación?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "med-explor-prioridades",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_exploracion",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "id": "medico-hallazgos",
+      "id": "med-explor-estado",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Hematomas en antebrazos compatibles con bloqueo. Ya quedó registrado en urgencias.",
-      "siguienteNodoId": "decision-derivacion"
+      "texto": "Paciente adulta ingresada hace pocas horas, sedada. Aún consolidamos la evolución; el pronóstico dependerá de las próximas horas.",
+      "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
-      "id": "medico-contexto",
+      "id": "med-explor-ingreso",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Ingresó con su madre y hermano. El agresor presunto no estaba presente al traslado.",
-      "siguienteNodoId": "decision-derivacion"
+      "texto": "Ingresó con familiares; el agresor presunto no estaba al traslado. Enfermería documentó altercados en el pasillo durante el ingreso.",
+      "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
-      "id": "decision-derivacion",
+      "id": "med-explor-prioridades",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Conviene contrastar el relato familiar con los hallazgos del examen físico y la evolución. También hay un ingreso simultáneo de una menor que activó otra ruta.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Próximo paso institucional",
+      "texto": "Puede profundizar en hallazgos y evolución. Con lo clínico disponible, considera qué indagar.",
       "opciones": [
         {
-          "id": "activar-ruta-violencia",
-          "texto": "Solicitar activación de protocolo de sospecha de violencia intrafamiliar.",
+          "id": "prep-slot-med-profundizacion-1",
+          "texto": "«¿Qué hallazgos clínicos destacaría del examen inicial?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "med-profun-hallazgos",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-med-profundizacion-2",
+          "texto": "«¿Cómo ha sido la evolución desde el ingreso?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "med-profun-evolucion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-med-profundizacion-3",
+          "texto": "«¿Qué riesgos observa en el cuadro actual de la paciente?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "med-profun-riesgos",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "med-profun-hallazgos",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Hay contusión temporo-parietal y hematomas en antebrazos compatibles con defensa. Aún no tenemos todos los detalles del examen completo.",
+      "siguienteNodoId": "decision-nivel4-interdisciplinar"
+    },
+    {
+      "id": "med-profun-evolucion",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "TCE moderado con sedación; tomografía sin hematoma expansivo al ingreso. Evolución reservada las próximas horas en UCI.",
+      "siguienteNodoId": "decision-nivel4-interdisciplinar"
+    },
+    {
+      "id": "med-profun-riesgos",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Riesgo neurológico inmediato y posible revictimización si no se coordina protección. La sospecha de violencia quedó anotada, pendiente de activación formal.",
+      "siguienteNodoId": "decision-nivel4-interdisciplinar"
+    },
+    {
+      "id": "decision-nivel4-interdisciplinar",
+      "emisor": "jugador",
+      "texto": "Conviene articular equipos antes de cerrar la entrevista clínica; organiza qué coordinar.",
+      "opciones": [
+        {
+          "id": "prep-slot-med-interdisciplinar-1",
+          "texto": "«¿Qué equipos deben articularse en casos como este?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "med-n4-interdisciplinar",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "med-n4-interdisciplinar",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Coordinamos con psicología, trabajo social y psiquiatría si la evolución lo requiere. Salud mental puede sostener el abordaje cuando la paciente estabilice.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "decision-prep-info-critica",
+      "emisor": "jugador",
+      "texto": "Hay discrepancias y datos sensibles que conviene precisar; reflexiona sobre qué profundizar.",
+      "opciones": [
+        {
+          "id": "prep-slot-med-critica-1",
+          "texto": "«¿Por qué cree que la familia insistió en hablar de una caída accidental?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "medico-minimizacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-med-critica-2",
+          "texto": "«¿Podría orientarme sobre lo consignado en la historia clínica de urgencias?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "medico-nota",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-med-critica-3",
+          "texto": "«¿El informe menciona a la menor fallecida en el mismo episodio?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "medico-menor",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "medico-minimizacion",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "La madre y el hermano hablaron de resbalón en el baño. El patrón de lesiones sugiere forcejeo frontal; algunos lo enmarcaron como ‘tropezón mutuo’.",
+      "testimonio": {
+        "id": "testimonio-medico-discrepancia",
+        "tema": "mecanismo_lesion",
+        "valor": "version_caida_accidental",
+        "descripcion": "Médico registra discrepancia entre relato familiar e lesiones",
+        "personajeId": "medico-urgencias"
+      },
+      "siguienteNodoId": "medico-percepcion-ingreso"
+    },
+    {
+      "id": "medico-percepcion-ingreso",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "En enfermería anotaron que la paciente ‘se tambaleó’ mientras discutían; eso no explica los hematomas bilaterales en defensa.",
+      "testimonio": {
+        "id": "testimonio-medico-percepcion-tambaleo",
+        "tema": "percepcion_agresion",
+        "valor": "forcejeo_mutuo",
+        "descripcion": "Registro inicial enmarca el episodio como tambaleo/discusión, no empujón claro",
+        "personajeId": "medico-urgencias"
+      },
+      "siguienteNodoId": "decision-nivel5-normativo"
+    },
+    {
+      "id": "medico-nota",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "La nota dice ‘contusión en brazo izquierdo, posible mecanismo de defensa’. El informe completo está en estación médica para lectura detallada.",
+      "siguienteNodoId": "decision-nivel5-normativo"
+    },
+    {
+      "id": "medico-menor",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Consta ingreso simultáneo de la menor ya sin signos vitales. Eso activó protocolo forense aparte; la paciente adulta siguió ruta de trauma.",
+      "siguienteNodoId": "decision-nivel5-normativo"
+    },
+    {
+      "id": "decision-nivel5-normativo",
+      "emisor": "jugador",
+      "texto": "Antes de cerrar, conviene precisar el marco normativo e institucional del caso.",
+      "opciones": [
+        {
+          "id": "prep-slot-med-normativo-1",
+          "texto": "«¿Qué marco normativo aplica y cómo se articula la ruta institucional?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "med-marco-normativo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_marco_res459_ley1257",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "med-marco-normativo",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "La Resolución 459 de 2012 define la ruta ante sospecha de violencia intrafamiliar en el servicio de salud. La Ley 1257 respalda medidas de protección cuando el riesgo lo exige.",
+      "siguienteNodoId": "med-epicee-orientacion"
+    },
+    {
+      "id": "med-epicee-orientacion",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Cuando Lucía despierte, conviene un abordaje gradual de la mala noticia — en el servicio usamos criterios tipo EPICEE o SPIKES para no revictimizar. Usted puede sostener ese proceso junto con nosotros.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "decision-cierre",
+      "emisor": "jugador",
+      "texto": "Es momento de definir la coordinación institucional.",
+      "opciones": [
+        {
+          "id": "prep-slot-med-cierre-1",
+          "texto": "«Considero necesario activar el protocolo de sospecha de violencia intrafamiliar.»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "cierre-medico",
           "efectos": [
             {
               "tipo": "establecer_flag",
-              "parametros": { "clave": "protocolo_violencia_solicitado", "valor": true }
+              "parametros": {
+                "clave": "prep_rubrica_med_cierre",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "protocolo_violencia_solicitado",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_derivacion_interdisciplinaria",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_rutas_institucionales",
+                "valor": true
+              }
             }
           ]
         },
         {
-          "id": "seguir-evaluacion",
-          "texto": "Continuar evaluación psicosocial antes de activar rutas formales.",
+          "id": "prep-slot-med-cierre-2",
+          "texto": "«Prefiero completar la valoración psicosocial antes de activar rutas formales.»",
           "estrategiaClinica": "contencion_emocional",
-          "siguienteNodoId": "cierre-medico"
+          "siguienteNodoId": "cierre-medico",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_cierre",
+                "valor": true
+              }
+            }
+          ]
         },
         {
-          "id": "confrontar-version",
-          "texto": "Cuestionar al médico por qué no activó el protocolo al ingreso.",
+          "id": "prep-slot-med-cierre-3",
+          "texto": "«Doctor, me preocupa que el protocolo no se haya activado al ingreso. ¿Qué ocurrió?»",
           "estrategiaClinica": "confrontacion",
-          "siguienteNodoId": "cierre-medico",
-          "modificadoresMetricas": { "colaboracion": -10 }
+          "siguienteNodoId": "medico-respuesta-protocolo",
+          "modificadoresMetricas": {
+            "colaboracion": -10
+          },
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_med_cierre",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
+    },
+    {
+      "id": "medico-respuesta-protocolo",
+      "emisor": "personaje",
+      "personajeId": "medico-urgencias",
+      "texto": "Priorizamos estabilización. La sospecha quedó registrada; activar formalmente depende también de salud mental y trabajo social. Usted puede impulsarlo.",
+      "siguienteNodoId": "cierre-medico"
     },
     {
       "id": "cierre-medico",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "El informe completo está en estación médica. Avísenme si necesitan interconsulta psiquiátrica.",
+      "texto": "El informe completo está en estación médica. Estos casos exigen coordinación institucional: cuando la paciente estabilice, conviene escucharla con el informe revisado, contrastar versiones y activar la red interdisciplinaria.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",
-          "parametros": { "conversacionId": "entrevista-medico-urgencias" }
+          "parametros": {
+            "conversacionId": "entrevista-medico-urgencias"
+          }
         }
       ]
     }

@@ -1,0 +1,36 @@
+{
+  "id": "cronologia-episodio",
+  "titulo": "Cronología imprecisa del episodio",
+  "descripcion": "Hermano, Lucía y registros vecinales ubican el inicio del forcejeo en horarios cercanos pero no idénticos (22:32–22:45).",
+  "evidenciasInvolucradas": [],
+  "personajesInvolucrados": ["hermano", "lucia", "policia"],
+  "requisitosRevelacion": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": { "conversacionId": "revisita-hermano-tras-policia" }
+        },
+        {
+          "tipo": "o",
+          "condiciones": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "revisita-lucia-tras-medico" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "entrevista-policia-entrada" }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "severidad": "leve",
+  "preguntasReflexion": [
+    "¿La diferencia de minutos invalida el relato o refleja estrés agudo?",
+    "¿Qué fuente tendría mayor peso forense: celular, vecinos o memoria traumática?"
+  ]
+}

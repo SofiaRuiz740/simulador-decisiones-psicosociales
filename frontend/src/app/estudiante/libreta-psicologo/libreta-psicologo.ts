@@ -69,11 +69,23 @@ export class LibretaPsicologoComponent {
   });
 
   togglePanel(): void {
-    this.panel?.toggle();
+    if (!this.panel) return;
+
+    if (this.panel.opened) {
+      this.cerrarPanel();
+      return;
+    }
+
+    void this.panel.open().then(() => {
+      if (this.panel?.opened) {
+        this.abierta.set(true);
+      }
+    });
   }
 
   cerrarPanel(): void {
     this.panel?.close();
+    this.abierta.set(false);
   }
 
   rolPersonaje(personajeId: string): string {

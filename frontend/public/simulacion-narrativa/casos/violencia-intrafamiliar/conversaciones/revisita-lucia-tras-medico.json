@@ -1,0 +1,172 @@
+{
+  "id": "revisita-lucia-tras-medico",
+  "titulo": "Lucía — contraste con informe médico",
+  "escenarioId": "consulta-inicial",
+  "personajeId": "lucia",
+  "nodoInicialId": "apertura-contraste",
+  "noConsumeConversacionUtil": true,
+  "requisitosAcceso": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-medico-urgencias"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "revisita-lucia-informe"
+          }
+        }
+      ]
+    }
+  ],
+  "requisitosRevisita": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "entrevista-medico-urgencias"
+          }
+        },
+        {
+          "tipo": "conversacion_completada",
+          "parametros": {
+            "conversacionId": "revisita-lucia-informe"
+          }
+        }
+      ]
+    }
+  ],
+  "nodos": [
+    {
+      "id": "apertura-contraste",
+      "emisor": "narrador",
+      "texto": "Lucía abre los ojos un momento. El monitor sigue estable, pero su voz apenas alcanza un susurro.",
+      "siguienteNodoId": "lucia-recibe-medico"
+    },
+    {
+      "id": "lucia-recibe-medico",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "¿Usted habló con el médico…? Dígame la verdad: ¿qué dice el informe de mis brazos?",
+      "siguienteNodoId": "decision-contraste-medico"
+    },
+    {
+      "id": "decision-contraste-medico",
+      "emisor": "jugador",
+      "texto": "Lucía pregunta directamente por el informe; la profesional reflexiona sobre cómo responder.",
+      "opciones": [
+        {
+          "id": "mencionar-defensa",
+          "texto": "«Las lesiones en antebrazos son compatibles con defensa, no con un resbalón.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-admite-presion"
+        },
+        {
+          "id": "mencionar-discrepancia",
+          "texto": "«Al ingreso se habló de caída accidental. El médico anotó que eso no encaja.»",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "lucia-admite-presion",
+          "modificadoresMetricas": {
+            "confianza": -5,
+            "colaboracion": 6
+          }
+        },
+        {
+          "id": "explorar-miedo-primero",
+          "texto": "«¿Alguien le pidió que dijera que se cayó sola?»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "lucia-miedo-declaracion"
+        }
+      ]
+    },
+    {
+      "id": "lucia-miedo-declaracion",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Mi mamá… repitió lo del resbalón en la ambulancia. Miguel me miraba como diciendo ‘no digas más’. Yo seguí el juego.",
+      "testimonio": {
+        "id": "testimonio-lucia-presion-declaracion",
+        "tema": "mecanismo_lesion",
+        "valor": "version_caida_accidental",
+        "descripcion": "Lucía admite haber sostenido versión de caída bajo presión familiar",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "decision-hora"
+    },
+    {
+      "id": "lucia-admite-presion",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "No resbalé… me empujó cuando me puse delante de la niña. Pero dije otra cosa porque tenía miedo de lo que él haría después.",
+      "siguienteNodoId": "decision-hora"
+    },
+    {
+      "id": "decision-hora",
+      "emisor": "jugador",
+      "texto": "La cronología del episodio aún puede precisarse; considera cómo indagar.",
+      "opciones": [
+        {
+          "id": "preguntar-hora",
+          "texto": "«¿Recuerda a qué hora empezó la discusión en casa?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-hora"
+        },
+        {
+          "id": "contrastar-hermano",
+          "texto": "«Su hermano ubica el forcejeo cerca de las 10:30. ¿Coincide con lo que recuerda?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-hora-contraste"
+        }
+      ]
+    },
+    {
+      "id": "lucia-hora",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Después de la cena… como diez y cuarto, diez y media. Todo fue muy rápido; luego ya estaba aquí.",
+      "testimonio": {
+        "id": "testimonio-lucia-hora-2230",
+        "tema": "cronologia_episodio",
+        "valor": "hora_2230",
+        "descripcion": "Lucía ubica el inicio del episodio cerca de las 22:30",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-revisita-medico"
+    },
+    {
+      "id": "lucia-hora-contraste",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Diego tiene mejor memoria que yo ahora… yo diría más tarde, casi las once, cuando ya gritábamos fuerte. El reloj lo vi en la cocina, pero la cabeza me duele.",
+      "testimonio": {
+        "id": "testimonio-lucia-hora-2245",
+        "tema": "cronologia_episodio",
+        "valor": "hora_2245",
+        "descripcion": "Lucía recuerda el episodio cerca de las 22:45; difiere levemente del hermano",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "cierre-revisita-medico"
+    },
+    {
+      "id": "cierre-revisita-medico",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Gracias por no forzarme del todo… Necesito que quede claro que traté de proteger a mi hija. Lo demás… lo diré cuando pueda respirar.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": {
+            "conversacionId": "revisita-lucia-tras-medico"
+          }
+        }
+      ]
+    }
+  ]
+}

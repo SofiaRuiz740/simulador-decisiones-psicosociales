@@ -14,6 +14,7 @@
 }
 
 :host ::ng-deep .libreta-host.mat-drawer-container,
+:host ::ng-deep .libreta-host.mat-drawer-container-has-open,
 :host ::ng-deep .libreta-host .mat-drawer-content {
   pointer-events: none;
   background: transparent !important;
@@ -42,10 +43,11 @@
 .libreta-panel {
   width: clamp(320px, 28vw, 400px);
   height: 100%;
-  max-height: 100vh;
+  max-height: 100%;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: #f8f7f4;
   border-left: 1px solid #d8d4cb;
   box-shadow: -8px 0 32px rgba(15, 23, 42, 0.12);
@@ -57,11 +59,22 @@
   justify-content: space-between;
   gap: 12px;
   padding: 20px 16px 16px 20px;
-  background: #fff;
+  background: linear-gradient(180deg, #fff 0%, #faf9f7 100%);
   border-bottom: 1px solid #e7e3db;
   position: sticky;
   top: 0;
   z-index: 2;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #5c6f65, #8fa396);
+    border-radius: 0 2px 2px 0;
+  }
 }
 
 .panel-titulo {
@@ -93,28 +106,59 @@
 .panel-body {
   flex: 1 1 auto;
   min-height: 0;
-  padding: 12px 12px 32px;
+  padding: 16px 14px 36px;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #7a8f84 #ebe6de;
+  background:
+    linear-gradient(#f8f7f4 30%, rgba(248, 247, 244, 0)),
+    linear-gradient(rgba(248, 247, 244, 0), #f8f7f4 70%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, rgba(92, 111, 101, 0.08), rgba(92, 111, 101, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(92, 111, 101, 0.08), rgba(92, 111, 101, 0)) 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #ebe6de;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #7a8f84;
+    border-radius: 999px;
+    border: 2px solid #ebe6de;
+  }
 }
 
 .secciones {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 
   .mat-expansion-panel {
     background: #fff;
     border: 1px solid #ebe6de;
     border-radius: 10px !important;
     box-shadow: none !important;
+    border-left: 3px solid #d8e0da;
+  }
+
+  .mat-expansion-panel.mat-expanded {
+    border-left-color: #5c6f65;
   }
 
   .mat-expansion-panel-header {
     padding: 0 14px;
-    height: 52px;
+    height: 54px;
   }
 
   .mat-expansion-panel-header-title {
@@ -122,6 +166,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
+    font-size: 0.92rem;
     color: #334155;
 
     mat-icon {
@@ -167,12 +212,12 @@
 }
 
 .subtitulo-seccion {
-  margin: 4px 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  margin: 6px 4px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #64748b;
+  color: #5c6f65;
 }
 
 .lista-clinica {

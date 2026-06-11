@@ -105,6 +105,12 @@ export class NarrativaStateService {
     this._error.set(null);
   }
 
+  restaurarSesion(caso: CasoNarrativoCompleto, estado: EstadoPartida): void {
+    this._caso.set(caso);
+    this._estado.set(structuredClone(estado));
+    this._error.set(null);
+  }
+
   actualizarEstado(mutador: (estado: EstadoPartida) => void): void {
     const actual = this._estado();
     if (!actual) return;

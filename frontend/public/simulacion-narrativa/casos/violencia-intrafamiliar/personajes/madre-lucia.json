@@ -1,0 +1,25 @@
+{
+  "id": "madre-lucia",
+  "nombre": "Carmen Morales",
+  "rol": "familiar",
+  "edad": 58,
+  "relacionFamilia": "Madre de Lucía (paciente en UCI); abuela de Sofi, la menor fallecida en el episodio.",
+  "descripcion": "Aguarda en sala de espera. En duelo por su nieta y angustiada por la recuperación de su hija.",
+  "personalidad": "Protectora, minimiza conflictos familiares, teme perder también a Lucía.",
+  "metricasIniciales": {
+    "confianza": 30,
+    "ansiedad": 80,
+    "colaboracion": 40,
+    "aperturaEmocional": 25
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 3,
+    "mensajesAgotamiento": [
+      "No puedo seguir… estoy agotada.",
+      "Perdón, necesito un momento antes de seguir hablando.",
+      "Ya dije todo lo que puedo por ahora.",
+      "Déjeme respirar… esto es demasiado para mí.",
+      "No tengo fuerzas para entrar otra vez en esos detalles."
+    ]
+  }
+}

@@ -47,6 +47,9 @@ export class EscenaVisualComponent {
       conversacionesDisponibles: this.facade.conversacionesDisponibles().map((c) => c.id),
       conversacionesEnProgreso: Object.keys(estado.nodosConversacionActivos),
       conversacionesCompletadas: estado.conversacionesCompletadas,
+      conversacionesAgotamientoReintento: escena.sprites
+        .map((sprite) => sprite.conversacionId)
+        .filter((id) => this.facade.conversacionPermiteReintentoAgotamiento(id)),
     });
   });
 
@@ -99,6 +102,9 @@ export class EscenaVisualComponent {
           if (!this.escenas.irAEscena(hotspot.destinoEscenaId, estado, caso)) {
             this.mensaje.emit('No puedes acceder a esa ubicación en este momento.');
             return;
+          }
+          if (destino?.escenarioNarrativoId) {
+            this.facade.establecerEscenarioNarrativo(destino.escenarioNarrativoId);
           }
         }
         break;
@@ -160,13 +166,8 @@ export class EscenaVisualComponent {
       return;
     }
 
-    if (completada) {
-      this.mensaje.emit('Esta conversación ya fue completada.');
-      return;
-    }
-
-    if (this.facade.estaConversacionBloqueadaPorFatiga(conversacionId)) {
-      this.facade.iniciarConversacion(conversacionId);
+    if (this.facade.conversacionPermiteReintentoAgotamiento(conversacionId)) {
+      this.facade.activarModoAgotamientoConversacion(conversacionId);
       this.abrirConversacion.emit({ conversacionId, modoAcercamiento });
       return;
     }

@@ -38,6 +38,8 @@ export class AuthService {
 
   /** True si hay un access token guardado y no está expirado. */
   readonly isAuthenticated = computed(() => {
+    // Depende de _usuario para invalidar el computed tras login/logout.
+    this._usuario();
     const token = this.getAccessToken();
     return token !== null && !this.isTokenExpired(token);
   });

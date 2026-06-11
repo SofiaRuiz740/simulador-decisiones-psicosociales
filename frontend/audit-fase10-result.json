@@ -1,0 +1,157 @@
+{
+  "fecha": "2026-06-08T20:01:03.818Z",
+  "baseUrl": "http://localhost:8080",
+  "escenasConfigVersion": "2.5.0",
+  "hotspotsPersonaje": [
+    {
+      "id": "hotspot-policia-entrada",
+      "escenaId": "entrada-hospital",
+      "posicion": {
+        "x": 14,
+        "y": 26,
+        "ancho": 12,
+        "alto": 58
+      }
+    },
+    {
+      "id": "hotspot-madre-espera",
+      "escenaId": "sala-espera",
+      "posicion": {
+        "x": 44,
+        "y": 22,
+        "ancho": 14,
+        "alto": 58
+      }
+    },
+    {
+      "id": "hotspot-hermano-espera",
+      "escenaId": "sala-espera",
+      "posicion": {
+        "x": 20,
+        "y": 24,
+        "ancho": 12,
+        "alto": 56
+      }
+    },
+    {
+      "id": "hotspot-enfermera-pasillo",
+      "escenaId": "pasillo-urgencias",
+      "posicion": {
+        "x": 21,
+        "y": 20,
+        "ancho": 13,
+        "alto": 62
+      }
+    },
+    {
+      "id": "hotspot-lucia-uci",
+      "escenaId": "cuidados-intensivos",
+      "posicion": {
+        "x": 38,
+        "y": 28,
+        "ancho": 18,
+        "alto": 50
+      }
+    },
+    {
+      "id": "hotspot-medico-uci",
+      "escenaId": "cuidados-intensivos",
+      "posicion": {
+        "x": 54,
+        "y": 16,
+        "ancho": 14,
+        "alto": 62
+      }
+    },
+    {
+      "id": "hotspot-comisario",
+      "escenaId": "interior-comisaria",
+      "posicion": {
+        "x": 27,
+        "y": 20,
+        "ancho": 14,
+        "alto": 58
+      }
+    },
+    {
+      "id": "hotspot-trabajadora-social",
+      "escenaId": "interior-comisaria",
+      "posicion": {
+        "x": 63,
+        "y": 22,
+        "ancho": 14,
+        "alto": 56
+      }
+    }
+  ],
+  "viewports": [
+    {
+      "name": "1366x768",
+      "width": 1366,
+      "height": 768,
+      "layoutEscena": {
+        "dialogoAbierto": false
+      }
+    },
+    {
+      "name": "1600x900",
+      "width": 1600,
+      "height": 900,
+      "layoutEscena": {
+        "dialogoAbierto": false
+      }
+    },
+    {
+      "name": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "layoutEscena": {
+        "dialogoAbierto": false
+      }
+    }
+  ],
+  "pruebas": [
+    {
+      "id": "hotspots-8-personajes",
+      "ok": true,
+      "detalle": "8/8 hotspots definidos"
+    },
+    {
+      "id": "config-visual-v2.5",
+      "ok": true,
+      "detalle": "version=2.5.0"
+    },
+    {
+      "id": "escenas-cargan",
+      "ok": true,
+      "detalle": "3 viewports probados"
+    }
+  ],
+  "resumen": {
+    "aprobado": true,
+    "bloques": {
+      "1-conversacion": "Layout 3 zonas en dialogo-narrativo.scss",
+      "2-jerarquia": "Nombre/rol apilados, tipografía ampliada",
+      "3-hotspots": "Posiciones calibradas escenas-hospital.json v2.5.0",
+      "4-transiciones": "300ms diálogo/escena/cierre",
+      "5-libreta": "Expediente clínico libreta-psicologo.scss",
+      "6-mapa": "Ubicación actual vs disponible mapa-escenas-dialog",
+      "7-cierre": "Informe académico simulacion-narrativa.html/scss"
+    },
+    "archivosModificados": [
+      "dialogo-narrativo/dialogo-narrativo.scss",
+      "dialogo-narrativo/dialogo-narrativo.ts",
+      "escena-visual/escena-visual.scss",
+      "exploracion-visual/exploracion-visual.scss",
+      "services/escena-visual.service.ts",
+      "hotspot-personaje/hotspot-personaje.scss",
+      "hotspot-lupa/hotspot-lupa.scss",
+      "libreta-psicologo/libreta-psicologo.scss",
+      "components/mapa-escenas-dialog/mapa-escenas-dialog.ts",
+      "simulacion-narrativa/simulacion-narrativa.html",
+      "simulacion-narrativa/simulacion-narrativa.scss",
+      "public/.../escenas-hospital.json"
+    ],
+    "limitacionMapaVisitados": "No hay historial de escenas visitadas en estado; el mapa distingue ubicación actual vs disponibles sin cambiar navegación."
+  }
+}

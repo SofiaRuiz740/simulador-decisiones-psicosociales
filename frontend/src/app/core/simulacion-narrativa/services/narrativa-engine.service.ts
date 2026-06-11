@@ -65,11 +65,14 @@ import {
   actualizarEstadoContradiccion,
   TrazabilidadService,
 } from './trazabilidad.service';
+import { NarrativaPersistenciaService } from './narrativa-persistencia.service';
+import { PartidaPersistida } from '../utils/partida-persistencia.util';
 
 @Injectable({ providedIn: 'root' })
 export class NarrativaEngineService {
   private readonly state = inject(NarrativaStateService);
   private readonly trazabilidad = inject(TrazabilidadService);
+  private readonly persistencia = inject(NarrativaPersistenciaService);
 
   private get caso(): CasoNarrativoCompleto | null {
     return this.state.caso();
@@ -206,6 +209,33 @@ export class NarrativaEngineService {
 
   estaConversacionEnModoFatiga(conversacionId: string): boolean {
     return this.state.estado()?.conversacionesEnFatiga.includes(conversacionId) ?? false;
+  }
+
+  /** Reabre una conversación ya completada o agotada solo para mostrar respuesta contextual. */
+  activarModoAgotamientoConversacion(conversacionId: string): void {
+    const caso = this.caso;
+    const estado = this.state.estado();
+    if (!caso || !estado) return;
+
+    const conversacion = caso.conversaciones[conversacionId];
+    if (!conversacion?.personajeId) return;
+
+    const completada = estado.conversacionesCompletadas.includes(conversacionId);
+    const agotada = this.estaConversacionBloqueadaPorFatiga(conversacionId);
+    if (!completada && !agotada) return;
+
+    this.state.actualizarEstado((estadoMut) => {
+      if (!estadoMut.conversacionesEnFatiga.includes(conversacionId)) {
+        estadoMut.conversacionesEnFatiga.push(conversacionId);
+      }
+    });
+  }
+
+  conversacionPermiteReintentoAgotamiento(conversacionId: string): boolean {
+    const estado = this.state.estado();
+    if (!estado) return false;
+    if (estado.conversacionesCompletadas.includes(conversacionId)) return true;
+    return this.estaConversacionBloqueadaPorFatiga(conversacionId);
   }
 
   nodoConversacionActual(conversacionId: string): NodoDialogo | null {
@@ -352,6 +382,22 @@ export class NarrativaEngineService {
       }
 
       this.postProcesarEstado(estado);
+    });
+  }
+
+  /** Asegura el cierre de la entrevista cuando el nodo final no aplicó efectos al mostrar. */
+  finalizarConversacionActiva(conversacionId: string): void {
+    const caso = this.caso;
+    const estado = this.state.estado();
+    if (!caso || !estado || this.estaConversacionEnModoFatiga(conversacionId)) return;
+    if (estado.conversacionesCompletadas.includes(conversacionId)) return;
+
+    const conversacion = caso.conversaciones[conversacionId];
+    if (!conversacion) return;
+
+    this.state.actualizarEstado((estadoMut) => {
+      this.completarConversacion(conversacionId, conversacion, estadoMut);
+      this.postProcesarEstado(estadoMut);
     });
   }
 
@@ -584,6 +630,21 @@ export class NarrativaEngineService {
     });
   }
 
+  /** Sincroniza el escenario narrativo al explorar una zona visual (p. ej. comisaría). */
+  establecerEscenarioNarrativo(escenarioId: string): void {
+    const caso = this.caso;
+    const estado = this.state.estado();
+    if (!caso || !estado || !caso.escenarios[escenarioId]) return;
+    if (estado.escenarioActualId === escenarioId) return;
+
+    this.state.actualizarEstado((estadoMut) => {
+      estadoMut.escenarioActualId = escenarioId;
+      if (!estadoMut.escenariosVisitados.includes(escenarioId)) {
+        estadoMut.escenariosVisitados.push(escenarioId);
+      }
+    });
+  }
+
   generarResumenPedagogico(): ResumenPedagogico | null {
     const estado = this.state.estado();
     if (!estado) return null;
@@ -596,7 +657,26 @@ export class NarrativaEngineService {
     return this.trazabilidad.generarInformePedagogicoDocente(estado, this.caso);
   }
 
-  prepararSesion(caso: CasoNarrativoCompleto): void {
+  prepararSesion(caso: CasoNarrativoCompleto, partidaGuardada?: PartidaPersistida | null): void {
+    const hayProgresoGuardado =
+      !!partidaGuardada &&
+      (partidaGuardada.estado.conversacionesCompletadas.length > 0 ||
+        partidaGuardada.estado.evidenciasDescubiertas.length > 0 ||
+        Object.keys(partidaGuardada.estado.flags).length > 0 ||
+        partidaGuardada.estado.decisiones.length > 0 ||
+        Object.values(partidaGuardada.estado.nodosVisitadosPorConversacion).some(
+          (nodos) => nodos.length > 0,
+        ) ||
+        partidaGuardada.estado.escenariosVisitados.length > 1);
+
+    if (hayProgresoGuardado && partidaGuardada) {
+      this.state.restaurarSesion(caso, partidaGuardada.estado);
+      this.state.actualizarEstado((estado) => {
+        this.postProcesarEstado(estado, false);
+      });
+      return;
+    }
+
     this.state.inicializarSesion(caso);
     this.state.actualizarEstado((estado) => {
       inicializarMetricasPersonajes(estado, Object.values(caso.personajes));
@@ -701,6 +781,14 @@ export class NarrativaEngineService {
     this.trazabilidad.sincronizarEventos(estado, caso);
     this.trazabilidad.sincronizarObjetivos(estado, caso);
     sincronizarLibretaDesdeEstado(estado, caso);
+    this.persistirPartidaSiCorresponde(estado);
+  }
+
+  /** Persiste progreso narrativo (escena visual opcional; si falta, conserva la última guardada). */
+  persistirPartidaSiCorresponde(estado: EstadoPartida, escenaVisualId: string | null = null): void {
+    const actual = this.state.estado();
+    if (!actual) return;
+    this.persistencia.guardarPartida(actual, escenaVisualId);
   }
 
   private mapearTipoIntervencionAEstrategia(

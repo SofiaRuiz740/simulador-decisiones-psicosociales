@@ -1,0 +1,10 @@
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--text-muted, #64748b);
+  font-size: 0.875rem;
+}

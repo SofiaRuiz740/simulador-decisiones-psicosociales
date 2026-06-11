@@ -11,11 +11,10 @@ import logging
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMultiAlternatives
 
 from apps.casos.models import Pregunta
 from apps.participaciones.models import Participacion, RespuestaSeleccionada
-from apps.usuarios.mail import conexion_smtp_docente
 
 from .models import Resultado
 
@@ -44,13 +43,9 @@ def _nivel_alcanzado(porcentaje: float, niveles: list) -> dict | None:
 def notificar_resultado_estudiante(resultado: Resultado) -> tuple[bool, str | None]:
     """Envía correo con la nota al estudiante (RF42).
 
-    Prioriza el SMTP del docente que dictó la práctica para que el remitente
-    real sea el docente (mismo flujo que las invitaciones). Si el docente no
-    tiene SMTP configurado, hace fallback a DEFAULT_FROM_EMAIL del sistema y
-    deja log de advertencia. Solo marca `notificado_estudiante=True` si el
-    envío sale bien.
-
-    Devuelve `(ok, error?)`.
+    Usa el SMTP global del sistema (DEFAULT_FROM_EMAIL). El docente queda
+    como Reply-To para que la conversación posterior llegue directamente
+    a él. Solo marca `notificado_estudiante=True` si el envío sale bien.
     """
     if resultado.notificado_estudiante:
         return True, None
@@ -63,11 +58,12 @@ def notificar_resultado_estudiante(resultado: Resultado) -> tuple[bool, str | No
         return False, 'El estudiante no tiene correo registrado.'
 
     asunto = f'Resultado de tu práctica: {practica.nombre}'
+    estado = 'Aprobado' if resultado.aprobado else 'No aprobado'
     cuerpo = (
         f'Hola {estudiante.nombre_completo},\n\n'
         f'Tu participación en la práctica «{practica.nombre}» fue calificada.\n\n'
         f'  • Nota final: {resultado.nota_final}\n'
-        f'  • Estado: {"Aprobado" if resultado.aprobado else "No aprobado"}\n'
+        f'  • Estado: {estado}\n'
         f'  • Correctas: {resultado.correctas} · Incorrectas: {resultado.incorrectas} · '
         f'Sin responder: {resultado.no_respondidas}\n\n'
         f'Consulta el detalle entrando al simulador con tu correo.\n\n'
@@ -76,38 +72,17 @@ def notificar_resultado_estudiante(resultado: Resultado) -> tuple[bool, str | No
         cuerpo += f'Retroalimentación del docente:\n{resultado.feedback_docente}\n\n'
     cuerpo += '—\n'
 
-    # 1) intento con SMTP del docente
-    conexion = None
-    from_email = settings.DEFAULT_FROM_EMAIL
-    reply_to = []
-    if docente.email and getattr(docente, 'correo_smtp_password', ''):
-        conexion, err = conexion_smtp_docente(docente)
-        if conexion:
-            nombre = docente.get_full_name() or docente.username
-            from_email = f'"{nombre}" <{docente.email}>'
-            reply_to = [docente.email]
-        else:
-            logger.warning(
-                'Resultado %s: SMTP docente no disponible (%s). Usaré DEFAULT_FROM_EMAIL.',
-                resultado.id, err,
-            )
+    reply_to = [docente.email.strip()] if (docente.email or '').strip() else []
 
     try:
-        if conexion is not None:
-            mensaje = EmailMessage(
-                subject=asunto, body=cuerpo,
-                from_email=from_email, to=[estudiante.correo],
-                reply_to=reply_to, connection=conexion,
-            )
-            mensaje.send(fail_silently=False)
-        else:
-            # Fallback explícito y NO silencioso (al menos logueado).
-            send_mail(
-                asunto, cuerpo,
-                settings.DEFAULT_FROM_EMAIL,
-                [estudiante.correo],
-                fail_silently=False,
-            )
+        mensaje = EmailMultiAlternatives(
+            subject=asunto,
+            body=cuerpo,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[estudiante.correo],
+            reply_to=reply_to,
+        )
+        mensaje.send(fail_silently=False)
         resultado.notificado_estudiante = True
         resultado.save(update_fields=['notificado_estudiante'])
         logger.info(

@@ -30,24 +30,19 @@ export class PracticasService {
     id: number,
     estudiante_ids: number[] = [],
     grupo_ids: number[] = [],
-    correo_smtp_password?: string,
   ) {
-    const body: Record<string, unknown> = { estudiante_ids, grupo_ids };
-    if (correo_smtp_password) body['correo_smtp_password'] = correo_smtp_password;
     return this.http.post<{
       creadas: number;
       correos_enviados: number;
       correos_fallidos: number;
       autorizaciones: unknown[];
-    }>(`${this.api}/practicas/${id}/autorizar-estudiantes/`, body);
+    }>(`${this.api}/practicas/${id}/autorizar-estudiantes/`, { estudiante_ids, grupo_ids });
   }
 
-  reenviarInvitacion(practicaId: number, autorizacionId: number, correo_smtp_password?: string) {
-    const body: Record<string, string> = {};
-    if (correo_smtp_password) body['correo_smtp_password'] = correo_smtp_password;
+  reenviarInvitacion(practicaId: number, autorizacionId: number) {
     return this.http.post<unknown>(
       `${this.api}/practicas/${practicaId}/reenviar-invitacion/${autorizacionId}/`,
-      body,
+      {},
     );
   }
 
@@ -65,11 +60,9 @@ export class PracticasService {
     practicaId: number,
     autorizacionId: number,
     motivo: string,
-    correo_smtp_password?: string,
   ) {
     const body: Record<string, string> = {};
     if (motivo) body['motivo'] = motivo;
-    if (correo_smtp_password) body['correo_smtp_password'] = correo_smtp_password;
     return this.http.post<{
       autorizacion: unknown;
       email_enviado: boolean;

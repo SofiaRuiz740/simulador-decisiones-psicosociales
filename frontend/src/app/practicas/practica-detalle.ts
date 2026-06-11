@@ -11,12 +11,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { Observable, of } from 'rxjs';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { AuthService } from '../core/auth/auth.service';
-import { mockupDialog } from '../shared/constants/dialog-config';
-import { CorreoInvitacionesDialog } from '../shared/dialogs/correo-invitaciones-dialog';
 
 import { Estudiante, Grupo } from '../core/models/academico.model';
 import { EstadoPractica, PracticaDetalle, SeguimientoParticipacion } from '../core/models/practicas.model';
@@ -46,7 +43,6 @@ export class PracticaDetallePage implements OnInit {
   private readonly simulacion = inject(SimulacionService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly auth = inject(AuthService);
-  private readonly dialog = inject(MatDialog);
   private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
@@ -114,7 +110,7 @@ export class PracticaDetallePage implements OnInit {
     if (!p) return;
     const ok = await this.ux.confirm({
       titulo: 'Quitar autorización',
-      mensaje: `${nombreEstudiante} dejará de tener acceso a la práctica "${p.nombre}". Si tiene SMTP configurado se notificará por correo.`,
+      mensaje: `${nombreEstudiante} dejará de tener acceso a la práctica "${p.nombre}". Se le enviará un correo informando la decisión.`,
       variant: 'danger',
       textoConfirmar: 'Quitar autorización',
       icono: 'person_off',
@@ -130,29 +126,20 @@ export class PracticaDetallePage implements OnInit {
       rows: 3,
       maxlength: 300,
     });
-    // El askInput devuelve null si cancela; el campo es opcional, así que `null` = sin motivo.
     const motivoFinal = motivo === null ? '' : motivo;
 
-    // Si el docente aún no tiene SMTP configurado, pedimos la clave Gmail
-    // antes de la petición para que la notificación se envíe.
-    this.pedirClaveGmail('Notificar al estudiante por correo').subscribe((clave) => {
-      if (clave === null) return;
-      this.practicas.desautorizarEstudiante(
-        p.id, autorizacionId, motivoFinal, clave || undefined,
-      ).subscribe({
-        next: (resp) => {
-          if (clave) this.auth.cargarPerfil().subscribe();
-          const msg = resp.email_enviado
-            ? `${nombreEstudiante} fue desautorizado y notificado por correo.`
-            : `${nombreEstudiante} fue desautorizado. ${resp.email_error || 'No se pudo enviar el correo.'}`;
-          this.snackBar.open(msg, 'OK', { duration: 5000 });
-          this.cargar(p.id);
-        },
-        error: (err) => {
-          const msg = err?.error?.detail || 'No se pudo desautorizar.';
-          this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo desautorizar.', 'OK', { duration: 4500 });
-        },
-      });
+    this.practicas.desautorizarEstudiante(p.id, autorizacionId, motivoFinal).subscribe({
+      next: (resp) => {
+        const msg = resp.email_enviado
+          ? `${nombreEstudiante} fue desautorizado y notificado por correo.`
+          : `${nombreEstudiante} fue desautorizado. La práctica quedó registrada pero no se pudo enviar el correo: ${resp.email_error || 'revisa la configuración SMTP'}.`;
+        this.snackBar.open(msg, 'OK', { duration: 5000 });
+        this.cargar(p.id);
+      },
+      error: (err) => {
+        const msg = err?.error?.detail || 'No se pudo desautorizar.';
+        this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo desautorizar.', 'OK', { duration: 4500 });
+      },
     });
   }
 
@@ -200,41 +187,21 @@ export class PracticaDetallePage implements OnInit {
       this.snackBar.open('Selecciona al menos un estudiante o grupo.', 'OK', { duration: 3000 });
       return;
     }
-    this.pedirClaveGmail('Autorizar y enviar invitaciones por correo').subscribe((clave) => {
-      if (clave === null) return;
-      this.ejecutarAutorizar(p, estIds, grupoIds, clave || undefined);
-    });
-  }
-
-  private pedirClaveGmail(titulo: string): Observable<string | null | undefined> {
-    if (this.auth.usuario()?.correo_smtp_configurado) {
-      return of(undefined);
-    }
-    return this.dialog.open(CorreoInvitacionesDialog, {
-      ...mockupDialog('480px'),
-      data: { modo: 'enviar', titulo, boton: 'Enviar correo' },
-    }).afterClosed();
-  }
-
-  private ejecutarAutorizar(p: PracticaDetalle, estIds: number[], grupoIds: number[], clave?: string) {
-    this.practicas.autorizarEstudiantes(p.id, estIds, grupoIds, clave).subscribe({
+    this.practicas.autorizarEstudiantes(p.id, estIds, grupoIds).subscribe({
       next: (r) => {
-        if (clave) this.auth.cargarPerfil().subscribe();
-        const msg = r.correos_fallidos > 0
-          ? `${r.creadas} autorizados. ${r.correos_enviados} correos enviados, ${r.correos_fallidos} fallaron. Verifica tu contraseña Gmail.`
-          : r.creadas > 0
-            ? `${r.creadas} estudiantes autorizados. ${r.correos_enviados} invitaciones enviadas por correo.`
-            : 'No había estudiantes nuevos por autorizar.';
+        const msg = r.creadas === 0
+          ? 'Los estudiantes seleccionados ya estaban autorizados en esta práctica.'
+          : r.correos_fallidos > 0
+            ? `Práctica asignada a ${r.creadas} estudiante(s). ${r.correos_enviados} código(s) enviado(s) por correo, ${r.correos_fallidos} fallaron — revisa la configuración SMTP.`
+            : `Práctica asignada correctamente. El código de acceso fue enviado al correo de ${r.creadas} estudiante(s).`;
         this.snackBar.open(msg, 'OK', { duration: 5000 });
         for (const k of Object.keys(this.seleccionEst)) this.seleccionEst[Number(k)] = false;
         for (const k of Object.keys(this.seleccionGrupo)) this.seleccionGrupo[Number(k)] = false;
         this.cargar(p.id);
       },
       error: (err) => {
-        const msg = err?.error?.correo_smtp_password?.[0]
-          || err?.error?.detail
-          || 'No se pudo autorizar.';
-        this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo autorizar.', 'OK', { duration: 4500 });
+        const msg = err?.error?.detail || 'No se pudo asignar la práctica.';
+        this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo asignar la práctica.', 'OK', { duration: 4500 });
       },
     });
   }
@@ -242,21 +209,15 @@ export class PracticaDetallePage implements OnInit {
   reenviarInvitacion(autorizacionId: number) {
     const p = this.practica();
     if (!p) return;
-    this.pedirClaveGmail('Reenviar invitación por correo').subscribe((clave) => {
-      if (clave === null) return;
-      this.practicas.reenviarInvitacion(p.id, autorizacionId, clave || undefined).subscribe({
-        next: () => {
-          if (clave) this.auth.cargarPerfil().subscribe();
-          this.snackBar.open('Invitación reenviada por correo.', 'OK', { duration: 3000 });
-          this.cargar(p.id);
-        },
-        error: (err) => {
-          const msg = err?.error?.correo_smtp_password?.[0]
-            || err?.error?.detail
-            || 'No se pudo enviar el correo.';
-          this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo enviar el correo.', 'OK', { duration: 4500 });
-        },
-      });
+    this.practicas.reenviarInvitacion(p.id, autorizacionId).subscribe({
+      next: () => {
+        this.snackBar.open('El código de acceso fue reenviado al correo del estudiante.', 'OK', { duration: 3500 });
+        this.cargar(p.id);
+      },
+      error: (err) => {
+        const msg = err?.error?.detail || 'No se pudo reenviar el correo. Revisa la configuración SMTP.';
+        this.snackBar.open(typeof msg === 'string' ? msg : 'No se pudo reenviar el correo.', 'OK', { duration: 4500 });
+      },
     });
   }
 

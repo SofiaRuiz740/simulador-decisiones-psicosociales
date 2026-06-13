@@ -1,0 +1,76 @@
+{
+  "viewport": "1920x1080",
+  "fase": "21B",
+  "escenas": {
+    "salaEsperaHospital": {
+      "hotspot-madre-espera": {
+        "antes": {
+          "x": 48.9,
+          "y": 41.1,
+          "ancho": 7.1,
+          "alto": 25.3
+        },
+        "despues": {
+          "x": 50.3,
+          "y": 41.1,
+          "ancho": 4.6,
+          "alto": 25.3
+        },
+        "nota": "Cabeza-hombros-torso sentado; ancho reducido; sin silla lateral",
+        "label": "Madre"
+      },
+      "hotspot-hermano-espera": {
+        "antes": {
+          "x": 22.8,
+          "y": 15.8,
+          "ancho": 7.1,
+          "alto": 35.4
+        },
+        "despues": {
+          "x": 20.7,
+          "y": 20.6,
+          "ancho": 7.1,
+          "alto": 32.3
+        },
+        "nota": "Centrado cabeza-torso; desplazado izquierda y abajo",
+        "label": "Hermano"
+      }
+    },
+    "pasilloUrgencias": {
+      "hotspot-enfermera-pasillo": {
+        "antes": {
+          "x": 21.5,
+          "y": 26.2,
+          "ancho": 6.3,
+          "alto": 31.8
+        },
+        "despues": {
+          "x": 21.5,
+          "y": 31.3,
+          "ancho": 6.3,
+          "alto": 32.3
+        },
+        "nota": "Borde superior en corona; sin vacío encima",
+        "label": "Enfermera"
+      }
+    },
+    "cuidadosIntensivos": {
+      "hotspot-lucia-uci": {
+        "antes": {
+          "x": 28.3,
+          "y": 37.8,
+          "ancho": 7.3,
+          "alto": 18.1
+        },
+        "despues": {
+          "x": 28.3,
+          "y": 37.8,
+          "ancho": 7.3,
+          "alto": 18.1
+        },
+        "nota": "Sin cambio Fase 21B — solo validación overlay",
+        "label": "Lucía UCI (referencia)"
+      }
+    }
+  }
+}

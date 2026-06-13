@@ -1,0 +1,22 @@
+{
+  "id": "comisario",
+  "nombre": "Comisario Rodríguez",
+  "rol": "profesional",
+  "descripcion": "Funcionario a cargo del registro del caso. Contrasta versiones y orienta sobre antecedentes formales.",
+  "metricasIniciales": {
+    "confianza": 55,
+    "ansiedad": 15,
+    "colaboracion": 60,
+    "aperturaEmocional": 30
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "El expediente de hoy quedó cerrado; lo demás es por escrito.",
+      "Ya contrasté con usted lo que tenemos en archivo.",
+      "Para más detalle necesitará solicitud formal.",
+      "No puedo seguir ampliando fuera de procedimiento.",
+      "Retomemos mañana si hace falta profundizar."
+    ]
+  }
+}

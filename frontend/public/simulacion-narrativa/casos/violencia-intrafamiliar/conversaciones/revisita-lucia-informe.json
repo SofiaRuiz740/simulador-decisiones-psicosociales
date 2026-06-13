@@ -8,53 +8,368 @@
   "requisitosAcceso": [
     {
       "tipo": "evidencia_descubierta",
-      "parametros": { "evidenciaId": "informe-urgencias" }
+      "parametros": {
+        "evidenciaId": "informe-urgencias"
+      }
     }
   ],
   "requisitosRevisita": [
     {
       "tipo": "evidencia_descubierta",
-      "parametros": { "evidenciaId": "informe-urgencias" }
+      "parametros": {
+        "evidenciaId": "informe-urgencias"
+      }
     }
   ],
   "nodos": [
     {
       "id": "saludo-revisita",
       "emisor": "narrador",
-      "texto": "La paciente abre los ojos un momento. El monitor cardíaco marca un ritmo estable. Respira con dificultad.",
+      "texto": "El pasillo de urgencias queda atrás. En UCI la luz es tenue; el monitor marca un ritmo estable, pero la respiración aún cuesta.",
+      "siguienteNodoId": "format-ref-d3-uci"
+    },
+    {
+      "id": "format-ref-d3-uci",
+      "emisor": "jugador",
+      "texto": "Antes de acercarse a Lucía, repasa lo recogido en entrevistas previas. Con esa información, surge una pregunta clínica importante.",
+      "opciones": [
+        {
+          "id": "format-d3-a",
+          "texto": "Discusiones ocasionales.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d3-a",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d3",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d3-b",
+          "texto": "Celos y control coercitivo.",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "feedback-format-d3-b",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d3",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d3-c",
+          "texto": "Diferencias económicas.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d3-c",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d3",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feedback-format-d3-a",
+      "emisor": "narrador",
+      "texto": "Las discusiones ocasionales pueden formar parte del conflicto, aunque no siempre implican riesgo inmediato.",
+      "siguienteNodoId": "lucia-semiconsciente"
+    },
+    {
+      "id": "feedback-format-d3-b",
+      "emisor": "narrador",
+      "texto": "El control coercitivo aparece repetido en varios relatos recogidos hasta esta noche.",
+      "siguienteNodoId": "lucia-semiconsciente"
+    },
+    {
+      "id": "feedback-format-d3-c",
+      "emisor": "narrador",
+      "texto": "Las diferencias económicas están presentes, aunque otros relatos describen dinámicas más urgentes.",
       "siguienteNodoId": "lucia-semiconsciente"
     },
     {
       "id": "lucia-semiconsciente",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Mi hija…? No la veo…",
+      "texto": "¿Usted es de salud mental…? Me duele la cabeza… no entiendo bien dónde estoy.",
+      "siguienteNodoId": "decision-apertura-lucia"
+    },
+    {
+      "id": "decision-apertura-lucia",
+      "emisor": "jugador",
+      "texto": "Lucía está sedada y vulnerable. La profesional reflexiona sobre cómo abrir el acercamiento.",
+      "opciones": [
+        {
+          "id": "presentar-servicio",
+          "texto": "«Soy psicóloga del hospital. Estoy aquí para acompañarla, sin apuro.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "lucia-acuse-recibo"
+        },
+        {
+          "id": "validar-estado",
+          "texto": "«Comprendo que está muy cansada. Podemos hablar solo de cómo se siente ahora.»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "lucia-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_pai",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucia-acuse-recibo",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Gracias… Mi mamá y mi hermano están afuera, ¿verdad? Tengo miedo de que estén peleando otra vez.",
+      "siguienteNodoId": "decision-exploracion-inicial"
+    },
+    {
+      "id": "decision-exploracion-inicial",
+      "emisor": "jugador",
+      "texto": "Puede explorar el contexto sin presionar. Considera por dónde continuar la exploración.",
+      "opciones": [
+        {
+          "id": "explorar-familia-espera",
+          "texto": "«Su familia está en el hospital. ¿Le preocupa algo concreto de lo que ocurra afuera?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-preocupacion-familia"
+        },
+        {
+          "id": "explorar-bienestar",
+          "texto": "«Antes de hablar del episodio, ¿cómo se siente usted en este momento?»",
+          "estrategiaClinica": "escucha_activa",
+          "siguienteNodoId": "lucia-bienestar"
+        }
+      ]
+    },
+    {
+      "id": "lucia-preocupacion-familia",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Miguel siempre dice cosas horribles cuando hay visitas… y mi mamá trata de callarlo. No quiero que le digan cosas que la hagan sentir culpable.",
+      "siguienteNodoId": "decision-profundizacion-relacion"
+    },
+    {
+      "id": "lucia-bienestar",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Duele todo… y estoy confundida. Antes de esto, ya venía muy agotada en casa.",
+      "siguienteNodoId": "decision-profundizacion-relacion"
+    },
+    {
+      "id": "decision-profundizacion-relacion",
+      "emisor": "jugador",
+      "texto": "Puede profundizar en la dinámica de pareja sin juzgar. Considera qué indagar a continuación.",
+      "opciones": [
+        {
+          "id": "explorar-celos-control",
+          "texto": "«¿Cómo era convivir con Miguel antes de esta noche?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-celos-control"
+        },
+        {
+          "id": "explorar-aislamiento",
+          "texto": "«¿Con quién podía hablar cuando las cosas se ponían difíciles en casa?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-aislamiento"
+        },
+        {
+          "id": "explorar-cambios",
+          "texto": "«¿Notó cambios en usted misma en los últimos meses?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "lucia-cambios-conducta"
+        }
+      ]
+    },
+    {
+      "id": "lucia-celos-control",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Revisaba el celular… preguntaba dónde estaba. Si salía con mi mamá, decía que la familia me metía en la cabeza cosas contra él. Celos todo el tiempo.",
+      "siguienteNodoId": "decision-info-critica-violencia"
+    },
+    {
+      "id": "lucia-aislamiento",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Con mi hermano a veces… pero Miguel decía que no debía contarle nada. Dejé de ver a una amiga porque ‘provocaba’. Me fui quedando sola.",
+      "siguienteNodoId": "decision-info-critica-violencia"
+    },
+    {
+      "id": "lucia-cambios-conducta",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Me saltaba comidas, no dormía. Sofi me preguntaba por qué lloraba en el baño. Yo le decía que era cansancio… pero era miedo.",
+      "siguienteNodoId": "decision-info-critica-violencia"
+    },
+    {
+      "id": "decision-info-critica-violencia",
+      "emisor": "jugador",
+      "texto": "Hay aspectos sensibles del vínculo que conviene precisar con cuidado; reflexiona sobre qué profundizar.",
+      "opciones": [
+        {
+          "id": "explorar-chantaje",
+          "texto": "«¿Miguel le decía algo que la hiciera sentir que no podía irse?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "lucia-chantaje-dependencia"
+        },
+        {
+          "id": "explorar-miedo-represalias",
+          "texto": "«¿Teme alguna consecuencia si habla de lo ocurrido?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "lucia-miedo-miguel",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_factores_riesgo",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "explorar-escalada",
+          "texto": "«¿Había episodios previos que terminaron ‘bien’ y luego volvieron?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "lucia-escalada",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_ciclo_violencia",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_senales_previas",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucia-chantaje-dependencia",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Decía que sin él no pagábamos nada… que Sofi y yo no teníamos a quién más ir. Yo le creí. Eso me paralizaba.",
+      "testimonio": {
+        "id": "testimonio-lucia-dependencia-economica",
+        "tema": "clima_familiar",
+        "valor": "dependencia_emocional",
+        "descripcion": "Lucía describe chantaje emocional y dependencia económica",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "lucia-semiconsciente-hija"
+    },
+    {
+      "id": "lucia-miedo-miguel",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Si digo la verdad… Miguel puede hacerle daño a mi mamá o a Diego. Él siempre dice que sin él no sobrevivimos.",
+      "testimonio": {
+        "id": "testimonio-lucia-miedo-represalias",
+        "tema": "clima_familiar",
+        "valor": "miedo_represalias",
+        "descripcion": "Lucía teme represalias de Miguel contra su familia",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "lucia-semiconsciente-hija"
+    },
+    {
+      "id": "lucia-escalada",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Gritaba, luego pedía perdón con flores… y yo pensaba ‘esta vez sí cambió’. Pero volvía. Cada vez más fuerte.",
+      "testimonio": {
+        "id": "testimonio-lucia-escalada",
+        "tema": "clima_familiar",
+        "valor": "violencia_sostenida",
+        "descripcion": "Lucía describe episodios previos con reconciliación y escalada",
+        "personajeId": "lucia"
+      },
+      "siguienteNodoId": "lucia-semiconsciente-hija"
+    },
+    {
+      "id": "lucia-semiconsciente-hija",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "¿Mi hija…? No la veo… ¿Dónde está Sofi?",
       "siguienteNodoId": "decision-noticia-hija"
     },
     {
       "id": "decision-noticia-hija",
       "emisor": "jugador",
-      "texto": "Cómo responder sobre la menor fallecida",
+      "texto": "Lucía pregunta por su hija. Reflexiona sobre cómo responder.",
       "opciones": [
         {
           "id": "informar-con-contencion",
-          "texto": "Informar con claridad y contención sobre el fallecimiento de su hija.",
+          "texto": "«Sofi falleció. Lamento profundamente su pérdida. Estoy aquí con usted; podemos ir paso a paso.»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "lucia-duelo",
-          "modificadoresMetricas": { "confianza": 8, "ansiedad": 5 }
+          "modificadoresMetricas": {
+            "confianza": 8,
+            "ansiedad": 5
+          },
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_spikes_epicee",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_comunicacion_empatica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_pai",
+                "valor": true
+              }
+            }
+          ]
         },
         {
           "id": "posponer-noticia",
-          "texto": "Posponer la noticia hasta estabilizar emocionalmente y centrarse en su estado actual.",
+          "texto": "«Primero quiero asegurarme de que usted esté lo más estable posible. Hablemos de cómo se siente ahora.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "lucia-suspira"
         },
         {
           "id": "evadir-noticia",
-          "texto": "Desviar la pregunta hacia el informe médico sin responder sobre la niña.",
+          "texto": "«Revisé el informe médico. Centrémonos en su estado de salud por ahora.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "lucia-sospecha",
-          "modificadoresMetricas": { "confianza": -8 }
+          "modificadoresMetricas": {
+            "confianza": -8
+          }
         }
       ]
     },
@@ -62,54 +377,373 @@
       "id": "lucia-duelo",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "No… no puede ser… Yo trataba de protegerla…",
-      "siguienteNodoId": "decision-informe"
+      "texto": "No… no puede ser… Yo trataba de protegerla… Dios mío…",
+      "siguienteNodoId": "decision-estabilizacion"
     },
     {
       "id": "lucia-suspira",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Estoy muy cansada… ¿Por qué me duele tanto la cabeza?",
-      "siguienteNodoId": "decision-informe"
+      "texto": "Estoy muy cansada… la cabeza me arde… ¿Por qué duele tanto?",
+      "siguienteNodoId": "decision-estabilizacion"
     },
     {
       "id": "lucia-sospecha",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Por qué no me responde sobre mi hija? ¿Pasó algo?",
+      "texto": "¿Por qué no me responde sobre mi hija? ¿Pasó algo malo?",
+      "siguienteNodoId": "decision-estabilizacion"
+    },
+    {
+      "id": "decision-estabilizacion",
+      "emisor": "jugador",
+      "texto": "Lucía está agotada y vulnerable; reflexiona sobre cómo sostenerla en este momento.",
+      "opciones": [
+        {
+          "id": "validar-dolor",
+          "texto": "«Comprendo lo agotada que está. Podemos hacer pausas cuando lo necesite.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "lucia-pausa-respira"
+        },
+        {
+          "id": "escuchar-sin-juicio",
+          "texto": "«Estoy aquí para escucharla. Tómese el tiempo que necesite.»",
+          "estrategiaClinica": "escucha_activa",
+          "siguienteNodoId": "lucia-pausa-respira",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_escucha_activa",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucia-pausa-respira",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Gracias… no puedo pensar con claridad. Mi mamá y mi hermano están afuera… ¿Están bien?",
       "siguienteNodoId": "decision-informe"
     },
     {
       "id": "decision-informe",
       "emisor": "jugador",
-      "texto": "Cómo abordar el informe de urgencias",
+      "texto": "Ya revisó el informe de urgencias. Considera cómo abordarlo con ella.",
       "opciones": [
         {
           "id": "explorar-con-empatia",
           "texto": "«Revisé el informe. Quiero entender qué ocurrió ese día, a su ritmo.»",
           "estrategiaClinica": "validacion_emocional",
-          "siguienteNodoId": "cierre-revisita"
+          "siguienteNodoId": "lucia-respuesta-empatia"
         },
         {
           "id": "explorar-hechos",
           "texto": "«El informe menciona lesiones compatibles con defensa. ¿Recuerda ese momento?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "cierre-revisita"
+          "siguienteNodoId": "lucia-respuesta-hechos"
         },
         {
           "id": "confrontar-version",
           "texto": "«El relato de caída accidental no coincide con las lesiones. Necesito la verdad.»",
           "estrategiaClinica": "confrontacion",
-          "siguienteNodoId": "cierre-revisita",
-          "modificadoresMetricas": { "confianza": -12, "colaboracion": -8 }
+          "siguienteNodoId": "lucia-respuesta-confrontacion",
+          "modificadoresMetricas": {
+            "confianza": -12,
+            "colaboracion": -8
+          },
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_confrontacion_imprudente",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
+    },
+    {
+      "id": "lucia-respuesta-empatia",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Él empujó… yo traté de cubrirme con los brazos. La niña gritaba… y luego todo se volvió negro.",
+      "siguienteNodoId": "decision-cierre-lucia"
+    },
+    {
+      "id": "lucia-respuesta-hechos",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Recuerdo sus manos en mi pecho… empujándome. Caí de lado. Antes dije que resbalé porque él me miraba.",
+      "siguienteNodoId": "decision-cierre-lucia"
+    },
+    {
+      "id": "lucia-respuesta-confrontacion",
+      "emisor": "personaje",
+      "personajeId": "lucia",
+      "texto": "Está bien… no resbalé. Me empujó cuando me interpuse por la niña. Tengo terror de lo que pueda hacer si sale libre.",
+      "siguienteNodoId": "decision-cierre-lucia"
+    },
+    {
+      "id": "decision-cierre-lucia",
+      "emisor": "jugador",
+      "texto": "El acercamiento clínico llega a un punto sensible; considera cómo cerrarlo con cuidado.",
+      "opciones": [
+        {
+          "id": "plan-seguridad",
+          "texto": "«Su relato quedará registrado para activar medidas de protección.»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "sintesis-eval-hospital",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_medidas_proteccion",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_decision_etica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "posponer-declaracion",
+          "texto": "«Podemos retomar cuando esté más despierta y acompañada.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "sintesis-eval-hospital"
+        }
+      ]
+    },
+    {
+      "id": "sintesis-eval-hospital",
+      "emisor": "narrador",
+      "texto": "Ha recorrido urgencias: familia en crisis, personal institucional y la paciente en UCI. Antes de continuar, considere su criterio profesional sobre la intervención en el hospital.",
+      "siguienteNodoId": "decision-academica-hospital-1"
+    },
+    {
+      "id": "decision-academica-hospital-1",
+      "emisor": "jugador",
+      "texto": "Con lo observado en urgencias, la psicóloga ordena sus prioridades clínicas iniciales.",
+      "opciones": [
+        {
+          "id": "eval-hosp-d1-a",
+          "texto": "Notificar de inmediato a Lucía sobre la muerte de su hija, aunque esté sedada.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-hosp-d1",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d1",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d1-b",
+          "texto": "Contención emocional de la familia y primeros auxilios psicológicos antes de indagaciones sensibles.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "registro-eval-hosp-d1",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d1",
+                "valor": "B"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d1_correcta",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d1-c",
+          "texto": "Interrogar a Lucía sobre los hechos antes de que concluya su evaluación médica.",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "registro-eval-hosp-d1",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d1",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-hosp-d1",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. La intervención continúa.",
+      "siguienteNodoId": "decision-academica-hospital-2"
+    },
+    {
+      "id": "decision-academica-hospital-2",
+      "emisor": "jugador",
+      "texto": "El relato familiar contrasta con otros datos. La profesional reflexiona sobre cómo interpretarlo clínicamente.",
+      "opciones": [
+        {
+          "id": "eval-hosp-d2-a",
+          "texto": "Resolución 459 de 2012.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-hosp-d2",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d2",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d2-b",
+          "texto": "Resolución 459 de 2012 y Ley 1257 de 2008.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-hosp-d2",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d2",
+                "valor": "B"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d2_correcta",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d2-c",
+          "texto": "Resolución 459 de 2012 y Ley 1448 de 2011.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-hosp-d2",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d2",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-hosp-d2",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. La intervención continúa.",
+      "siguienteNodoId": "decision-academica-hospital-3"
+    },
+    {
+      "id": "decision-academica-hospital-3",
+      "emisor": "jugador",
+      "texto": "Antes de cerrar el acercamiento con Lucía, considera cuál describe mejor la intervención psicosocial pertinente.",
+      "opciones": [
+        {
+          "id": "eval-hosp-d3-a",
+          "texto": "Priorizar la obtención de la versión judicial de los hechos antes de estabilizar emocionalmente a la familia.",
+          "estrategiaClinica": "confrontacion",
+          "siguienteNodoId": "registro-eval-hosp-d3",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d3",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d3-b",
+          "texto": "Limitarse a la valoración del trauma físico sin evaluación psicosocial ni exploración de antecedentes.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "registro-eval-hosp-d3",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d3",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d3-c",
+          "texto": "Aplicar PAP y escucha activa, sin activar rutas interdisciplinarias ni evaluar factores de riesgo.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "registro-eval-hosp-d3",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d3",
+                "valor": "C"
+              }
+            }
+          ]
+        },
+        {
+          "id": "eval-hosp-d3-d",
+          "texto": "Aplicar PAP y escucha sin juzgar, protocolo EPICEE/SPIKES, evaluación psicosocial integral, identificación de factores de riesgo y protectores, exploración de antecedentes de violencia, trabajo interdisciplinario y derivación a salud mental.",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "registro-eval-hosp-d3",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d3",
+                "valor": "D"
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "eval_hospital_d3_correcta",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registro-eval-hosp-d3",
+      "emisor": "narrador",
+      "texto": "Registra su criterio. Cierra el acercamiento con Lucía.",
+      "siguienteNodoId": "cierre-revisita"
     },
     {
       "id": "cierre-revisita",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Él empujó… yo traté de cubrirme… No quiero que le pase algo a mi familia por hablar.",
+      "texto": "Él empujó… yo traté de cubrirme… No quiero que le pase algo a mi familia por hablar. Cuando salga de aquí… no sé qué va a pasar.",
       "testimonio": {
         "id": "testimonio-lucia-revisita-empujon",
         "tema": "mecanismo_lesion",
@@ -120,7 +754,9 @@
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",
-          "parametros": { "conversacionId": "revisita-lucia-informe" }
+          "parametros": {
+            "conversacionId": "revisita-lucia-informe"
+          }
         }
       ]
     }

@@ -4,6 +4,7 @@ Pistas de ambientación sonora
 Coloque aquí las pistas instrumentales en loop:
 
   ambiente-hospital.mp3   (obligatoria — simulación clínica)
+  ambiente-comisaria.mp3  (opcional — comisaría; si falta, se modula la pista hospital)
   ambiente-intro.mp3      (opcional — introducción narrativa)
 
 Recomendaciones de perfil sonoro:

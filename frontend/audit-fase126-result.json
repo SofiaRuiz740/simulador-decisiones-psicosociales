@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-06-08T22:35:51.564Z",
+  "fase": "12.6",
+  "pruebas": [
+    {
+      "nombre": "config-hotspots-v251",
+      "ok": true,
+      "version": "2.5.1"
+    },
+    {
+      "nombre": "retratos_entrevista-policia-entrada",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_entrevista-policia-entrada",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    },
+    {
+      "nombre": "retratos_entrevista-madre-espera",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_entrevista-madre-espera",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    },
+    {
+      "nombre": "retratos_entrevista-hermano-espera",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_entrevista-hermano-espera",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    },
+    {
+      "nombre": "retratos_entrevista-enfermera-pasillo",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_entrevista-enfermera-pasillo",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    },
+    {
+      "nombre": "retratos_entrevista-medico-urgencias",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_entrevista-medico-urgencias",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    },
+    {
+      "nombre": "retratos_revisita-lucia-informe",
+      "ok": true,
+      "npcH": 454,
+      "psicoH": 454,
+      "overlapTexto": false
+    },
+    {
+      "nombre": "sin_cierre_auto_revisita-lucia-informe",
+      "ok": true,
+      "cerradoEn": null,
+      "visible": true
+    }
+  ],
+  "fallos": [],
+  "resumen": {
+    "total": 13,
+    "ok": 13,
+    "fallos": 0
+  }
+}

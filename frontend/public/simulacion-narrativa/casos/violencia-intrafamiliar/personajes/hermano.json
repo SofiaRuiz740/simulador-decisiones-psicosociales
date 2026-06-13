@@ -3,8 +3,8 @@
   "nombre": "Diego Morales",
   "rol": "familiar",
   "edad": 22,
-  "relacionFamilia": "Hermano de la paciente. Presenció parte del episodio agresivo.",
-  "descripcion": "Joven visiblemente agitado. Oscila entre querer hablar y temer represalias familiares.",
+  "relacionFamilia": "Hermano de Lucía; tío de la menor fallecida. Presenció parte del episodio agresivo.",
+  "descripcion": "Hermano de la paciente en UCI. Joven visiblemente agitado. Oscila entre querer hablar y temer represalias familiares.",
   "metricasIniciales": {
     "confianza": 20,
     "ansiedad": 75,
@@ -12,6 +12,13 @@
     "aperturaEmocional": 30
   },
   "configFatiga": {
-    "limiteConversacionesUtiles": 2
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "No quiero seguir hablando de eso.",
+      "Ya dije lo que vi… no me haga repetirlo.",
+      "Estoy saturado, de verdad.",
+      "Déjeme respirar un rato, por favor.",
+      "Si sigo, me va a explotar el pecho."
+    ]
   }
 }

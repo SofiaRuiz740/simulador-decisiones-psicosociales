@@ -17,14 +17,18 @@ export interface MapaEscenasDialogData {
       Mapa de escenas
     </h2>
     <mat-dialog-content>
-      <p class="mapa-hint">Ubicaciones exploradas en esta práctica.</p>
-      <mat-nav-list>
+      <p class="mapa-hint">
+        Ubicaciones disponibles en esta práctica. La escena resaltada indica dónde se encuentra ahora.
+      </p>
+      <mat-nav-list class="mapa-lista">
         @for (escena of data.escenas; track escena.id) {
           <a mat-list-item [class.escena-actual]="escena.actual">
-            <mat-icon matListItemIcon>{{ escena.actual ? 'location_on' : 'place' }}</mat-icon>
+            <mat-icon matListItemIcon>{{ escena.actual ? 'my_location' : 'place' }}</mat-icon>
             <span matListItemTitle>{{ escena.titulo }}</span>
             @if (escena.actual) {
               <span matListItemLine class="actual-label">Ubicación actual</span>
+            } @else {
+              <span matListItemLine class="disponible-label">Disponible para explorar</span>
             }
           </a>
         }
@@ -35,10 +39,25 @@ export interface MapaEscenasDialogData {
     </mat-dialog-actions>
   `,
   styles: [`
-    h2 { display: flex; align-items: center; gap: 8px; }
-    .mapa-hint { margin: 0 0 8px; color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; }
-    .escena-actual { background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent); }
-    .actual-label { color: var(--mat-sys-primary); font-size: 0.8rem; }
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    mat-dialog-content {
+      padding-top: 8px;
+    }
+
+    .mapa-lista {
+      padding-top: 4px;
+    }
+
+    .disponible-label {
+      color: #94a3b8;
+      font-size: 0.78rem;
+    }
   `],
 })
 export class MapaEscenasDialogComponent {

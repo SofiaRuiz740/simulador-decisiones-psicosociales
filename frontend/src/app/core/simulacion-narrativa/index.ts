@@ -12,3 +12,4 @@ export * from './utils/metricas-personaje.util';
 export * from './utils/objetivo-narrativo.util';
 export * from './utils/progresion-narrativa.util';
 export * from './utils/revisita.util';
+export * from './utils/evaluacion-academica.util';

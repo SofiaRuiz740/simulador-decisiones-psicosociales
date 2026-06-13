@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -11,6 +11,7 @@ import { DialogoNarrativoComponent } from './dialogo-narrativo/dialogo-narrativo
 import { DocumentoEvidenciaComponent } from './documento-evidencia/documento-evidencia';
 import { EscenaVisualComponent } from './escena-visual/escena-visual';
 import { EscenaVisualService } from './services/escena-visual.service';
+import { diagnosticarTrasladoComisaria } from './utils/comisaria-acceso.util';
 
 @Component({
   selector: 'app-exploracion-visual',
@@ -42,6 +43,32 @@ export class ExploracionVisualComponent implements OnInit {
   readonly escenaActual = this.escenas.escenaActual;
   readonly tiempoNarrativo = this.facade.tiempoNarrativoFormateado;
   readonly tituloCaso = computed(() => this.facade.caso()?.manifest.titulo ?? '');
+
+  constructor() {
+    effect(() => {
+      const escena = this.escenaActual();
+      if (!escena) return;
+      if (escena.id === 'exterior-comisaria' || escena.id === 'interior-comisaria') {
+        void this.ambiente.transicionHospitalAComisaria();
+        return;
+      }
+      if (escena.escenarioNarrativoId === 'consulta-inicial') {
+        void this.ambiente.transicionComisariaAHospital();
+      }
+    });
+
+    effect(() => {
+      const estado = this.facade.estado();
+      const escena = this.escenaActual();
+      if (!estado || escena?.escenarioNarrativoId !== 'consulta-inicial') return;
+
+      if (typeof window !== 'undefined') {
+        (window as Window & { __fase21aDiagnosticoComisaria?: () => ReturnType<typeof diagnosticarTrasladoComisaria> })
+          .__fase21aDiagnosticoComisaria = () =>
+          diagnosticarTrasladoComisaria(this.facade.estado(), this.facade.caso());
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.escenas.cargarConfiguracion(this.casoId()).subscribe({

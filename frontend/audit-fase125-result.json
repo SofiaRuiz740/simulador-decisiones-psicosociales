@@ -1,0 +1,225 @@
+{
+  "timestamp": "2026-06-08T22:40:18.134Z",
+  "fase": "12.5",
+  "titulo": "Composición visual de diálogos",
+  "baseUrl": "http://localhost:8080",
+  "pruebas": [
+    {
+      "nombre": "1366x768_ventana",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1284,
+          "h": 334,
+          "bottom": 661
+        },
+        "caja": {
+          "w": 673,
+          "h": 230
+        },
+        "npc": {
+          "w": 280,
+          "h": 315
+        },
+        "psico": {
+          "w": 280,
+          "h": 315
+        }
+      },
+      "fullscreen": false
+    },
+    {
+      "nombre": "1366x768_fullscreen",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1284,
+          "h": 334,
+          "bottom": 754
+        },
+        "caja": {
+          "w": 673,
+          "h": 230
+        },
+        "npc": {
+          "w": 280,
+          "h": 315
+        },
+        "psico": {
+          "w": 280,
+          "h": 315
+        }
+      },
+      "fullscreen": true
+    },
+    {
+      "nombre": "1600x900_ventana",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1400,
+          "h": 398,
+          "bottom": 791
+        },
+        "caja": {
+          "w": 766,
+          "h": 270
+        },
+        "npc": {
+          "w": 290,
+          "h": 378
+        },
+        "psico": {
+          "w": 290,
+          "h": 378
+        }
+      },
+      "fullscreen": false
+    },
+    {
+      "nombre": "1600x900_fullscreen",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1400,
+          "h": 398,
+          "bottom": 884
+        },
+        "caja": {
+          "w": 766,
+          "h": 270
+        },
+        "npc": {
+          "w": 290,
+          "h": 378
+        },
+        "psico": {
+          "w": 290,
+          "h": 378
+        }
+      },
+      "fullscreen": true
+    },
+    {
+      "nombre": "1920x1080_ventana",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1420,
+          "h": 474,
+          "bottom": 970
+        },
+        "caja": {
+          "w": 766,
+          "h": 324
+        },
+        "npc": {
+          "w": 300,
+          "h": 454
+        },
+        "psico": {
+          "w": 300,
+          "h": 454
+        }
+      },
+      "fullscreen": false
+    },
+    {
+      "nombre": "1920x1080_fullscreen",
+      "ok": true,
+      "grid": true,
+      "npcLeftOfCaja": true,
+      "psicoRightOfCaja": true,
+      "npcBottomAligned": true,
+      "psicoBottomAligned": true,
+      "composicionContainsAll": true,
+      "npcOverlapsText": false,
+      "psicoOverlapsText": false,
+      "npcVisible": true,
+      "psicoVisible": true,
+      "integradoEnPlaca": true,
+      "rects": {
+        "composicion": {
+          "w": 1420,
+          "h": 474,
+          "bottom": 1061
+        },
+        "caja": {
+          "w": 766,
+          "h": 324
+        },
+        "npc": {
+          "w": 300,
+          "h": 454
+        },
+        "psico": {
+          "w": 300,
+          "h": 454
+        }
+      },
+      "fullscreen": true
+    }
+  ],
+  "fallos": [],
+  "resumen": {
+    "total": 6,
+    "ok": 6,
+    "fallos": 0,
+    "apto": true
+  }
+}

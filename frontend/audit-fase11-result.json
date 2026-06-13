@@ -1,0 +1,186 @@
+{
+  "timestamp": "2026-06-08T20:31:16.929Z",
+  "baseUrl": "http://localhost:8080",
+  "incidencias": [
+    {
+      "severidad": "MENOR",
+      "bloque": "B1",
+      "titulo": "Evidencia informe vía estación",
+      "detalle": "No se abrió desde estación médica; el flujo puede obtenerla vía enfermera.",
+      "corregida": false
+    },
+    {
+      "severidad": "MENOR",
+      "bloque": "B3",
+      "titulo": "Audio ambiente-hospital.mp3 ausente",
+      "detalle": "Se usa capa sintética de respaldo (LEEME.txt). Opcional para entrega.",
+      "corregida": false
+    }
+  ],
+  "pruebas": [
+    {
+      "nombre": "assets_registrados",
+      "ok": true
+    },
+    {
+      "nombre": "fullscreen_libreta",
+      "ok": true,
+      "motivo": "libreta no abre en fullscreen"
+    },
+    {
+      "nombre": "consola_sin_errores_criticos",
+      "ok": true,
+      "motivo": ""
+    },
+    {
+      "nombre": "sin_404_criticos",
+      "ok": true,
+      "motivo": ""
+    },
+    {
+      "nombre": "persistencia_activa",
+      "ok": true,
+      "motivo": "sin conversaciones guardadas"
+    },
+    {
+      "nombre": "persistencia_recarga",
+      "ok": true,
+      "motivo": "progreso perdido tras F5"
+    }
+  ],
+  "bloques": {
+    "assets": {
+      "exitCode": 1,
+      "stdout": "ersonajes/comisario-conversar.png\n\n  ✗ Faltantes:\n    (ninguno)\n\n  ? Archivos sin registrar:\n    • personajes/comisario.png\n    • personajes/policia-conversar.png\n    • personajes/trabajadoraSocial.png\n\n## RETRATOS EXPRESIÓN (0 registrados)\n  (sin registros — categoría opcional)\n\n## ICONOS (6 registrados)\n\n  ✓ Existen:\n    • lupa → iconos/lupa.svg\n    • libreta → iconos/libreta.svg\n    • conversacion → iconos/conversacion.svg\n    • evidencia → iconos/evidencia.svg\n    • contradiccion → iconos/contradiccion.svg\n    • hipotesis → iconos/hipotesis.svg\n\n  ✗ Faltantes:\n    (ninguno)\n\n═══════════════════════════════════════════════════════\n  RESUMEN\n  Registrados y presentes : 31\n  Registrados y faltantes : 0\n  Archivos sin registrar  : 9\n═══════════════════════════════════════════════════════\n\n",
+      "stderr": ""
+    },
+    "fullscreen": {
+      "fsActive": true,
+      "libretaFs": true
+    },
+    "recorridoCompleto": [
+      {
+        "paso": "policia",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "madre",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "hermano",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "enfermera",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "evidencia_informe",
+        "ok": false
+      },
+      {
+        "paso": "medico",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "revisita_uci",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "desbloqueo_comisaria",
+        "visible": true
+      },
+      {
+        "paso": "comisario",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "trabajadora_social",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "conclusion",
+        "resultado": "cerrado"
+      },
+      {
+        "paso": "pantalla_final",
+        "visible": true
+      }
+    ],
+    "consola": {
+      "erroresCriticos": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "warnings": [],
+      "http404": [
+        "http://localhost:8080/assets/simulacion-narrativa/audio/ambiente-hospital.mp3"
+      ]
+    },
+    "persistencia": {
+      "tienePartida": true,
+      "conversaciones": [
+        "entrevista-policia-entrada",
+        "entrevista-madre-espera",
+        "entrevista-hermano-espera",
+        "entrevista-enfermera-pasillo",
+        "entrevista-medico-urgencias",
+        "revisita-lucia-informe",
+        "entrevista-comisario",
+        "entrevista-trabajadora-social-comisaria"
+      ],
+      "escenaVisualId": "interior-comisaria"
+    },
+    "responsive": [
+      {
+        "viewport": "1366x768",
+        "ok": true,
+        "overlapNpc": false,
+        "overlapPsi": false,
+        "npcLeft": 154,
+        "psiMarginRight": 154
+      },
+      {
+        "viewport": "1600x900",
+        "ok": true,
+        "overlapNpc": false,
+        "overlapPsi": false,
+        "npcLeft": 271,
+        "psiMarginRight": 271
+      },
+      {
+        "viewport": "1920x1080",
+        "ok": true,
+        "overlapNpc": false,
+        "overlapPsi": false,
+        "npcLeft": 431,
+        "psiMarginRight": 431
+      }
+    ]
+  },
+  "resumen": {
+    "pruebasTotal": 6,
+    "pruebasOk": 6,
+    "incidencias": {
+      "critico": 0,
+      "medio": 0,
+      "menor": 2
+    },
+    "aprobadoEntrega": true,
+    "recomendacion": "APTO PARA ENTREGA"
+  },
+  "correccionesFase11": [
+    {
+      "severidad": "CRITICO",
+      "titulo": "Retrato trabajadora social 404",
+      "archivo": "asset.model.ts",
+      "corregida": true
+    },
+    {
+      "severidad": "CRITICO",
+      "titulo": "Libreta bloqueaba clics en fullscreen",
+      "archivo": "libreta-psicologo.ts/scss",
+      "corregida": true
+    }
+  ]
+}

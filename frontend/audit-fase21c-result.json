@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-06-12T12:51:00.000Z",
+  "fase": "21C",
+  "pruebas": [
+    {
+      "nombre": "hotspots_traslado_configurados",
+      "ok": true,
+      "count": 5,
+      "ids": [
+        "ir-comisaria",
+        "ir-comisaria-sala",
+        "ir-comisaria-pasillo",
+        "ir-comisaria-estacion",
+        "ir-comisaria-uci"
+      ]
+    },
+    {
+      "nombre": "condicion_6_de_6_visible",
+      "ok": true,
+      "visible": true
+    },
+    {
+      "nombre": "condicion_sin_lucia_oculto",
+      "ok": true,
+      "bloqueo": "revisita-lucia-informe pendiente"
+    },
+    {
+      "nombre": "condicion_comisaria_visitada_oculto",
+      "ok": true,
+      "bloqueo": "escenario_visitado investigacion-comisaria"
+    },
+    {
+      "nombre": "json_version_desplegada",
+      "ok": true,
+      "version": "2.11.0"
+    }
+  ],
+  "fallos": [],
+  "diagnostico_comisaria": {
+    "causa_raiz_historica": "escenario_conversaciones_completadas sin conversacionIds exigía las 9 conversaciones de consulta-inicial, incluida revisita-madre-tras-ts (solo tras comisaría) — bloqueo circular",
+    "correccion": "FASE 21A — bloque y con 6 conversacion_completada explícitas en escenas-hospital.json",
+    "bloqueos_runtime": [
+      "Falta revisita-lucia-informe (requiere evidencia informe-urgencias)",
+      "investigacion-comisaria ya en escenariosVisitados (sesión previa o visita a exterior-comisaría)"
+    ]
+  },
+  "resumen": {
+    "total": 5,
+    "ok": 5,
+    "fallos": 0
+  }
+}

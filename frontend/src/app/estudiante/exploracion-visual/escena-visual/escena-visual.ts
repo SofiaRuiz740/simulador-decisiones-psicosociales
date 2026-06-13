@@ -12,6 +12,10 @@ import {
 import { variablesCssEscena } from '../utils/sprite-layout.util';
 import { etiquetaInteraccionPersonaje } from '../utils/presentacion-personaje.util';
 import { escenaEsAccesible, hotspotEsAccesible } from '../utils/escena-acceso.util';
+import {
+  HOTSPOTS_TRASLADO_COMISARIA,
+  registrarDiagnosticoComisariaEnConsola,
+} from '../utils/comisaria-acceso.util';
 
 @Component({
   selector: 'app-escena-visual',
@@ -47,6 +51,9 @@ export class EscenaVisualComponent {
       conversacionesDisponibles: this.facade.conversacionesDisponibles().map((c) => c.id),
       conversacionesEnProgreso: Object.keys(estado.nodosConversacionActivos),
       conversacionesCompletadas: estado.conversacionesCompletadas,
+      conversacionesAgotamientoReintento: escena.sprites
+        .map((sprite) => sprite.conversacionId)
+        .filter((id) => this.facade.conversacionPermiteReintentoAgotamiento(id)),
     });
   });
 
@@ -99,6 +106,9 @@ export class EscenaVisualComponent {
           if (!this.escenas.irAEscena(hotspot.destinoEscenaId, estado, caso)) {
             this.mensaje.emit('No puedes acceder a esa ubicación en este momento.');
             return;
+          }
+          if (destino?.escenarioNarrativoId) {
+            this.facade.establecerEscenarioNarrativo(destino.escenarioNarrativoId);
           }
         }
         break;
@@ -160,13 +170,8 @@ export class EscenaVisualComponent {
       return;
     }
 
-    if (completada) {
-      this.mensaje.emit('Esta conversación ya fue completada.');
-      return;
-    }
-
-    if (this.facade.estaConversacionBloqueadaPorFatiga(conversacionId)) {
-      this.facade.iniciarConversacion(conversacionId);
+    if (this.facade.conversacionPermiteReintentoAgotamiento(conversacionId)) {
+      this.facade.activarModoAgotamientoConversacion(conversacionId);
       this.abrirConversacion.emit({ conversacionId, modoAcercamiento });
       return;
     }
@@ -185,6 +190,11 @@ export class EscenaVisualComponent {
   private hotspotEsVisible(hotspot: HotspotEscena): boolean {
     const estado = this.facade.estado();
     const caso = this.facade.caso();
+
+    if (HOTSPOTS_TRASLADO_COMISARIA.includes(hotspot.id as (typeof HOTSPOTS_TRASLADO_COMISARIA)[number])) {
+      registrarDiagnosticoComisariaEnConsola(this.escena().id, hotspot.id, estado, caso);
+    }
+
     if (!hotspotEsAccesible(hotspot, estado, caso)) {
       return false;
     }

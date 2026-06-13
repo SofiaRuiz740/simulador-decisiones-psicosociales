@@ -245,3 +245,52 @@ export interface Resultado {
   fecha_actualizacion: string;
   detalle_preguntas: DetallePreguntaResultado[];
 }
+
+export interface SolicitudReapertura {
+  id: number;
+  estudiante_id: number;
+  estudiante_nombre: string;
+  estudiante_correo: string;
+  practica_id: number;
+  practica_nombre: string;
+  autorizacion_id: number;
+  estado: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
+  estado_display: string;
+  motivo: string;
+  mensaje_resolucion: string;
+  fecha_solicitud: string;
+  fecha_resolucion: string | null;
+}
+
+export interface RegistroReinicio {
+  id: number;
+  practica_id: number;
+  practica_nombre: string;
+  docente_nombre: string;
+  estudiante_nombre: string | null;
+  alcance: 'INDIVIDUAL' | 'GLOBAL';
+  alcance_display: string;
+  motivo: string;
+  estudiantes_afectados: number;
+  fecha: string;
+}
+
+export interface ResultadoNarrativo {
+  id: number;
+  practica_id: number;
+  practica_nombre: string;
+  caso_nombre: string;
+  estudiante_id?: number;
+  estudiante_nombre?: string;
+  estudiante_correo?: string;
+  porcentaje: number;
+  entrevistas_realizadas: number;
+  entrevistas_totales: number;
+  evidencias_encontradas: number;
+  contradicciones_detectadas: number;
+  hipotesis_formuladas: number;
+  estado_final: string;
+  fortalezas: string[];
+  aspectos_mejorar: string[];
+  fecha_finalizacion: string;
+}

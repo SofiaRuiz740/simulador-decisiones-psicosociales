@@ -7,101 +7,108 @@
       role="presentation">
       <div class="dialogo-overlay" aria-hidden="true"></div>
 
-      <article
-        class="dialogo-caja"
-        role="dialog"
-        aria-modal="true"
-        [attr.aria-label]="'Entrevista con ' + nombreEntrevistado()">
-        <button
-          type="button"
-          class="dialogo-cerrar"
-          aria-label="Cerrar entrevista"
-          (click)="cerrarDialogo()">
-          <mat-icon>close</mat-icon>
-        </button>
+      <figure
+        class="personaje-escena personaje-escena--npc"
+        [ngClass]="'personaje-escena--rol-' + (rolVisualEntrevistado() || 'npc')"
+        aria-hidden="true"
+        [class.personaje-escena--activo]="personajeActivo() === 'npc'">
+        @if (retratoEntrevistadoUrl(); as urlEntrevistado) {
+          <img
+            class="personaje-imagen"
+            [src]="urlEntrevistado"
+            [alt]="nombreEntrevistado()" />
+        } @else {
+          <div class="personaje-placeholder">
+            <mat-icon>person</mat-icon>
+          </div>
+        }
+      </figure>
 
-        <header class="dialogo-caja-encabezado">
-          <span class="dialogo-orador-nombre">{{ nombreOrador() }}</span>
-          @if (rolOrador()) {
-            <span class="dialogo-orador-rol">{{ rolOrador() }}</span>
-          }
-        </header>
+      <figure
+        class="personaje-escena personaje-escena--psicologa personaje-escena--rol-psicologa"
+        aria-hidden="true"
+        [class.personaje-escena--activo]="personajeActivo() === 'psicologa'">
+        @if (retratoPsicologaUrl(); as url) {
+          <img
+            class="personaje-imagen"
+            [src]="url"
+            [alt]="PSICOLOGA_ENTREVISTADORA.nombre" />
+        } @else {
+          <div class="personaje-placeholder">
+            <mat-icon>psychology</mat-icon>
+          </div>
+        }
+      </figure>
 
-        <div
-          class="dialogo-caja-texto"
-          [class.escribiendo]="!typewriterCompleto()"
-          (click)="onTextoClick($event)">
-          @if (nodoActual.emisor === 'personaje') {
-            <p class="texto-dialogo">
-              <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
-            </p>
-          } @else if (nodoActual.emisor === 'jugador' && opciones().length) {
-            <p class="texto-dialogo texto-prompt">{{ textoVisible() }}</p>
-          } @else {
-            <p class="texto-dialogo">{{ textoVisible() }}</p>
-          }
-          @if (!typewriterCompleto()) {
-            <span class="cursor-typewriter" aria-hidden="true"></span>
-          }
-        </div>
+      <div class="dialogo-composicion" role="presentation">
+        <article
+          class="dialogo-caja"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-label]="'Entrevista con ' + nombreEntrevistado()">
+          <button
+            type="button"
+            class="dialogo-cerrar"
+            aria-label="Cerrar entrevista"
+            (click)="cerrarDialogo()">
+            <mat-icon>close</mat-icon>
+          </button>
 
-        <footer class="dialogo-caja-acciones">
-          @if (enFatiga()) {
-            <p class="dialogo-aviso">Esta persona no desea continuar la conversación por ahora.</p>
-            <button type="button" class="btn-dialogo btn-secundario" (click)="cerrarDialogo()">
-              Retirarse en silencio
-            </button>
-          } @else if (opciones().length) {
-            <p class="acciones-etiqueta">Responder</p>
-            <div class="opciones-narrativas">
-              @for (opcion of opciones(); track opcion.id) {
-                <button
-                  type="button"
-                  class="btn-dialogo btn-opcion"
-                  (click)="seleccionarOpcion(opcion.id)">
-                  <mat-icon class="opcion-icono" aria-hidden="true">edit_note</mat-icon>
-                  <span class="opcion-texto">{{ opcion.texto }}</span>
-                </button>
+          <header class="dialogo-caja-encabezado">
+            <span class="dialogo-orador-nombre">{{ nombreOrador() }}</span>
+            @if (rolOrador()) {
+              <span class="dialogo-orador-rol">{{ rolOrador() }}</span>
+            }
+          </header>
+
+          <div
+            class="dialogo-caja-texto"
+            [class.escribiendo]="!typewriterCompleto()"
+            (click)="onTextoClick($event)">
+            @if (nodoActual.emisor === 'personaje') {
+              <p class="texto-dialogo">
+                <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
+              </p>
+            } @else if (nodoActual.emisor === 'jugador' && opciones().length) {
+              <p class="texto-dialogo texto-prompt">{{ textoVisible() }}</p>
+            } @else {
+              <p class="texto-dialogo">{{ textoVisible() }}</p>
+            }
+            @if (!typewriterCompleto()) {
+              <span class="cursor-typewriter" aria-hidden="true"></span>
+            }
+          </div>
+
+          <footer class="dialogo-caja-acciones">
+            @if (enFatiga()) {
+              <p class="dialogo-aviso">Esta persona no desea continuar la conversación por ahora.</p>
+              <button type="button" class="btn-dialogo btn-secundario" (click)="cerrarDialogo()">
+                Retirarse en silencio
+              </button>
+            } @else if (opciones().length) {
+              @if (esReflexionClinica()) {
+                <p class="acciones-etiqueta">Reflexión clínica</p>
+              } @else {
+                <p class="acciones-etiqueta">Podría decir…</p>
               }
-            </div>
-          } @else {
-            <button type="button" class="btn-dialogo btn-principal" (click)="continuar()">
-              {{ esNodoFinal() ? 'Finalizar entrevista' : 'Seguir escuchando' }}
-            </button>
-          }
-        </footer>
-      </article>
-
-      <div class="dialogo-personajes" aria-hidden="true">
-        <figure
-          class="personaje-escena personaje-escena--npc"
-          [class.personaje-escena--activo]="personajeActivo() === 'npc'">
-          @if (retratoEntrevistadoUrl(); as urlEntrevistado) {
-            <img
-              class="personaje-imagen"
-              [src]="urlEntrevistado"
-              [alt]="nombreEntrevistado()" />
-          } @else {
-            <div class="personaje-placeholder">
-              <mat-icon>person</mat-icon>
-            </div>
-          }
-        </figure>
-
-        <figure
-          class="personaje-escena personaje-escena--psicologa"
-          [class.personaje-escena--activo]="personajeActivo() === 'psicologa'">
-          @if (retratoPsicologaUrl(); as url) {
-            <img
-              class="personaje-imagen"
-              [src]="url"
-              [alt]="PSICOLOGA_ENTREVISTADORA.nombre" />
-          } @else {
-            <div class="personaje-placeholder">
-              <mat-icon>psychology</mat-icon>
-            </div>
-          }
-        </figure>
+              <div class="opciones-narrativas">
+                @for (opcion of opciones(); track opcion.id) {
+                  <button
+                    type="button"
+                    class="btn-dialogo btn-opcion"
+                    (click)="seleccionarOpcion(opcion.id)">
+                    <mat-icon class="opcion-icono" aria-hidden="true">forum</mat-icon>
+                    <span class="opcion-texto">{{ opcion.texto }}</span>
+                  </button>
+                }
+              </div>
+            } @else {
+              <button type="button" class="btn-dialogo btn-principal" (click)="continuar()">
+                {{ esNodoFinal() ? 'Despedirse con cuidado' : 'Escuchar con atención' }}
+              </button>
+            }
+          </footer>
+        </article>
       </div>
     </div>
   }

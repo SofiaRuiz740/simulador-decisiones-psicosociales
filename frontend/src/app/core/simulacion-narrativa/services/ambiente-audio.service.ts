@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 import {
+  AUDIO_AMBIENTE_COMISARIA_REGISTRADO,
   AUDIO_AMBIENTE_INTRO_REGISTRADO,
   AUDIO_AMBIENTE_REGISTRADO,
   BASE_ASSETS_SIMULACION,
@@ -23,7 +24,7 @@ const UMBRAL_LOOP_ANTICIPADO_S = 3;
 const VARIACION_VOLUMEN_AMPLITUD = 0.022;
 const PERIODO_MODULACION_MS = 82000;
 
-export type FaseAmbienteAudio = 'intro' | 'simulacion';
+export type FaseAmbienteAudio = 'intro' | 'simulacion' | 'comisaria';
 
 type BackendAmbiente = 'archivo' | 'sintetico' | null;
 
@@ -142,6 +143,37 @@ export class AmbienteAudioService {
     await this.crossfadeAPista(urlHospital, DURACION_CROSSFADE_PISTA_MS);
   }
 
+  /** Crossfade hacia ambientación de comisaría al explorar ese escenario. */
+  async transicionHospitalAComisaria(): Promise<void> {
+    if (!this.sesionActiva || this.faseActual === 'comisaria') return;
+
+    this.faseActual = 'comisaria';
+    const urlComisaria = `${BASE_ASSETS_SIMULACION}/${AUDIO_AMBIENTE_COMISARIA_REGISTRADO}`;
+    const comisariaDisponible = await this.probarArchivo(urlComisaria);
+
+    if (comisariaDisponible) {
+      await this.crossfadeAPista(urlComisaria, DURACION_CROSSFADE_PISTA_MS);
+      return;
+    }
+
+    this.ajustarCapaSinteticaComisaria(true);
+  }
+
+  /** Restaura ambientación hospitalaria al regresar del escenario comisaría. */
+  async transicionComisariaAHospital(): Promise<void> {
+    if (!this.sesionActiva || this.faseActual === 'simulacion') return;
+
+    this.faseActual = 'simulacion';
+    this.ajustarCapaSinteticaComisaria(false);
+    const urlHospital = `${BASE_ASSETS_SIMULACION}/${AUDIO_AMBIENTE_REGISTRADO}`;
+    if (this.urlPistaActual === urlHospital) return;
+
+    const hospitalDisponible = await this.probarArchivo(urlHospital);
+    if (!hospitalDisponible) return;
+
+    await this.crossfadeAPista(urlHospital, DURACION_CROSSFADE_PISTA_MS);
+  }
+
   detener(): void {
     this.cancelarFade();
     this.detenerModulacion();
@@ -248,11 +280,24 @@ export class AmbienteAudioService {
 
   private async resolverUrlPista(fase: FaseAmbienteAudio): Promise<string> {
     const urlHospital = `${BASE_ASSETS_SIMULACION}/${AUDIO_AMBIENTE_REGISTRADO}`;
+    if (fase === 'comisaria') {
+      const urlComisaria = `${BASE_ASSETS_SIMULACION}/${AUDIO_AMBIENTE_COMISARIA_REGISTRADO}`;
+      const comisariaDisponible = await this.probarArchivo(urlComisaria);
+      return comisariaDisponible ? urlComisaria : urlHospital;
+    }
     if (fase !== 'intro') return urlHospital;
 
     const urlIntro = `${BASE_ASSETS_SIMULACION}/${AUDIO_AMBIENTE_INTRO_REGISTRADO}`;
     const introDisponible = await this.probarArchivo(urlIntro);
     return introDisponible ? urlIntro : urlHospital;
+  }
+
+  private ajustarCapaSinteticaComisaria(comisaria: boolean): void {
+    if (this.backend !== 'sintetico' || !this.osciladores.length) return;
+    const base = comisaria ? [98, 147, 196, 293.66] : [110, 164.81, 220, 329.63];
+    this.osciladores.forEach((osc, index) => {
+      osc.frequency.value = base[index] ?? base[0];
+    });
   }
 
   private async probarArchivo(url: string): Promise<boolean> {

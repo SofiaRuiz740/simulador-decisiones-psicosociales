@@ -14,6 +14,7 @@ import { CasoNarrativoLoaderService } from './caso-narrativo-loader.service';
 import { LibretaService } from './libreta.service';
 import { NarrativaDataService } from './narrativa-data.service';
 import { NarrativaEngineService } from './narrativa-engine.service';
+import { NarrativaPersistenciaService } from './narrativa-persistencia.service';
 import { NarrativaStateService } from './narrativa-state.service';
 import { TrazabilidadService } from './trazabilidad.service';
 
@@ -29,6 +30,7 @@ export class NarrativaFacadeService {
   private readonly engine = inject(NarrativaEngineService);
   private readonly trazabilidad = inject(TrazabilidadService);
   private readonly libretaService = inject(LibretaService);
+  private readonly persistencia = inject(NarrativaPersistenciaService);
 
   readonly caso = this.state.caso;
   readonly estado = this.state.estado;
@@ -56,9 +58,30 @@ export class NarrativaFacadeService {
     this.state.establecerError(null);
 
     return this.loader.cargarCaso(casoId).pipe(
-      tap((caso) => this.engine.prepararSesion(caso)),
+      tap((caso) => {
+        const partidaGuardada = this.persistencia.cargarPartidaGuardada(casoId);
+        this.engine.prepararSesion(caso, partidaGuardada);
+      }),
       finalize(() => this.state.establecerCargando(false)),
     );
+  }
+
+  establecerContextoPersistencia(contexto: {
+    casoId: string;
+    estudianteId: number | null;
+    practicaId: number | null;
+  }): void {
+    this.persistencia.establecerContexto(contexto);
+  }
+
+  persistirPartida(escenaVisualId: string | null = null): void {
+    const estado = this.state.estado();
+    if (!estado) return;
+    this.persistencia.guardarPartida(estado, escenaVisualId);
+  }
+
+  consumirEscenaVisualRestaurada(): string | null {
+    return this.persistencia.consumirEscenaVisualRestaurada();
   }
 
   reiniciar(): void {
@@ -73,6 +96,7 @@ export class NarrativaFacadeService {
   hipotesisFormulables = () => this.engine.hipotesisFormulables();
   intervencionesDisponibles = () => this.engine.intervencionesDisponibles();
   transicionesDisponibles = () => this.engine.transicionesDisponibles();
+  establecerEscenarioNarrativo = (id: string) => this.engine.establecerEscenarioNarrativo(id);
 
   // Conversaciones
   nodoConversacionActual = (id: string) => this.engine.nodoConversacionActual(id);
@@ -81,9 +105,14 @@ export class NarrativaFacadeService {
   seleccionarOpcionDialogo = (conversacionId: string, opcionId: string) =>
     this.engine.seleccionarOpcionDialogo(conversacionId, opcionId);
   avanzarConversacionAutomatica = (id: string) => this.engine.avanzarConversacionAutomatica(id);
+  finalizarConversacionActiva = (id: string) => this.engine.finalizarConversacionActiva(id);
   estaConversacionBloqueadaPorFatiga = (id: string) =>
     this.engine.estaConversacionBloqueadaPorFatiga(id);
   estaConversacionEnModoFatiga = (id: string) => this.engine.estaConversacionEnModoFatiga(id);
+  activarModoAgotamientoConversacion = (id: string) =>
+    this.engine.activarModoAgotamientoConversacion(id);
+  conversacionPermiteReintentoAgotamiento = (id: string) =>
+    this.engine.conversacionPermiteReintentoAgotamiento(id);
 
   // Métricas psicosociales (visibles al estudiante como parte de la relación clínica)
   obtenerMetricasPersonaje = (personajeId: string): MetricasPersonaje | undefined =>
@@ -132,7 +161,15 @@ export class NarrativaFacadeService {
   agregarNotaLibreta = (
     contenido: string,
     vinculos?: LibretaPsicologo['notasEstudiante'][number]['vinculos'],
-  ) => this.libretaService.agregarNota(contenido, vinculos);
+  ) => {
+    const nota = this.libretaService.agregarNota(contenido, vinculos);
+    if (nota) this.persistirPartida(null);
+    return nota;
+  };
 
-  eliminarNotaLibreta = (notaId: string) => this.libretaService.eliminarNota(notaId);
+  eliminarNotaLibreta = (notaId: string) => {
+    const ok = this.libretaService.eliminarNota(notaId);
+    if (ok) this.persistirPartida(null);
+    return ok;
+  };
 }

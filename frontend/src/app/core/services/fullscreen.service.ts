@@ -80,7 +80,24 @@ export class FullscreenService {
 
   private sincronizarEstado(): void {
     const doc = document as DocumentoFullscreen;
-    this.activo.set(!!(document.fullscreenElement ?? doc.webkitFullscreenElement));
+    const activo = !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
+    this.activo.set(activo);
+    this.reubicarOverlayMaterial(activo ? this.obtenerElementoFullscreen() : null);
+  }
+
+  /** CDK/Material monta overlays en body; en fullscreen quedan fuera y dejan de responder. */
+  private reubicarOverlayMaterial(contenedor: Element | null): void {
+    const overlay = document.querySelector('.cdk-overlay-container');
+    if (!overlay) return;
+
+    if (contenedor instanceof HTMLElement) {
+      contenedor.appendChild(overlay);
+      return;
+    }
+
+    if (overlay.parentElement !== document.body) {
+      document.body.appendChild(overlay);
+    }
   }
 
   private esElementoFullscreen(element: HTMLElement): boolean {

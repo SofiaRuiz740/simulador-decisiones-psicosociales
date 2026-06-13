@@ -1,0 +1,61 @@
+{
+  "viewport": "1920x1080",
+  "escenas": {
+    "salaEsperaHospital": {
+      "hotspot-madre-espera": {
+        "x": 48.9,
+        "y": 41.1,
+        "ancho": 7.1,
+        "alto": 25.3,
+        "nota": "Cabeza, hombros y torso sentado; excluye sillas vecinas y falda/pies",
+        "label": "Madre"
+      },
+      "hotspot-hermano-espera": {
+        "x": 23.9,
+        "y": 15.8,
+        "ancho": 7.1,
+        "alto": 35.4,
+        "nota": "Vertical cabeza-cintura; excluye suelo y fila de sillas",
+        "label": "Hermano"
+      }
+    },
+    "pasilloUrgencias": {
+      "hotspot-enfermera-pasillo": {
+        "x": 21.5,
+        "y": 26.2,
+        "ancho": 6.3,
+        "alto": 31.8,
+        "nota": "Vertical cabeza-cintura; excluye pared y pasillo central",
+        "label": "Enfermera"
+      }
+    },
+    "cuidadosIntensivos": {
+      "hotspot-lucia-uci": {
+        "x": 28.3,
+        "y": 37.8,
+        "ancho": 7.3,
+        "alto": 18.1,
+        "nota": "Rostro, hombros y torso superior en cama; excluye monitores y cama",
+        "label": "Lucía UCI"
+      }
+    },
+    "interiorComisaria": {
+      "hotspot-comisario": {
+        "x": 34.8,
+        "y": 34.8,
+        "ancho": 7.4,
+        "alto": 15.7,
+        "nota": "Cuerpo sentado; excluye escritorio y papeles",
+        "label": "Comisario"
+      },
+      "hotspot-trabajadora-social": {
+        "x": 66.5,
+        "y": 20.4,
+        "ancho": 6.6,
+        "alto": 23.6,
+        "nota": "Vertical cabeza-cintura; excluye sillas y mesa",
+        "label": "Trabajadora social"
+      }
+    }
+  }
+}

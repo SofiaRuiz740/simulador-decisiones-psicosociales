@@ -87,10 +87,29 @@
           Iniciar simulación
         </button>
 
-        @if (!puedeIniciar()) {
+        @if (!puedeIniciar() && practicaCompletada()) {
+          <p class="aviso">Esta práctica ya fue completada.</p>
+        } @else if (!puedeIniciar()) {
           <p class="aviso">Esta práctica estará disponible próximamente.</p>
         }
 
+        @if (puedeSolicitarReintento()) {
+          <button
+            mat-stroked-button
+            type="button"
+            class="btn-reintento"
+            [disabled]="solicitando()"
+            (click)="solicitarNuevoIntento()">
+            <mat-icon>replay</mat-icon>
+            Solicitar nuevo intento
+          </button>
+        } @else if (solicitudPendiente()) {
+          <p class="aviso info">Solicitud de reintento pendiente de aprobación del docente.</p>
+        } @else if (reintentoAutorizado()) {
+          <p class="aviso info">Tu docente autorizó un nuevo intento. Puedes iniciar la simulación.</p>
+        }
+
+        <a mat-stroked-button routerLink="/estudiante/resultados">Ver resultados</a>
         <a mat-stroked-button routerLink="/estudiante/panel">Volver al panel</a>
       </aside>
     </div>

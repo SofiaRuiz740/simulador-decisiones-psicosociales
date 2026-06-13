@@ -1,0 +1,77 @@
+<section class="module page">
+  <header class="hero-glass">
+    <h1><em>Solicitudes de reapertura</em></h1>
+    <p>Estudiantes que solicitaron volver a realizar una práctica completada.</p>
+  </header>
+
+  <nav class="tabs" aria-label="Filtros">
+    @for (f of ['TODAS', 'PENDIENTE', 'APROBADA', 'RECHAZADA']; track f) {
+      <button type="button" class="tab" [class.active]="filtro() === f" (click)="filtro.set($any(f))">
+        {{ f === 'TODAS' ? 'Todas' : f.charAt(0) + f.slice(1).toLowerCase() }}
+      </button>
+    }
+  </nav>
+
+  <section class="panel">
+    <div class="panel__body">
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      } @else if (filtradas().length === 0) {
+        <div class="empty-state-mockup">
+          <strong>Sin solicitudes</strong>
+          No hay solicitudes con el filtro seleccionado.
+        </div>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Práctica</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (sol of filtradas(); track sol.id) {
+                <tr>
+                  <td>
+                    <strong>{{ sol.estudiante_nombre }}</strong>
+                    <div class="muted">{{ sol.estudiante_correo }}</div>
+                  </td>
+                  <td>{{ sol.practica_nombre }}</td>
+                  <td>{{ sol.fecha_solicitud | date:'medium' }}</td>
+                  <td><span [ngClass]="badgeClass(sol.estado)">{{ sol.estado_display }}</span></td>
+                  <td class="acciones">
+                    @if (sol.estado === 'PENDIENTE') {
+                      <button
+                        mat-flat-button
+                        color="primary"
+                        type="button"
+                        [disabled]="procesando() === sol.id"
+                        (click)="aprobar(sol)">
+                        Aprobar
+                      </button>
+                      <button
+                        mat-stroked-button
+                        type="button"
+                        [disabled]="procesando() === sol.id"
+                        (click)="rechazar(sol)">
+                        Rechazar
+                      </button>
+                    } @else if (sol.mensaje_resolucion) {
+                      <span class="muted">{{ sol.mensaje_resolucion }}</span>
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+</section>

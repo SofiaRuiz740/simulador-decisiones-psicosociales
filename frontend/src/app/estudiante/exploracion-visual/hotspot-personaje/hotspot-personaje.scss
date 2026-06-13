@@ -10,7 +10,6 @@
   overflow: visible;
   outline: none;
   box-shadow: none;
-  clip-path: inset(0 10% 14% 10% round 2px);
 
   &.interactuable {
     cursor: pointer;
@@ -20,7 +19,7 @@
       outline: none;
 
       .hotspot-personaje-silueta {
-        opacity: 0.08;
+        opacity: 0.1;
       }
 
       .hotspot-personaje-tooltip {
@@ -37,7 +36,7 @@
       outline: none;
 
       .hotspot-personaje-silueta {
-        opacity: 0.06;
+        opacity: 0.07;
       }
 
       .hotspot-personaje-tooltip {
@@ -62,19 +61,19 @@
   }
 
   &.activo .hotspot-personaje-silueta {
-    opacity: 0.1;
-    background: rgba(212, 196, 168, 0.14);
+    opacity: 0.12;
+    background: rgba(212, 196, 168, 0.16);
   }
 }
 
 .hotspot-personaje-silueta {
   position: absolute;
-  inset: 0 12% 20% 12%;
-  border-radius: 44% 44% 32% 32% / 52% 52% 14% 14%;
+  inset: 0;
+  border-radius: 42% 42% 30% 30% / 50% 50% 12% 12%;
   background: rgba(248, 250, 252, 1);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 
 .hotspot-personaje-tooltip {
@@ -100,7 +99,7 @@
   opacity: 0;
   pointer-events: none;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
   z-index: 2;
 }
 

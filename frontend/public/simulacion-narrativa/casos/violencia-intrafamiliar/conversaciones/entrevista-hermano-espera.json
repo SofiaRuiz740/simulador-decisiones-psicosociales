@@ -1,6 +1,6 @@
 {
   "id": "entrevista-hermano-espera",
-  "titulo": "Hermano en recepción",
+  "titulo": "Hermano de Lucía en recepción",
   "escenarioId": "consulta-inicial",
   "personajeId": "hermano",
   "nodoInicialId": "apertura",
@@ -10,34 +10,44 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "¿Puedo hablar con usted un momento? Vi cuando empujó a mi hermana… pero nadie quiere decirlo.",
+      "texto": "Disculpe… ¿puedo hablar con usted un momento? Estoy muy nervioso. Mi hermana Lucía está en UCI y siento que en la familia nadie quiere decir lo que pasó de verdad.",
       "siguienteNodoId": "decision-apertura"
     },
     {
       "id": "decision-apertura",
       "emisor": "jugador",
-      "texto": "Cómo sostener el testimonio emergente",
+      "texto": "Él se acerca con un testimonio difícil. La profesional reflexiona sobre cómo recibirlo.",
       "opciones": [
         {
           "id": "escuchar-sin-interrumpir",
           "texto": "«Cuénteme con sus palabras lo que vio, sin apuro.»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "hermano-relato",
-          "modificadoresMetricas": { "confianza": 12, "aperturaEmocional": 10 }
+          "modificadoresMetricas": {
+            "confianza": 12,
+            "aperturaEmocional": 10
+          }
         },
         {
           "id": "aclarar-hechos",
-          "texto": "Pedir secuencia concreta: hora, lugar, quién estaba presente.",
+          "texto": "«Para ubicarme: ¿recuerda la hora, el lugar y quién estaba presente?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "hermano-relato"
+          "siguienteNodoId": "hermano-secuencia"
         }
       ]
+    },
+    {
+      "id": "hermano-secuencia",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Eran cerca de las diez y media. En el comedor. Mi mamá acababa de llegar. Miguel gritaba por la custodia de Sofi; Lucía se interpuso y entonces él la empujó.",
+      "siguienteNodoId": "hermano-relato"
     },
     {
       "id": "hermano-relato",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Gritaban por la niña… Mi cuñado la empujó contra la pared. Mi hermana intentó cubrirse y cayó.",
+      "texto": "Gritaban por Sofi, mi sobrina… Miguel empujó a mi hermana Lucía contra la pared. Ella intentó cubrirse y cayó. Yo no supe qué hacer.",
       "testimonio": {
         "id": "testimonio-hermano-empujon",
         "tema": "mecanismo_lesion",
@@ -45,31 +55,291 @@
         "descripcion": "Hermano confirma empujón durante agresión",
         "personajeId": "hermano"
       },
+      "siguienteNodoId": "decision-enfoque-hermano"
+    },
+    {
+      "id": "decision-enfoque-hermano",
+      "emisor": "jugador",
+      "texto": "Diego comparte un relato clave. Diego comparte un relato clave; la profesional considera qué aspecto investigativo profundizar.",
+      "opciones": [
+        {
+          "id": "explorar-senales-previas",
+          "texto": "«¿Había señales previas que la familia terminaba minimizando?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-senales-previas",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_senales_previas",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_factores_riesgo",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "explorar-ayuda-previa",
+          "texto": "«¿Intentaron pedir ayuda antes de que ocurriera esto?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-ayuda-previa",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_intentos_ayuda",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "explorar-protectores",
+          "texto": "«¿Quién en la familia la apoyaba cuando Miguel explotaba?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "hermano-protectores",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_factores_protectores",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hermano-senales-previas",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Sí… golpes en la pared, puertas que cerraba de golpe. Mi mamá decía ‘asunto de pareja’. Yo también callé.",
+      "siguienteNodoId": "decision-sobrina"
+    },
+    {
+      "id": "hermano-ayuda-previa",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Una vez llamé a la policía por los gritos… Lucía pidió que no dijera nada. Después Miguel cambió unos días y volvió igual. Pero no dejé de intentar: le decía que podía quedarse en mi casa si hacía falta.",
+      "siguienteNodoId": "decision-sobrina"
+    },
+    {
+      "id": "hermano-protectores",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Yo trataba de quedarme cuando podía y la abrazaba cuando Miguel no estaba. Mi mamá venía con comida casi todos los días. Una vecina nos avisaba si escuchaba gritos. No es que no hubiera apoyo… Miguel nos apartaba.",
+      "siguienteNodoId": "decision-sobrina"
+    },
+    {
+      "id": "decision-sobrina",
+      "emisor": "jugador",
+      "texto": "El relato menciona a su sobrina Sofi. Percibe miedo en su mirada; reflexiona sobre cómo abordarlo sin presionar.",
+      "opciones": [
+        {
+          "id": "preguntar-nieta",
+          "texto": "«¿Dónde estaba Sofi mientras ocurría el forcejeo?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-nieta"
+        },
+        {
+          "id": "posponer-nieta",
+          "texto": "«Prefiero centrarme primero en lo que le ocurrió a Lucía.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "decision-miguel"
+        }
+      ]
+    },
+    {
+      "id": "hermano-nieta",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Sofi estaba en el pasillo, tratando de separarlos. Cuando Lucía cayó, mi sobrina quedó en el suelo… ya no se levantó. Miguel salió corriendo antes de que llegara la ambulancia.",
+      "testimonio": {
+        "id": "testimonio-hermano-nieta-pasillo",
+        "tema": "clima_familiar",
+        "valor": "exposicion_menor",
+        "descripcion": "Menor expuesta al forcejeo; agresor huyó antes del traslado",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-miguel"
+    },
+    {
+      "id": "decision-miguel",
+      "emisor": "jugador",
+      "texto": "Miguel aparece en el relato; considera cómo profundizar.",
+      "opciones": [
+        {
+          "id": "patron-previo",
+          "texto": "«¿Había ocurrido algo similar con Miguel antes de esta noche?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-patron"
+        },
+        {
+          "id": "post-empujon",
+          "texto": "«¿Qué hizo Miguel inmediatamente después del empujón?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-post-empujon"
+        }
+      ]
+    },
+    {
+      "id": "hermano-patron",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Sí… gritos cada semana. Una vez empujó a Lucía contra la nevera; Sofi lloraba en su cuarto. Mi mamá decía que ‘así son los matrimonios difíciles’.",
+      "testimonio": {
+        "id": "testimonio-hermano-ciclo-violencia",
+        "tema": "clima_familiar",
+        "valor": "violencia_sostenida",
+        "descripcion": "Hermano describe episodios previos y normalización familiar",
+        "personajeId": "hermano"
+      },
+      "siguienteNodoId": "decision-miedo"
+    },
+    {
+      "id": "hermano-post-empujon",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Dijo ‘se cayó sola’ y me miró como amenazándome. Mi mamá repitió lo mismo a los paramédicos. Yo bajé la cabeza… y ahora me odio por eso.",
       "siguienteNodoId": "decision-miedo"
     },
     {
       "id": "decision-miedo",
       "emisor": "jugador",
-      "texto": "Cómo abordar el temor a represalias",
+      "texto": "Percibe miedo en su mirada. Percibe miedo en su mirada; reflexiona sobre cómo abordarlo sin presionar.",
       "opciones": [
         {
           "id": "explorar-seguridad",
-          "texto": "Preguntar si se siente seguro hablando aquí, en el hospital.",
+          "texto": "«¿Se siente seguro hablando aquí, en el hospital?»",
           "estrategiaClinica": "evaluacion_riesgo",
-          "siguienteNodoId": "cierre-hermano"
+          "siguienteNodoId": "hermano-seguridad"
         },
         {
           "id": "normalizar-miedo",
-          "texto": "Validar que hablar puede ser peligroso y preguntar qué necesitaría para sentirse protegido.",
+          "texto": "«Es comprensible tener miedo. ¿Qué necesitaría para sentirse más protegido?»",
           "estrategiaClinica": "validacion_emocional",
-          "siguienteNodoId": "cierre-hermano"
+          "siguienteNodoId": "hermano-proteccion"
         },
         {
           "id": "presionar-detalles",
-          "texto": "Insistir en nombres y detalles forenses de inmediato.",
+          "texto": "«Necesito nombres y detalles concretos ahora mismo.»",
           "estrategiaClinica": "confrontacion",
-          "siguienteNodoId": "cierre-hermano",
-          "modificadoresMetricas": { "confianza": -15, "ansiedad": 10 }
+          "siguienteNodoId": "hermano-cierre-temprano",
+          "modificadoresMetricas": {
+            "confianza": -15,
+            "ansiedad": 10
+          },
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_confrontacion_imprudente",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hermano-seguridad",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Aquí dentro me siento un poco más tranquilo… afuera no sé. Miguel conoce dónde trabaja mi mamá y dónde estudio yo.",
+      "siguienteNodoId": "decision-afrontamiento-familiar"
+    },
+    {
+      "id": "hermano-proteccion",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Necesitaría que alguien le prohíba acercarse… y que mi hermana sepa que no la voy a abandonar si digo la verdad. Cuando salga de UCI, quiero ser quien la acompañe en lo que necesite.",
+      "siguienteNodoId": "decision-afrontamiento-familiar"
+    },
+    {
+      "id": "hermano-cierre-temprano",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Ya le dije lo principal… no voy a repetir nombres delante de mi mamá. Esto es muy fuerte.",
+      "siguienteNodoId": "cierre-hermano"
+    },
+    {
+      "id": "decision-afrontamiento-familiar",
+      "emisor": "jugador",
+      "texto": "Diego muestra agotamiento emocional. Diego muestra agotamiento emocional; considera cómo explorar el afrontamiento familiar.",
+      "opciones": [
+        {
+          "id": "explorar-reaccion-familiar",
+          "texto": "«¿Cómo ha reaccionado su familia desde el ingreso de Lucía?»",
+          "estrategiaClinica": "validacion_emocional",
+          "siguienteNodoId": "hermano-reaccion-familiar"
+        },
+        {
+          "id": "explorar-preocupaciones-actuales",
+          "texto": "«¿Qué le preocupa más en este momento, aparte de lo ocurrido esta noche?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "hermano-preocupaciones"
+        },
+        {
+          "id": "explorar-recuperacion-lucia",
+          "texto": "«¿Cómo piensa acompañar a Lucía durante su recuperación?»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "hermano-apoyo-recuperacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_factores_protectores_familia",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hermano-reaccion-familiar",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Mi mamá llora sin parar y se culpa. Yo trato de no desmoronarme delante de ella, pero por dentro estoy hecho pedazos. Sofi… todavía no cae del todo.",
+      "siguienteNodoId": "decision-compromiso"
+    },
+    {
+      "id": "hermano-preocupaciones",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Que Lucía no despierte bien… que Miguel aparezca otra vez… que mi mamá se enferme de la tristeza. No sé si podemos afrontar todo esto solos.",
+      "siguienteNodoId": "decision-compromiso"
+    },
+    {
+      "id": "hermano-apoyo-recuperacion",
+      "emisor": "personaje",
+      "personajeId": "hermano",
+      "texto": "Quiero quedarme cerca cuando la estabilicen. Puedo ayudar con trámites, llevarla a controles, estar en turnos de noche si el hospital lo permite. No la voy a dejar sola otra vez.",
+      "siguienteNodoId": "decision-compromiso"
+    },
+    {
+      "id": "decision-compromiso",
+      "emisor": "jugador",
+      "texto": "Muestra disposición a colaborar; reflexiona sobre cómo sostener ese vínculo.",
+      "opciones": [
+        {
+          "id": "registrar-testimonio",
+          "texto": "«Su relato puede quedar registrado para proteger a Lucía. ¿Le parece bien?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "cierre-hermano"
+        },
+        {
+          "id": "posponer-declaracion",
+          "texto": "«Entiendo. Podemos retomar cuando se sienta en un momento más seguro.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-hermano"
         }
       ]
     },
@@ -77,11 +347,13 @@
       "id": "cierre-hermano",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "No quiero que le pase algo a mi hermana por lo que diga… pero tampoco puedo callar para siempre.",
+      "texto": "No quiero que le pase algo a Lucía por lo que diga… Mi mamá está destrozada allá afuera, entre Sofi y el estado de mi hermana. Pero tampoco puedo callar para siempre.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",
-          "parametros": { "conversacionId": "entrevista-hermano-espera" }
+          "parametros": {
+            "conversacionId": "entrevista-hermano-espera"
+          }
         }
       ]
     }

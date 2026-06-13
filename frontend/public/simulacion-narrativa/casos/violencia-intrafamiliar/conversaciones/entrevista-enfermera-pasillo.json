@@ -10,76 +10,387 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "La paciente llegó inconsciente. Familia muy alterada. ¿Viene a coordinar contención emocional?",
-      "siguienteNodoId": "decision-enfoque"
+      "texto": "Buenas. Esta noche ha sido intensa en urgencias. ¿Viene a coordinar contención o necesita orientación sobre el ingreso?",
+      "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
-      "id": "decision-enfoque",
+      "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "Qué información priorizar con enfermería",
+      "texto": "La enfermera está disponible para orientar. Antes de profundizar, ordena mentalmente cómo quiere abrir la entrevista.",
       "opciones": [
         {
-          "id": "estado-vital",
-          "texto": "Preguntar por signos de alerta y restricciones de visita en UCI.",
+          "id": "prep-slot-enf-exploracion-1",
+          "texto": "«¿Cómo está organizado el servicio esta noche y qué restricciones hay para visitas?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "enfermera-estado"
-        },
-        {
-          "id": "dinamica-familiar",
-          "texto": "Indagar cómo se comportó la familia durante el ingreso.",
-          "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "enfermera-familia"
-        }
-      ]
-    },
-    {
-      "id": "enfermera-estado",
-      "emisor": "personaje",
-      "personajeId": "enfermera",
-      "texto": "Estable hemodinámicamente, pero sedada. Solo personal autorizado puede acercarse al box.",
-      "siguienteNodoId": "decision-visita"
-    },
-    {
-      "id": "enfermera-familia",
-      "emisor": "personaje",
-      "personajeId": "enfermera",
-      "texto": "Hubo discusión entre familiares sobre ‘quién tuvo la culpa’. Un hombre fue retirado del área.",
-      "siguienteNodoId": "decision-visita"
-    },
-    {
-      "id": "decision-visita",
-      "emisor": "jugador",
-      "texto": "Cómo proceder con el acceso clínico",
-      "opciones": [
-        {
-          "id": "solicitar-reporte",
-          "texto": "Solicitar el reporte de enfermería del ingreso para revisarlo.",
-          "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "cierre-enfermera",
+          "siguienteNodoId": "enf-explor-servicio",
           "efectos": [
             {
-              "tipo": "descubrir_evidencia",
-              "parametros": { "evidenciaId": "informe-urgencias" }
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_exploracion",
+                "valor": true
+              }
             }
           ]
         },
         {
-          "id": "posponer-acercamiento",
-          "texto": "Coordinar contención familiar antes de solicitar documentos.",
-          "estrategiaClinica": "contencion_emocional",
-          "siguienteNodoId": "cierre-enfermera"
+          "id": "prep-slot-enf-exploracion-2",
+          "texto": "«Intervengo en el caso de la paciente ingresada. ¿Con quién debo coordinar el acceso clínico?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enf-explor-coordinacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-exploracion-3",
+          "texto": "«Antes de entrar al detalle, ¿cómo describiría la dinámica general del ingreso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enf-explor-dinamica",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_exploracion",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "id": "cierre-enfermera",
+      "id": "enf-explor-servicio",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Le dejo copia del reporte en estación médica cuando esté disponible.",
+      "texto": "Hay alta demanda y familias esperando noticias. En UCI solo entra personal autorizado; si va allá, coordine antes con guardia.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "enf-explor-coordinacion",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Para datos clínicos precisos, el médico tratante tiene el informe. Yo puedo orientar sobre lo observado en enfermería al ingreso.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "enf-explor-dinamica",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Llegó una paciente en estado grave y familiares muy alterados. El pasillo estuvo tenso durante el traslado; estamos estabilizando el flujo de visitas.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "decision-prep-profundizacion",
+      "emisor": "jugador",
+      "texto": "Puede profundizar en aspectos del ingreso. Con lo escuchado, considera qué línea conviene explorar.",
+      "opciones": [
+        {
+          "id": "prep-slot-enf-profundizacion-1",
+          "texto": "«¿Cómo está la paciente en términos generales y qué restricciones de acceso hay?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enf-profun-estado",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-profundizacion-2",
+          "texto": "«¿Cómo se comportó la familia durante el ingreso en el pasillo?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enf-profun-familia",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-profundizacion-3",
+          "texto": "«¿Qué observaciones relevantes quedaron registradas al ingreso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enf-profun-observaciones-teaser",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enf-profun-estado",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Hemodinámicamente estable, pero sedada. Glasgow bajo al ingreso. Solo personal identificado en el box; si va a UCI, lleve credencial del servicio.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "enf-profun-familia",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Discutían en el pasillo sobre ‘de quién fue la culpa’. Activamos manejo de crisis; ustedes de salud mental suelen iniciar con primeros auxilios psicológicos cuando la familia llega así. Un hombre fue retirado; Carmen, la mamá de Lucía, y su hijo Diego siguieron muy alterados.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "enf-profun-observaciones-teaser",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Hay anotaciones sobre lesiones visibles y sobre la versión que dio la familia. Puedo ampliar si lo necesita para su evaluación.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "decision-prep-info-critica",
+      "emisor": "jugador",
+      "texto": "Hay datos sensibles del ingreso que conviene precisar. Hay aspectos que aún no están claros; reflexiona sobre cuál merece mayor atención.",
+      "opciones": [
+        {
+          "id": "prep-slot-enf-critica-1",
+          "texto": "«¿Qué anotaron en enfermería sobre las lesiones visibles al ingreso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enfermera-lesiones",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-critica-2",
+          "texto": "«¿Recuerda algo más sobre la conducta de la familia en el pasillo?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enfermera-familia-detalle",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-critica-3",
+          "texto": "«¿Qué más observó en la dinámica de urgencias esa noche?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "enfermera-dinamica-detalle",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enfermera-lesiones",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Anotamos moretones visibles en brazos y marca en el rostro al ingreso. La familia insistía en ‘caída en el baño’. Nosotras registramos lo observable; el mecanismo lo precisa el médico en el informe.",
+      "testimonio": {
+        "id": "testimonio-enfermera-lesiones",
+        "tema": "mecanismo_lesion",
+        "valor": "compatible_con_defensa",
+        "descripcion": "Enfermería registra lesiones incompatibles con caída en baño",
+        "personajeId": "enfermera"
+      },
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "enfermera-familia-detalle",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "El joven lloraba en silencio; Carmen, la madre de Lucía, repetía que ‘Lucía es torpe’. Eso me inquietó porque sonaba a culpar a la víctima.",
+      "testimonio": {
+        "id": "testimonio-enfermera-altercado",
+        "tema": "clima_familiar",
+        "valor": "altercado_pasillo",
+        "descripcion": "Altercado en pasillo; agresor retirado del área",
+        "personajeId": "enfermera"
+      },
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "enfermera-dinamica-detalle",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "El ingreso fue simultáneo con otra víctima menor ya sin signos vitales. Eso activó protocolo aparte; la paciente adulta siguió ruta de trauma.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "decision-cierre",
+      "emisor": "jugador",
+      "texto": "Es momento de definir el siguiente paso clínico.",
+      "opciones": [
+        {
+          "id": "prep-slot-enf-cierre-1",
+          "texto": "«¿Podría facilitarme el reporte de enfermería del ingreso para revisarlo?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-enfermera-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_cierre",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "descubrir_evidencia",
+              "parametros": {
+                "evidenciaId": "informe-urgencias"
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-cierre-2",
+          "texto": "«Prefiero coordinar contención familiar antes de revisar documentos.»",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "cierre-enfermera-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_cierre",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-enf-cierre-3",
+          "texto": "«Para precisar lesiones y evolución, ¿podría orientarme con el médico tratante?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-enfermera-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_enf_cierre",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cierre-enfermera-dialogo",
+      "emisor": "personaje",
+      "personajeId": "enfermera",
+      "texto": "Dejo el reporte en estación médica cuando esté disponible. Si necesita precisión sobre lesiones, evolución o el TCE, el médico tratante lo tiene más claro.",
+      "siguienteNodoId": "format-ref-d1-enfermera"
+    },
+    {
+      "id": "format-ref-d1-enfermera",
+      "emisor": "jugador",
+      "texto": "La enfermera orientó sobre el ingreso. Antes de continuar, la profesional reflexiona sobre cuál debería ser el siguiente paso.",
+      "opciones": [
+        {
+          "id": "format-d1-a",
+          "texto": "Intentar entrevistar inmediatamente a Lucía.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d1-a",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d1",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d1-b",
+          "texto": "Esperar información médica sobre su estabilidad.",
+          "estrategiaClinica": "contencion_emocional",
+          "siguienteNodoId": "feedback-format-d1-b",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d1",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d1-c",
+          "texto": "Solicitar información policial antes de cualquier intervención.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d1-c",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d1",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feedback-format-d1-a",
+      "emisor": "narrador",
+      "texto": "El personal médico informa que la paciente aún no se encuentra en condiciones para una entrevista clínica.",
+      "siguienteNodoId": "cierre-enfermera"
+    },
+    {
+      "id": "feedback-format-d1-b",
+      "emisor": "narrador",
+      "texto": "Esperar la valoración médica permite planificar la intervención psicológica con mayor seguridad.",
+      "siguienteNodoId": "cierre-enfermera"
+    },
+    {
+      "id": "feedback-format-d1-c",
+      "emisor": "narrador",
+      "texto": "La información policial puede aportar contexto, pero la condición clínica de la paciente sigue siendo prioritaria.",
+      "siguienteNodoId": "cierre-enfermera"
+    },
+    {
+      "id": "cierre-enfermera",
+      "emisor": "narrador",
+      "texto": "Cierra la entrevista con enfermería. El reporte queda disponible en estación médica.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",
-          "parametros": { "conversacionId": "entrevista-enfermera-pasillo" }
+          "parametros": {
+            "conversacionId": "entrevista-enfermera-pasillo"
+          }
         }
       ]
     }

@@ -21,6 +21,12 @@ function withBearer(req: Parameters<HttpInterceptorFn>[0], token: string) {
   return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
 }
 
+function redirigirTrasSesionInvalida(auth: AuthService, router: Router): void {
+  const destino = auth.loginUrlDeRol(auth.rol());
+  auth.clearLocalSession();
+  router.navigate([destino]);
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -45,15 +51,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         switchMap(() => {
           const newToken = auth.getAccessToken();
           if (!newToken) {
-            auth.clearLocalSession();
-            router.navigate(['/auth/login']);
+            redirigirTrasSesionInvalida(auth, router);
             return throwError(() => err);
           }
           return next(withBearer(req, newToken));
         }),
         catchError(() => {
-          auth.clearLocalSession();
-          router.navigate(['/auth/login']);
+          redirigirTrasSesionInvalida(auth, router);
           return throwError(() => err);
         }),
       );

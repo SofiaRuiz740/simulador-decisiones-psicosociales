@@ -109,7 +109,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       const practicaId = Number(practicaParam);
       const registro = this.session.obtenerPractica(practicaId);
       if (!registro) {
-        this.router.navigate(['/estudiante/panel']);
+        this.router.navigate(['/panel-estudiante']);
         return;
       }
       this.practicaId.set(practicaId);
@@ -200,7 +200,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       if (!salir) return;
       this.persistirProgreso();
       void this.fullscreen.salir();
-      this.router.navigate(['/estudiante/panel']);
+      this.router.navigate(['/panel-estudiante']);
     });
   }
 

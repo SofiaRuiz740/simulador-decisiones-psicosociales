@@ -142,7 +142,13 @@ export class AuthEntry implements OnInit {
 
   private extractLoginError(err: HttpErrorResponse): string {
     if (err.status === 0) return 'No se pudo conectar con el servidor. Verifica tu conexión.';
-    if (err.status === 401) return 'Usuario o contraseña incorrectos.';
+    if (err.status === 401) {
+      const username = this.loginForm.controls.username.value.trim();
+      if (username.includes('@')) {
+        return 'Los estudiantes no usan contraseña. Entra en «Accede con tu código» con tu correo y el código de la práctica.';
+      }
+      return 'Usuario o contraseña incorrectos.';
+    }
     const detail = err.error?.detail;
     if (typeof detail === 'string') return detail;
     return 'Error inesperado al iniciar sesión. Intenta de nuevo.';

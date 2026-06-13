@@ -1,0 +1,133 @@
+:host {
+  display: contents;
+}
+
+.neural-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.neural-decor__layer {
+  position: absolute;
+  opacity: 1;
+
+  &--tr {
+    top: -2%;
+    right: -4%;
+    width: min(38vw, 340px);
+    height: auto;
+  }
+
+  &--bl {
+    bottom: -4%;
+    left: -6%;
+    width: min(42vw, 380px);
+    height: auto;
+  }
+
+  &--mr {
+    top: 28%;
+    right: -2%;
+    width: min(18vw, 160px);
+    height: auto;
+    opacity: 0.7;
+  }
+}
+
+.neural-decor__stroke {
+  stroke: var(--app-purple);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  opacity: 0.07;
+  vector-effect: non-scaling-stroke;
+}
+
+.neural-decor__organic {
+  stroke: var(--app-purple-dark);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.06;
+  vector-effect: non-scaling-stroke;
+
+  &--soft {
+    opacity: 0.045;
+    stroke: var(--app-teal);
+  }
+}
+
+.neural-decor__wave {
+  stroke: var(--app-purple);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.055;
+  vector-effect: non-scaling-stroke;
+
+  &--soft {
+    opacity: 0.04;
+    stroke: var(--app-teal);
+  }
+}
+
+.neural-decor__arc {
+  stroke: var(--app-purple-light);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.08;
+  stroke-dasharray: 4 6;
+  vector-effect: non-scaling-stroke;
+}
+
+.neural-decor__node {
+  fill: var(--app-purple);
+  opacity: 0.1;
+
+  &--soft {
+    fill: var(--app-teal);
+    opacity: 0.08;
+  }
+}
+
+// Variante más tenue para el sidebar
+:host(.neural-decor--sidebar) {
+  .neural-decor__stroke { opacity: 0.05; }
+  .neural-decor__node { opacity: 0.07; }
+  .neural-decor__arc { opacity: 0.06; }
+  .neural-decor__wave { opacity: 0.04; }
+
+  .neural-decor__layer--tr {
+    top: auto;
+    bottom: 8%;
+    right: -20%;
+    width: 180px;
+  }
+
+  .neural-decor__layer--bl {
+    display: none;
+  }
+
+  .neural-decor__layer--mr {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .neural-decor__layer--mr {
+    display: none;
+  }
+
+  .neural-decor__layer--tr {
+    width: 220px;
+    opacity: 0.75;
+  }
+
+  .neural-decor__layer--bl {
+    width: 260px;
+    opacity: 0.75;
+  }
+}

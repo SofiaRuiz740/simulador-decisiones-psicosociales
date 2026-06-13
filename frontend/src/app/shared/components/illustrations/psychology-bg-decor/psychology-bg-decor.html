@@ -1,0 +1,57 @@
+<div class="psychology-bg-decor" [class.psychology-bg-decor--panel]="variant() === 'panel-zen'" aria-hidden="true">
+  @if (variant() === 'dashboard') {
+    <div class="psychology-bg-decor__bokeh" aria-hidden="true"></div>
+
+    <svg class="psychology-bg-decor__waves psychology-bg-decor__waves--top" viewBox="0 0 1200 160" preserveAspectRatio="none">
+      <path
+        d="M0 88 Q180 62 360 88 T720 84 T1080 90 T1200 86"
+        stroke="#CFC3FF"
+        stroke-width="1.5"
+        stroke-opacity="0.26"
+        fill="none"
+        stroke-linecap="round"
+      />
+      <path
+        d="M0 118 Q220 94 440 116 T880 112 T1200 118"
+        stroke="#E6E0FF"
+        stroke-width="1.25"
+        stroke-opacity="0.18"
+        fill="none"
+        stroke-linecap="round"
+      />
+    </svg>
+
+    <div class="psychology-bg-decor__item psychology-bg-decor__item--brain psych-float psych-float--slow">
+      <app-brain-line />
+    </div>
+
+    <div class="psychology-bg-decor__item psychology-bg-decor__item--plant psych-float psych-float--mid">
+      <app-plant-wave />
+    </div>
+  }
+
+  @if (variant() === 'panel-zen') {
+    <svg class="psychology-bg-decor__waves" viewBox="0 0 800 120" preserveAspectRatio="none">
+      <path
+        d="M0 72 Q100 54 200 72 T400 70 T600 74 T800 70"
+        stroke="#CFC3FF"
+        stroke-width="1.5"
+        stroke-opacity="0.28"
+        fill="none"
+        stroke-linecap="round"
+      />
+      <path
+        d="M0 92 Q120 74 240 90 T480 86 T720 92 T800 88"
+        stroke="#E6E0FF"
+        stroke-width="1.25"
+        stroke-opacity="0.2"
+        fill="none"
+        stroke-linecap="round"
+      />
+    </svg>
+
+    <div class="psychology-bg-decor__item psychology-bg-decor__item--meditation psych-float psych-float--mid">
+      <app-meditation-person />
+    </div>
+  }
+</div>

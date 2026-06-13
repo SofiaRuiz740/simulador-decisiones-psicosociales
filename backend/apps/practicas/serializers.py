@@ -1,5 +1,6 @@
 """Serializers de la app practicas."""
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.academico.models import Estudiante, Grupo
@@ -93,6 +94,22 @@ class PracticaListSerializer(serializers.ModelSerializer):
             validar_grupo_docente(value, request.user)
         return value
 
+    def update(self, instance, validated_data):
+        """Si el docente extiende fecha_fin al futuro, reabre la práctica auto-cerrada."""
+        nueva_fin = validated_data.get('fecha_fin')
+        ahora = timezone.now()
+        if (
+            nueva_fin
+            and nueva_fin > ahora
+            and instance.estado == Practica.Estado.FINALIZADA
+            and 'estado' not in validated_data
+        ):
+            inicio = validated_data.get('fecha_inicio', instance.fecha_inicio)
+            validated_data['estado'] = (
+                Practica.Estado.EN_CURSO if ahora >= inicio else Practica.Estado.SIN_INICIAR
+            )
+        return super().update(instance, validated_data)
+
 
 class PracticaDetalleSerializer(PracticaListSerializer):
     autorizaciones = AutorizacionSerializer(many=True, read_only=True)
@@ -161,20 +178,26 @@ class AccesoEstudianteSerializer(serializers.Serializer):
         correo = attrs['correo'].lower().strip()
         codigo = attrs['codigo'].upper().strip()
         try:
-            est = Estudiante.objects.get(correo=correo)
+            est = Estudiante.objects.get(correo__iexact=correo)
         except Estudiante.DoesNotExist:
-            raise serializers.ValidationError('Correo no registrado en el sistema.')
+            raise serializers.ValidationError({
+                'non_field_errors': ['Correo no registrado en el sistema.'],
+            })
         try:
             auth = AutorizacionEstudiante.objects.select_related('practica').get(
                 estudiante=est, codigo_acceso=codigo,
             )
         except AutorizacionEstudiante.DoesNotExist:
-            raise serializers.ValidationError('Código de acceso inválido para este correo.')
+            raise serializers.ValidationError({
+                'non_field_errors': ['Código de acceso inválido para este correo.'],
+            })
         if auth.revocada:
-            raise serializers.ValidationError(
-                'Tu autorización para esta práctica fue revocada por el docente. '
-                'Si crees que es un error, contáctalo directamente.',
-            )
+            raise serializers.ValidationError({
+                'non_field_errors': [
+                    'Tu autorización para esta práctica fue revocada por el docente. '
+                    'Si crees que es un error, contáctalo directamente.',
+                ],
+            })
         attrs['estudiante'] = est
         attrs['autorizacion'] = auth
         return attrs

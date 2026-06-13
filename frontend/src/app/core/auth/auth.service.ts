@@ -6,6 +6,7 @@ import { Observable, catchError, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AccesoEstudianteRespuesta } from '../models/practicas.model';
 import { JwtPayload, Rol, TokenPair, Usuario } from '../models/usuario.model';
+import { EstudianteSessionService } from '../services/estudiante-session.service';
 
 const ACCESS_KEY = 'simulador.access';
 const REFRESH_KEY = 'simulador.refresh';
@@ -31,6 +32,7 @@ export interface RegistroDocenteData {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly estudianteSession = inject(EstudianteSessionService);
 
   /** Usuario actualmente autenticado (signal reactiva). null si no hay sesión. */
   private readonly _usuario = signal<Usuario | null>(this.loadUserFromStorage());
@@ -111,8 +113,9 @@ export class AuthService {
 
     return request$.pipe(
       tap(() => {
+        const destino = this.rol() === Rol.Estudiante ? '/estudiante' : '/auth/login';
         this.clearLocalSession();
-        this.router.navigate(['/auth/login']);
+        this.router.navigate([destino]);
       }),
     );
   }
@@ -123,6 +126,7 @@ export class AuthService {
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(PRACTICA_ACTIVA_KEY);
+    this.estudianteSession.limpiarDatosLocales();
     this._usuario.set(null);
   }
 
@@ -166,6 +170,11 @@ export class AuthService {
     if (rol === Rol.Admin) return '/admin';
     if (rol === Rol.Estudiante) return '/panel-estudiante';
     return '/docente'; // default y fallback
+  }
+
+  /** Pantalla de acceso según rol (p. ej. tras expirar la sesión). */
+  loginUrlDeRol(rol: Rol | null = this.rol()): string {
+    return rol === Rol.Estudiante ? '/estudiante' : '/auth/login';
   }
 
   private handleAuthSuccess(res: AuthResponse): void {

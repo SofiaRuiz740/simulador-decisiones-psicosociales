@@ -5,13 +5,15 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
 import { MisPracticaEstudiante } from '../core/models/practicas.model';
 import { PracticasService } from '../core/services/practicas.service';
+import { PsychologyBgDecor } from '../shared/components/illustrations/psychology-bg-decor/psychology-bg-decor';
 
 @Component({
   selector: 'app-panel-estudiante-inicio',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PsychologyBgDecor],
   template: `
     <section class="module page">
-      <header class="hero-glass">
+      <header class="hero-glass hero-glass--with-meta hero-glass--decor">
+        <app-psychology-bg-decor variant="dashboard" />
         <h1>Hola, <em>{{ nombre() }}</em></h1>
         <p class="hero-glass__meta">Panel del estudiante</p>
       </header>
@@ -62,7 +64,8 @@ import { PracticasService } from '../core/services/practicas.service';
         </div>
         <div class="panel__body">
           @if (enCurso().length === 0) {
-            <div class="empty-state-mockup empty-state-mockup--compact">
+            <div class="empty-state-mockup empty-state-mockup--compact empty-state-mockup--decor">
+              <app-psychology-bg-decor variant="panel-zen" />
               <strong>Sin simulación en curso</strong>
               Usa tu código de acceso en la pantalla de ingreso del simulador.
               <a routerLink="/estudiante" class="btn-ghost" style="margin-top:12px;display:inline-flex">Acceder con código</a>
@@ -85,6 +88,37 @@ import { PracticasService } from '../core/services/practicas.service';
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--app-ink);
+    }
+    .dash-list__empty {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--app-slate);
+      line-height: 1.55;
+    }
+
+    .hero-glass--decor {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      padding: 1.5rem 1.75rem;
+      background: linear-gradient(120deg, #fbf3ec 0%, #f4eefc 55%, #ece4fb 100%);
+
+      h1,
+      .hero-glass__meta {
+        position: relative;
+        z-index: 1;
+      }
+    }
+
+    .empty-state-mockup--decor {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+
+      > * {
+        position: relative;
+        z-index: 1;
+      }
     }
   `],
 })

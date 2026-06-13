@@ -1,0 +1,121 @@
+:host {
+  display: contents;
+}
+
+.psychology-bg-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  &--panel {
+    border-radius: inherit;
+  }
+}
+
+.psychology-bg-decor__bokeh {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.65) 0, transparent 26px),
+    radial-gradient(circle at 78% 14%, rgba(255, 255, 255, 0.45) 0, transparent 20px),
+    radial-gradient(circle at 92% 38%, rgba(207, 195, 255, 0.4) 0, transparent 18px),
+    radial-gradient(circle at 30% 72%, rgba(255, 255, 255, 0.35) 0, transparent 22px);
+  opacity: 0.55;
+}
+
+.psychology-bg-decor__item {
+  position: absolute;
+  pointer-events: none;
+  line-height: 0;
+  background: transparent;
+
+  &--brain {
+    top: 0;
+    right: 0;
+    width: min(320px, 38vw);
+    height: min(280px, 32vw);
+  }
+
+  &--plant {
+    top: auto;
+    bottom: -4%;
+    right: -6%;
+    width: min(260px, 50vw);
+    height: min(300px, 55vw);
+    opacity: 0.45;
+  }
+
+  &--meditation {
+    right: 2%;
+    bottom: 0;
+    width: min(160px, 28vw);
+    height: min(195px, 32vw);
+  }
+}
+
+.psychology-bg-decor__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  pointer-events: none;
+
+  &--top {
+    top: 0;
+    bottom: auto;
+    height: 110px;
+    opacity: 0.85;
+  }
+}
+
+@keyframes psych-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.psych-float {
+  animation: psych-float 10s ease-in-out infinite;
+
+  &--slow {
+    animation-duration: 11s;
+  }
+
+  &--mid {
+    animation-duration: 9s;
+    animation-delay: 0.6s;
+  }
+}
+
+@media (max-width: 768px) {
+  .psychology-bg-decor__item--brain {
+    width: 220px;
+    height: 190px;
+  }
+
+  .psychology-bg-decor__item--plant {
+    width: 170px;
+    height: 200px;
+    bottom: -2%;
+    right: -8%;
+  }
+
+  .psychology-bg-decor__item--meditation {
+    width: 130px;
+    height: 160px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psych-float {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 280" fill="none" aria-hidden="true">
+  <circle cx="110" cy="42" r="22" stroke="#9B72F3" stroke-width="2" opacity="0.78" />
+  <path
+    d="M110 66 C92 74 78 88 72 106 C68 118 68 130 72 142"
+    stroke="#9B72F3"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.75"
+  />
+  <path
+    d="M110 66 C128 74 142 88 148 106 C152 118 152 130 148 142"
+    stroke="#9B72F3"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.75"
+  />
+  <path
+    d="M72 106 C88 98 98 94 110 94 C122 94 132 98 148 106"
+    stroke="#B8A8FF"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    opacity="0.7"
+  />
+  <path
+    d="M58 124 C66 118 74 114 82 112"
+    stroke="#B8A8FF"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    opacity="0.68"
+  />
+  <path
+    d="M162 124 C154 118 146 114 138 112"
+    stroke="#B8A8FF"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    opacity="0.68"
+  />
+  <path
+    d="M58 124 L52 138 L48 152 L46 166"
+    stroke="#9B72F3"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.72"
+  />
+  <path
+    d="M162 124 L168 138 L172 152 L174 166"
+    stroke="#9B72F3"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.72"
+  />
+  <path
+    d="M46 166 C54 168 62 168 70 166"
+    stroke="#B8A8FF"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    opacity="0.65"
+  />
+  <path
+    d="M174 166 C166 168 158 168 150 166"
+    stroke="#B8A8FF"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    opacity="0.65"
+  />
+  <path
+    d="M72 142 L64 168 L52 192 L44 214"
+    stroke="#9B72F3"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.72"
+  />
+  <path
+    d="M148 142 L156 168 L168 192 L176 214"
+    stroke="#9B72F3"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.72"
+  />
+  <path
+    d="M64 168 C78 176 94 180 110 180 C126 180 142 176 156 168"
+    stroke="#B8A8FF"
+    stroke-width="1.85"
+    stroke-linecap="round"
+    opacity="0.68"
+  />
+  <path
+    d="M44 214 C62 226 86 234 110 236 C134 234 158 226 176 214"
+    stroke="#9B72F3"
+    stroke-width="2"
+    stroke-linecap="round"
+    opacity="0.74"
+  />
+  <path
+    d="M88 214 C96 228 102 238 110 242 C118 238 124 228 132 214"
+    stroke="#B8A8FF"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    opacity="0.62"
+  />
+  <path
+    d="M98 236 L92 252 L88 264"
+    stroke="#B8A8FF"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    opacity="0.58"
+  />
+</svg>

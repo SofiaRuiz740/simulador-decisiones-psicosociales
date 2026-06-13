@@ -1,68 +1,85 @@
-<section class="module page">
+<section class="module page ia-detalle">
 
-  <a routerLink="/ia-generativa" class="page-back">← Volver a IA generativa</a>
+  <a routerLink="/ia-generativa" [queryParams]="{ tab: 'borradores' }" class="page-back">← Volver a IA generativa</a>
 
   @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
 
   @if (propuesta(); as p) {
-    <header class="hero-glass hero-glass--compact">
-      <div class="hero-glass__row">
-        <div>
+    <header class="ia-banner ia-banner--compact">
+      <div class="ia-banner__glow" aria-hidden="true"></div>
+      <div class="ia-banner__inner">
+        <div class="ia-banner__copy">
           <div class="ia-chips">
             <span class="ia-chip-ai">
               <mat-icon>auto_awesome</mat-icon>
-              {{ p.generada_con_llm ? 'Generado por IA' : 'Plantilla pedagógica' }}
+              {{ p.generada_con_llm ? 'Generado por IA' : 'Plantilla' }}
             </span>
             <span class="badge" [class]="badgeClass(p.estado)">{{ p.estado_display }}</span>
           </div>
           <h1><em>{{ p.titulo }}</em></h1>
-          <p class="hero-glass__meta">
-            <span>{{ p.tema }}</span>
-            <span>{{ p.nivel_dificultad }}</span>
-            <span>{{ p.numero_escenarios }} escenarios</span>
-          </p>
+          <p>{{ p.tema }}</p>
         </div>
-        <div class="actions actions--end">
-          @if (puedeEditar()) {
-            <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id, 'editar']">Editar</a>
-          }
-          @if (puedeAprobar()) {
-            <button type="button" class="btn-ghost" (click)="aprobar()">Aprobar</button>
-          }
-          @if (puedeRechazar()) {
-            <button type="button" class="btn-ghost" (click)="rechazar()">Rechazar</button>
-          }
-          @if (puedeConvertir()) {
-            <button type="button" class="btn-primary" (click)="convertir()">Convertir en caso</button>
-          }
-          @if (p.caso_resultante_id) {
-            <a class="btn-primary" [routerLink]="['/casos', p.caso_resultante_id]">Abrir caso</a>
-          }
-        </div>
+        <dl class="ia-banner__kpis">
+          <div>
+            <dt>Dificultad</dt>
+            <dd>{{ p.nivel_dificultad }}</dd>
+          </div>
+          <div>
+            <dt>Escenarios</dt>
+            <dd>{{ p.numero_escenarios }}</dd>
+          </div>
+          <div>
+            <dt>Creada</dt>
+            <dd>{{ p.fecha_creacion | date:'d MMM' }}</dd>
+          </div>
+        </dl>
       </div>
     </header>
 
+    <div class="surface ia-detalle__bar">
+      <div class="actions">
+        @if (puedeEditar()) {
+          <a class="btn-ghost" [routerLink]="['/ia-generativa/propuesta', p.id, 'editar']">Editar</a>
+        }
+        @if (puedeAprobar()) {
+          <button type="button" class="btn-ghost" (click)="aprobar()">Aprobar</button>
+        }
+        @if (puedeRechazar()) {
+          <button type="button" class="btn-ghost ia-btn-danger" (click)="rechazar()">Rechazar</button>
+        }
+      </div>
+      <div class="actions actions--end">
+        @if (puedeConvertir()) {
+          <button type="button" class="btn-primary" (click)="convertir()">Convertir en caso</button>
+        }
+        @if (p.caso_resultante_id) {
+          <a class="btn-primary" [routerLink]="['/casos', p.caso_resultante_id]">Abrir caso</a>
+        }
+      </div>
+    </div>
+
     @if (p.motivo_rechazo) {
-      <div class="surface surface--warn">
+      <div class="surface surface--warn ia-detalle__warn">
         <strong>Motivo de rechazo</strong>
         <p>{{ p.motivo_rechazo }}</p>
       </div>
     }
 
     @if (p.objetivo_aprendizaje) {
-      <div class="builder-block builder-block--intro">
+      <div class="surface ia-detalle__objetivo">
         <div class="form-section__title">Objetivo de aprendizaje</div>
         <p>{{ p.objetivo_aprendizaje }}</p>
       </div>
     }
 
-    <section class="panel">
+    <section class="panel ia-detalle__preview">
       <div class="panel__toolbar">
         <div class="toolbar">
-          <h2 class="panel-title">Vista previa del caso</h2>
+          <h2 class="ia-panel-title">Vista previa del caso</h2>
+          <span class="ia-preview-hint">Navega escenario por escenario</span>
         </div>
       </div>
-      <div class="panel__body">
+      <div class="panel__body ia-detalle__preview-body">
         <app-game-preview [contenido]="p.contenido_json" />
       </div>
     </section>

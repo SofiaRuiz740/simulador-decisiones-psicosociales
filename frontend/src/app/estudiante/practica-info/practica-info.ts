@@ -85,7 +85,14 @@ export class PracticaInfoComponent implements OnInit {
     this.practicasApi.estadoAutorizacion(practica.autorizacion_id).subscribe({
       next: (estado) => {
         this.reintentoAutorizado.set(estado.reintento_autorizado);
-        if (estado.reintento_autorizado && practica.progreso.estado === 'completada') {
+        if (estado.reintento_autorizado && estado.ultimo_reinicio_en) {
+          const claveReinicio = `simulador.reinicio_aplicado:${practica.autorizacion_id}`;
+          if (localStorage.getItem(claveReinicio) !== estado.ultimo_reinicio_en) {
+            this.session.reiniciarProgresoLocal(practica.id);
+            localStorage.setItem(claveReinicio, estado.ultimo_reinicio_en);
+            this.practica.set(this.session.obtenerPractica(practica.id));
+          }
+        } else if (estado.reintento_autorizado && practica.progreso.estado === 'completada') {
           this.session.reiniciarProgresoLocal(practica.id);
           this.practica.set(this.session.obtenerPractica(practica.id));
         }

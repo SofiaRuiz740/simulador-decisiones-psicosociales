@@ -213,8 +213,13 @@ class ReinicioPracticaViewSet(viewsets.GenericViewSet):
         if estudiante and auth.estudiante_id != estudiante.id:
             raise PermissionDenied('No autorizado.')
 
+        ultimo_reinicio = (
+            auth.registros_reinicio.order_by('-fecha').values_list('fecha', flat=True).first()
+        )
+
         return Response({
             'autorizacion_id': auth.id,
             'practica_id': auth.practica_id,
             'reintento_autorizado': auth.reintento_autorizado,
+            'ultimo_reinicio_en': ultimo_reinicio.isoformat() if ultimo_reinicio else None,
         })

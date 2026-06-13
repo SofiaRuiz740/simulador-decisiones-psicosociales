@@ -141,6 +141,11 @@ export class PracticasService {
     const url = autorizacionId
       ? `${this.api}/practicas/reinicios/estado-autorizacion/?autorizacion_id=${autorizacionId}`
       : `${this.api}/practicas/reinicios/estado-autorizacion/`;
-    return this.http.get<{ autorizacion_id: number; practica_id: number; reintento_autorizado: boolean }>(url);
+    return this.http.get<{
+      autorizacion_id: number;
+      practica_id: number;
+      reintento_autorizado: boolean;
+      ultimo_reinicio_en: string | null;
+    }>(url);
   }
 }

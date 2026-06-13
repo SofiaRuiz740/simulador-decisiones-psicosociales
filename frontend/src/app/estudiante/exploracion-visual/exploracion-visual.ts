@@ -11,6 +11,7 @@ import { DialogoNarrativoComponent } from './dialogo-narrativo/dialogo-narrativo
 import { DocumentoEvidenciaComponent } from './documento-evidencia/documento-evidencia';
 import { EscenaVisualComponent } from './escena-visual/escena-visual';
 import { EscenaVisualService } from './services/escena-visual.service';
+import { diagnosticarTrasladoComisaria } from './utils/comisaria-acceso.util';
 
 @Component({
   selector: 'app-exploracion-visual',
@@ -53,6 +54,18 @@ export class ExploracionVisualComponent implements OnInit {
       }
       if (escena.escenarioNarrativoId === 'consulta-inicial') {
         void this.ambiente.transicionComisariaAHospital();
+      }
+    });
+
+    effect(() => {
+      const estado = this.facade.estado();
+      const escena = this.escenaActual();
+      if (!estado || escena?.escenarioNarrativoId !== 'consulta-inicial') return;
+
+      if (typeof window !== 'undefined') {
+        (window as Window & { __fase21aDiagnosticoComisaria?: () => ReturnType<typeof diagnosticarTrasladoComisaria> })
+          .__fase21aDiagnosticoComisaria = () =>
+          diagnosticarTrasladoComisaria(this.facade.estado(), this.facade.caso());
       }
     });
   }

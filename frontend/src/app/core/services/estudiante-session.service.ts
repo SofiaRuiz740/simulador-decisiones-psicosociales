@@ -8,6 +8,7 @@ import {
 } from '../models/estudiante-session.model';
 import { AccesoEstudianteRespuesta } from '../models/practicas.model';
 import { resolverCasoNarrativoId } from '../utils/caso-narrativo.util';
+import { clavesIntroRelacionadas } from '../simulacion-narrativa/utils/introduccion-narrativa.util';
 import {
   borrarPartidaPersistida,
   clavePartidaPersistida,
@@ -161,6 +162,9 @@ export class EstudianteSessionService {
         estudianteId,
         practicaId,
       });
+      for (const clave of clavesIntroRelacionadas(casoNarrativoId, estudianteId, practicaId)) {
+        localStorage.removeItem(clave);
+      }
     }
 
     const lista = [...this._practicas()];

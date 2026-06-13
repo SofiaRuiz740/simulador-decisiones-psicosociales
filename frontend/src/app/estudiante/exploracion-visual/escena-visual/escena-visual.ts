@@ -12,6 +12,10 @@ import {
 import { variablesCssEscena } from '../utils/sprite-layout.util';
 import { etiquetaInteraccionPersonaje } from '../utils/presentacion-personaje.util';
 import { escenaEsAccesible, hotspotEsAccesible } from '../utils/escena-acceso.util';
+import {
+  HOTSPOTS_TRASLADO_COMISARIA,
+  registrarDiagnosticoComisariaEnConsola,
+} from '../utils/comisaria-acceso.util';
 
 @Component({
   selector: 'app-escena-visual',
@@ -186,6 +190,11 @@ export class EscenaVisualComponent {
   private hotspotEsVisible(hotspot: HotspotEscena): boolean {
     const estado = this.facade.estado();
     const caso = this.facade.caso();
+
+    if (HOTSPOTS_TRASLADO_COMISARIA.includes(hotspot.id as (typeof HOTSPOTS_TRASLADO_COMISARIA)[number])) {
+      registrarDiagnosticoComisariaEnConsola(this.escena().id, hotspot.id, estado, caso);
+    }
+
     if (!hotspotEsAccesible(hotspot, estado, caso)) {
       return false;
     }

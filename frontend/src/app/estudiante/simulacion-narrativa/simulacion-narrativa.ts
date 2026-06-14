@@ -178,7 +178,9 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
         this.fase.set(faseInicial);
         void this.ambiente.iniciar(faseInicial === 'intro' ? 'intro' : 'simulacion');
       },
-      error: () => undefined,
+      error: (err) => {
+        console.error('No se pudo iniciar el caso narrativo:', err);
+      },
     });
   }
 

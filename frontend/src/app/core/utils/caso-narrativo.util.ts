@@ -48,7 +48,7 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
 ];
 
 const MAPEO_CASO_BACKEND: Record<number, string> = {
-  1: 'violencia-intrafamiliar',
+  2: 'violencia-intrafamiliar',
 };
 
 export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): string {
@@ -56,12 +56,7 @@ export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): str
     return MAPEO_CASO_BACKEND[practica.caso_id];
   }
 
-  const nombre = practica.caso_nombre.toLowerCase();
-  if (nombre.includes('violencia') || nombre.includes('intrafamiliar')) {
-    return 'violencia-intrafamiliar';
-  }
-
-  return 'violencia-intrafamiliar';
+  return '';
 }
 
 export function obtenerCatalogoCaso(slug: string): CasoNarrativoCatalogo | undefined {

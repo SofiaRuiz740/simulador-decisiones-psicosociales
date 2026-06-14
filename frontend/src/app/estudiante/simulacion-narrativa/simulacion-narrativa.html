@@ -1,4 +1,4 @@
-@if (cargando() || fase() === 'cargando') {
+@if (!error() && (cargando() || fase() === 'cargando')) {
   <div class="simulacion-carga">
     <mat-progress-bar mode="indeterminate" />
     <p>Preparando práctica clínica…</p>

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, finalize, tap } from 'rxjs';
+import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
 
 import {
   CasoCatalogo,
@@ -61,6 +61,13 @@ export class NarrativaFacadeService {
       tap((caso) => {
         const partidaGuardada = this.persistencia.cargarPartidaGuardada(casoId);
         this.engine.prepararSesion(caso, partidaGuardada);
+      }),
+      catchError((err) => {
+        const detalle = err?.message ?? err?.statusText ?? 'Error desconocido al cargar el caso.';
+        this.state.establecerError(
+          `No se pudo cargar la información de la práctica (${detalle}). Intenta recargar la página.`,
+        );
+        return throwError(() => err);
       }),
       finalize(() => this.state.establecerCargando(false)),
     );

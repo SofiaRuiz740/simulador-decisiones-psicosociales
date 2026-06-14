@@ -2,6 +2,18 @@
   padding-bottom: 0;
 }
 
+.tab-panel {
+  .metrics + .panel {
+    margin-top: 10px;
+  }
+
+  .panel__body > .empty-state-mockup {
+    margin-top: 1.25rem;
+    padding-top: 2.75rem;
+    padding-bottom: 2.75rem;
+  }
+}
+
 .tab-empty {
   padding: 0;
 }

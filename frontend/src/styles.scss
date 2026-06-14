@@ -91,6 +91,7 @@ body {
   line-height: 1.55;
   margin: 0;
   height: 100%;
+  min-height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -98,6 +99,12 @@ body {
     radial-gradient(ellipse 80% 50% at 0% 0%, rgba(212, 184, 245, 0.25), transparent 50%),
     radial-gradient(ellipse 60% 40% at 100% 10%, rgba(42, 157, 143, 0.08), transparent 45%),
     radial-gradient(ellipse 50% 30% at 50% 100%, rgba(155, 114, 243, 0.06), transparent 50%);
+}
+
+app-root {
+  display: block;
+  height: 100%;
+  min-height: 100%;
 }
 
 // Selección de texto con la paleta nueva

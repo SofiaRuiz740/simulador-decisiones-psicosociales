@@ -1,117 +1,110 @@
 @if (practica(); as p) {
-  <app-estudiante-shell [titulo]="p.nombre">
-    <header class="page-header">
-      <a routerLink="/estudiante/practicas" class="back-link">
-        <mat-icon>arrow_back</mat-icon>
-        Mis prácticas
-      </a>
+  <section class="module page practica-info-page">
+
+    <a routerLink="/panel-estudiante/practicas" class="page-back">← Mis prácticas</a>
+
+    <header class="practica-info-page__head">
       <h1>{{ p.nombre }}</h1>
-      <p class="subtitulo">{{ subtituloCaso() }}</p>
+      <p>{{ subtituloCaso() }}</p>
     </header>
 
-    <div class="layout">
-      <section class="info-card elevated-card">
-        <h2>Información de la práctica</h2>
+    <div class="practica-info-layout">
+      <article class="practica-info-card">
+        <h2 class="practica-info-card__title">Información de la práctica</h2>
 
-        <dl class="datos">
-          <div>
+        <dl class="practica-meta">
+          <div class="practica-meta__item">
             <dt>Estado</dt>
-            <dd>{{ etiquetaEstado(p.progreso.estado) }}</dd>
+            <dd>
+              <span class="badge" [class]="badgeClass(p.progreso.estado)">{{ etiquetaEstado(p.progreso.estado) }}</span>
+            </dd>
           </div>
-          <div>
+          <div class="practica-meta__item practica-meta__item--wide">
             <dt>Caso académico</dt>
             <dd>{{ p.caso_nombre }}</dd>
           </div>
-          <div>
+          <div class="practica-meta__item">
             <dt>Tiempo estimado</dt>
-            <dd>{{ p.tiempo_max_min }} minutos</dd>
+            <dd>{{ p.tiempo_max_min }} min</dd>
           </div>
-          <div>
-            <dt>Fecha de asignación</dt>
-            <dd>{{ p.fecha_inicio | date:'fullDate' }}</dd>
+          <div class="practica-meta__item">
+            <dt>Asignación</dt>
+            <dd>{{ p.fecha_inicio | date:'mediumDate' }}</dd>
           </div>
-          <div>
+          <div class="practica-meta__item">
             <dt>Fecha límite</dt>
-            <dd>{{ p.fecha_fin | date:'fullDate' }}</dd>
+            <dd>{{ p.fecha_fin | date:'mediumDate' }}</dd>
           </div>
         </dl>
 
         @if (p.mensaje_personalizado) {
-          <div class="mensaje-docente">
-            <mat-icon>mail</mat-icon>
-            <div>
-              <strong>Mensaje del docente</strong>
-              <p>{{ p.mensaje_personalizado }}</p>
-            </div>
+          <div class="practica-nota">
+            <strong>Mensaje del docente</strong>
+            <p>{{ p.mensaje_personalizado }}</p>
           </div>
         }
 
-        <div class="progreso">
-          <div class="progreso-head">
-            <span>Progreso registrado</span>
-            <strong>{{ p.progreso.porcentaje }}%</strong>
+        <div class="practica-progress">
+          <div class="progress-bar">
+            <div class="progress-bar__fill" [style.width.%]="p.progreso.porcentaje"></div>
           </div>
-          <mat-progress-bar mode="determinate" [value]="p.progreso.porcentaje" />
-          @if (p.progreso.conversacionesTotales > 0) {
-            <p class="progreso-detalle">
-              {{ p.progreso.conversacionesCompletadas }} de
-              {{ p.progreso.conversacionesTotales }} entrevistas exploradas
-            </p>
-          }
+          <p class="practica-progress__label">
+            Progreso {{ p.progreso.porcentaje }}%
+            @if (p.progreso.conversacionesTotales > 0) {
+              · {{ p.progreso.conversacionesCompletadas }}/{{ p.progreso.conversacionesTotales }} entrevistas
+            }
+          </p>
         </div>
-      </section>
+      </article>
 
-      <aside class="acciones-card elevated-card">
-        <h2>Iniciar actividad</h2>
-        <p>
-          La simulación narrativa se abrirá dentro de la plataforma. Podrás activar
-          pantalla completa cuando quieras una experiencia más inmersiva.
+      <article class="practica-info-card practica-info-card--action">
+        <h2 class="practica-info-card__title">Iniciar actividad</h2>
+
+        <p class="practica-info-card__lead">
+          Simulación narrativa en la plataforma. Pantalla completa opcional para mayor inmersión.
         </p>
 
-        @if (catalogo(); as cat) {
-          <ul class="objetivos">
-            <li><mat-icon>explore</mat-icon> Exploración clínica guiada</li>
-            <li><mat-icon>groups</mat-icon> Entrevistas con actores del caso</li>
-            <li><mat-icon>menu_book</mat-icon> Libreta de registro psicosocial</li>
+        @if (catalogo()) {
+          <ul class="practica-tags">
+            <li>Exploración clínica</li>
+            <li>Entrevistas</li>
+            <li>Libreta psicosocial</li>
           </ul>
         }
 
-        <button
-          mat-flat-button
-          color="primary"
-          type="button"
-          class="btn-iniciar"
-          [disabled]="!puedeIniciar()"
-          (click)="iniciarSimulacion()">
-          <mat-icon>play_arrow</mat-icon>
-          Iniciar simulación
-        </button>
-
-        @if (!puedeIniciar() && practicaCompletada()) {
-          <p class="aviso">Esta práctica ya fue completada.</p>
-        } @else if (!puedeIniciar()) {
-          <p class="aviso">Esta práctica estará disponible próximamente.</p>
-        }
-
-        @if (puedeSolicitarReintento()) {
-          <button
-            mat-stroked-button
-            type="button"
-            class="btn-reintento"
-            [disabled]="solicitando()"
-            (click)="solicitarNuevoIntento()">
-            <mat-icon>replay</mat-icon>
-            Solicitar nuevo intento
+        <div class="practica-actions">
+          <button type="button" class="btn-primary" [disabled]="!puedeIniciar()" (click)="iniciarSimulacion()">
+            Iniciar simulación
           </button>
-        } @else if (solicitudPendiente()) {
-          <p class="aviso info">Solicitud de reintento pendiente de aprobación del docente.</p>
-        } @else if (reintentoAutorizado()) {
-          <p class="aviso info">Tu docente autorizó un nuevo intento. Puedes iniciar la simulación.</p>
-        }
 
-        <a mat-stroked-button routerLink="/estudiante/resultados">Ver resultados</a>
-        <a mat-stroked-button routerLink="/estudiante/panel">Volver al panel</a>
-      </aside>
+          @if (!puedeIniciar() && practicaCompletada()) {
+            <p class="practica-aviso">Esta práctica ya fue completada.</p>
+          } @else if (!puedeIniciar()) {
+            <p class="practica-aviso">Esta práctica estará disponible próximamente.</p>
+          }
+
+          @if (puedeSolicitarReintento()) {
+            <button
+              type="button"
+              class="btn-ghost practica-actions__secondary"
+              [disabled]="solicitando()"
+              (click)="solicitarNuevoIntento()">
+              Solicitar nuevo intento
+            </button>
+          } @else if (solicitudPendiente()) {
+            <p class="practica-aviso">Reintento pendiente de aprobación del docente.</p>
+          } @else if (reintentoAutorizado()) {
+            <p class="practica-aviso">Nuevo intento autorizado. Puedes iniciar la simulación.</p>
+          }
+
+          <nav class="practica-links" aria-label="Acciones relacionadas">
+            <a routerLink="/estudiante/resultados">Ver resultados</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/estudiante/panel">Volver al panel</a>
+          </nav>
+        </div>
+      </article>
     </div>
-  </app-estudiante-shell>
+
+  </section>
 }

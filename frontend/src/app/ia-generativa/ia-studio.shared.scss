@@ -1,0 +1,140 @@
+// Estilos compartidos del estudio IA (banner, chips)
+
+.ia-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(155, 114, 243, 0.18);
+  background:
+    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(155, 114, 243, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 0% 100%, rgba(42, 157, 143, 0.08), transparent 50%),
+    linear-gradient(135deg, #fdfbff 0%, #f8f5ff 48%, #faf9fc 100%);
+  padding: 1.75rem 2rem;
+  box-shadow: var(--shadow-md);
+
+  &__glow {
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(155, 114, 243, 0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  &__inner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  &__copy {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--app-purple-dark);
+    background: rgba(155, 114, 243, 0.1);
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    margin-bottom: 0.65rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--app-ink);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    em {
+      font-style: italic;
+      color: var(--app-purple);
+    }
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    max-width: 520px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--app-text);
+  }
+
+  &__kpis {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin: 0;
+
+    div {
+      min-width: 4.5rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(155, 114, 243, 0.12);
+      border-radius: var(--radius-md);
+      text-align: center;
+      backdrop-filter: blur(4px);
+    }
+
+    dt {
+      margin: 0;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--app-slate);
+    }
+
+    dd {
+      margin: 0.25rem 0 0;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--app-purple-dark);
+      line-height: 1;
+    }
+  }
+
+  &--compact {
+    padding: 1.35rem 1.5rem;
+
+    h1 {
+      font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+    }
+
+    p {
+      font-size: 0.82rem;
+    }
+
+    .ia-banner__kpis div {
+      min-width: 4rem;
+      padding: 0.55rem 0.75rem;
+    }
+
+    .ia-banner__kpis dd {
+      font-size: 1.1rem;
+      text-transform: capitalize;
+    }
+  }
+}
+
+.ia-panel-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-ink);
+}

@@ -5,26 +5,22 @@ import { estudianteAuthGuard } from './guards/estudiante-auth.guard';
 export const ESTUDIANTE_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./estudiante').then((m) => m.Estudiante),
-    title: 'Acceso estudiante · Simulador',
+    redirectTo: '/auth/login',
+    pathMatch: 'full',
   },
   {
     path: 'panel',
-    canActivate: [estudianteAuthGuard],
-    loadComponent: () => import('./panel-estudiante/panel-estudiante').then((m) => m.PanelEstudianteComponent),
-    title: 'Panel estudiante · Simulador',
+    redirectTo: '/panel-estudiante',
+    pathMatch: 'full',
   },
   {
     path: 'practicas',
-    canActivate: [estudianteAuthGuard],
-    loadComponent: () => import('./mis-practicas/mis-practicas').then((m) => m.MisPracticasComponent),
-    title: 'Mis prácticas · Simulador',
+    redirectTo: '/panel-estudiante/practicas',
+    pathMatch: 'full',
   },
   {
     path: 'practicas/:practicaId',
-    canActivate: [estudianteAuthGuard],
-    loadComponent: () => import('./practica-info/practica-info').then((m) => m.PracticaInfoComponent),
-    title: 'Información de práctica · Simulador',
+    redirectTo: (route) => `/panel-estudiante/practicas/${route.params['practicaId']}`,
   },
   {
     path: 'practicas/:practicaId/simulacion',
@@ -35,7 +31,7 @@ export const ESTUDIANTE_ROUTES: Routes = [
   },
   {
     path: 'simulacion',
-    redirectTo: 'panel',
+    redirectTo: '/panel-estudiante',
     pathMatch: 'full',
   },
   {
@@ -47,7 +43,7 @@ export const ESTUDIANTE_ROUTES: Routes = [
   },
   {
     path: 'simulacion-narrativa',
-    redirectTo: 'panel',
+    redirectTo: '/panel-estudiante',
     pathMatch: 'full',
   },
   {

@@ -12,6 +12,12 @@ export const PANEL_ESTUDIANTE_ROUTES: Routes = [
     title: 'Mis prácticas · Estudiante',
   },
   {
+    path: 'practicas/:id',
+    loadComponent: () =>
+      import('../estudiante/practica-info/practica-info').then((m) => m.PracticaInfoComponent),
+    title: 'Práctica · Estudiante',
+  },
+  {
     path: 'resultados',
     loadComponent: () => import('./resultados').then((m) => m.PanelEstudianteResultados),
     title: 'Resultados y retroalimentación · Estudiante',

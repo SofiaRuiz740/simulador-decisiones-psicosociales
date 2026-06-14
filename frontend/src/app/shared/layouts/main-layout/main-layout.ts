@@ -36,6 +36,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Rol } from '../../../core/models/usuario.model';
 
 import { NavIcon } from '../../components/nav-icon/nav-icon';
+import { EstudiantePanelWaves } from '../../components/illustrations/estudiante-panel-waves/estudiante-panel-waves';
+import { SidebarZen } from '../../components/illustrations/sidebar-zen/sidebar-zen';
 
 
 
@@ -96,6 +98,8 @@ interface NavGroup {
     MatTooltipModule,
 
     NavIcon,
+    EstudiantePanelWaves,
+    SidebarZen,
 
   ],
 
@@ -194,6 +198,7 @@ export class MainLayout {
 
 
 
+
     { label: 'Resultados', route: '/resultados', icon: 'results', roles: [Rol.Docente, Rol.Estudiante, Rol.Admin], group: 'analitica' },
 
     { label: 'Reportes', route: '/reportes', icon: 'reports', roles: [Rol.Docente, Rol.Admin], group: 'analitica' },
@@ -283,6 +288,8 @@ export class MainLayout {
 
 
   readonly showDocenteActions = computed(() => this.rol() === Rol.Docente);
+
+  readonly isEstudiante = computed(() => this.rol() === Rol.Estudiante);
 
 
 

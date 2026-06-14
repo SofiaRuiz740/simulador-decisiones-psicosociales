@@ -4,16 +4,31 @@
     La propuesta no incluye escenarios para previsualizar.
   </div>
 } @else {
-  <app-case-preview [data]="previewData()" />
-
-  <nav class="preview-nav">
-    <button type="button" class="btn-ghost" (click)="anterior()" [disabled]="pasoIdx() === 0">Anterior</button>
-    <span class="preview-nav__step">Escenario {{ pasoIdx() + 1 }} / {{ totalPasos() }}</span>
-    <div class="preview-nav__actions">
-      <button type="button" class="btn-ghost" (click)="reiniciar()">Reiniciar</button>
-      @if (pasoIdx() < totalPasos() - 1) {
-        <button type="button" class="btn-primary" (click)="siguiente()">Siguiente</button>
+  <div class="ia-preview">
+    <div class="ia-preview__progress">
+      @for (esc of escenarios(); track $index; let idx = $index) {
+        <span class="ia-preview__dot"
+              [class.active]="pasoIdx() === idx"
+              [class.done]="pasoIdx() > idx"
+              [attr.aria-label]="'Escenario ' + (idx + 1)"></span>
       }
     </div>
-  </nav>
+
+    <app-case-preview [data]="previewData()" />
+
+    <nav class="ia-preview__nav">
+      <button type="button" class="btn-ghost" (click)="anterior()" [disabled]="pasoIdx() === 0">
+        ← Anterior
+      </button>
+      <span class="ia-preview__step">
+        Escenario <strong>{{ pasoIdx() + 1 }}</strong> de {{ totalPasos() }}
+      </span>
+      <div class="ia-preview__actions">
+        <button type="button" class="btn-ghost" (click)="reiniciar()">Reiniciar</button>
+        @if (pasoIdx() < totalPasos() - 1) {
+          <button type="button" class="btn-primary" (click)="siguiente()">Siguiente →</button>
+        }
+      </div>
+    </nav>
+  </div>
 }

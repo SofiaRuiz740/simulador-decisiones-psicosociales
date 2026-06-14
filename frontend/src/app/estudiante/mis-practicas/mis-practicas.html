@@ -1,54 +1,68 @@
 <app-estudiante-shell titulo="Mis prácticas">
-  <header class="page-header">
-    <div>
-      <a routerLink="/estudiante/panel" class="back-link">
-        <mat-icon>arrow_back</mat-icon>
-        Panel
-      </a>
-      <h1>Prácticas asignadas</h1>
-      <p>Consulta el estado de cada práctica antes de iniciar la simulación.</p>
-    </div>
-  </header>
+  <section class="module page">
 
-  @if (practicas().length === 0) {
-    <div class="vacio elevated-card">
-      <mat-icon>assignment</mat-icon>
-      <p>No hay prácticas registradas en esta sesión.</p>
-      <a mat-flat-button color="primary" routerLink="/estudiante">Ingresar con código</a>
-    </div>
-  } @else {
-    <div class="lista">
-      @for (practica of practicas(); track practica.id) {
-        <article class="fila elevated-card">
-          <div class="fila-main">
-            <div class="fila-titulos">
-              <span class="estado-chip" [ngClass]="practica.progreso.estado">
-                {{ etiquetaEstado(practica.progreso.estado) }}
-              </span>
-              <h2>{{ practica.nombre }}</h2>
-              <p>{{ practica.caso_nombre }}</p>
-            </div>
-            <div class="fila-datos">
-              <div>
-                <span class="label">Avance</span>
-                <strong>{{ practica.progreso.porcentaje }}%</strong>
-                <mat-progress-bar mode="determinate" [value]="practica.progreso.porcentaje" />
-              </div>
-              <div>
-                <span class="label">Asignación</span>
-                <span>{{ practica.fecha_inicio | date:'mediumDate' }}</span>
-              </div>
-              <div>
-                <span class="label">Fecha límite</span>
-                <span>{{ practica.fecha_fin | date:'mediumDate' }}</span>
-              </div>
-            </div>
-          </div>
-          <button mat-flat-button color="primary" type="button" (click)="abrirPractica(practica.id)">
-            Ver información
-          </button>
-        </article>
+    <header class="hero-glass">
+      <h1><em>Mis</em> prácticas</h1>
+    </header>
+
+    <nav class="subnav" aria-label="Filtros de prácticas">
+      @for (v of vistas; track v.id) {
+        <button type="button" class="subnav-btn" [class.active]="vista() === v.id" (click)="vista.set(v.id)">
+          {{ v.label }}
+        </button>
       }
-    </div>
-  }
+    </nav>
+
+    <section class="panel">
+      <div class="panel__body">
+        @if (filtradas().length === 0) {
+          <div class="empty-state-mockup">
+            <strong>Sin prácticas {{ vistaLabel() }}</strong>
+            Cuando tu docente te autorice, aparecerán aquí. También puedes ingresar con tu código de acceso.
+            <a routerLink="/auth/login" class="btn-primary est-empty-action">Ingresar con código</a>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Práctica</th>
+                  <th>Caso</th>
+                  <th>Inicio</th>
+                  <th>Límite</th>
+                  <th>Tiempo</th>
+                  <th>Progreso</th>
+                  <th>Estado</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of filtradas(); track p.id) {
+                  <tr>
+                    <td><strong>{{ p.nombre }}</strong></td>
+                    <td>{{ p.caso_nombre }}</td>
+                    <td>{{ p.fecha_inicio | date:'short' }}</td>
+                    <td>{{ p.fecha_fin | date:'short' }}</td>
+                    <td>{{ p.tiempo_max_min }} min</td>
+                    <td>{{ p.progreso.porcentaje }}%</td>
+                    <td><span class="badge" [class]="badgeClass(p.progreso.estado)">{{ etiquetaEstado(p.progreso.estado) }}</span></td>
+                    <td class="col-actions">
+                      @if (p.progreso.estado === 'en_progreso') {
+                        <a class="btn-ghost" [routerLink]="['/estudiante/practicas', p.id, 'simulacion']">Continuar</a>
+                      } @else if (p.progreso.estado === 'completada' && p.progreso.resultadoId) {
+                        <a class="btn-ghost" [routerLink]="['/estudiante/resultado', p.progreso.resultadoId]">Resultado</a>
+                      } @else {
+                        <button type="button" class="btn-ghost" (click)="abrirPractica(p.id)">Ver</button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+
+  </section>
 </app-estudiante-shell>

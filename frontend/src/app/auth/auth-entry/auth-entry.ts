@@ -10,8 +10,12 @@ import {
 } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, map, throwError } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
+import { PracticasService } from '../../core/services/practicas.service';
+import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
+import { mensajeErrorHttp } from '../../core/utils/http-error';
 
 function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
   const pwd = group.get('password')?.value;
@@ -28,6 +32,8 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
 export class AuthEntry implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly practicas = inject(PracticasService);
+  private readonly estudianteSession = inject(EstudianteSessionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -75,16 +81,43 @@ export class AuthEntry implements OnInit {
     this.loading.set(true);
     this.loginError.set(null);
     const { username, password } = this.loginForm.getRawValue();
+    const identificador = username.trim();
 
-    this.auth.loginDocente(username, password).subscribe({
-      next: () => {
-        this.router.navigateByUrl(this.auth.dashboardDeRol(this.auth.rol()));
-      },
-      error: (err: HttpErrorResponse) => {
-        this.loading.set(false);
-        this.loginError.set(this.extractLoginError(err));
-      },
-    });
+    this.auth
+      .loginDocente(identificador, password)
+      .pipe(
+        map(() => ({ tipo: 'docente' as const })),
+        catchError((err: HttpErrorResponse) => {
+          if (err.status !== 401 || !this.esCorreo(identificador)) {
+            return throwError(() => err);
+          }
+
+          const correo = identificador.toLowerCase();
+          const codigo = password.trim().toUpperCase();
+
+          return this.practicas.accesoEstudiante(correo, codigo).pipe(
+            map((res) => {
+              this.auth.establecerSesionEstudiante(res);
+              this.estudianteSession.registrarAcceso(res);
+              return { tipo: 'estudiante' as const };
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: ({ tipo }) => {
+          this.loading.set(false);
+          const destino =
+            tipo === 'estudiante'
+              ? '/panel-estudiante'
+              : this.auth.dashboardDeRol(this.auth.rol());
+          void this.router.navigateByUrl(destino);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.loading.set(false);
+          this.loginError.set(this.extractLoginError(err, identificador));
+        },
+      });
   }
 
   submitRegister(): void {
@@ -140,9 +173,21 @@ export class AuthEntry implements OnInit {
     };
   }
 
-  private extractLoginError(err: HttpErrorResponse): string {
+  private esCorreo(valor: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+  }
+
+  private extractLoginError(err: HttpErrorResponse, identificador: string): string {
     if (err.status === 0) return 'No se pudo conectar con el servidor. Verifica tu conexión.';
-    if (err.status === 401) return 'Usuario o contraseña incorrectos.';
+    if (err.status === 401) {
+      if (this.esCorreo(identificador)) {
+        return mensajeErrorHttp(
+          err,
+          'Los datos no coinciden. Verifica tu correo y tu contraseña o código de práctica.',
+        );
+      }
+      return 'Usuario o contraseña incorrectos.';
+    }
     const detail = err.error?.detail;
     if (typeof detail === 'string') return detail;
     return 'Error inesperado al iniciar sesión. Intenta de nuevo.';

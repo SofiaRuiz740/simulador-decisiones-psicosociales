@@ -2,10 +2,23 @@
 
 from __future__ import annotations
 
+from django.utils import timezone
+
 from apps.academico.models import Estudiante, Grupo
 from apps.participaciones.models import Participacion
 from apps.participaciones.services import fila_seguimiento
 from apps.practicas.models import AutorizacionEstudiante, Practica
+
+
+def sincronizar_practica_vencida(practica: Practica) -> bool:
+    """Marca FINALIZADA una práctica cuya fecha_fin ya pasó (RN27)."""
+    if practica.estado in (Practica.Estado.FINALIZADA, Practica.Estado.CANCELADA):
+        return False
+    if timezone.now() <= practica.fecha_fin:
+        return False
+    practica.estado = Practica.Estado.FINALIZADA
+    practica.save(update_fields=['estado', 'fecha_actualizacion'])
+    return True
 
 
 def _materia_display_practica(practica) -> str | None:

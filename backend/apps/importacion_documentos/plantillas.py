@@ -152,6 +152,9 @@ def parsear_plantilla_rubrica(archivo_excel) -> dict:
     errores: list[dict] = []
     advertencias: list[dict] = []
 
+    if hasattr(archivo_excel, 'seek'):
+        archivo_excel.seek(0)
+
     try:
         wb = load_workbook(archivo_excel, data_only=True)
     except Exception as exc:

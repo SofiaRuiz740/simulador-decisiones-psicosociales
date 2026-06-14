@@ -38,6 +38,23 @@
   &__meta {
     display: none;
   }
+
+  &--with-meta {
+    p,
+    .hero-glass__meta {
+      display: block;
+    }
+
+    .hero-glass__meta {
+      margin: 0.35rem 0 0;
+      font-size: 0.84rem;
+      color: var(--app-slate);
+    }
+  }
+
+  &--compact {
+    margin-bottom: 0;
+  }
 }
 
 .page-head {

@@ -22,7 +22,12 @@ from .serializers import (
     PracticaDetalleSerializer,
     PracticaListSerializer,
 )
-from .services import autorizar_estudiantes_en_practica, listar_autorizaciones_docente, listar_mis_practicas
+from .services import (
+    autorizar_estudiantes_en_practica,
+    listar_autorizaciones_docente,
+    listar_mis_practicas,
+    sincronizar_practica_vencida,
+)
 
 
 class PracticaViewSet(viewsets.ModelViewSet):
@@ -216,11 +221,20 @@ class AccesoEstudianteView(generics.GenericAPIView):
         auth: AutorizacionEstudiante = ser.validated_data['autorizacion']
         practica = auth.practica
 
-        # Validar estado de la práctica.
+        sincronizar_practica_vencida(practica)
+        practica.refresh_from_db(fields=['estado', 'fecha_fin', 'fecha_actualizacion'])
+
         if practica.estado == Practica.Estado.CANCELADA:
-            raise ValidationError('La práctica fue cancelada.')
-        if practica.estado == Practica.Estado.FINALIZADA or timezone.now() > practica.fecha_fin:
-            raise ValidationError('La práctica ya finalizó.')
+            raise ValidationError({
+                'non_field_errors': ['La práctica fue cancelada. Contacta a tu docente.'],
+            })
+        if practica.ya_finalizada:
+            raise ValidationError({
+                'non_field_errors': [
+                    'La práctica ya finalizó. Pide a tu docente que extienda la fecha '
+                    'de cierre o te reautorice.',
+                ],
+            })
 
         # Crear/garantizar usuario para el estudiante (rol ESTUDIANTE, sin password).
         estudiante = ser.validated_data['estudiante']

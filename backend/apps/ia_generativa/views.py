@@ -8,6 +8,8 @@
 - POST /api/ia/propuestas/{id}/convertir-en-caso/   → crea Caso real
 """
 
+import logging
+
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
@@ -30,6 +32,8 @@ from .services import (
     generar_propuesta_caso,
 )
 from .services.case_generator import GenerationError
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -142,6 +146,12 @@ class PropuestaCasoIAViewSet(
             caso = convertir_propuesta_en_caso(propuesta, request.user)
         except GenerationError as exc:
             return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # noqa: BLE001 - convertir errores inesperados en respuesta legible
+            logger.exception('Error inesperado al convertir propuesta %s en caso', propuesta.pk)
+            return Response(
+                {'detail': f'Error al convertir la propuesta: {exc}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response({
             'detail': 'Caso creado en estado EN_REVISION.',

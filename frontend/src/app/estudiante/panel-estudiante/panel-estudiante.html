@@ -1,100 +1,134 @@
 <app-estudiante-shell titulo="Panel del estudiante">
-  <section class="hero">
-    <p class="hero-cap">
-      <span class="edition">Espacio académico</span>
-      <span class="dot">·</span>
-      <span class="today">{{ hoy }}</span>
-    </p>
-    <h1 class="hero-title">{{ saludo() }}, <em>{{ nombre() }}</em></h1>
-    <p class="hero-lead">
-      Desde aquí gestionas tus prácticas asignadas. Elige cuándo iniciar cada simulación
-      y retoma tu avance cuando lo necesites.
-    </p>
-  </section>
+  <section class="module page">
 
-  <section class="kpis">
-    <article class="kpi">
-      <span class="kpi-num">{{ resumen().total }}</span>
-      <span class="kpi-label">Prácticas asignadas</span>
-    </article>
-    <article class="kpi">
-      <span class="kpi-num">{{ resumen().activas }}</span>
-      <span class="kpi-label">En curso</span>
-    </article>
-    <article class="kpi">
-      <span class="kpi-num">{{ resumen().completadas }}</span>
-      <span class="kpi-label">Completadas</span>
-    </article>
-  </section>
-
-  <section class="seccion">
-    <header class="seccion-header">
-      <div>
-        <h2>Mis prácticas</h2>
-        <p>Selecciona una práctica para ver su información e iniciar la simulación.</p>
-      </div>
-      <a mat-stroked-button routerLink="/estudiante/practicas">
-        <mat-icon>list</mat-icon>
-        Ver listado
-      </a>
+    <header class="hero-glass">
+      <h1>Hola, <em>{{ nombre() }}</em></h1>
     </header>
 
-    @if (practicas().length === 0) {
-      <div class="vacio elevated-card">
-        <mat-icon>school</mat-icon>
-        <p>Aún no tienes prácticas registradas. Ingresa con el código que te entregó tu docente.</p>
-        <a mat-flat-button color="primary" routerLink="/estudiante">Ingresar con código</a>
-      </div>
-    } @else {
-      <div class="practicas-grid">
-        @for (practica of practicas(); track practica.id) {
-          <article class="practica-card elevated-card" (click)="abrirPractica(practica.id)">
-            <div class="card-top">
-              <span class="estado-chip" [ngClass]="practica.progreso.estado">
-                {{ etiquetaEstado(practica.progreso.estado) }}
-              </span>
-              <mat-icon class="card-icon">psychology</mat-icon>
-            </div>
-            <h3>{{ practica.nombre }}</h3>
-            <p class="caso">{{ practica.caso_nombre }}</p>
-            <div class="progreso">
-              <div class="progreso-label">
-                <span>Avance</span>
-                <strong>{{ practica.progreso.porcentaje }}%</strong>
-              </div>
-              <mat-progress-bar mode="determinate" [value]="practica.progreso.porcentaje" />
-            </div>
-            <ul class="fechas">
-              <li><mat-icon>event</mat-icon> Asignada: {{ practica.fecha_inicio | date:'mediumDate' }}</li>
-              <li><mat-icon>event_busy</mat-icon> Límite: {{ practica.fecha_fin | date:'mediumDate' }}</li>
-            </ul>
-            <button mat-flat-button color="primary" type="button" class="card-cta">
-              Ver práctica
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
-          </article>
-        }
-      </div>
-    }
-  </section>
+    <section class="metrics metrics--compact">
+      <article class="metric metric--accent">
+        <div class="metric__value">{{ pendientes().length }}</div>
+        <div class="metric__label">Pendientes</div>
+      </article>
+      <article class="metric metric--teal">
+        <div class="metric__value">{{ enCurso().length }}</div>
+        <div class="metric__label">En curso</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ completadas().length }}</div>
+        <div class="metric__label">Completadas</div>
+      </article>
+      <article class="metric">
+        <div class="metric__value">{{ practicas().length }}</div>
+        <div class="metric__label">Total</div>
+      </article>
+    </section>
 
-  @if (proximasPracticas.length) {
-    <section class="seccion proximas">
-      <header class="seccion-header">
-        <div>
-          <h2>Próximas áreas de formación</h2>
-          <p>Casos en preparación para ampliar tu experiencia académica.</p>
+    <section class="dash-minimal">
+      <div class="dash-minimal__head">
+        <h2>Pendientes</h2>
+        <a routerLink="/estudiante/practicas" class="btn-ghost">Ver todas</a>
+      </div>
+      @if (pendientes().length === 0) {
+        <p class="dash-list__empty">No tienes prácticas pendientes. Cuando el docente te autorice, aparecerán aquí.</p>
+      } @else {
+        <ul class="dash-list">
+          @for (p of pendientes().slice(0, 3); track p.id) {
+            <li class="dash-list__item">
+              <div>
+                <p class="dash-list__text"><strong>{{ p.nombre }}</strong></p>
+                <p class="dash-list__text">{{ p.caso_nombre }} · Límite {{ p.fecha_fin | date:'mediumDate' }}</p>
+              </div>
+              <a class="btn-ghost" [routerLink]="['/estudiante/practicas', p.id]">Ver</a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="panel">
+      <div class="panel__toolbar">
+        <div class="toolbar">
+          <h2 class="panel-title">{{ tituloActividad() }}</h2>
         </div>
-      </header>
-      <div class="proximas-grid">
-        @for (caso of proximasPracticas; track caso.slug) {
-          <article class="proxima-card">
-            <span class="proxima-tag">Próximamente</span>
-            <h3>{{ caso.tituloPractica }}</h3>
-            <p>{{ caso.areaTematica }}</p>
-          </article>
+      </div>
+      <div class="panel__body">
+        @if (enCurso().length > 0) {
+          <div class="surface surface--flat">
+            <article class="list-row">
+              <div>
+                <div class="list-row__title">{{ enCurso()[0].nombre }}</div>
+                <div class="list-row__meta">
+                  {{ enCurso()[0].caso_nombre }} · Progreso {{ enCurso()[0].progreso.porcentaje }}%
+                </div>
+              </div>
+              <div class="list-row__side">
+                <span class="badge badge--en-curso">En curso</span>
+                <div class="actions actions--end">
+                  <a class="btn-primary" [routerLink]="['/estudiante/practicas', enCurso()[0].id, 'simulacion']">
+                    Continuar simulación
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        } @else if (pendientes().length > 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>{{ pendientes()[0].nombre }}</strong>
+            {{ pendientes()[0].caso_nombre }} · Lista para comenzar
+            <button type="button" class="btn-primary est-panel-action" (click)="abrirPractica(pendientes()[0].id)">
+              Comenzar práctica
+            </button>
+          </div>
+        } @else if (completadas().length > 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Revisa tu retroalimentación</strong>
+            Tienes {{ completadas().length }} práctica(s) completada(s).
+            <a routerLink="/panel-estudiante/resultados" class="btn-primary est-panel-action">Ver resultados</a>
+          </div>
+        } @else {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin prácticas asignadas</strong>
+            Cuando tu docente te autorice, aparecerán en Mis prácticas.
+            <a routerLink="/estudiante/practicas" class="btn-ghost est-panel-action">Ir a mis prácticas</a>
+          </div>
         }
       </div>
     </section>
-  }
+
+    @if (completadas().length > 0) {
+      <section class="surface">
+        <div class="card__header">
+          <h3 class="card__title">Completadas recientemente</h3>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Práctica</th>
+                <th>Caso</th>
+                <th>Progreso</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of completadas().slice(0, 5); track p.id) {
+                <tr>
+                  <td><strong>{{ p.nombre }}</strong></td>
+                  <td>{{ p.caso_nombre }}</td>
+                  <td>{{ p.progreso.porcentaje }}%</td>
+                  <td class="col-actions">
+                    @if (p.progreso.resultadoId) {
+                      <a class="btn-ghost" [routerLink]="['/estudiante/resultado', p.progreso.resultadoId]">Ver resultado</a>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+  </section>
 </app-estudiante-shell>

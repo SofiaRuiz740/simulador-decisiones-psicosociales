@@ -1,4 +1,4 @@
-@if (cargando() || fase() === 'cargando') {
+@if (!error() && (cargando() || fase() === 'cargando')) {
   <div class="simulacion-carga">
     <mat-progress-bar mode="indeterminate" />
     <p>Preparando práctica clínica…</p>
@@ -10,7 +10,7 @@
     <mat-icon>error_outline</mat-icon>
     <h1>No se pudo iniciar el caso</h1>
     <p>{{ error() }}</p>
-    <button mat-stroked-button routerLink="/estudiante/panel">
+    <button mat-stroked-button routerLink="/panel-estudiante">
       <mat-icon>arrow_back</mat-icon>
       Volver al panel
     </button>

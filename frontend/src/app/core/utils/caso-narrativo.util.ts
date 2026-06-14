@@ -49,6 +49,8 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
 
 const MAPEO_CASO_BACKEND: Record<number, string> = {
   2: 'violencia-intrafamiliar',
+  3: 'violencia-intrafamiliar',
+  4: 'violencia-intrafamiliar',
 };
 
 export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): string {

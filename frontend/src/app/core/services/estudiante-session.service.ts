@@ -217,15 +217,21 @@ export class EstudianteSessionService {
   /** Sincroniza el listado del API con localStorage para simulación y detalle. */
   sincronizarDesdeApi(filas: MisPracticaEstudiante[]): void {
     for (const row of filas) {
+      const existente = this.obtenerPractica(row.practica_id);
+      const activaSesion = this.practicaActiva();
+      const casoId =
+        existente?.caso_id ||
+        (activaSesion?.id === row.practica_id ? activaSesion.caso_id : 0);
+
       const activa = {
         id: row.practica_id,
         nombre: row.practica_nombre,
-        caso_id: 0,
+        caso_id: casoId,
         caso_nombre: row.caso_nombre,
         tiempo_max_min: row.tiempo_max_min,
         fecha_inicio: row.fecha_inicio,
         fecha_fin: row.fecha_fin,
-        mensaje_personalizado: '',
+        mensaje_personalizado: existente?.mensaje_personalizado ?? '',
         estado: row.practica_estado as PracticaEstudianteActiva['estado'],
         autorizacion_id: row.autorizacion_id,
       };
@@ -243,14 +249,16 @@ export class EstudianteSessionService {
     const casoNarrativoId = resolverCasoNarrativoId(practica);
 
     if (idx >= 0) {
-      const prev = lista[idx].progreso;
+      const prev = lista[idx];
+      const prevProgreso = prev.progreso;
       lista[idx] = {
-        ...lista[idx],
+        ...prev,
         ...practica,
+        caso_id: practica.caso_id || prev.caso_id,
         autorizacion_id: autorizacionId,
         progreso: {
-          ...prev,
-          porcentaje: progresoPct > 0 ? progresoPct : prev.porcentaje,
+          ...prevProgreso,
+          porcentaje: progresoPct > 0 ? progresoPct : prevProgreso.porcentaje,
         },
       };
     } else {

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../core/auth/auth.service';
 import { MisPracticaEstudiante } from '../core/models/practicas.model';
+import { EstudianteSessionService } from '../core/services/estudiante-session.service';
 import { PracticasService } from '../core/services/practicas.service';
 
 @Component({
@@ -123,6 +124,7 @@ import { PracticasService } from '../core/services/practicas.service';
 export class PanelEstudianteInicio implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly practicasSrv = inject(PracticasService);
+  private readonly session = inject(EstudianteSessionService);
 
   readonly practicas = signal<MisPracticaEstudiante[]>([]);
 
@@ -143,7 +145,10 @@ export class PanelEstudianteInicio implements OnInit {
 
   ngOnInit(): void {
     this.practicasSrv.misPracticas().subscribe({
-      next: (rows) => this.practicas.set(rows),
+      next: (rows) => {
+        this.session.sincronizarDesdeApi(rows);
+        this.practicas.set(rows);
+      },
     });
   }
 

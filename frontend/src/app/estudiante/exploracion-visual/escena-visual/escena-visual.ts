@@ -13,6 +13,7 @@ import { variablesCssEscena } from '../utils/sprite-layout.util';
 import { etiquetaInteraccionPersonaje } from '../utils/presentacion-personaje.util';
 import { escenaEsAccesible, hotspotEsAccesible } from '../utils/escena-acceso.util';
 import {
+  ESCENARIO_NARRATIVO_COMISARIA,
   HOTSPOTS_TRASLADO_COMISARIA,
   registrarDiagnosticoComisariaEnConsola,
 } from '../utils/comisaria-acceso.util';
@@ -69,6 +70,35 @@ export class EscenaVisualComponent {
     });
   });
 
+  /** Spot fijo en entrada: visible siempre hasta cerrar el arco hospitalario; acceso según requisitos del caso. */
+  readonly hotspotTrasladoEntrada = computed((): { hotspot: HotspotEscena; interactuable: boolean } | null => {
+    const escena = this.escena();
+    if (escena.id !== 'entrada') return null;
+
+    const hotspot = escena.hotspots.find((item) => item.id === 'ir-comisaria');
+    if (!hotspot) return null;
+
+    const estado = this.facade.estado();
+    const caso = this.facade.caso();
+    if (!estado) return null;
+
+    const comisariaYaVisitada = estado.escenariosVisitados.includes(ESCENARIO_NARRATIVO_COMISARIA);
+    const cierreInvestigacion = estado.conversacionesCompletadas.includes('cierre-investigacion');
+    const casoCompletado = Boolean(estado.flags['caso_completado']);
+    if (comisariaYaVisitada || cierreInvestigacion || casoCompletado) return null;
+
+    registrarDiagnosticoComisariaEnConsola(escena.id, hotspot.id, estado, caso);
+
+    const destino = hotspot.destinoEscenaId
+      ? this.escenas.obtenerEscena(hotspot.destinoEscenaId)
+      : null;
+    const interactuable =
+      hotspotEsAccesible(hotspot, estado, caso) &&
+      (!destino || escenaEsAccesible(destino, estado, caso));
+
+    return { hotspot, interactuable };
+  });
+
   etiquetaHotspotPersonaje(hotspot: {
     personajeId: string;
     etiquetaInteraccion?: string;
@@ -95,6 +125,16 @@ export class EscenaVisualComponent {
       return;
     }
     this.iniciarConversacion(conversacionId, modoAcercamiento);
+  }
+
+  onHotspotTrasladoEntrada(hotspot: HotspotEscena, interactuable: boolean): void {
+    if (!interactuable) {
+      this.mensaje.emit(
+        'Esta ubicación aún no está disponible. Completa la evaluación hospitalaria primero.',
+      );
+      return;
+    }
+    this.onHotspot(hotspot);
   }
 
   onHotspot(hotspot: HotspotEscena): void {

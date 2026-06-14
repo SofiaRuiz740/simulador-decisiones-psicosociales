@@ -13,9 +13,10 @@ import { HotspotEscena, posicionCss } from '../models/escena-visual.model';
       [class.es-evidencia]="hotspot().tipo === 'evidencia'"
       [class.es-conversacion]="hotspot().tipo === 'conversacion'"
       [class.es-dock]="modoDock()"
+      [class.es-bloqueado]="!interactuable()"
       [style]="estiloPosicion()"
       [attr.aria-label]="hotspot().etiqueta"
-      (click)="activar.emit()">
+      (click)="onClick()">
       <span
         class="hotspot-icono"
         [style.mask-image]="'url(' + iconoUrl() + ')'"
@@ -32,6 +33,7 @@ export class HotspotLupaComponent {
   readonly hotspot = input.required<HotspotEscena>();
   /** Acción fija en HUD: misma apariencia, etiqueta siempre visible. */
   readonly modoDock = input(false);
+  readonly interactuable = input(true);
 
   readonly activar = output<void>();
 
@@ -45,5 +47,9 @@ export class HotspotLupaComponent {
       ...posicionCss(this.hotspot().posicion),
       position: 'absolute',
     };
+  }
+
+  onClick(): void {
+    this.activar.emit();
   }
 }

@@ -130,7 +130,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       const practicaId = Number(practicaParam);
       const registro = this.session.obtenerPractica(practicaId);
       if (!registro) {
-        this.router.navigate(['/estudiante/panel']);
+        this.router.navigate(['/panel-estudiante']);
         return;
       }
       this.practicaId.set(practicaId);
@@ -178,7 +178,9 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
         this.fase.set(faseInicial);
         void this.ambiente.iniciar(faseInicial === 'intro' ? 'intro' : 'simulacion');
       },
-      error: () => undefined,
+      error: (err) => {
+        console.error('No se pudo iniciar el caso narrativo:', err);
+      },
     });
   }
 
@@ -244,7 +246,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       this.persistirProgreso();
       this.sincronizarResultadoAcademico();
       void this.fullscreen.salir();
-      this.router.navigate(['/estudiante/panel']);
+      this.router.navigate(['/panel-estudiante']);
     });
   }
 

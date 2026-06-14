@@ -8,12 +8,17 @@
       <a routerLink="/auth/login" class="estudiante-back">← Acceso docente</a>
 
       <header class="login-card__header">
-        <span class="estudiante-badge">Estudiante</span>
         <h1 class="login-card__title">Tu práctica te <em>espera</em></h1>
         <p class="login-card__subtitle">
           Ingresa con el correo y código que te entregó tu docente.
         </p>
       </header>
+
+      @if (sesionActiva()) {
+        <p class="estudiante-session-hint">
+          Ya tienes sesión activa. Ingresa otro código si tu docente te autorizó una práctica nueva.
+        </p>
+      }
 
       @if (loading()) {
         <mat-progress-bar mode="indeterminate" class="progress" />
@@ -61,7 +66,7 @@
               maxlength="16"
               required />
           </div>
-          <span class="form-field__hint">El docente te lo entregó para esta práctica.</span>
+          <span class="form-field__hint">Es personal: debe coincidir exactamente con tu correo (no uses contraseña).</span>
           @if (form.controls.codigo.touched && form.controls.codigo.hasError('required')) {
             <span class="field-error">El código es obligatorio.</span>
           }
@@ -75,12 +80,6 @@
           Empezar práctica
         </button>
       </form>
-
-      <ul class="estudiante-tips">
-        <li>Tendrás un tiempo límite — el reloj corre al iniciar.</li>
-        <li>Puedes cambiar tus respuestas antes de finalizar.</li>
-        <li>Verás la retroalimentación cuando termines.</li>
-      </ul>
     </div>
   </section>
 </main>

@@ -1,11 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { EstadoPracticaEstudiante } from '../../core/models/estudiante-session.model';
 import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
 import { PracticasService } from '../../core/services/practicas.service';
 import {
@@ -13,19 +11,10 @@ import {
   resolverCasoNarrativoId,
   subtituloCasoParaPractica,
 } from '../../core/utils/caso-narrativo.util';
-import { EstudianteShellComponent } from '../estudiante-shell/estudiante-shell';
 
 @Component({
   selector: 'app-practica-info',
-  imports: [
-    DatePipe,
-    RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressBarModule,
-    MatSnackBarModule,
-    EstudianteShellComponent,
-  ],
+  imports: [DatePipe, RouterLink],
   templateUrl: './practica-info.html',
   styleUrl: './practica-info.scss',
 })
@@ -70,10 +59,10 @@ export class PracticaInfoComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('practicaId'));
+    const id = Number(this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.paramMap.get('practicaId'));
     const practica = this.session.obtenerPractica(id);
     if (!practica) {
-      this.router.navigate(['/estudiante/panel']);
+      this.router.navigate(['/panel-estudiante']);
       return;
     }
     this.session.seleccionarPractica(id);
@@ -114,9 +103,20 @@ export class PracticaInfoComponent implements OnInit {
       case 'completada':
         return 'Completada';
       case 'en_progreso':
-        return 'En progreso';
+        return 'En curso';
       default:
-        return 'Sin iniciar';
+        return 'Pendiente';
+    }
+  }
+
+  badgeClass(estado: EstadoPracticaEstudiante): string {
+    switch (estado) {
+      case 'completada':
+        return 'badge badge--finalizado';
+      case 'en_progreso':
+        return 'badge badge--en-curso';
+      default:
+        return 'badge badge--pendiente';
     }
   }
 

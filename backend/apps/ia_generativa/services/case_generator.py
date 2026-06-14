@@ -86,12 +86,12 @@ def convertir_propuesta_en_caso(propuesta: PropuestaCasoIA, docente) -> Caso:
     storytelling = data.get('storytelling') or {}
 
     caso = Caso.objects.create(
-        nombre=data.get('titulo') or propuesta.tema,
+        nombre=(data.get('titulo') or propuesta.tema)[:200],
         descripcion=data.get('descripcion', ''),
         contexto_historia=_texto_storytelling(storytelling),
         desarrollo_situacional=storytelling.get('conflicto_central', ''),
-        area_psicosocial=data.get('area_psicologia_social', ''),
-        tiempo_estimado_min=int(data.get('tiempo_estimado') or 30),
+        area_psicosocial=(data.get('area_psicologia_social') or '')[:150],
+        tiempo_estimado_min=_int(data.get('tiempo_estimado'), 30) or 30,
         estado=Caso.Estado.EN_REVISION,
         docente_creador=docente,
     )
@@ -105,7 +105,7 @@ def convertir_propuesta_en_caso(propuesta: PropuestaCasoIA, docente) -> Caso:
     for i, esc in enumerate(data.get('escenarios') or [], start=1):
         e = Escenario.objects.create(
             caso=caso, orden=i,
-            titulo=esc.get('titulo') or f'Escenario {i}',
+            titulo=(esc.get('titulo') or f'Escenario {i}')[:200],
             narrativa=_texto_escenario(esc),
             recursos_multimedia=_recursos_visuales(esc),
         )
@@ -115,7 +115,7 @@ def convertir_propuesta_en_caso(propuesta: PropuestaCasoIA, docente) -> Caso:
             p = Pregunta.objects.create(
                 escenario=e, orden=j,
                 enunciado=preg.get('enunciado', ''),
-                peso=int(preg.get('peso', 1) or 1),
+                peso=_int(preg.get('peso'), 1) or 1,
                 criterio_rubrica_id=cid,
             )
             for k, op in enumerate(preg.get('opciones') or [], start=1):

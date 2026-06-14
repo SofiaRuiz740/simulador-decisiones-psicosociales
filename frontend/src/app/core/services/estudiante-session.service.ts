@@ -6,7 +6,8 @@ import {
   ProgresoPracticaLocal,
   EstadoPracticaEstudiante,
 } from '../models/estudiante-session.model';
-import { AccesoEstudianteRespuesta } from '../models/practicas.model';
+import { AccesoEstudianteRespuesta, MisPracticaEstudiante } from '../models/practicas.model';
+import { Rol } from '../models/usuario.model';
 import { resolverCasoNarrativoId } from '../utils/caso-narrativo.util';
 import { clavesIntroRelacionadas } from '../simulacion-narrativa/utils/introduccion-narrativa.util';
 import {
@@ -74,7 +75,7 @@ export class EstudianteSessionService {
         username: respuesta.estudiante.correo,
         email: respuesta.estudiante.correo,
         nombre_completo: respuesta.estudiante.nombre_completo,
-        rol: 'Estudiante',
+        rol: Rol.Estudiante,
       }),
     );
 
@@ -187,6 +188,7 @@ export class EstudianteSessionService {
   }
 
   cerrarSesion(): void {
+    this.limpiarDatosLocales();
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
@@ -206,26 +208,65 @@ export class EstudianteSessionService {
     }
   }
 
-  private upsertPractica(practica: PracticaEstudianteActiva, autorizacionId: number): void {
+  /** Vacía prácticas locales (logout centralizado desde AuthService). */
+  limpiarDatosLocales(): void {
+    localStorage.removeItem(PRACTICAS_KEY);
+    this._practicas.set([]);
+  }
+
+  /** Sincroniza el listado del API con localStorage para simulación y detalle. */
+  sincronizarDesdeApi(filas: MisPracticaEstudiante[]): void {
+    for (const row of filas) {
+      const activa = {
+        id: row.practica_id,
+        nombre: row.practica_nombre,
+        caso_id: 0,
+        caso_nombre: row.caso_nombre,
+        tiempo_max_min: row.tiempo_max_min,
+        fecha_inicio: row.fecha_inicio,
+        fecha_fin: row.fecha_fin,
+        mensaje_personalizado: '',
+        estado: row.practica_estado as PracticaEstudianteActiva['estado'],
+        autorizacion_id: row.autorizacion_id,
+      };
+      this.upsertPractica(activa, row.autorizacion_id, row.progreso_pct);
+    }
+  }
+
+  private upsertPractica(
+    practica: PracticaEstudianteActiva,
+    autorizacionId: number,
+    progresoPct = 0,
+  ): void {
     const lista = [...this._practicas()];
     const idx = lista.findIndex((p) => p.id === practica.id);
     const casoNarrativoId = resolverCasoNarrativoId(practica);
 
     if (idx >= 0) {
+      const prev = lista[idx].progreso;
       lista[idx] = {
         ...lista[idx],
         ...practica,
         autorizacion_id: autorizacionId,
+        progreso: {
+          ...prev,
+          porcentaje: progresoPct > 0 ? progresoPct : prev.porcentaje,
+        },
       };
     } else {
+      const porcentaje = progresoPct;
+      let estado: EstadoPracticaEstudiante = 'no_iniciada';
+      if (porcentaje >= 100) estado = 'completada';
+      else if (porcentaje > 0) estado = 'en_progreso';
+
       lista.push({
         ...practica,
         autorizacion_id: autorizacionId,
         progreso: {
           practicaId: practica.id,
           casoNarrativoId,
-          porcentaje: 0,
-          estado: 'no_iniciada',
+          porcentaje,
+          estado,
           ultimaActividad: practica.fecha_inicio,
           conversacionesCompletadas: 0,
           conversacionesTotales: 0,

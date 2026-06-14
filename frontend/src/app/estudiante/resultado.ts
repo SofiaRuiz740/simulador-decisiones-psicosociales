@@ -61,7 +61,7 @@ export class ResultadoEstudiante implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) {
-      this.router.navigate(['/estudiante/panel']);
+      this.router.navigate(['/panel-estudiante']);
       return;
     }
     this.servicio.obtenerResultado(id).subscribe({
@@ -70,12 +70,12 @@ export class ResultadoEstudiante implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.router.navigate(['/estudiante/panel']);
+        this.router.navigate(['/panel-estudiante']);
       },
     });
   }
 
   salir() {
-    this.router.navigate(['/estudiante/panel']);
+    this.router.navigate(['/panel-estudiante']);
   }
 }

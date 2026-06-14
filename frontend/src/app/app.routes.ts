@@ -101,7 +101,7 @@ export const routes: Routes = [
             (m) => m.IMPORTACION_DOCUMENTOS_ROUTES,
           ),
         canActivate: [roleGuard],
-        data: { roles: [Rol.Docente] },
+        data: { roles: [Rol.Docente, Rol.Admin] },
       },
       {
         path: 'practicas',

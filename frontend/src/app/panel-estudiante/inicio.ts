@@ -57,21 +57,47 @@ import { PracticasService } from '../core/services/practicas.service';
       <section class="panel">
         <div class="panel__toolbar">
           <div class="toolbar">
-            <h2 class="panel-title">Continuar simulación</h2>
+            <h2 class="panel-title">{{ tituloActividad() }}</h2>
           </div>
         </div>
         <div class="panel__body">
-          @if (enCurso().length === 0) {
+          @if (enCurso().length > 0) {
             <div class="empty-state-mockup empty-state-mockup--compact">
-              <strong>Sin simulación en curso</strong>
-              Usa tu código de acceso en la pantalla de ingreso del simulador.
-              <a routerLink="/estudiante" class="btn-ghost" style="margin-top:12px;display:inline-flex">Acceder con código</a>
+              <strong>{{ enCurso()[0].practica_nombre }}</strong>
+              Progreso {{ enCurso()[0].progreso_pct }}% · {{ enCurso()[0].caso_nombre }}
+              <a
+                [routerLink]="['/estudiante/practicas', enCurso()[0].practica_id, 'simulacion']"
+                class="btn-primary"
+                style="margin-top:12px;display:inline-flex">
+                Continuar simulación
+              </a>
+            </div>
+          } @else if (pendientes().length > 0) {
+            <div class="empty-state-mockup empty-state-mockup--compact">
+              <strong>{{ pendientes()[0].practica_nombre }}</strong>
+              {{ pendientes()[0].caso_nombre }} · Lista para comenzar
+              <a
+                [routerLink]="['/panel-estudiante/practicas', pendientes()[0].practica_id]"
+                class="btn-primary"
+                style="margin-top:12px;display:inline-flex">
+                Comenzar práctica
+              </a>
+            </div>
+          } @else if (completadas().length > 0) {
+            <div class="empty-state-mockup empty-state-mockup--compact">
+              <strong>Revisa tu retroalimentación</strong>
+              Tienes {{ completadas().length }} práctica(s) completada(s). Consulta comentarios y rúbrica del docente.
+              <a routerLink="/panel-estudiante/resultados" class="btn-primary" style="margin-top:12px;display:inline-flex">
+                Ver resultados
+              </a>
             </div>
           } @else {
             <div class="empty-state-mockup empty-state-mockup--compact">
-              <strong>{{ enCurso()[0].practica_nombre }}</strong>
-              Progreso {{ enCurso()[0].progreso_pct }}% · Código {{ enCurso()[0].codigo_acceso }}
-              <a routerLink="/estudiante/simulacion" class="btn-primary" style="margin-top:12px;display:inline-flex">Continuar</a>
+              <strong>Sin prácticas asignadas</strong>
+              Cuando tu docente te autorice, aparecerán en Mis prácticas.
+              <a routerLink="/panel-estudiante/practicas" class="btn-ghost" style="margin-top:12px;display:inline-flex">
+                Ir a mis prácticas
+              </a>
             </div>
           }
         </div>
@@ -85,6 +111,12 @@ import { PracticasService } from '../core/services/practicas.service';
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--app-ink);
+    }
+    .dash-list__empty {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--app-slate);
+      line-height: 1.55;
     }
   `],
 })
@@ -101,6 +133,13 @@ export class PanelEstudianteInicio implements OnInit {
   readonly completadas = computed(() =>
     this.practicas().filter((p) => p.estado === 'FINALIZADA' || p.estado === 'INCOMPLETA'),
   );
+
+  readonly tituloActividad = computed(() => {
+    if (this.enCurso().length > 0) return 'Continuar simulación';
+    if (this.pendientes().length > 0) return 'Próxima práctica';
+    if (this.completadas().length > 0) return 'Resultados';
+    return 'Mis prácticas';
+  });
 
   ngOnInit(): void {
     this.practicasSrv.misPracticas().subscribe({

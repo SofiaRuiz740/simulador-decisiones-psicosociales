@@ -12,20 +12,6 @@
 
   <!-- Caso -->
   <div class="tab-panel" [class.active]="tab() === 'caso'">
-    <div class="tip-bar">
-      <strong>Antes de subir:</strong>
-      respeta los encabezados de sección (CONTEXTO, ESCENARIO 1, PREGUNTA 1, etc.) de la plantilla DOCX para que el parser extraiga la estructura. Si dudas, descarga primero la plantilla o el caso ejemplo.
-      <div class="tip-bar__actions">
-        <button type="button" class="btn-ghost"
-          (click)="descargarPlantilla({titulo: 'Plantilla caso', tipo: 'caso'})">
-          Descargar plantilla DOCX
-        </button>
-        <button type="button" class="btn-ghost"
-          (click)="descargarPlantilla({titulo: 'Caso ejemplo', tipo: 'ejemplo'})">
-          Ver ejemplo
-        </button>
-      </div>
-    </div>
 
     <div class="dropzone" (click)="fileInput.click()">
       <p class="dropzone__title">Subir documento</p>
@@ -36,17 +22,14 @@
     @if (archivo(); as a) {
       <div class="file-info">
         <strong>{{ a.nombre_original }}</strong>
-        <span>{{ a.tipo }} · {{ a.estado_display }}</span>
-      </div>
-    }
-
-    @if (archivo() && !archivo()!.texto_extraido) {
-      <div class="builder-block" style="margin-top: 1rem">
-        <div class="form-actions">
-          <button type="button" class="btn-primary" (click)="procesar()" [disabled]="loading() || archivo()!.estado !== 'SUBIDO'">
-            Procesar documento
-          </button>
-        </div>
+        <span>
+          {{ a.tipo }} ·
+          @if (loading() && !a.texto_extraido) {
+            extrayendo texto…
+          } @else {
+            {{ a.estado_display }}
+          }
+        </span>
       </div>
     }
 
@@ -108,7 +91,7 @@
         } @else {
           <div class="empty-state-mockup empty-state-mockup--compact">
             <strong>Sin resultado</strong>
-            Sube y procesa un documento para ver la vista previa y crear el caso.
+            Sube un documento para ver la vista previa y crear el caso.
           </div>
         }
       </div>
@@ -117,17 +100,6 @@
 
   <!-- Estudiantes -->
   <div class="tab-panel" [class.active]="tab() === 'estudiantes'">
-    <div class="tip-bar">
-      <strong>Antes de importar:</strong>
-      verifica que cada fila tenga un correo válido (es la llave para crear o vincular). Si la materia o el grupo no existen aún, se crean automáticamente.
-      <div class="tip-bar__actions">
-        <button type="button" class="btn-ghost"
-          (click)="descargarPlantilla({titulo: 'Plantilla estudiantes', tipo: 'estudiantes'})">
-          Descargar plantilla XLSX
-        </button>
-      </div>
-    </div>
-
     <div class="dropzone" (click)="fileEstudiantes.click()">
       <p class="dropzone__title">Subir Excel o CSV</p>
       <p class="dropzone__hint">nombre, correo, identificación, materia, grupo</p>
@@ -168,18 +140,6 @@
 
   <!-- Grupos -->
   <div class="tab-panel" [class.active]="tab() === 'grupos'">
-    <div class="tip-bar">
-      <strong>Antes de importar:</strong>
-      la columna "estudiantes" debe contener correos separados por ";". Los correos
-      que no estén creados aún se generarán automáticamente como estudiantes nuevos.
-      <div class="tip-bar__actions">
-        <button type="button" class="btn-ghost"
-          (click)="descargarPlantilla({titulo: 'Plantilla grupos', tipo: 'grupos'})">
-          Descargar plantilla XLSX
-        </button>
-      </div>
-    </div>
-
     <div class="dropzone" (click)="fileGrupos.click()">
       <p class="dropzone__title">Subir Excel o CSV de grupos</p>
       <p class="dropzone__hint">grupo, materia, periodo, estudiantes (correos separados por ;)</p>
@@ -219,20 +179,6 @@
 
   <!-- Rúbrica -->
   <div class="tab-panel" [class.active]="tab() === 'rubrica'">
-    <div class="tip-bar">
-      <strong>Antes de importar:</strong>
-      la plantilla XLSX debe tener una fila por criterio (columnas
-      <em>criterio · descripcion · peso · nivel_1_nombre · nivel_1_descriptor · …</em>).
-      Los pesos deben sumar 100 para que el cálculo de nota use la rúbrica. Si suman
-      otro valor la rúbrica se guarda igual pero el cálculo usará el modo plano.
-      <div class="tip-bar__actions">
-        <button type="button" class="btn-ghost"
-          (click)="descargarPlantilla({titulo: 'Plantilla rúbrica', tipo: 'rubrica'})">
-          Descargar plantilla XLSX
-        </button>
-      </div>
-    </div>
-
     <div class="subnav-rubrica">
       <select [(ngModel)]="rubricaCasoId" aria-label="Caso destino">
         <option [ngValue]="null">— Selecciona el caso destino —</option>
@@ -253,6 +199,13 @@
       </p>
     </div>
     <input #fileRubrica type="file" accept=".xlsx" hidden (change)="seleccionarRubrica($event)" />
+
+    @if (tab() === 'rubrica' && casosCargados() && !casosDisponibles().length) {
+      <div class="empty-state-mockup empty-state-mockup--compact" style="margin-top: 1rem">
+        <strong>Sin casos disponibles</strong>
+        Crea o importa un caso en la pestaña «Caso» antes de cargar la rúbrica.
+      </div>
+    }
 
     @if (resultadoRubrica(); as r) {
       <div class="template-preview" style="margin-top: 1rem">

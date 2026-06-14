@@ -20,6 +20,6 @@ import { RouterOutlet } from '@angular/router';
       </section>
     </main>
   `,
-  styles: [`:host { display: block; min-height: 100vh; }`],
+  styles: [`:host { display: block; height: 100dvh; overflow: hidden; }`],
 })
 export class Auth {}

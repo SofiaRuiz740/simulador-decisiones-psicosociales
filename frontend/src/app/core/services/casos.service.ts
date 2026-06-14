@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, expand, map, reduce } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { Paginated } from '../models/academico.model';
@@ -25,6 +25,20 @@ export class CasosService {
 
   // Casos
   listarCasos(page = 1) { return this.http.get<Paginated<CasoListItem>>(`${this.api}/casos/?page=${page}`); }
+
+  /** Recorre todas las páginas del listado de casos del docente. */
+  listarTodosCasos(): Observable<CasoListItem[]> {
+    let page = 1;
+    return this.listarCasos(page).pipe(
+      expand((resp) => {
+        if (!resp.next) return EMPTY;
+        page += 1;
+        return this.listarCasos(page);
+      }),
+      map((resp) => resp.results),
+      reduce((acc, batch) => acc.concat(batch), [] as CasoListItem[]),
+    );
+  }
   obtenerCaso(id: number): Observable<CasoDetalle> { return this.http.get<CasoDetalle>(`${this.api}/casos/${id}/`); }
   crearCaso(data: CasoInput) { return this.http.post<CasoListItem>(`${this.api}/casos/`, data); }
   actualizarCaso(id: number, data: Partial<CasoInput>) { return this.http.patch<CasoListItem>(`${this.api}/casos/${id}/`, data); }

@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 
 /**
  * Permite el acceso a la ruta solo si hay un usuario autenticado.
- * Si no, redirige a /auth.
+ * Sin sesión, redirige al login unificado.
  */
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -15,5 +15,5 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  return router.createUrlTree(['/auth']);
+  return router.createUrlTree(['/auth/login']);
 };

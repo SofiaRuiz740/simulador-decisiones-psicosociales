@@ -7,13 +7,56 @@ import io
 import re
 from typing import Any
 
-from django.db import transaction
+from django.core.management.color import no_style
+from django.db import connection, transaction, IntegrityError
 from openpyxl import Workbook, load_workbook
 from rest_framework.exceptions import ValidationError
 
 from apps.usuarios.models import Usuario
 
 from .models import Estudiante, Grupo, InscripcionGrupo, Materia
+
+_MODELOS_CON_SECUENCIA = (Estudiante, Materia, Grupo, InscripcionGrupo)
+
+
+def _sincronizar_secuencias_academico() -> None:
+    """Alinea secuencias PostgreSQL tras cargas con IDs explícitos (fixtures, seeds)."""
+    if connection.vendor != 'postgresql':
+        return
+    statements = connection.ops.sequence_reset_sql(no_style(), list(_MODELOS_CON_SECUENCIA))
+    with connection.cursor() as cursor:
+        for sql in statements:
+            cursor.execute(sql)
+
+
+def _get_or_create_estudiante(
+    correo: str,
+    defaults: dict,
+    docente,
+    stats: dict,
+) -> tuple[Estudiante, bool]:
+    """Obtiene o crea un estudiante por correo; repara secuencia si PostgreSQL falla por PK."""
+    correo = correo.lower().strip()
+    existente = Estudiante.objects.filter(correo=correo).first()
+    if existente:
+        stats['estudiantes_vinculados'] += 1
+        _vincular_estudiante_docente(existente, docente)
+        return existente, False
+
+    try:
+        estudiante = Estudiante.objects.create(correo=correo, **defaults)
+    except IntegrityError:
+        _sincronizar_secuencias_academico()
+        existente = Estudiante.objects.filter(correo=correo).first()
+        if existente:
+            stats['estudiantes_vinculados'] += 1
+            _vincular_estudiante_docente(existente, docente)
+            return existente, False
+        estudiante = Estudiante.objects.create(correo=correo, **defaults)
+
+    stats['estudiantes_creados'] += 1
+    _vincular_estudiante_docente(estudiante, docente)
+    return estudiante, True
 
 EXTENSIONES = ('.csv', '.xlsx', '.xlsm')
 SEPARADOR_ESTUDIANTES = re.compile(r'[;,]')
@@ -33,10 +76,17 @@ def _celda_texto(valor: Any) -> str:
 
 def leer_filas_archivo(archivo) -> list[dict]:
     """Lee la primera hoja / CSV y devuelve filas como dict con clave `_fila`."""
-    nombre = (archivo.name or '').lower()
-    if nombre.endswith('.csv'):
+    if hasattr(archivo, 'seek'):
+        archivo.seek(0)
+    nombre = (getattr(archivo, 'name', '') or '').lower()
+    content_type = (getattr(archivo, 'content_type', '') or '').lower()
+    if nombre.endswith('.csv') or content_type in ('text/csv', 'application/csv'):
         return _leer_csv(archivo)
-    if nombre.endswith(('.xlsx', '.xlsm')):
+    if (
+        nombre.endswith(('.xlsx', '.xlsm'))
+        or 'spreadsheetml' in content_type
+        or content_type == 'application/octet-stream' and nombre.endswith('.xlsx')
+    ):
         return _leer_xlsx(archivo)
     raise ValidationError({
         'archivo': f'Formato no soportado. Usa: {", ".join(EXTENSIONES)}',
@@ -44,6 +94,8 @@ def leer_filas_archivo(archivo) -> list[dict]:
 
 
 def _leer_csv(archivo) -> list[dict]:
+    if hasattr(archivo, 'seek'):
+        archivo.seek(0)
     raw = archivo.read()
     if isinstance(raw, bytes):
         texto = raw.decode('utf-8-sig')
@@ -67,6 +119,8 @@ def _leer_csv(archivo) -> list[dict]:
 
 
 def _leer_xlsx(archivo) -> list[dict]:
+    if hasattr(archivo, 'seek'):
+        archivo.seek(0)
     wb = load_workbook(archivo, read_only=True, data_only=True)
     ws = wb.active
     iterador = ws.iter_rows(values_only=True)
@@ -128,17 +182,18 @@ def _procesar_fila_estudiante(fila: dict, docente, stats: dict) -> None:
 
     first_name, last_name = _partir_nombre(nombre)
     identificacion = _celda_texto(fila.get('identificacion'))
-    estudiante, creado = Estudiante.objects.get_or_create(
-        correo=correo,
-        defaults={
+    estudiante, creado = _get_or_create_estudiante(
+        correo,
+        {
             'first_name': first_name,
             'last_name': last_name,
             'identificacion': identificacion,
             'docente_creador': docente,
         },
+        docente,
+        stats,
     )
     if not creado:
-        actualizar = False
         campos = []
         if first_name and not estudiante.first_name:
             estudiante.first_name = first_name
@@ -148,11 +203,6 @@ def _procesar_fila_estudiante(fila: dict, docente, stats: dict) -> None:
             campos.append('last_name')
         if campos:
             estudiante.save(update_fields=campos)
-        stats['estudiantes_vinculados'] += 1
-    else:
-        stats['estudiantes_creados'] += 1
-
-    _vincular_estudiante_docente(estudiante, docente)
 
     if identificacion and estudiante.identificacion != identificacion:
         estudiante.identificacion = identificacion
@@ -185,6 +235,8 @@ def importar_estudiantes(archivo, docente) -> dict:
     filas = leer_filas_archivo(archivo)
     if not filas:
         raise ValidationError({'archivo': 'No hay filas de datos para importar.'})
+
+    _sincronizar_secuencias_academico()
 
     stats = {
         'filas_procesadas': 0,
@@ -225,19 +277,16 @@ def importar_estudiantes(archivo, docente) -> dict:
 def _obtener_o_crear_por_correo(correo: str, docente, stats: dict) -> Estudiante:
     local = correo.split('@')[0].replace('.', ' ').replace('_', ' ').title()
     first_name, last_name = _partir_nombre(local)
-    estudiante, creado = Estudiante.objects.get_or_create(
-        correo=correo,
-        defaults={
+    estudiante, _creado = _get_or_create_estudiante(
+        correo,
+        {
             'first_name': first_name or correo,
             'last_name': last_name,
             'docente_creador': docente,
         },
+        docente,
+        stats,
     )
-    if creado:
-        stats['estudiantes_creados'] += 1
-    else:
-        stats['estudiantes_vinculados'] += 1
-    _vincular_estudiante_docente(estudiante, docente)
     return estudiante
 
 
@@ -288,6 +337,8 @@ def importar_grupos(archivo, docente) -> dict:
     filas = leer_filas_archivo(archivo)
     if not filas:
         raise ValidationError({'archivo': 'No hay filas de datos para importar.'})
+
+    _sincronizar_secuencias_academico()
 
     stats = {
         'filas_procesadas': 0,

@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.est-panel-waves {
+  position: absolute;
+  inset: 0;
+}
+
+.est-panel-waves__svg {
+  position: absolute;
+  top: -2%;
+  right: -4%;
+  width: min(68vw, 780px);
+  height: auto;
+  max-height: 55vh;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 78% 70% at 78% 12%, #000 0%, transparent 74%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 70% at 78% 12%, #000 0%, transparent 74%);
+
+  &--soft {
+    top: 6%;
+    right: 8%;
+    width: min(48vw, 520px);
+    max-height: 38vh;
+    opacity: 0.85;
+    mask-image: radial-gradient(ellipse 72% 65% at 82% 18%, #000 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 72% 65% at 82% 18%, #000 0%, transparent 70%);
+  }
+}
+
+@media (max-width: 768px) {
+  .est-panel-waves__svg {
+    width: 95vw;
+    right: -18%;
+    max-height: 42vh;
+  }
+
+  .est-panel-waves__svg--soft {
+    display: none;
+  }
+}

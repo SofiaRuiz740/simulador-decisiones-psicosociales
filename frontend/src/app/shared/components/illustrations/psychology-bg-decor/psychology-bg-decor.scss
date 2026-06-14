@@ -1,0 +1,160 @@
+:host {
+  display: contents;
+}
+
+.psychology-bg-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  &--panel {
+    border-radius: inherit;
+  }
+}
+
+.psychology-bg-decor__bokeh {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.65) 0, transparent 26px),
+    radial-gradient(circle at 78% 14%, rgba(255, 255, 255, 0.45) 0, transparent 20px),
+    radial-gradient(circle at 92% 38%, rgba(207, 195, 255, 0.4) 0, transparent 18px),
+    radial-gradient(circle at 30% 72%, rgba(255, 255, 255, 0.35) 0, transparent 22px);
+  opacity: 0.55;
+
+  &--soft {
+    opacity: 0.4;
+    background-image:
+      radial-gradient(circle at 82% 22%, rgba(255, 255, 255, 0.5) 0, transparent 24px),
+      radial-gradient(circle at 68% 68%, rgba(207, 195, 255, 0.28) 0, transparent 20px);
+  }
+}
+
+.psychology-bg-decor__sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  span {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 0 6px rgba(200, 180, 255, 0.45);
+
+    &:nth-child(1) { top: 18%; left: 12%; opacity: 0.7; }
+    &:nth-child(2) { top: 32%; left: 28%; width: 3px; height: 3px; opacity: 0.5; }
+    &:nth-child(3) { top: 14%; left: 52%; opacity: 0.6; }
+    &:nth-child(4) { top: 48%; left: 18%; width: 3px; height: 3px; opacity: 0.45; }
+    &:nth-child(5) { top: 62%; left: 42%; opacity: 0.55; }
+    &:nth-child(6) { top: 24%; left: 68%; width: 3px; height: 3px; opacity: 0.4; }
+  }
+}
+
+.psychology-bg-decor__item {
+  position: absolute;
+  pointer-events: none;
+  line-height: 0;
+  background: transparent;
+
+  &--brain {
+    top: -6%;
+    right: -2%;
+    width: min(280px, 38%);
+    height: min(240px, 34%);
+  }
+
+  &--plant {
+    top: auto;
+    bottom: -10%;
+    left: -4%;
+    right: auto;
+    width: min(140px, 22%);
+    height: min(180px, 28%);
+    opacity: 0.55;
+    color: #b8a8ff;
+  }
+
+  &--meditation {
+    right: 0;
+    bottom: -4%;
+    width: min(200px, 34%);
+    height: min(220px, 38%);
+  }
+}
+
+.psychology-bg-decor__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  pointer-events: none;
+
+  &--top {
+    top: 0;
+    bottom: auto;
+    height: 110px;
+    opacity: 0.85;
+  }
+
+  &--bottom {
+    height: 72px;
+    opacity: 0.65;
+  }
+}
+
+@keyframes psych-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.psych-float {
+  animation: psych-float 10s ease-in-out infinite;
+
+  &--slow {
+    animation-duration: 11s;
+  }
+
+  &--mid {
+    animation-duration: 9s;
+    animation-delay: 0.6s;
+  }
+}
+
+@media (max-width: 768px) {
+  .psychology-bg-decor__item--brain {
+    width: 200px;
+    height: 170px;
+    right: -8%;
+  }
+
+  .psychology-bg-decor__item--plant {
+    width: 100px;
+    height: 130px;
+    bottom: -6%;
+    left: -6%;
+  }
+
+  .psychology-bg-decor__item--meditation {
+    width: 150px;
+    height: 170px;
+    right: -4%;
+    bottom: -6%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psych-float {
+    animation: none !important;
+  }
+}

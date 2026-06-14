@@ -58,9 +58,14 @@ import { PracticasService } from '../core/services/practicas.service';
                       <td><span class="badge badge--activo">{{ p.estado_display }}</span></td>
                       <td class="col-actions">
                         @if (p.estado === 'EN_CURSO') {
-                          <a class="btn-ghost" routerLink="/estudiante/simulacion" [title]="'Código: ' + p.codigo_acceso">Continuar</a>
+                          <a
+                            class="btn-ghost"
+                            [routerLink]="['/estudiante/practicas', p.practica_id, 'simulacion']"
+                            [title]="'Código: ' + p.codigo_acceso">
+                            Continuar
+                          </a>
                         } @else if (p.estado === 'NO_INICIADA') {
-                          <a class="btn-ghost" routerLink="/estudiante" [title]="'Código: ' + p.codigo_acceso">Acceder</a>
+                          <a class="btn-ghost" [routerLink]="['/panel-estudiante/practicas', p.practica_id]">Comenzar</a>
                         } @else {
                           <a class="btn-ghost" routerLink="/resultados" title="Ver resultados">Resultados</a>
                         }

@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  line-height: 0;
+  background: transparent;
+}
+
+.psych-png--brain {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top right;
+  opacity: 0.42;
+  filter: brightness(0) saturate(100%) invert(52%) sepia(22%) saturate(1100%) hue-rotate(220deg);
+  pointer-events: none;
+  user-select: none;
+
+  &.psych-png--fallback {
+    opacity: 0.38;
+    filter: none;
+  }
+}

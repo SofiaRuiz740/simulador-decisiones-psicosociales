@@ -80,7 +80,9 @@
 
     </nav>
 
-
+    <div class="sidebar__illustration" aria-hidden="true">
+      <app-sidebar-zen />
+    </div>
 
     @if (usuario(); as u) {
 
@@ -234,7 +236,10 @@
 
 
 
-    <main class="main-content">
+    <main class="main-content" [class.main-content--estudiante]="isEstudiante()">
+      @if (isEstudiante()) {
+        <app-estudiante-panel-waves />
+      }
 
       <router-outlet />
 

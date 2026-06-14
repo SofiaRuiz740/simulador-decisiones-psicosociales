@@ -186,9 +186,15 @@ export class MainLayout {
 
     { label: 'Mis prácticas', route: '/panel-estudiante/practicas', icon: 'calendar', roles: [Rol.Estudiante], group: 'practica' },
 
+    { label: 'Resultados y retroalimentación', route: '/panel-estudiante/resultados', icon: 'results', roles: [Rol.Estudiante], group: 'practica' },
+
     { label: 'Prácticas', route: '/practicas', icon: 'calendar', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
 
     { label: 'Participaciones', route: '/participaciones', icon: 'play', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
+
+    { label: 'Solicitudes de reapertura', route: '/solicitudes-reapertura', icon: 'calendar', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
+
+    { label: 'Reinicio de prácticas', route: '/reinicio-practicas', icon: 'calendar', roles: [Rol.Docente], group: 'practica' },
 
 
 

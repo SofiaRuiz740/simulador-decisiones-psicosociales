@@ -1,83 +1,109 @@
 @if (practica(); as p) {
-  <section class="module page">
+  <section class="module page practica-info-page">
 
     <a routerLink="/panel-estudiante/practicas" class="page-back">← Mis prácticas</a>
 
-    <header class="hero-glass hero-glass--with-meta hero-glass--compact">
-      <h1><em>{{ p.nombre }}</em></h1>
-      <p class="hero-glass__meta">{{ subtituloCaso() }}</p>
+    <header class="practica-info-page__head">
+      <h1>{{ p.nombre }}</h1>
+      <p>{{ subtituloCaso() }}</p>
     </header>
 
-    <div class="grid-2">
-      <div class="builder-block">
-        <div class="form-section__title">Información de la práctica</div>
+    <div class="practica-info-layout">
+      <article class="practica-info-card">
+        <h2 class="practica-info-card__title">Información de la práctica</h2>
 
-        <div class="field-row field-row--2 practica-datos">
-          <div class="field">
-            <label>Estado</label>
-            <span class="badge" [class]="badgeClass(p.progreso.estado)">{{ etiquetaEstado(p.progreso.estado) }}</span>
+        <dl class="practica-meta">
+          <div class="practica-meta__item">
+            <dt>Estado</dt>
+            <dd>
+              <span class="badge" [class]="badgeClass(p.progreso.estado)">{{ etiquetaEstado(p.progreso.estado) }}</span>
+            </dd>
           </div>
-          <div class="field">
-            <label>Caso académico</label>
-            <span>{{ p.caso_nombre }}</span>
+          <div class="practica-meta__item practica-meta__item--wide">
+            <dt>Caso académico</dt>
+            <dd>{{ p.caso_nombre }}</dd>
           </div>
-          <div class="field">
-            <label>Tiempo estimado</label>
-            <span>{{ p.tiempo_max_min }} minutos</span>
+          <div class="practica-meta__item">
+            <dt>Tiempo estimado</dt>
+            <dd>{{ p.tiempo_max_min }} min</dd>
           </div>
-          <div class="field">
-            <label>Fecha de asignación</label>
-            <span>{{ p.fecha_inicio | date:'mediumDate' }}</span>
+          <div class="practica-meta__item">
+            <dt>Asignación</dt>
+            <dd>{{ p.fecha_inicio | date:'mediumDate' }}</dd>
           </div>
-          <div class="field">
-            <label>Fecha límite</label>
-            <span>{{ p.fecha_fin | date:'mediumDate' }}</span>
+          <div class="practica-meta__item">
+            <dt>Fecha límite</dt>
+            <dd>{{ p.fecha_fin | date:'mediumDate' }}</dd>
           </div>
-        </div>
+        </dl>
 
         @if (p.mensaje_personalizado) {
-          <div class="surface practica-mensaje">
+          <div class="practica-nota">
             <strong>Mensaje del docente</strong>
             <p>{{ p.mensaje_personalizado }}</p>
           </div>
         }
 
-        <div class="progress-bar">
-          <div class="progress-bar__fill" [style.width.%]="p.progreso.porcentaje"></div>
+        <div class="practica-progress">
+          <div class="progress-bar">
+            <div class="progress-bar__fill" [style.width.%]="p.progreso.porcentaje"></div>
+          </div>
+          <p class="practica-progress__label">
+            Progreso {{ p.progreso.porcentaje }}%
+            @if (p.progreso.conversacionesTotales > 0) {
+              · {{ p.progreso.conversacionesCompletadas }}/{{ p.progreso.conversacionesTotales }} entrevistas
+            }
+          </p>
         </div>
-        <p class="practica-progreso">
-          Progreso {{ p.progreso.porcentaje }}%
-          @if (p.progreso.conversacionesTotales > 0) {
-            · {{ p.progreso.conversacionesCompletadas }} de {{ p.progreso.conversacionesTotales }} entrevistas
-          }
-        </p>
-      </div>
+      </article>
 
-      <div class="builder-block">
-        <div class="form-section__title">Iniciar actividad</div>
-        <p class="practica-intro">
-          La simulación narrativa se abrirá dentro de la plataforma. Podrás activar
-          pantalla completa cuando quieras una experiencia más inmersiva.
+      <article class="practica-info-card practica-info-card--action">
+        <h2 class="practica-info-card__title">Iniciar actividad</h2>
+
+        <p class="practica-info-card__lead">
+          Simulación narrativa en la plataforma. Pantalla completa opcional para mayor inmersión.
         </p>
 
         @if (catalogo()) {
-          <ul class="practica-objetivos">
-            <li>Exploración clínica guiada</li>
-            <li>Entrevistas con actores del caso</li>
-            <li>Libreta de registro psicosocial</li>
+          <ul class="practica-tags">
+            <li>Exploración clínica</li>
+            <li>Entrevistas</li>
+            <li>Libreta psicosocial</li>
           </ul>
         }
 
-        <div class="form-actions form-actions--stack">
+        <div class="practica-actions">
           <button type="button" class="btn-primary" [disabled]="!puedeIniciar()" (click)="iniciarSimulacion()">
             Iniciar simulación
           </button>
-          @if (!puedeIniciar()) {
+
+          @if (!puedeIniciar() && practicaCompletada()) {
+            <p class="practica-aviso">Esta práctica ya fue completada.</p>
+          } @else if (!puedeIniciar()) {
             <p class="practica-aviso">Esta práctica estará disponible próximamente.</p>
           }
-          <a routerLink="/panel-estudiante" class="btn-ghost">Volver al panel</a>
+
+          @if (puedeSolicitarReintento()) {
+            <button
+              type="button"
+              class="btn-ghost practica-actions__secondary"
+              [disabled]="solicitando()"
+              (click)="solicitarNuevoIntento()">
+              Solicitar nuevo intento
+            </button>
+          } @else if (solicitudPendiente()) {
+            <p class="practica-aviso">Reintento pendiente de aprobación del docente.</p>
+          } @else if (reintentoAutorizado()) {
+            <p class="practica-aviso">Nuevo intento autorizado. Puedes iniciar la simulación.</p>
+          }
+
+          <nav class="practica-links" aria-label="Acciones relacionadas">
+            <a routerLink="/panel-estudiante/resultados">Ver resultados</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/panel-estudiante">Volver al panel</a>
+          </nav>
         </div>
-      </div>
+      </article>
     </div>
 
   </section>

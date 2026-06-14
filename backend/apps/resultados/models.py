@@ -39,3 +39,42 @@ class Resultado(models.Model):
 
     def __str__(self) -> str:
         return f'Resultado de {self.participacion.estudiante.correo}: {self.nota_final}'
+
+
+class ResultadoNarrativo(models.Model):
+    """Resultado académico de una simulación narrativa (persistente en servidor)."""
+
+    autorizacion = models.OneToOneField(
+        'practicas.AutorizacionEstudiante',
+        on_delete=models.CASCADE,
+        related_name='resultado_narrativo',
+    )
+    practica = models.ForeignKey(
+        'practicas.Practica',
+        on_delete=models.CASCADE,
+        related_name='resultados_narrativos',
+    )
+    estudiante = models.ForeignKey(
+        'academico.Estudiante',
+        on_delete=models.CASCADE,
+        related_name='resultados_narrativos',
+    )
+    porcentaje = models.PositiveIntegerField('porcentaje de avance', default=0)
+    entrevistas_realizadas = models.PositiveIntegerField(default=0)
+    entrevistas_totales = models.PositiveIntegerField(default=0)
+    evidencias_encontradas = models.PositiveIntegerField(default=0)
+    contradicciones_detectadas = models.PositiveIntegerField(default=0)
+    hipotesis_formuladas = models.PositiveIntegerField(default=0)
+    estado_final = models.CharField('estado final', max_length=40, default='completada')
+    fortalezas = models.JSONField('fortalezas', default=list, blank=True)
+    aspectos_mejorar = models.JSONField('aspectos por mejorar', default=list, blank=True)
+    resumen_pedagogico = models.JSONField('resumen pedagógico', default=dict, blank=True)
+    fecha_finalizacion = models.DateTimeField('fecha de finalización')
+
+    class Meta:
+        verbose_name = 'Resultado narrativo'
+        verbose_name_plural = 'Resultados narrativos'
+        ordering = ['-fecha_finalizacion']
+
+    def __str__(self) -> str:
+        return f'Resultado narrativo {self.estudiante.correo} — {self.practica.nombre}'

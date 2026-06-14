@@ -102,3 +102,35 @@ class ResultadoSerializer(serializers.ModelSerializer):
 
 class FeedbackDocenteSerializer(serializers.Serializer):
     feedback_docente = serializers.CharField()
+
+
+class ResultadoNarrativoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    caso_nombre = serializers.CharField()
+    estudiante_id = serializers.IntegerField(required=False)
+    estudiante_nombre = serializers.CharField(required=False)
+    estudiante_correo = serializers.EmailField(required=False)
+    porcentaje = serializers.IntegerField()
+    entrevistas_realizadas = serializers.IntegerField()
+    entrevistas_totales = serializers.IntegerField()
+    evidencias_encontradas = serializers.IntegerField()
+    contradicciones_detectadas = serializers.IntegerField()
+    hipotesis_formuladas = serializers.IntegerField()
+    estado_final = serializers.CharField()
+    fortalezas = serializers.ListField(child=serializers.CharField())
+    aspectos_mejorar = serializers.ListField(child=serializers.CharField())
+    fecha_finalizacion = serializers.DateTimeField()
+
+
+class GuardarResultadoNarrativoSerializer(serializers.Serializer):
+    autorizacion_id = serializers.IntegerField(min_value=1, required=False)
+    porcentaje = serializers.IntegerField(min_value=0, max_value=100)
+    entrevistas_realizadas = serializers.IntegerField(min_value=0)
+    entrevistas_totales = serializers.IntegerField(min_value=0)
+    evidencias_encontradas = serializers.IntegerField(min_value=0)
+    contradicciones_detectadas = serializers.IntegerField(min_value=0)
+    hipotesis_formuladas = serializers.IntegerField(min_value=0)
+    estado_final = serializers.CharField(max_length=40, default='completada')
+    resumen_pedagogico = serializers.JSONField(default=dict)

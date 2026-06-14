@@ -29,6 +29,13 @@ export class PanelEstudianteComponent {
     this.practicas().filter((p) => p.progreso.estado === 'completada'),
   );
 
+  readonly tituloActividad = computed(() => {
+    if (this.enCurso().length > 0) return 'Continuar simulación';
+    if (this.pendientes().length > 0) return 'Próxima práctica';
+    if (this.completadas().length > 0) return 'Resultados';
+    return 'Mis prácticas';
+  });
+
   abrirPractica(practicaId: number): void {
     this.session.seleccionarPractica(practicaId);
     this.router.navigate(['/estudiante/practicas', practicaId]);

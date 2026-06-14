@@ -36,6 +36,16 @@ body {
   height: 100%;
 }
 
+body:has(.login-page) {
+  overflow: hidden;
+  height: 100dvh;
+}
+
+app-root:has(.login-page) {
+  height: 100dvh;
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -80,12 +90,15 @@ a {
 .login-page {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
 }
 
 .login-page__hero {
   position: relative;
+  min-height: 0;
+  height: 100%;
   overflow: hidden;
   background: #2a1545;
 }
@@ -101,7 +114,10 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 56px;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: clamp(16px, 2.5vh, 32px) clamp(24px, 4vw, 48px);
   background: var(--color-bg-panel);
 }
 
@@ -111,15 +127,23 @@ a {
 .login-card {
   width: 100%;
   max-width: 420px;
-  padding: 56px 48px 52px;
+  max-height: calc(100dvh - clamp(32px, 5vh, 64px));
+  padding: clamp(28px, 4vh, 40px) clamp(28px, 4vw, 40px) clamp(24px, 3.5vh, 36px);
   background: var(--color-card);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.login-card--register {
+  max-width: 440px;
 }
 
 .login-card__header {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: clamp(20px, 3vh, 28px);
 }
 
 .login-card__title {
@@ -145,7 +169,7 @@ a {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(10px, 1.6vh, 14px);
 }
 
 .form-field__input-wrap {
@@ -166,7 +190,7 @@ a {
 
 .form-field__input {
   width: 100%;
-  height: 52px;
+  height: clamp(44px, 6vh, 48px);
   padding: 0 44px 0 46px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-input);
@@ -215,7 +239,7 @@ a {
    Auth switch (login ↔ registro)
    ============================================= */
 .auth-switch {
-  margin-top: 24px;
+  margin-top: clamp(14px, 2vh, 20px);
   text-align: center;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
@@ -259,8 +283,8 @@ a.auth-switch__link:hover {
 .login-form .btn-primary,
 .login-card > form .btn-primary {
   width: 100%;
-  height: 52px;
-  margin-top: 4px;
+  height: clamp(44px, 6vh, 48px);
+  margin-top: 2px;
   border: none;
   border-radius: var(--radius-button);
   background: var(--gradient-button);
@@ -300,30 +324,64 @@ a.auth-switch__link:hover {
 /* =============================================
    Responsive
    ============================================= */
+@media (max-height: 760px) {
+  .login-card {
+    border-radius: 32px;
+  }
+
+  .login-card__title {
+    font-size: clamp(1.65rem, 4vh, 2rem);
+    margin-bottom: 6px;
+  }
+
+  .login-card__subtitle {
+    font-size: 0.875rem;
+  }
+
+  .login-card__header {
+    margin-bottom: 16px;
+  }
+
+  .login-form {
+    gap: 10px;
+  }
+
+  .form-field__input,
+  .login-form .btn-primary,
+  .login-card > form .btn-primary {
+    height: 44px;
+  }
+
+  .auth-switch {
+    margin-top: 12px;
+    font-size: 0.75rem;
+  }
+}
+
 @media (max-width: 900px) {
   .login-page {
     grid-template-columns: 1fr;
-    grid-template-rows: 38vh auto;
+    grid-template-rows: minmax(0, 34dvh) minmax(0, 1fr);
   }
 
   .login-page__hero {
-    min-height: 38vh;
+    min-height: 0;
   }
 
   .login-page__panel {
-    padding: 32px 24px 48px;
+    padding: clamp(12px, 2vh, 24px) clamp(16px, 4vw, 24px);
   }
 
   .login-card {
     max-width: 480px;
-    padding: 40px 32px 36px;
+    max-height: calc(66dvh - clamp(24px, 4vh, 48px));
     border-radius: 32px;
   }
 }
 
 @media (max-width: 480px) {
   .login-card {
-    padding: 32px 24px 28px;
+    padding: 24px 20px 20px;
     border-radius: 28px;
   }
 }

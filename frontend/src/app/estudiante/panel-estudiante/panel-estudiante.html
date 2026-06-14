@@ -49,17 +49,11 @@
     <section class="panel">
       <div class="panel__toolbar">
         <div class="toolbar">
-          <h2 class="panel-title">Continuar simulación</h2>
+          <h2 class="panel-title">{{ tituloActividad() }}</h2>
         </div>
       </div>
       <div class="panel__body">
-        @if (enCurso().length === 0) {
-          <div class="empty-state-mockup empty-state-mockup--compact">
-            <strong>Sin simulación en curso</strong>
-            Ingresa con el código que te entregó tu docente o abre una práctica pendiente.
-            <a routerLink="/estudiante" class="btn-ghost est-panel-action">Acceder con código</a>
-          </div>
-        } @else {
+        @if (enCurso().length > 0) {
           <div class="surface surface--flat">
             <article class="list-row">
               <div>
@@ -72,11 +66,31 @@
                 <span class="badge badge--en-curso">En curso</span>
                 <div class="actions actions--end">
                   <a class="btn-primary" [routerLink]="['/estudiante/practicas', enCurso()[0].id, 'simulacion']">
-                    Continuar
+                    Continuar simulación
                   </a>
                 </div>
               </div>
             </article>
+          </div>
+        } @else if (pendientes().length > 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>{{ pendientes()[0].nombre }}</strong>
+            {{ pendientes()[0].caso_nombre }} · Lista para comenzar
+            <button type="button" class="btn-primary est-panel-action" (click)="abrirPractica(pendientes()[0].id)">
+              Comenzar práctica
+            </button>
+          </div>
+        } @else if (completadas().length > 0) {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Revisa tu retroalimentación</strong>
+            Tienes {{ completadas().length }} práctica(s) completada(s).
+            <a routerLink="/panel-estudiante/resultados" class="btn-primary est-panel-action">Ver resultados</a>
+          </div>
+        } @else {
+          <div class="empty-state-mockup empty-state-mockup--compact">
+            <strong>Sin prácticas asignadas</strong>
+            Cuando tu docente te autorice, aparecerán en Mis prácticas.
+            <a routerLink="/estudiante/practicas" class="btn-ghost est-panel-action">Ir a mis prácticas</a>
           </div>
         }
       </div>

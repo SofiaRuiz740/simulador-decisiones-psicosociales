@@ -211,6 +211,7 @@
 }
 
 .main-content {
+  position: relative;
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
@@ -221,6 +222,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+
+  > :not(app-estudiante-panel-waves) {
+    position: relative;
+    z-index: 1;
+  }
 
   &::-webkit-scrollbar { display: none; }
 }
@@ -241,6 +247,10 @@
   padding: 0;
   max-width: none;
   overflow: hidden;
+}
+
+:host-context(app-simulacion-narrativa) .main-content app-estudiante-panel-waves {
+  display: none;
 }
 
 @media (max-width: 1024px) {

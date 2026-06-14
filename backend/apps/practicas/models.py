@@ -111,3 +111,105 @@ class AutorizacionEstudiante(models.Model):
             if not cls.objects.filter(codigo_acceso=codigo).exists():
                 return codigo
         raise RuntimeError('No se pudo generar un código de acceso único.')
+
+
+class SolicitudReapertura(models.Model):
+    """Solicitud del estudiante para volver a realizar una práctica completada."""
+
+    class Estado(models.TextChoices):
+        PENDIENTE = 'PENDIENTE', 'Pendiente'
+        APROBADA = 'APROBADA', 'Aprobada'
+        RECHAZADA = 'RECHAZADA', 'Rechazada'
+
+    autorizacion = models.ForeignKey(
+        AutorizacionEstudiante,
+        on_delete=models.CASCADE,
+        related_name='solicitudes_reapertura',
+    )
+    estudiante = models.ForeignKey(
+        Estudiante,
+        on_delete=models.CASCADE,
+        related_name='solicitudes_reapertura',
+    )
+    practica = models.ForeignKey(
+        Practica,
+        on_delete=models.CASCADE,
+        related_name='solicitudes_reapertura',
+    )
+    estado = models.CharField(
+        'estado',
+        max_length=20,
+        choices=Estado.choices,
+        default=Estado.PENDIENTE,
+    )
+    motivo = models.TextField('motivo del estudiante', blank=True)
+    mensaje_resolucion = models.TextField('mensaje del docente', blank=True)
+    docente_resolvio = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='solicitudes_reapertura_resueltas',
+    )
+    fecha_solicitud = models.DateTimeField(auto_now_add=True)
+    fecha_resolucion = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Solicitud de reapertura'
+        verbose_name_plural = 'Solicitudes de reapertura'
+        ordering = ['-fecha_solicitud']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['autorizacion'],
+                condition=models.Q(estado='PENDIENTE'),
+                name='unique_solicitud_reapertura_pendiente',
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f'Solicitud {self.estudiante.correo} → {self.practica.nombre} [{self.estado}]'
+
+
+class RegistroReinicioPractica(models.Model):
+    """Auditoría de reinicios de práctica realizados por docentes."""
+
+    class Alcance(models.TextChoices):
+        INDIVIDUAL = 'INDIVIDUAL', 'Individual'
+        GLOBAL = 'GLOBAL', 'Global'
+
+    practica = models.ForeignKey(
+        Practica,
+        on_delete=models.CASCADE,
+        related_name='registros_reinicio',
+    )
+    docente = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='registros_reinicio_practica',
+    )
+    estudiante = models.ForeignKey(
+        Estudiante,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='registros_reinicio',
+    )
+    autorizacion = models.ForeignKey(
+        AutorizacionEstudiante,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='registros_reinicio',
+    )
+    alcance = models.CharField('alcance', max_length=20, choices=Alcance.choices)
+    motivo = models.CharField('motivo', max_length=300, blank=True)
+    estudiantes_afectados = models.PositiveIntegerField('estudiantes afectados', default=1)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Registro de reinicio de práctica'
+        verbose_name_plural = 'Registros de reinicio de práctica'
+        ordering = ['-fecha']
+
+    def __str__(self) -> str:
+        return f'Reinicio {self.alcance} — {self.practica.nombre} ({self.fecha:%Y-%m-%d})'

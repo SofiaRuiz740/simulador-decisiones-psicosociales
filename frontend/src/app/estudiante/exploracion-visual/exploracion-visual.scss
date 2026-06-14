@@ -47,6 +47,12 @@
 }
 
 .hud-ubicacion {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+
   .hud-caso {
     display: block;
     margin-bottom: 4px;
@@ -89,12 +95,12 @@ app-escena-visual {
   display: block;
   position: absolute;
   inset: 0;
-  transition: filter 0.28s ease;
+  transition: filter 0.3s ease;
 }
 
 .exploracion.entrevista-activa app-escena-visual {
-  filter: blur(7px);
-  transition: filter 0.28s ease;
+  filter: blur(6px) saturate(0.92);
+  transition: filter 0.3s ease;
 }
 
 @media (max-width: 640px) {

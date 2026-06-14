@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -203,26 +203,57 @@ export class ExtrasService {
   descargarPlantillaEstudiantes() {
     return this.http.get(`${this.api}/importacion/masiva/plantilla-estudiantes/`, {
       responseType: 'blob',
+      observe: 'response',
     });
   }
 
   descargarPlantillaGrupos() {
     return this.http.get(`${this.api}/importacion/masiva/plantilla-grupos/`, {
       responseType: 'blob',
+      observe: 'response',
     });
   }
 
   descargarPlantillaCaso() {
-    return this.http.get(`${this.api}/importacion/masiva/plantilla-caso/`, { responseType: 'blob' });
+    return this.http.get(`${this.api}/importacion/masiva/plantilla-caso/`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
   descargarPlantillaRubrica() {
-    return this.http.get(`${this.api}/importacion/masiva/plantilla-rubrica/`, { responseType: 'blob' });
+    return this.http.get(`${this.api}/importacion/masiva/plantilla-rubrica/`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
   descargarGuiaImportacion() {
-    return this.http.get(`${this.api}/importacion/masiva/guia-importacion/`, { responseType: 'blob' });
+    return this.http.get(`${this.api}/importacion/masiva/guia-importacion/`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
   descargarCasoEjemplo() {
-    return this.http.get(`${this.api}/importacion/masiva/caso-ejemplo/`, { responseType: 'blob' });
+    return this.http.get(`${this.api}/importacion/masiva/caso-ejemplo/`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
+  }
+
+  /** Valida la respuesta binaria antes de disparar la descarga en el navegador. */
+  guardarRespuestaDescarga(response: HttpResponse<Blob>, nombre: string): void {
+    const blob = response.body;
+    const contentType = response.headers.get('Content-Type') ?? blob?.type ?? '';
+    if (!blob?.size) {
+      throw new Error('El servidor no devolvió contenido.');
+    }
+    if (
+      contentType.includes('application/json')
+      || contentType.includes('text/html')
+      || (contentType.includes('text/plain') && blob.size < 512)
+    ) {
+      throw new Error('No se pudo descargar el archivo. Verifica tu sesión e intenta de nuevo.');
+    }
+    this.descargarArchivo(blob, nombre);
   }
 
   private guardarBlob(blob: Blob, nombre: string): void {

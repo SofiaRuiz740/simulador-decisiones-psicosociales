@@ -1,0 +1,22 @@
+{
+  "id": "trabajadora-social-comisaria",
+  "nombre": "Trabajadora social institucional",
+  "rol": "profesional",
+  "descripcion": "Profesional de la comisaría que articula protección, red de apoyo y seguimiento psicosocial.",
+  "metricasIniciales": {
+    "confianza": 60,
+    "ansiedad": 20,
+    "colaboracion": 70,
+    "aperturaEmocional": 45
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "Ya dejé asentado el plan de contacto con la red.",
+      "Por ahora no hay novedades que agregar al seguimiento.",
+      "Debo atender otros casos en turno; lo urgente ya quedó canalizado.",
+      "Lo que falta lo vemos mejor con el informe clínico completo.",
+      "Prefiero retomar cuando tenga el formulario de articulación firmado."
+    ]
+  }
+}

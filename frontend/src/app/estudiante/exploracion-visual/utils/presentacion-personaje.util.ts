@@ -11,7 +11,7 @@ export const PSICOLOGA_ENTREVISTADORA = {
 const ETIQUETAS_ROL_VISUAL: Record<string, string> = {
   psicologa: 'Investigadora clínica',
   victima: 'Paciente (víctima)',
-  'madre-victima': 'Madre víctima',
+  'madre-victima': 'Madre de Lucía (abuela)',
   'hermano-familiar': 'Hermano',
   'medico-urgencias': 'Médico de urgencias',
   enfermera: 'Enfermera',
@@ -53,7 +53,7 @@ export function rolPersonajeVisible(
 
 const ETIQUETAS_INTERACCION_POR_ROL: Record<string, string> = {
   victima: 'Paciente en UCI',
-  'madre-victima': 'Madre (víctima)',
+  'madre-victima': 'Madre de Lucía',
   'hermano-familiar': 'Hermano',
   enfermera: 'Enfermera jefe',
   'medico-urgencias': 'Médico tratante',

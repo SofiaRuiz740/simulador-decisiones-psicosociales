@@ -13,17 +13,17 @@
   overflow: hidden;
   cursor: default;
   transform-origin: center center;
-  animation: escena-entrada 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: escena-entrada 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   &.transicionando {
-    animation: escena-salida 0.28s ease forwards;
+    animation: escena-salida 0.3s ease forwards;
   }
 }
 
 @keyframes escena-entrada {
   from {
     opacity: 0;
-    transform: scale(1.06);
+    transform: scale(1.04);
   }
   to {
     opacity: 1;

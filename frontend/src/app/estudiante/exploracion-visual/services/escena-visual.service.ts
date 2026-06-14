@@ -4,6 +4,8 @@ import { Observable, tap } from 'rxjs';
 
 import { ROL_VISUAL_POR_CONVERSACION } from '../../../core/simulacion-narrativa/models/asset.model';
 import { environment } from '../../../../environments/environment';
+import { NarrativaFacadeService } from '../../../core/simulacion-narrativa/services/narrativa-facade.service';
+import { escenaVisualPersistidaValida } from '../../../core/simulacion-narrativa/utils/partida-persistencia.util';
 import {
   ConfigExploracionVisual,
   EscenaVisual,
@@ -17,6 +19,7 @@ import { EstadoPartida } from '../../../core/simulacion-narrativa/models/estado-
 @Injectable({ providedIn: 'root' })
 export class EscenaVisualService {
   private readonly http = inject(HttpClient);
+  private readonly facade = inject(NarrativaFacadeService);
 
   private readonly _config = signal<ConfigExploracionVisual | null>(null);
   private readonly _escenaActualId = signal<string | null>(null);
@@ -69,7 +72,13 @@ export class EscenaVisualService {
     return this.http.get<ConfigExploracionVisual>(url).pipe(
       tap((config) => {
         this._config.set(config);
-        this._escenaActualId.set(config.escenaInicialId);
+        const restaurada = this.facade.consumirEscenaVisualRestaurada();
+        const escenaInicial = escenaVisualPersistidaValida(
+          restaurada,
+          config.escenas.map((escena) => escena.id),
+        );
+        this._escenaActualId.set(escenaInicial ?? config.escenaInicialId);
+        this.facade.persistirPartida(this._escenaActualId());
       }),
     );
   }
@@ -93,7 +102,11 @@ export class EscenaVisualService {
     window.setTimeout(() => {
       this._escenaActualId.set(escenaId);
       this._transicionActiva.set(false);
-    }, 260);
+      const estadoActual = estado ?? this.facade.estado();
+      if (estadoActual) {
+        this.facade.persistirPartida(escenaId);
+      }
+    }, 300);
 
     return true;
   }
@@ -133,6 +146,7 @@ export function resolverHotspotsPersonajeEnEscena(
     conversacionesDisponibles: string[];
     conversacionesEnProgreso: string[];
     conversacionesCompletadas: string[];
+    conversacionesAgotamientoReintento?: string[];
   },
 ): HotspotPersonajeEnEscena[] {
   const {
@@ -140,11 +154,13 @@ export function resolverHotspotsPersonajeEnEscena(
     conversacionesDisponibles,
     conversacionesEnProgreso,
     conversacionesCompletadas,
+    conversacionesAgotamientoReintento = [],
   } = opciones;
 
   const completadas = new Set(conversacionesCompletadas);
   const disponiblesSet = new Set(conversacionesDisponibles);
   const enCursoSet = new Set(conversacionesEnProgreso);
+  const agotamientoSet = new Set(conversacionesAgotamientoReintento);
   const porPersonaje = new Map<string, HotspotPersonajeConfig[]>();
 
   for (const hotspot of hotspots) {
@@ -174,6 +190,18 @@ export function resolverHotspotsPersonajeEnEscena(
     const disponible = lista.find((hotspot) => disponiblesSet.has(hotspot.conversacionId));
     if (disponible) {
       visibles.push({ hotspot: disponible, interactuable: true });
+      continue;
+    }
+
+    const completada = lista.find((hotspot) => completadas.has(hotspot.conversacionId));
+    if (completada) {
+      visibles.push({ hotspot: completada, interactuable: true });
+      continue;
+    }
+
+    const agotamiento = lista.find((hotspot) => agotamientoSet.has(hotspot.conversacionId));
+    if (agotamiento) {
+      visibles.push({ hotspot: agotamiento, interactuable: true });
       continue;
     }
 

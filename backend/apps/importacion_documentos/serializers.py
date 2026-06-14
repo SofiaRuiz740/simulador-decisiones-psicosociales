@@ -21,7 +21,7 @@ class ArchivoFuenteSerializer(serializers.ModelSerializer):
 
 
 class CrearCasoDesdeArchivoSerializer(serializers.Serializer):
-    nombre = serializers.CharField(max_length=200)
+    nombre = serializers.CharField(max_length=200, required=False, allow_blank=True, default='')
     area_psicosocial = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
 
 

@@ -71,5 +71,70 @@
     @if (fase() === 'simulacion') {
       <app-libreta-psicologo [mostrarFab]="false" />
     }
+
+    @if (casoCompletado()) {
+      <aside class="cierre-caso" role="dialog" aria-labelledby="cierre-titulo">
+        <div class="cierre-caso__panel">
+          <header class="cierre-caso__encabezado">
+            <p class="cierre-caso__etiqueta">Informe de cierre</p>
+            <h2 id="cierre-titulo">Investigación concluida</h2>
+            <p class="cierre-caso__lead">
+              Completó la evaluación psicosocial de un caso de violencia intrafamiliar con desenlace
+              trágico: ingreso crítico de Lucía en UCI, fallecimiento de su hija menor y articulación con la
+              comisaría para protección y seguimiento.
+            </p>
+          </header>
+          @if (resumenCierre(); as resumen) {
+            <section class="cierre-caso__seccion" aria-labelledby="cierre-recopilo">
+              <h3 id="cierre-recopilo" class="cierre-caso__seccion-titulo">Lo que recopiló</h3>
+              <ul class="cierre-caso__stats">
+                <li><strong>{{ resumen.totalConversaciones }}</strong> entrevistas con familia y personal institucional</li>
+                <li><strong>{{ resumen.totalEvidencias }}</strong> evidencias clínicas y documentales revisadas</li>
+                <li><strong>{{ resumen.totalContradicciones }}</strong> contradicciones entre versiones analizadas</li>
+                <li><strong>{{ resumen.totalHipotesis }}</strong> hipótesis psicosociales formuladas</li>
+              </ul>
+            </section>
+          }
+          <section class="cierre-caso__seccion cierre-caso__seccion--analisis" aria-labelledby="cierre-analisis">
+            <h3 id="cierre-analisis" class="cierre-caso__seccion-titulo">Síntesis clínica</h3>
+            <p class="cierre-caso__reflexion">
+              <span class="cierre-caso__bloque"><strong>Hallazgos relevantes:</strong> relatos cruzados sobre un episodio violento, lesiones
+              compatibles con defensa, minimización familiar y antecedentes policiales previos.</span>
+              <span class="cierre-caso__bloque"><strong>Factores de riesgo:</strong> violencia sostenida en el hogar, miedo a represalias,
+              duelo reciente y necesidad de protección para sobrevivientes.</span>
+              <span class="cierre-caso__bloque"><strong>Aprendizaje:</strong> la investigación clínica requiere contrastar testimonios,
+              evidencia médica e información institucional sin perder contención emocional.
+              Revise su libreta antes de cerrar la práctica.</span>
+            </p>
+          </section>
+          @if (competenciasEvaluadas().length) {
+            <section class="cierre-caso__seccion cierre-caso__seccion--competencias" aria-labelledby="cierre-competencias">
+              <h3 id="cierre-competencias" class="cierre-caso__seccion-titulo">Competencias evaluadas</h3>
+              <ul class="cierre-caso__competencias">
+                @for (comp of competenciasEvaluadas(); track comp.id) {
+                  <li
+                    class="cierre-caso__competencia"
+                    [class.cierre-caso__competencia--fortalecida]="comp.fortalecida"
+                    [class.cierre-caso__competencia--pendiente]="!comp.fortalecida">
+                    <span class="cierre-caso__competencia-estado" aria-hidden="true">
+                      {{ comp.fortalecida ? '✓' : '○' }}
+                    </span>
+                    <span class="cierre-caso__competencia-texto">
+                      <strong>{{ comp.etiqueta }}</strong>
+                      <span>{{ comp.detalle }}</span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+          <div class="cierre-caso__acciones">
+            <button mat-flat-button color="primary" type="button" (click)="finalizarPractica()">
+              Volver al panel
+            </button>
+          </div>
+        </div>
+      </aside>
+    }
   </div>
 </ng-template>

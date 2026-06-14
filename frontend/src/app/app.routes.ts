@@ -101,7 +101,7 @@ export const routes: Routes = [
             (m) => m.IMPORTACION_DOCUMENTOS_ROUTES,
           ),
         canActivate: [roleGuard],
-        data: { roles: [Rol.Docente] },
+        data: { roles: [Rol.Docente, Rol.Admin] },
       },
       {
         path: 'practicas',
@@ -118,6 +118,24 @@ export const routes: Routes = [
           ),
         canActivate: [roleGuard],
         data: { roles: [Rol.Docente, Rol.Admin] },
+      },
+      {
+        path: 'solicitudes-reapertura',
+        loadChildren: () =>
+          import('./solicitudes-reapertura/solicitudes-reapertura.routes').then(
+            (m) => m.SOLICITUDES_REAPERTURA_ROUTES,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Docente, Rol.Admin] },
+      },
+      {
+        path: 'reinicio-practicas',
+        loadChildren: () =>
+          import('./reinicio-practicas/reinicio-practicas.routes').then(
+            (m) => m.REINICIO_PRACTICAS_ROUTES,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Rol.Docente] },
       },
       {
         path: 'resultados',

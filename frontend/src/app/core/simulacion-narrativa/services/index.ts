@@ -4,5 +4,6 @@ export * from './libreta.service';
 export * from './narrativa-data.service';
 export * from './narrativa-engine.service';
 export * from './narrativa-facade.service';
+export * from './narrativa-persistencia.service';
 export * from './narrativa-state.service';
 export * from './trazabilidad.service';

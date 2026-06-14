@@ -1,0 +1,17 @@
+{
+  "id": "investigacion-comisaria",
+  "orden": 3,
+  "titulo": "Comisaría — articulación interinstitucional",
+  "narrativa": "Tras completar la evaluación hospitalaria, accedes a la comisaría para contrastar antecedentes y coordinar protección.",
+  "ubicacion": "Comisaría de flagrancia",
+  "momentoTemporal": "Madrugada — 02:30",
+  "personajesPresentes": ["comisario", "trabajadora-social-comisaria"],
+  "conversacionesDisponibles": [
+    "entrevista-comisario",
+    "entrevista-trabajadora-social-comisaria",
+    "cierre-investigacion"
+  ],
+  "evidenciasDisponibles": [],
+  "intervencionesDisponibles": [],
+  "transiciones": []
+}

@@ -17,5 +17,5 @@ export const estudianteAuthGuard: CanActivateFn = () => {
     return true;
   }
 
-  return router.createUrlTree(['/estudiante']);
+  return router.createUrlTree(['/auth/login']);
 };

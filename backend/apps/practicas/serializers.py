@@ -201,3 +201,52 @@ class AccesoEstudianteSerializer(serializers.Serializer):
         attrs['estudiante'] = est
         attrs['autorizacion'] = auth
         return attrs
+
+
+class SolicitudReaperturaSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    estudiante_id = serializers.IntegerField()
+    estudiante_nombre = serializers.CharField()
+    estudiante_correo = serializers.EmailField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    autorizacion_id = serializers.IntegerField()
+    estado = serializers.CharField()
+    estado_display = serializers.CharField()
+    motivo = serializers.CharField()
+    mensaje_resolucion = serializers.CharField()
+    fecha_solicitud = serializers.DateTimeField()
+    fecha_resolucion = serializers.DateTimeField(allow_null=True)
+
+
+class CrearSolicitudReaperturaSerializer(serializers.Serializer):
+    autorizacion_id = serializers.IntegerField(min_value=1)
+    motivo = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class RechazarSolicitudSerializer(serializers.Serializer):
+    mensaje = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class ReiniciarEstudianteSerializer(serializers.Serializer):
+    autorizacion_id = serializers.IntegerField(min_value=1)
+    motivo = serializers.CharField(required=False, allow_blank=True, default='')
+    confirmacion = serializers.CharField()
+
+
+class ReiniciarGlobalSerializer(serializers.Serializer):
+    confirmacion = serializers.CharField()
+    motivo = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class RegistroReinicioSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    practica_id = serializers.IntegerField()
+    practica_nombre = serializers.CharField()
+    docente_nombre = serializers.CharField()
+    estudiante_nombre = serializers.CharField(allow_null=True)
+    alcance = serializers.CharField()
+    alcance_display = serializers.CharField()
+    motivo = serializers.CharField()
+    estudiantes_afectados = serializers.IntegerField()
+    fecha = serializers.DateTimeField()

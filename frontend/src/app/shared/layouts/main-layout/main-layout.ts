@@ -36,6 +36,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Rol } from '../../../core/models/usuario.model';
 
 import { NavIcon } from '../../components/nav-icon/nav-icon';
+import { EstudiantePanelWaves } from '../../components/illustrations/estudiante-panel-waves/estudiante-panel-waves';
+import { SidebarZen } from '../../components/illustrations/sidebar-zen/sidebar-zen';
 
 
 
@@ -96,6 +98,8 @@ interface NavGroup {
     MatTooltipModule,
 
     NavIcon,
+    EstudiantePanelWaves,
+    SidebarZen,
 
   ],
 
@@ -185,6 +189,10 @@ export class MainLayout {
     { label: 'Prácticas', route: '/practicas', icon: 'calendar', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
 
     { label: 'Participaciones', route: '/participaciones', icon: 'play', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
+
+    { label: 'Solicitudes de reapertura', route: '/solicitudes-reapertura', icon: 'calendar', roles: [Rol.Docente, Rol.Admin], group: 'practica' },
+
+    { label: 'Reinicio de prácticas', route: '/reinicio-practicas', icon: 'calendar', roles: [Rol.Docente], group: 'practica' },
 
 
 
@@ -277,6 +285,8 @@ export class MainLayout {
 
 
   readonly showDocenteActions = computed(() => this.rol() === Rol.Docente);
+
+  readonly isEstudiante = computed(() => this.rol() === Rol.Estudiante);
 
 
 

@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-06-08T23:26:30.092Z",
+  "fase": "12.7",
+  "pruebas": [
+    {
+      "nombre": "config-v252",
+      "ok": true,
+      "version": "2.5.2"
+    },
+    {
+      "nombre": "coords_madre",
+      "ok": true,
+      "antes": {
+        "x": 35.9,
+        "y": 47.1,
+        "ancho": 28.2,
+        "alto": 39.9
+      },
+      "ahora": {
+        "x": 41,
+        "y": 24,
+        "ancho": 17,
+        "alto": 34
+      },
+      "referencia": "salaEsperaHospital.png"
+    },
+    {
+      "nombre": "coords_medico",
+      "ok": true,
+      "antes": {
+        "x": 54,
+        "y": 44,
+        "ancho": 22,
+        "alto": 38
+      },
+      "ahora": {
+        "x": 43,
+        "y": 20,
+        "ancho": 14,
+        "alto": 38
+      },
+      "referencia": "cuidadosIntensivos.png"
+    },
+    {
+      "nombre": "intro_tras_reinicio",
+      "ok": true,
+      "fase": "intro",
+      "advertenciaVisible": true
+    },
+    {
+      "nombre": "intro_continuidad_normal",
+      "ok": true,
+      "escenaDirecta": true
+    },
+    {
+      "nombre": "hotspot_madre_visible",
+      "ok": true,
+      "x": 864.765625,
+      "y": 329.734375,
+      "width": 179.859375,
+      "height": 294.03125
+    },
+    {
+      "nombre": "hotspot_medico_visible",
+      "ok": true,
+      "x": 885.9375,
+      "y": 295.140625,
+      "width": 148.109375,
+      "height": 328.625
+    }
+  ],
+  "fallos": [],
+  "resumen": {
+    "total": 7,
+    "ok": 7,
+    "fallos": 0
+  }
+}

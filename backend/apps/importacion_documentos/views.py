@@ -5,7 +5,7 @@ from pathlib import Path
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from apps.casos.models import Caso
@@ -21,6 +21,7 @@ TIPOS_PERMITIDOS = {
     'text/plain': 'TXT',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
 }
+MAX_BYTES_ARCHIVO = 10 * 1024 * 1024
 
 
 class ArchivoFuenteViewSet(viewsets.ModelViewSet):
@@ -35,7 +36,7 @@ class ArchivoFuenteViewSet(viewsets.ModelViewSet):
 
     serializer_class = ArchivoFuenteSerializer
     permission_classes = [EsDocenteOAdmin]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     http_method_names = ['get', 'post', 'delete']
 
     def get_queryset(self):
@@ -48,6 +49,8 @@ class ArchivoFuenteViewSet(viewsets.ModelViewSet):
         f = request.FILES.get('archivo')
         if not f:
             raise ValidationError({'archivo': 'Adjunta un archivo en el campo "archivo".'})
+        if f.size > MAX_BYTES_ARCHIVO:
+            raise ValidationError({'archivo': 'El archivo supera el límite de 10 MB.'})
         tipo = TIPOS_PERMITIDOS.get(f.content_type)
         if not tipo:
             # Fallback por extensión.
@@ -66,6 +69,10 @@ class ArchivoFuenteViewSet(viewsets.ModelViewSet):
     def procesar(self, request, pk=None):
         af: ArchivoFuente = self.get_object()
         texto = extraer_texto(af.archivo.path, af.tipo)
+        if not texto.strip() or texto.startswith('[Error al extraer') or texto.startswith('[DOCX no soportado'):
+            raise ValidationError({
+                'archivo': texto.strip('[]') or 'No se pudo extraer texto del documento.',
+            })
         af.texto_extraido = texto
         af.estado = ArchivoFuente.Estado.PROCESADO
         af.save(update_fields=['texto_extraido', 'estado', 'fecha_actualizacion'])

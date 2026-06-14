@@ -27,6 +27,9 @@ from apps.usuarios.permissions import EsDocenteOAdmin
 from .serializers import ResultadoImportacionSerializer
 
 
+MAX_BYTES_IMPORTACION = 10 * 1024 * 1024
+
+
 class ImportacionMasivaViewSet(viewsets.ViewSet):
     """
     Importación masiva desde CSV/Excel.
@@ -44,6 +47,10 @@ class ImportacionMasivaViewSet(viewsets.ViewSet):
         archivo = request.FILES.get('archivo')
         if not archivo:
             raise ValidationError({'archivo': 'Adjunta un archivo en el campo "archivo".'})
+        if archivo.size > MAX_BYTES_IMPORTACION:
+            raise ValidationError({'archivo': 'El archivo supera el límite de 10 MB.'})
+        if hasattr(archivo, 'seek'):
+            archivo.seek(0)
         return archivo
 
     @action(detail=False, methods=['post'], url_path='estudiantes')

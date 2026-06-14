@@ -1,13 +1,5 @@
-import {
-  Component,
-  DestroyRef,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { NodoDialogo } from '../../../core/simulacion-narrativa/models/conversacion.model';
@@ -25,7 +17,7 @@ export const TYPEWRITER_MS = 28;
 
 @Component({
   selector: 'app-dialogo-narrativo',
-  imports: [MatIconModule],
+  imports: [MatIconModule, NgClass],
   templateUrl: './dialogo-narrativo.html',
   styleUrl: './dialogo-narrativo.scss',
 })
@@ -59,7 +51,9 @@ export class DialogoNarrativoComponent {
 
   readonly nodo = computed<NodoDialogo | null>(() => {
     const id = this.conversacionId();
-    if (!id || this.conversacionCompletada()) return null;
+    if (!id) return null;
+    if (this.enFatiga()) return this.facade.nodoConversacionActual(id);
+    if (this.conversacionCompletada()) return null;
     return this.facade.nodoConversacionActual(id);
   });
 
@@ -156,6 +150,18 @@ export class DialogoNarrativoComponent {
     return nodo.texto;
   });
 
+  readonly rolVisualEntrevistado = computed(() => {
+    const personajeId = this.personajeEntrevistadoId();
+    return this.escenas.rolVisualParaConversacion(personajeId ?? '', this.conversacionId());
+  });
+
+  readonly esReflexionClinica = computed(() => {
+    const opts = this.opciones();
+    if (!opts.length) return false;
+    const first = opts[0]?.texto?.trim() ?? '';
+    return !first.startsWith('«');
+  });
+
   readonly emisorActual = computed(() => this.nodoPantalla()?.emisor ?? 'narrador');
 
   readonly nombreOrador = computed(() => {
@@ -191,13 +197,6 @@ export class DialogoNarrativoComponent {
       this.iniciarTypewriter(texto);
     });
 
-    effect(() => {
-      if (this.conversacionCompletada() && !this.saliendo()) {
-        this.interfazSonido.completarEntrevista();
-        this.cerrarAnimado();
-      }
-    });
-
     this.destroyRef.onDestroy(() => this.limpiarTypewriter());
   }
 
@@ -223,6 +222,7 @@ export class DialogoNarrativoComponent {
 
     const id = this.conversacionId();
     if (this.esNodoFinal()) {
+      this.facade.finalizarConversacionActiva(id);
       this.interfazSonido.completarEntrevista();
       this.cerrarAnimado();
       return;
@@ -282,7 +282,7 @@ export class DialogoNarrativoComponent {
   private cerrarAnimado(): void {
     if (this.saliendo()) return;
     this.saliendo.set(true);
-    window.setTimeout(() => this.cerrar.emit(), 250);
+    window.setTimeout(() => this.cerrar.emit(), 300);
   }
 
   private textoJugadorDesde(nodo: NodoDialogo): string {

@@ -107,10 +107,14 @@ async function main() {
 
   // Auth mínima + intro no vista
   await page.goto(`${BASE}/estudiante`, { waitUntil: 'domcontentloaded' });
-  await page.evaluate((casoId) => {
+  await page.evaluate(({ casoId, estudianteId }) => {
     localStorage.setItem('simulador.access', 'inspect-token');
-    localStorage.removeItem(`narrativa-intro-vista:${casoId}`);
-  }, CASO_ID);
+    localStorage.setItem(
+      'simulador.user',
+      JSON.stringify({ id: estudianteId, email: 'inspect@test', nombre_completo: 'Inspect', rol: 'Estudiante' }),
+    );
+    localStorage.removeItem(`narrativa-intro-vista:${casoId}:${estudianteId}`);
+  }, { casoId: CASO_ID, estudianteId: 1 });
 
   await page.goto(URL, { waitUntil: 'networkidle', timeout: 60000 });
 

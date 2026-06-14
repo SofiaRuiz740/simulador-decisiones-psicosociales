@@ -8,5 +8,15 @@
     "ansiedad": 25,
     "colaboracion": 65,
     "aperturaEmocional": 35
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "No tengo información adicional relevante para este momento.",
+      "Lo clínico pertinente ya está en la historia de urgencias.",
+      "Debo retomar la guardia; otros pacientes me esperan.",
+      "No hay cambios desde la última valoración registrada.",
+      "Eso es todo lo que puedo aportar desde urgencias."
+    ]
   }
 }

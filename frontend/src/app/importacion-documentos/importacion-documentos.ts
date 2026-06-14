@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { switchMap } from 'rxjs';
 
 import {
   ArchivoFuente,
@@ -12,6 +14,7 @@ import {
   ResultadoImportacionRubrica,
 } from '../core/services/extras.service';
 import { CasosService } from '../core/services/casos.service';
+import { mensajeErrorHttpBlob } from '../core/utils/http-error';
 
 @Component({
   selector: 'app-importacion-documentos',
@@ -40,6 +43,8 @@ export class ImportacionDocumentos {
   readonly problemasCasoCreado = signal<{ codigo: string; mensaje: string }[] | null>(null);
   /** Casos del docente para el selector de rúbrica. */
   readonly casosDisponibles = signal<{ id: number; nombre: string }[]>([]);
+  readonly casosCargados = signal(false);
+  readonly cargandoCasos = signal(false);
   rubricaCasoId: number | null = null;
   nombreCasoVal = '';
   areaCasoVal = '';
@@ -78,27 +83,63 @@ export class ImportacionDocumentos {
     return txt.length > 1500 ? txt.slice(0, 1500) + '…' : txt;
   }
 
+  private mostrarError(err: unknown, fallback: string): void {
+    const httpErr = err as HttpErrorResponse;
+    void mensajeErrorHttpBlob(httpErr, fallback).then((msg) => {
+      this.snackBar.open(msg, 'OK', { duration: 5000 });
+    });
+  }
+
+  private textoExtraccionInvalido(texto: string): boolean {
+    const t = texto.trim();
+    return !t
+      || t.startsWith('[Error al extraer')
+      || t.startsWith('[DOCX no soportado');
+  }
+
   seleccionar(ev: Event) {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      this.snackBar.open('El archivo supera el límite de 10 MB.', 'OK', { duration: 4000 });
+      input.value = '';
+      return;
+    }
     this.loading.set(true);
-    this.servicio.subirArchivo(file).subscribe({
-      next: (a) => {
+    this.problemasCasoCreado.set(null);
+    this.archivo.set(null);
+    this.servicio.subirArchivo(file).pipe(
+      switchMap((a) => {
         this.archivo.set(a);
         this.nombreCasoVal = a.nombre_original.replace(/\.[^.]+$/, '');
+        return this.servicio.procesarArchivo(a.id);
+      }),
+    ).subscribe({
+      next: (res) => {
+        this.archivo.set(res);
         this.loading.set(false);
-        this.snackBar.open('Archivo subido. Procesa para extraer el texto.', 'OK', { duration: 3000 });
+        if (this.textoExtraccionInvalido(res.texto_extraido)) {
+          this.snackBar.open(
+            res.texto_extraido || 'No se pudo extraer texto del documento.',
+            'OK',
+            { duration: 6000 },
+          );
+          return;
+        }
+        this.snackBar.open('Documento procesado. Revisa la vista previa y crea el caso.', 'OK', { duration: 3500 });
       },
       error: (err) => {
         this.loading.set(false);
-        this.snackBar.open(err?.error?.archivo?.[0] || 'No se pudo subir.', 'OK', { duration: 4000 });
+        this.mostrarError(err, 'No se pudo subir o procesar el documento.');
       },
     });
+    input.value = '';
   }
 
   seleccionarEstudiantes(ev: Event) {
-    const file = (ev.target as HTMLInputElement).files?.[0];
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
     this.loading.set(true);
     this.resultadoEstudiantes.set(null);
@@ -113,15 +154,15 @@ export class ImportacionDocumentos {
       },
       error: (err) => {
         this.loading.set(false);
-        const msg = err?.error?.archivo?.[0] || 'No se pudo importar el archivo.';
-        this.snackBar.open(msg, 'OK', { duration: 4000 });
+        this.mostrarError(err, 'No se pudo importar el archivo de estudiantes.');
       },
     });
-    (ev.target as HTMLInputElement).value = '';
+    input.value = '';
   }
 
   seleccionarGrupos(ev: Event) {
-    const file = (ev.target as HTMLInputElement).files?.[0];
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
     this.loading.set(true);
     this.resultadoGrupos.set(null);
@@ -136,45 +177,31 @@ export class ImportacionDocumentos {
       },
       error: (err) => {
         this.loading.set(false);
-        const msg = err?.error?.archivo?.[0] || 'No se pudo importar el archivo.';
-        this.snackBar.open(msg, 'OK', { duration: 4000 });
+        this.mostrarError(err, 'No se pudo importar el archivo de grupos.');
       },
     });
-    (ev.target as HTMLInputElement).value = '';
-  }
-
-  procesar() {
-    const a = this.archivo();
-    if (!a) return;
-    this.loading.set(true);
-    this.servicio.procesarArchivo(a.id).subscribe({
-      next: (res) => {
-        this.archivo.set(res);
-        this.loading.set(false);
-        this.snackBar.open('Texto extraído.', 'OK', { duration: 2500 });
-      },
-      error: () => {
-        this.loading.set(false);
-        this.snackBar.open('No se pudo procesar.', 'OK', { duration: 3500 });
-      },
-    });
+    input.value = '';
   }
 
   crearCaso() {
     const a = this.archivo();
-    if (!a) return;
+    if (!a || this.textoExtraccionInvalido(a.texto_extraido)) return;
     this.loading.set(true);
     this.problemasCasoCreado.set(null);
     this.servicio.crearCasoDesdeArchivo(a.id, this.nombreCasoVal, this.areaCasoVal).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.snackBar.open('Caso creado en estado revisión.', 'OK', { duration: 2500 });
-        // Tras crear, validamos para mostrar lo que falta antes de redirigir.
+        this.casosCargados.set(false);
+        this.casos.listarTodosCasos().subscribe({
+          next: (lista) => {
+            this.casosDisponibles.set(lista.map((c) => ({ id: c.id, nombre: c.nombre })));
+            this.casosCargados.set(true);
+          },
+        });
         this.casos.validarCaso(res.caso_id).subscribe({
           next: (val) => {
             this.problemasCasoCreado.set(val.problemas);
-            // Si el caso quedó bien, vamos al editor; si hay problemas, los mostramos
-            // en el panel para que el docente complete antes de seguir.
             if (val.valido) {
               this.router.navigate(['/casos', res.caso_id]);
             } else {
@@ -188,34 +215,46 @@ export class ImportacionDocumentos {
           error: () => this.router.navigate(['/casos', res.caso_id]),
         });
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.snackBar.open('No se pudo crear el caso.', 'OK', { duration: 3500 });
+        this.mostrarError(err, 'No se pudo crear el caso.');
       },
     });
   }
 
   /** Carga la lista de casos cuando el docente entra a la tab Rúbrica. */
   cargarCasosParaRubrica(): void {
-    if (this.casosDisponibles().length) return;
-    this.casos.listarCasos().subscribe({
-      next: (resp) => this.casosDisponibles.set(
-        resp.results.map((c) => ({ id: c.id, nombre: c.nombre })),
-      ),
-      error: () => this.snackBar.open(
-        'No se pudieron cargar los casos.', 'OK', { duration: 3500 },
-      ),
+    if (this.casosCargados() || this.cargandoCasos()) return;
+    this.cargandoCasos.set(true);
+    this.casos.listarTodosCasos().subscribe({
+      next: (lista) => {
+        this.casosDisponibles.set(lista.map((c) => ({ id: c.id, nombre: c.nombre })));
+        this.casosCargados.set(true);
+        this.cargandoCasos.set(false);
+        if (!lista.length) {
+          this.snackBar.open(
+            'Aún no tienes casos. Importa o crea uno antes de cargar la rúbrica.',
+            'OK',
+            { duration: 4500 },
+          );
+        }
+      },
+      error: (err) => {
+        this.cargandoCasos.set(false);
+        this.mostrarError(err, 'No se pudieron cargar los casos.');
+      },
     });
   }
 
   seleccionarRubrica(ev: Event): void {
-    const file = (ev.target as HTMLInputElement).files?.[0];
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file || !this.rubricaCasoId) {
       this.snackBar.open(
         'Selecciona primero un caso destino para asociar la rúbrica.',
         'OK', { duration: 3500 },
       );
-      (ev.target as HTMLInputElement).value = '';
+      input.value = '';
       return;
     }
     this.loading.set(true);
@@ -231,40 +270,65 @@ export class ImportacionDocumentos {
       },
       error: (err) => {
         this.loading.set(false);
-        const msg = err?.error?.detail || err?.error?.archivo?.[0] || 'No se pudo importar la rúbrica.';
-        this.snackBar.open(msg, 'OK', { duration: 4500 });
+        this.mostrarError(err, 'No se pudo importar la rúbrica.');
       },
     });
-    (ev.target as HTMLInputElement).value = '';
+    input.value = '';
   }
 
   descargarPlantilla(p: { titulo: string; tipo: 'estudiantes' | 'grupos' | 'caso' | 'rubrica' | 'guia' | 'ejemplo' }): void {
     const handlers: Record<string, () => void> = {
-      estudiantes: () => this.servicio.descargarPlantillaEstudiantes().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-estudiantes.xlsx'),
-        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
-      }),
-      grupos: () => this.servicio.descargarPlantillaGrupos().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-grupos.xlsx'),
-        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
-      }),
-      caso: () => this.servicio.descargarPlantillaCaso().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-caso.docx'),
-        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
-      }),
-      rubrica: () => this.servicio.descargarPlantillaRubrica().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'plantilla-rubrica.xlsx'),
-        error: () => this.snackBar.open('No se pudo descargar la plantilla.', 'OK', { duration: 3500 }),
-      }),
-      guia: () => this.servicio.descargarGuiaImportacion().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'guia-importacion.pdf'),
-        error: () => this.snackBar.open('No se pudo descargar la guía.', 'OK', { duration: 3500 }),
-      }),
-      ejemplo: () => this.servicio.descargarCasoEjemplo().subscribe({
-        next: (blob) => this.servicio.descargarArchivo(blob, 'caso-ejemplo.docx'),
-        error: () => this.snackBar.open('No se pudo descargar el ejemplo.', 'OK', { duration: 3500 }),
-      }),
+      estudiantes: () => this.ejecutarDescarga(
+        this.servicio.descargarPlantillaEstudiantes(),
+        'plantilla-estudiantes.xlsx',
+      ),
+      grupos: () => this.ejecutarDescarga(
+        this.servicio.descargarPlantillaGrupos(),
+        'plantilla-grupos.xlsx',
+      ),
+      caso: () => this.ejecutarDescarga(
+        this.servicio.descargarPlantillaCaso(),
+        'plantilla-caso.docx',
+      ),
+      rubrica: () => this.ejecutarDescarga(
+        this.servicio.descargarPlantillaRubrica(),
+        'plantilla-rubrica.xlsx',
+      ),
+      guia: () => this.ejecutarDescarga(
+        this.servicio.descargarGuiaImportacion(),
+        'guia-importacion.pdf',
+      ),
+      ejemplo: () => this.ejecutarDescarga(
+        this.servicio.descargarCasoEjemplo(),
+        'caso-ejemplo.docx',
+      ),
     };
     handlers[p.tipo]?.();
+  }
+
+  private ejecutarDescarga(
+    peticion: ReturnType<ExtrasService['descargarPlantillaEstudiantes']>,
+    nombreArchivo: string,
+  ): void {
+    this.loading.set(true);
+    peticion.subscribe({
+      next: (response) => {
+        this.loading.set(false);
+        try {
+          this.servicio.guardarRespuestaDescarga(response, nombreArchivo);
+          this.snackBar.open('Descarga iniciada.', 'OK', { duration: 2500 });
+        } catch (err) {
+          this.snackBar.open(
+            err instanceof Error ? err.message : 'No se pudo descargar la plantilla.',
+            'OK',
+            { duration: 4500 },
+          );
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.mostrarError(err, 'No se pudo descargar la plantilla.');
+      },
+    });
   }
 }

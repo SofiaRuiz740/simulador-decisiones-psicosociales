@@ -8,5 +8,15 @@
     "ansiedad": 30,
     "colaboracion": 70,
     "aperturaEmocional": 40
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "Debo volver con los pacientes.",
+      "Ya le conté lo que quedó registrado al ingreso.",
+      "En este momento no tengo más datos que esos.",
+      "Si necesita detalle clínico, el médico tratante lo tiene.",
+      "Perdón, me están llamando de otro box."
+    ]
   }
 }

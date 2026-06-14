@@ -5,8 +5,8 @@ import { estudianteAuthGuard } from './guards/estudiante-auth.guard';
 export const ESTUDIANTE_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./estudiante').then((m) => m.Estudiante),
-    title: 'Acceso estudiante · Simulador',
+    redirectTo: '/auth/login',
+    pathMatch: 'full',
   },
   {
     path: 'panel',
@@ -51,5 +51,14 @@ export const ESTUDIANTE_ROUTES: Routes = [
     canActivate: [estudianteAuthGuard],
     loadComponent: () => import('./resultado').then((m) => m.ResultadoEstudiante),
     title: 'Resultado · Simulador',
+  },
+  {
+    path: 'resultados',
+    canActivate: [estudianteAuthGuard],
+    loadComponent: () =>
+      import('./resultados-retroalimentacion/resultados-retroalimentacion').then(
+        (m) => m.ResultadosRetroalimentacionPage,
+      ),
+    title: 'Resultados y retroalimentación · Simulador',
   },
 ];

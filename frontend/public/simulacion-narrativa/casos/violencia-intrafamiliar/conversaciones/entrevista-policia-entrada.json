@@ -10,59 +10,403 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Estamos tomando antecedentes del ingreso. ¿Usted viene en representación del servicio de salud mental?",
-      "siguienteNodoId": "decision-enfoque"
+      "texto": "Buenas noches. Estamos en el acceso de urgencias. ¿Viene usted en representación del servicio de salud mental?",
+      "siguienteNodoId": "decision-identificacion"
     },
     {
-      "id": "decision-enfoque",
+      "id": "decision-identificacion",
       "emisor": "jugador",
-      "texto": "Cómo iniciar el contacto institucional",
+      "texto": "Antes de hablar con el funcionario, la profesional repasa cómo quiere presentarse.",
       "opciones": [
         {
-          "id": "presentar-rol-clinico",
-          "texto": "«Soy psicóloga del equipo. Necesito comprender qué ocurrió antes del traslado.»",
+          "id": "prep-slot-pol-apertura-1",
+          "texto": "«Soy psicóloga del hospital. Intervengo en el caso de la paciente ingresada esta noche.»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "policia-contexto"
+          "siguienteNodoId": "policia-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_apertura",
+                "valor": true
+              }
+            }
+          ]
         },
         {
-          "id": "priorizar-seguridad",
-          "texto": "«Primero quiero saber si hay riesgo inmediato para la paciente o la familia presente.»",
-          "estrategiaClinica": "evaluacion_riesgo",
-          "siguienteNodoId": "policia-riesgo",
-          "modificadoresMetricas": { "confianza": 5 }
+          "id": "prep-slot-pol-apertura-2",
+          "texto": "«Antes de avanzar, ¿podría confirmarme el procedimiento para acceder a antecedentes del ingreso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "policia-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_apertura",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "id": "policia-contexto",
+      "id": "policia-acuse-recibo",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "El agresor presunto fue identificado. Hay versión de forcejeo doméstico, pero la familia minimiza.",
-      "siguienteNodoId": "decision-registro"
+      "texto": "Entendido. El ingreso sigue en trámite de registro. Puedo orientarle sobre el procedimiento cuando usted indique por dónde quiere comenzar.",
+      "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
-      "id": "policia-riesgo",
-      "emisor": "personaje",
-      "personajeId": "policia",
-      "texto": "No hay detenido en el hospital. Recomendamos no informar ubicación de la paciente a terceros no autorizados.",
-      "siguienteNodoId": "decision-registro"
-    },
-    {
-      "id": "decision-registro",
+      "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "Qué hacer con la información policial",
+      "texto": "La conversación acaba de abrirse. Organiza mentalmente qué indagar sobre la llegada al hospital esta noche.",
       "opciones": [
         {
-          "id": "solicitar-registro-formal",
-          "texto": "Pedir acceso al registro preliminar para contrastarlo con la historia clínica.",
+          "id": "prep-slot-pol-exploracion-1",
+          "texto": "«Necesito comprender el marco institucional de esta intervención antes de profundizar.»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "cierre-policia"
+          "siguienteNodoId": "pol-explor-marco",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_exploracion",
+                "valor": true
+              }
+            }
+          ]
         },
         {
-          "id": "posponer-registro",
-          "texto": "Agradecer y continuar la evaluación clínica antes de revisar el registro.",
+          "id": "prep-slot-pol-exploracion-2",
+          "texto": "«Mi intervención es clínica. ¿Con quién debo coordinar el acceso a la familia?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-explor-coordinacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-exploracion-3",
+          "texto": "«¿Qué información general tiene disponible sobre el traslado de esta noche?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-explor-general",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol-explor-marco",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Hay un registro preliminar en curso desde hace unas horas. Todavía no tenemos consolidado todo el traslado.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "pol-explor-coordinacion",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "La madre y un hermano están en sala de espera. Aún no hemos unificado quién acompañó todo el trayecto.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "pol-explor-general",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Ingresó esta noche una paciente adulta en estado grave. Acaba de llegar; aún consolidamos quién acompañó el traslado.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "decision-prep-profundizacion",
+      "emisor": "jugador",
+      "texto": "Observa lo ocurrido en acceso y pasillo; organiza mentalmente qué conviene revisar.",
+      "opciones": [
+        {
+          "id": "prep-slot-pol-profundizacion-1",
+          "texto": "«¿Cómo fue el arribo al hospital y quién acompañó el traslado?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-profun-llegada",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-profundizacion-3",
+          "texto": "«¿Qué conductas observaron en acceso o en el pasillo al ingreso?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-profun-comportamiento",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol-profun-llegada",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Lucía Morales ingresó inconsciente cerca de las once. La madre y un hermano la acompañaron; el yerno no viajó en la ambulancia.",
+      "siguienteNodoId": "decision-nivel3-vecinos"
+    },
+    {
+      "id": "pol-profun-comportamiento",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "En acceso había tensión entre familiares. Personal de seguridad retiró a un hombre del pasillo interior; no hay detenido en el hospital.",
+      "siguienteNodoId": "decision-nivel3-vecinos"
+    },
+    {
+      "id": "decision-nivel3-vecinos",
+      "emisor": "jugador",
+      "texto": "Conviene contrastar lo observado con los avisos recibidos. Considera qué indagar sobre vecinos y alertas.",
+      "opciones": [
+        {
+          "id": "prep-slot-pol-vecinos-1",
+          "texto": "«¿Qué información recibieron en la llamada o alerta inicial?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-profun-llamada",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-vecinos-2",
+          "texto": "«¿Qué relataron los vecinos sobre lo ocurrido antes del traslado?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "pol-n3-relato-vecinos",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol-profun-llamada",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "El primer aviso hablaba de forcejeo en vivienda. Los paramédicos ampliaron al llegar, pero la familia aún no unifica la versión.",
+      "siguienteNodoId": "decision-nivel4-antecedentes"
+    },
+    {
+      "id": "pol-n3-relato-vecinos",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Vecinos ubicaron gritos sostenidos cerca de las 22:45. En el traslado de esta noche, la familia insistió en que fue un accidente doméstico.",
+      "testimonio": {
+        "id": "testimonio-policia-hora-vecinos",
+        "tema": "cronologia_episodio",
+        "valor": "hora_2245",
+        "descripcion": "Vecinos ubican gritos sostenidos cerca de las 22:45",
+        "personajeId": "policia"
+      },
+      "siguienteNodoId": "decision-nivel4-antecedentes"
+    },
+    {
+      "id": "decision-nivel4-antecedentes",
+      "emisor": "jugador",
+      "texto": "Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "opciones": [
+        {
+          "id": "prep-slot-pol-critica-1",
+          "texto": "«¿Existen denuncias o intervenciones policiales previas en ese domicilio?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "policia-antecedentes",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-critica-2",
+          "texto": "«¿Dónde fue visto por última vez el agresor presunto?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "policia-paradero",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-critica-3",
+          "texto": "«¿Qué versión dieron los familiares al momento del traslado?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "policia-version",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "policia-antecedentes",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Dos partes en los últimos doce meses por disturbios en la misma vivienda. En ambos Miguel dijo que fue ‘una discusión de pareja’; Lucía nunca formalizó denuncia.",
+      "testimonio": {
+        "id": "testimonio-policia-antecedentes",
+        "tema": "clima_familiar",
+        "valor": "antecedentes_policiales",
+        "descripcion": "Dos partes previos por disturbios; minimización recurrente del agresor",
+        "personajeId": "policia"
+      },
+      "siguienteNodoId": "decision-nivel5-escalamiento"
+    },
+    {
+      "id": "decision-nivel5-escalamiento",
+      "emisor": "jugador",
+      "texto": "Conviene valorar si el patrón sugiere escalamiento previo; reflexiona sobre qué precisar.",
+      "opciones": [
+        {
+          "id": "prep-slot-pol-escalamiento-1",
+          "texto": "«¿Qué elementos sugieren que la violencia venía intensificándose?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "policia-cronologia-vecinos",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_cierre",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "policia-cronologia-vecinos",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Vecinos reportaron gritos y golpes en pared; cada vez sonó más fuerte que la anterior. El traslado de hoy llegó minutos después del último llamado. Hay un agresor presunto identificado: Miguel Álvarez, yerno de la paciente.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "policia-paradero",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "Fue retirado del pasillo de urgencias al ingreso. Un patrullero lo vio alejarse del hospital hacia el barrio; no tenemos orden de captura activa todavía. Por seguridad, no conviene divulgar la ubicación de la paciente.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "policia-version",
+      "emisor": "personaje",
+      "personajeId": "policia",
+      "texto": "La madre y el hermano dijeron que Lucía ‘resbaló’ durante una discusión. Eso no calza con lo que describió el hermano en privado ni con la nota prehospitalaria.",
+      "testimonio": {
+        "id": "testimonio-policia-version-resbalon",
+        "tema": "mecanismo_lesion",
+        "valor": "version_caida_accidental",
+        "descripcion": "Familia en ingreso habla de resbalón; contradice otros relatos",
+        "personajeId": "policia"
+      },
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "decision-cierre",
+      "emisor": "jugador",
+      "texto": "La información policial puede cruzarse con la clínica; piensa en cómo cerrar este contacto.",
+      "opciones": [
+        {
+          "id": "prep-slot-pol-cierre-1",
+          "texto": "«¿Podría facilitarme acceso al registro preliminar para contrastarlo con la historia clínica?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-policia",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_cierre",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-cierre-2",
+          "texto": "«Gracias. Prefiero continuar la evaluación clínica antes de revisar el registro formal.»",
           "estrategiaClinica": "contencion_emocional",
-          "siguienteNodoId": "cierre-policia"
+          "siguienteNodoId": "cierre-policia",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_cierre",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-pol-cierre-3",
+          "texto": "«¿Podrían mantener alerta si el agresor intenta reingresar al hospital?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "cierre-policia",
+          "modificadoresMetricas": {
+            "confianza": 4
+          },
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_pol_cierre",
+                "valor": true
+              }
+            }
+          ]
         }
       ]
     },
@@ -70,11 +414,13 @@
       "id": "cierre-policia",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Queda anotado. Si surge nueva información de riesgo, avísenos de inmediato.",
+      "texto": "Queda anotado. Si surge nuevo riesgo, avísenos de inmediato. La familia sigue adentro; el equipo médico tiene el registro del ingreso por si necesita contrastar versiones.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",
-          "parametros": { "conversacionId": "entrevista-policia-entrada" }
+          "parametros": {
+            "conversacionId": "entrevista-policia-entrada"
+          }
         }
       ]
     }

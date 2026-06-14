@@ -40,6 +40,8 @@ export class AuthService {
 
   /** True si hay un access token guardado y no está expirado. */
   readonly isAuthenticated = computed(() => {
+    // Depende de _usuario para invalidar el computed tras login/logout.
+    this._usuario();
     const token = this.getAccessToken();
     return token !== null && !this.isTokenExpired(token);
   });
@@ -113,7 +115,7 @@ export class AuthService {
 
     return request$.pipe(
       tap(() => {
-        const destino = this.rol() === Rol.Estudiante ? '/estudiante' : '/auth/login';
+        const destino = '/auth/login';
         this.clearLocalSession();
         this.router.navigate([destino]);
       }),
@@ -173,8 +175,8 @@ export class AuthService {
   }
 
   /** Pantalla de acceso según rol (p. ej. tras expirar la sesión). */
-  loginUrlDeRol(rol: Rol | null = this.rol()): string {
-    return rol === Rol.Estudiante ? '/estudiante' : '/auth/login';
+  loginUrlDeRol(_rol: Rol | null = this.rol()): string {
+    return '/auth/login';
   }
 
   private handleAuthSuccess(res: AuthResponse): void {

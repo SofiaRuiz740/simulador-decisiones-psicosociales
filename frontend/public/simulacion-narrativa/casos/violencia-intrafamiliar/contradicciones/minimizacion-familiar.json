@@ -1,0 +1,36 @@
+{
+  "id": "minimizacion-familiar",
+  "titulo": "Minimización frente a relato de agresión",
+  "descripcion": "Madre y registro de ingreso sostienen caída accidental; hermano y Lucía describen empujón intencional.",
+  "evidenciasInvolucradas": ["informe-urgencias"],
+  "personajesInvolucrados": ["madre-lucia", "hermano", "lucia"],
+  "requisitosRevelacion": [
+    {
+      "tipo": "y",
+      "condiciones": [
+        {
+          "tipo": "evidencia_descubierta",
+          "parametros": { "evidenciaId": "informe-urgencias" }
+        },
+        {
+          "tipo": "o",
+          "condiciones": [
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "revisita-hermano-tras-policia" }
+            },
+            {
+              "tipo": "conversacion_completada",
+              "parametros": { "conversacionId": "revisita-madre-tras-ts" }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "severidad": "moderada",
+  "preguntasReflexion": [
+    "¿Quién se beneficia de la versión de ‘caída’ en el ingreso?",
+    "¿Cómo integrar la minimización de la abuela sin invalidar su duelo?"
+  ]
+}

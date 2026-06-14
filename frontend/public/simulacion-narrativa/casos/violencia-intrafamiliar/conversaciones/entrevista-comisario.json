@@ -1,0 +1,566 @@
+{
+  "id": "entrevista-comisario",
+  "titulo": "Entrevista con el comisario",
+  "escenarioId": "investigacion-comisaria",
+  "personajeId": "comisario",
+  "nodoInicialId": "apertura-comisario",
+  "requisitosAcceso": [
+    {
+      "tipo": "escenario_conversaciones_completadas",
+      "parametros": {
+        "escenarioId": "consulta-inicial",
+        "conversacionIds": [
+          "entrevista-policia-entrada",
+          "entrevista-madre-espera",
+          "entrevista-hermano-espera",
+          "entrevista-enfermera-pasillo",
+          "entrevista-medico-urgencias",
+          "revisita-lucia-informe"
+        ]
+      }
+    }
+  ],
+  "nodos": [
+    {
+      "id": "apertura-comisario",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Buenas. Han pasado quince días desde el ingreso en urgencias. Me informaron que viene con documentación actualizada del caso. ¿En qué puedo orientarle?",
+      "siguienteNodoId": "decision-prep-apertura"
+    },
+    {
+      "id": "decision-prep-apertura",
+      "emisor": "jugador",
+      "texto": "Antes de hablar con el comisario, la profesional repasa cómo quiere presentarse.",
+      "opciones": [
+        {
+          "id": "prep-slot-com-apertura-1",
+          "texto": "«Soy psicóloga del hospital. Traigo el informe para articular con la comisaría.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_apertura",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-apertura-2",
+          "texto": "«Antes de profundizar, ¿podría orientarme sobre el procedimiento institucional aquí?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_apertura",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-apertura-3",
+          "texto": "«Entiendo que ya hubo contacto con el hospital. ¿Qué información tiene disponible por ahora?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-acuse-recibo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_apertura",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comisario-acuse-recibo",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Entendido. El expediente lleva quince días en consolidación y ya recibimos evolución clínica parcial. Puedo orientarle sobre el procedimiento cuando indique por dónde comenzar.",
+      "siguienteNodoId": "decision-prep-exploracion-inicial"
+    },
+    {
+      "id": "decision-prep-exploracion-inicial",
+      "emisor": "jugador",
+      "texto": "La conversación está abierta; organiza mentalmente qué indagar sobre el estado actual del proceso.",
+      "opciones": [
+        {
+          "id": "prep-slot-com-exploracion-1",
+          "texto": "«¿Cuál es el procedimiento institucional para casos con sospecha de violencia intrafamiliar?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "com-explor-procedimiento",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-exploracion-2",
+          "texto": "«¿Qué medidas de protección pueden activarse desde la comisaría en esta etapa?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "com-explor-medidas-teaser",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-exploracion-3",
+          "texto": "«¿Qué información policial previa existe vinculada a este domicilio?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "com-explor-antecedentes-teaser",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_exploracion",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "com-explor-procedimiento",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Recibimos el aviso del hospital aquella noche y abrimos expediente. Desde entonces hemos recibido informes clínicos de evolución parcial.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "com-explor-medidas-teaser",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Hay rutas conforme a la Ley 1257. Ya se activaron medidas provisionales; puedo detallar el estado actual si lo requiere.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "com-explor-antecedentes-teaser",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Existen intervenciones previas en la misma vivienda, documentadas antes del episodio. Puedo ampliar si necesita contrastarlas con lo recogido en el hospital.",
+      "siguienteNodoId": "decision-prep-profundizacion"
+    },
+    {
+      "id": "decision-prep-profundizacion",
+      "emisor": "jugador",
+      "texto": "Puede profundizar en medidas activadas y antecedentes revisados. Considera qué indagar a continuación.",
+      "opciones": [
+        {
+          "id": "prep-slot-com-profundizacion-1",
+          "texto": "«Necesito contrastar las versiones del núcleo familiar con los registros policiales previos.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-contraste",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-profundizacion-2",
+          "texto": "«Necesito valorar el nivel de riesgo actual para determinar qué medidas de protección son prioritarias, en el marco de la Ley 1257.»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "comisario-proteccion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_profundizacion",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_riesgo_feminicidio",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_medidas_proteccion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-profundizacion-3",
+          "texto": "«Desde salud mental reuní testimonios y evidencias clínicas que quiero cruzar con su expediente.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-hallazgos",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_profundizacion",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-profundizacion-4",
+          "texto": "«¿Sería pertinente proponer mediación familiar para facilitar el diálogo?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-no-mediacion",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_profundizacion",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_no_mediacion_ley1257",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comisario-no-mediacion",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "No procede. Con riesgo elevado, menor fallecida y antecedentes documentados, la Ley 1257 prioriza protección y acceso a la justicia, no acercamiento entre partes. La mediación en este contexto revictimiza y puede elevar el riesgo de feminicidio.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "comisario-contraste",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Hay dos partes en los últimos doce meses. En ambos el agresor presunto minimizó. Puedo ampliar el contraste con el informe de urgencias si lo requiere.",
+      "siguienteNodoId": "comisario-contraste-detalle"
+    },
+    {
+      "id": "comisario-contraste-detalle",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "El informe de urgencias describe lesiones compatibles con forcejeo reiterado, no con una caída aislada. Eso refuerza la valoración de riesgo en curso.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "comisario-proteccion",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Se activó alerta interna conforme a la Ley 1257: medida provisional de alejamiento y registro de riesgo elevado. La trabajadora social coordinará red de apoyo. Documente hallazgos clínicos que sustenten la protección jurídica.",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "comisario-hallazgos",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Perfecto. Aquí lo clínico pesa cuando hay convergencia: mecanismo de lesión, exposición de la menor y miedo a represalias. ¿Qué contradicciones encontró?",
+      "siguienteNodoId": "decision-prep-info-critica"
+    },
+    {
+      "id": "decision-prep-info-critica",
+      "emisor": "jugador",
+      "texto": "Hay líneas investigativas sensibles que conviene precisar. Hay aspectos que aún no están claros; reflexiona sobre cuál merece mayor atención.",
+      "opciones": [
+        {
+          "id": "prep-slot-com-critica-1",
+          "texto": "«¿Hay indicios de escalamiento reciente en la conducta de Miguel Álvarez?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "comisario-agresor",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_riesgo_feminicidio",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-critica-2",
+          "texto": "«¿Podría orientarme sobre los partes previos y si hubo denuncia formal?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-partes",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-critica-3",
+          "texto": "«¿Cómo quedó registrada la muerte de la menor en la investigación?»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "comisario-menor",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_info_critica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-critica-4",
+          "texto": "«¿Qué antecedentes de control, amenazas o violencia previa constan en el expediente?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "comisario-riesgo-acumulativo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_info_critica",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "info_riesgo_acumulativo",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comisario-riesgo-acumulativo",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Constan amenazas verbales, celos extremos, aislamiento progresivo de Lucía y dos partes previos por violencia. En el último llamado vecinos hablaron de que empuñó un cuchillo de cocina; aquel episodio, hace quince días, empeoró el patrón. Eso obliga a medidas urgentes, no a esperar.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "comisario-agresor",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Orden de alejamiento provisional en trámite, según Ley 2126 de 2021. Fue visto cerca del barrio, no en el hospital. Recomendamos no compartir ubicación de la paciente con la familia extendida sin filtro.",
+      "testimonio": {
+        "id": "testimonio-comisario-alejamiento",
+        "tema": "clima_familiar",
+        "valor": "medida_proteccion",
+        "descripcion": "Orden de alejamiento provisional en trámite contra agresor",
+        "personajeId": "comisario"
+      },
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "comisario-partes",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Primera intervención hace ocho meses: ‘discusión de pareja’. Segunda hace tres meses: vecinos reportaron golpes; Lucía no amplió denuncia formal. Hay acceso a la justicia vía comisaría, pero el patrón de minimización sostenida complica la protección.",
+      "testimonio": {
+        "id": "testimonio-comisario-partes",
+        "tema": "clima_familiar",
+        "valor": "antecedentes_policiales",
+        "descripcion": "Dos partes previos; Lucía no amplió denuncia",
+        "personajeId": "comisario"
+      },
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "comisario-menor",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "La muerte de la menor activó fiscalía. El expediente de violencia intrafamiliar se articula con ese proceso. Su evaluación psicosocial alimenta ambas vías.",
+      "siguienteNodoId": "decision-cierre"
+    },
+    {
+      "id": "decision-cierre",
+      "emisor": "jugador",
+      "texto": "La articulación con la comisaría requiere un cierre claro. La articulación con la comisaría requiere un cierre claro; considera cómo proceder.",
+      "opciones": [
+        {
+          "id": "prep-slot-com-cierre-1",
+          "texto": "«Puedo ofrecer una síntesis clínica de los testimonios convergentes sobre el empujón.»",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "cierre-comisario-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_cierre",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-cierre-2",
+          "texto": "«¿Podemos activar las rutas institucionales pertinentes y dejar constancia para la libreta?»",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "cierre-comisario-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_cierre",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_rutas_institucionales",
+                "valor": true
+              }
+            },
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "criterio_decision_etica",
+                "valor": true
+              }
+            }
+          ]
+        },
+        {
+          "id": "prep-slot-com-cierre-3",
+          "texto": "«¿Qué valoración de riesgo queda registrada formalmente tras esta articulación?»",
+          "estrategiaClinica": "evaluacion_riesgo",
+          "siguienteNodoId": "cierre-comisario-dialogo",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "prep_rubrica_com_cierre",
+                "valor": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cierre-comisario-dialogo",
+      "emisor": "personaje",
+      "personajeId": "comisario",
+      "texto": "Queda registrado. Nuestra responsabilidad es proteger derechos y sostener el acceso a la justicia cuando la evidencia converge. La trabajadora social puede ayudarle con el plan de protección integral.",
+      "siguienteNodoId": "format-ref-d4-comisario"
+    },
+    {
+      "id": "format-ref-d4-comisario",
+      "emisor": "jugador",
+      "texto": "Tras articular con la comisaría, la profesional reflexiona sobre cuál debe ser la prioridad institucional en este punto.",
+      "opciones": [
+        {
+          "id": "format-d4-a",
+          "texto": "Reconciliación familiar.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d4-a",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d4",
+                "valor": "A"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d4-b",
+          "texto": "Protección integral de la víctima.",
+          "estrategiaClinica": "planificacion_seguridad",
+          "siguienteNodoId": "feedback-format-d4-b",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d4",
+                "valor": "B"
+              }
+            }
+          ]
+        },
+        {
+          "id": "format-d4-c",
+          "texto": "Mediación con el agresor.",
+          "estrategiaClinica": "exploracion",
+          "siguienteNodoId": "feedback-format-d4-c",
+          "efectos": [
+            {
+              "tipo": "establecer_flag",
+              "parametros": {
+                "clave": "format_ref_d4",
+                "valor": "C"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feedback-format-d4-a",
+      "emisor": "narrador",
+      "texto": "Buscar reconciliación sin medidas previas suele aumentar la exposición al riesgo en estos casos.",
+      "siguienteNodoId": "cierre-comisario"
+    },
+    {
+      "id": "feedback-format-d4-b",
+      "emisor": "narrador",
+      "texto": "La protección integral articula medidas ya en trámite con el acompañamiento psicosocial.",
+      "siguienteNodoId": "cierre-comisario"
+    },
+    {
+      "id": "feedback-format-d4-c",
+      "emisor": "narrador",
+      "texto": "La mediación con el agresor no procede mientras las medidas de alejamiento siguen activas.",
+      "siguienteNodoId": "cierre-comisario"
+    },
+    {
+      "id": "cierre-comisario",
+      "emisor": "narrador",
+      "texto": "Cierra la entrevista con el comisario. El expediente queda en consolidación.",
+      "efectosAlMostrar": [
+        {
+          "tipo": "completar_conversacion",
+          "parametros": {
+            "conversacionId": "entrevista-comisario"
+          }
+        }
+      ]
+    }
+  ]
+}

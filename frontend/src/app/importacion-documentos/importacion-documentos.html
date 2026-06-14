@@ -36,17 +36,14 @@
     @if (archivo(); as a) {
       <div class="file-info">
         <strong>{{ a.nombre_original }}</strong>
-        <span>{{ a.tipo }} · {{ a.estado_display }}</span>
-      </div>
-    }
-
-    @if (archivo() && !archivo()!.texto_extraido) {
-      <div class="builder-block" style="margin-top: 1rem">
-        <div class="form-actions">
-          <button type="button" class="btn-primary" (click)="procesar()" [disabled]="loading() || archivo()!.estado !== 'SUBIDO'">
-            Procesar documento
-          </button>
-        </div>
+        <span>
+          {{ a.tipo }} ·
+          @if (loading() && !a.texto_extraido) {
+            extrayendo texto…
+          } @else {
+            {{ a.estado_display }}
+          }
+        </span>
       </div>
     }
 
@@ -108,7 +105,7 @@
         } @else {
           <div class="empty-state-mockup empty-state-mockup--compact">
             <strong>Sin resultado</strong>
-            Sube y procesa un documento para ver la vista previa y crear el caso.
+            Sube un documento para ver la vista previa y crear el caso.
           </div>
         }
       </div>
@@ -253,6 +250,13 @@
       </p>
     </div>
     <input #fileRubrica type="file" accept=".xlsx" hidden (change)="seleccionarRubrica($event)" />
+
+    @if (tab() === 'rubrica' && casosCargados() && !casosDisponibles().length) {
+      <div class="empty-state-mockup empty-state-mockup--compact" style="margin-top: 1rem">
+        <strong>Sin casos disponibles</strong>
+        Crea o importa un caso en la pestaña «Caso» antes de cargar la rúbrica.
+      </div>
+    }
 
     @if (resultadoRubrica(); as r) {
       <div class="template-preview" style="margin-top: 1rem">

@@ -1,0 +1,76 @@
+<app-estudiante-shell titulo="Resultados y retroalimentación">
+  <header class="page-header">
+    <div>
+      <a routerLink="/estudiante/panel" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Panel
+      </a>
+      <h1>Resultados y retroalimentación</h1>
+      <p>Consulta el resumen académico de tus prácticas finalizadas.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else if (lista().length === 0) {
+    <div class="vacio elevated-card">
+      <mat-icon>insights</mat-icon>
+      <p>Aún no hay resultados registrados. Completa una simulación para ver tu retroalimentación.</p>
+      <a mat-flat-button color="primary" routerLink="/estudiante/practicas">Ir a mis prácticas</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <aside class="lista elevated-card">
+        <h2>Prácticas realizadas</h2>
+        @for (r of lista(); track r.id) {
+          <button
+            type="button"
+            class="item"
+            [class.activo]="seleccionado()?.id === r.id"
+            (click)="verDetalle(r)">
+            <strong>{{ r.practica_nombre }}</strong>
+            <span>{{ r.fecha_finalizacion | date:'mediumDate' }}</span>
+            <span class="pct">{{ r.porcentaje }}%</span>
+          </button>
+        }
+      </aside>
+
+      @if (seleccionado(); as r) {
+        <section class="detalle elevated-card">
+          <header>
+            <h2>{{ r.practica_nombre }}</h2>
+            <p>{{ r.caso_nombre }} · {{ r.fecha_finalizacion | date:'fullDate' }}</p>
+          </header>
+
+          <div class="metricas">
+            <div><span>Avance</span><strong>{{ r.porcentaje }}%</strong></div>
+            <div><span>Entrevistas</span><strong>{{ r.entrevistas_realizadas }}/{{ r.entrevistas_totales }}</strong></div>
+            <div><span>Evidencias</span><strong>{{ r.evidencias_encontradas }}</strong></div>
+            <div><span>Contradicciones</span><strong>{{ r.contradicciones_detectadas }}</strong></div>
+            <div><span>Hipótesis</span><strong>{{ r.hipotesis_formuladas }}</strong></div>
+            <div><span>Estado</span><strong>{{ r.estado_final }}</strong></div>
+          </div>
+
+          <div class="retro">
+            <div>
+              <h3>Fortalezas</h3>
+              <ul>
+                @for (f of r.fortalezas; track f) {
+                  <li>{{ f }}</li>
+                }
+              </ul>
+            </div>
+            <div>
+              <h3>Aspectos por mejorar</h3>
+              <ul>
+                @for (a of r.aspectos_mejorar; track a) {
+                  <li>{{ a }}</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+  }
+</app-estudiante-shell>

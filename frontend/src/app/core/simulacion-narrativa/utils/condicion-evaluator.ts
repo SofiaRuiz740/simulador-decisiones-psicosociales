@@ -80,8 +80,10 @@ export function evaluarCondicion(
 
     case 'escenario_conversaciones_completadas': {
       const escenarioId = String(condicion.parametros?.['escenarioId']);
-      const escenario = caso?.escenarios[escenarioId];
-      const conversaciones = escenario?.conversacionesDisponibles ?? [];
+      const idsExplicitos = condicion.parametros?.['conversacionIds'];
+      const conversaciones = Array.isArray(idsExplicitos) && idsExplicitos.length
+        ? idsExplicitos.map(String)
+        : (caso?.escenarios[escenarioId]?.conversacionesDisponibles ?? []);
       if (!conversaciones.length) return false;
       return conversaciones.every((conversacionId) =>
         estado.conversacionesCompletadas.includes(conversacionId),

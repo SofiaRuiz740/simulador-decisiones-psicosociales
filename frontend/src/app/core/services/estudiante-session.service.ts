@@ -9,6 +9,11 @@ import {
 import { AccesoEstudianteRespuesta, MisPracticaEstudiante } from '../models/practicas.model';
 import { Rol } from '../models/usuario.model';
 import { resolverCasoNarrativoId } from '../utils/caso-narrativo.util';
+import { clavesIntroRelacionadas } from '../simulacion-narrativa/utils/introduccion-narrativa.util';
+import {
+  borrarPartidaPersistida,
+  clavePartidaPersistida,
+} from '../simulacion-narrativa/utils/partida-persistencia.util';
 
 const ACCESS_KEY = 'simulador.access';
 const REFRESH_KEY = 'simulador.refresh';
@@ -19,10 +24,13 @@ const PRACTICAS_KEY = 'simulador.practicas_estudiante';
 @Injectable({ providedIn: 'root' })
 export class EstudianteSessionService {
   private readonly _practicas = signal<PracticaEstudianteRegistro[]>(this.cargarPracticas());
+  private readonly _sesionActiva = signal(!!localStorage.getItem(ACCESS_KEY));
+  private readonly _practicaActivaId = signal<number | null>(this.leerPracticaActivaId());
 
   readonly practicas = this._practicas.asReadonly();
 
   readonly practicaActiva = computed(() => {
+    this._practicaActivaId();
     const raw = localStorage.getItem(PRACTICA_ACTIVA_KEY);
     if (!raw) return null;
     try {
@@ -32,7 +40,7 @@ export class EstudianteSessionService {
     }
   });
 
-  readonly autenticado = computed(() => !!localStorage.getItem(ACCESS_KEY));
+  readonly autenticado = computed(() => this._sesionActiva());
 
   readonly nombreEstudiante = computed(() => {
     const raw = localStorage.getItem(USER_KEY);
@@ -76,6 +84,8 @@ export class EstudianteSessionService {
       autorizacion_id: respuesta.autorizacion_id,
     };
     localStorage.setItem(PRACTICA_ACTIVA_KEY, JSON.stringify(practica));
+    this._sesionActiva.set(true);
+    this._practicaActivaId.set(practica.id);
     this.upsertPractica(practica, respuesta.autorizacion_id);
   }
 
@@ -87,6 +97,7 @@ export class EstudianteSessionService {
     const practica = this.obtenerPractica(id);
     if (!practica) return;
     localStorage.setItem(PRACTICA_ACTIVA_KEY, JSON.stringify(practica));
+    this._practicaActivaId.set(id);
   }
 
   guardarProgreso(
@@ -139,12 +150,62 @@ export class EstudianteSessionService {
     });
   }
 
+  /** Restablece progreso local tras aprobación de reintento o reinicio docente. */
+  reiniciarProgresoLocal(practicaId: number): void {
+    const practica = this.obtenerPractica(practicaId);
+    if (!practica) return;
+
+    const casoNarrativoId = resolverCasoNarrativoId(practica);
+    const estudianteId = this.estudianteId();
+    if (estudianteId != null) {
+      borrarPartidaPersistida({
+        casoId: casoNarrativoId,
+        estudianteId,
+        practicaId,
+      });
+      for (const clave of clavesIntroRelacionadas(casoNarrativoId, estudianteId, practicaId)) {
+        localStorage.removeItem(clave);
+      }
+    }
+
+    const lista = [...this._practicas()];
+    const idx = lista.findIndex((p) => p.id === practicaId);
+    if (idx < 0) return;
+
+    lista[idx] = {
+      ...lista[idx],
+      progreso: {
+        practicaId,
+        casoNarrativoId,
+        porcentaje: 0,
+        estado: 'no_iniciada',
+        ultimaActividad: new Date().toISOString(),
+        conversacionesCompletadas: 0,
+        conversacionesTotales: 0,
+      },
+    };
+    this.persistirPracticas(lista);
+  }
+
   cerrarSesion(): void {
     this.limpiarDatosLocales();
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(PRACTICA_ACTIVA_KEY);
+    this._sesionActiva.set(false);
+    this._practicaActivaId.set(null);
+  }
+
+  private leerPracticaActivaId(): number | null {
+    const raw = localStorage.getItem(PRACTICA_ACTIVA_KEY);
+    if (!raw) return null;
+    try {
+      const p = JSON.parse(raw) as { id?: number };
+      return typeof p.id === 'number' ? p.id : null;
+    } catch {
+      return null;
+    }
   }
 
   /** Vacía prácticas locales (logout centralizado desde AuthService). */

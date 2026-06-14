@@ -7,6 +7,12 @@
 }
 
 .dialogo-escena {
+  --dialogo-ancho-caja: min(48vw, 660px);
+  --dialogo-ancho-personaje: clamp(260px, 28vw, 420px);
+  --dialogo-altura-retrato: clamp(480px, 78vh, 92vh);
+  --dialogo-escala-activo: 1.08;
+  --dialogo-opacidad-inactivo: 0.48;
+  --dialogo-transicion-turno: 300ms;
   position: absolute;
   inset: 0;
   display: flex;
@@ -20,29 +26,47 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(8, 12, 20, 0.42);
+  background:
+    radial-gradient(ellipse 72% 88% at 50% 58%, transparent 0%, rgba(8, 12, 20, 0.22) 58%, rgba(8, 12, 20, 0.58) 100%),
+    linear-gradient(180deg, rgba(8, 12, 20, 0.2) 0%, rgba(8, 12, 20, 0.52) 100%),
+    rgba(8, 12, 20, 0.38);
+  backdrop-filter: blur(10px) saturate(0.92);
+  -webkit-backdrop-filter: blur(10px) saturate(0.92);
   pointer-events: none;
+}
+
+.dialogo-composicion {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  margin: 0 auto clamp(12px, 2vh, 24px);
+  padding: 0 clamp(12px, 2vw, 24px);
+  pointer-events: none;
+  overflow: visible;
 }
 
 .dialogo-caja {
   position: relative;
-  z-index: 4;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: min(92%, 980px);
-  min-height: clamp(260px, 36vh, 340px);
-  max-height: min(45vh, 520px);
-  margin: 0 clamp(12px, 2vw, 24px) clamp(10px, 1.5vh, 16px);
-  padding: clamp(14px, 2vw, 20px) clamp(16px, 2.2vw, 24px);
-  border-radius: 18px;
+  gap: 10px;
+  width: var(--dialogo-ancho-caja);
+  min-width: 0;
+  min-height: clamp(220px, 28vh, 300px);
+  max-height: min(40vh, 480px);
+  padding: clamp(14px, 1.8vw, 20px) clamp(16px, 2vw, 24px);
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(12, 18, 30, 0.58);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(8, 14, 26, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   box-shadow:
-    0 20px 48px rgba(0, 0, 0, 0.38),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    0 24px 56px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   pointer-events: auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -50,8 +74,8 @@
 
 .dialogo-cerrar {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   z-index: 4;
   display: inline-flex;
   align-items: center;
@@ -63,8 +87,8 @@
   color: rgba(226, 232, 240, 0.78);
   cursor: pointer;
   transition:
-    background 0.18s ease,
-    color 0.18s ease;
+    background 0.2s ease,
+    color 0.2s ease;
 
   mat-icon {
     font-size: 20px;
@@ -82,39 +106,40 @@
 
 .dialogo-caja-encabezado {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   padding-right: 36px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 8px;
+  padding-bottom: 12px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
 
 .dialogo-orador-nombre {
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  font-size: clamp(0.88rem, 1.4vw, 1rem);
+  font-size: clamp(1.02rem, 1.65vw, 1.2rem);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: #f8fafc;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .dialogo-orador-rol {
-  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  font-size: clamp(0.74rem, 1.05vw, 0.84rem);
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(212, 196, 168, 0.92);
-  line-height: 1.3;
+  color: rgba(212, 196, 168, 0.9);
+  line-height: 1.25;
 }
 
 .dialogo-caja-texto {
   flex: 0 1 auto;
-  min-height: 2.75rem;
+  min-height: 3rem;
   overflow-y: visible;
-  padding: 2px 0;
+  padding: 4px 0 2px;
   cursor: text;
 
   &.escribiendo {
@@ -124,19 +149,19 @@
 
 .texto-dialogo {
   margin: 0;
-  font-size: clamp(0.95rem, 1.45vw, 1.06rem);
-  line-height: 1.68;
-  color: #e2e8f0;
+  font-size: clamp(0.96rem, 1.42vw, 1.08rem);
+  line-height: 1.72;
+  color: #e8edf4;
   white-space: pre-wrap;
 }
 
 .texto-prompt {
   font-style: italic;
-  color: rgba(226, 232, 240, 0.9);
+  color: rgba(226, 232, 240, 0.92);
 }
 
 .comillas {
-  color: rgba(212, 196, 168, 0.78);
+  color: rgba(212, 196, 168, 0.76);
 }
 
 .cursor-typewriter {
@@ -158,8 +183,9 @@
 .dialogo-caja-acciones {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+  padding-top: 4px;
 }
 
 .dialogo-aviso {
@@ -180,7 +206,7 @@
 .opciones-narrativas {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
   overflow: visible;
 }
@@ -271,69 +297,119 @@
   min-width: 0;
 }
 
-.dialogo-personajes {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  padding-top: clamp(48px, 8vh, 72px);
-}
-
+/* —— Retratos tipo novela visual (laterales de pantalla completa) —— */
 .personaje-escena {
   position: absolute;
-  bottom: min(45vh, 520px);
+  bottom: 0;
+  z-index: 2;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  margin: 0;
-  height: clamp(220px, 40vh, 440px);
-  max-height: calc(100% - min(46vh, 540px));
-  filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.48));
-  opacity: 0.65;
+  width: var(--dialogo-ancho-personaje);
+  height: var(--dialogo-altura-retrato);
+  overflow: hidden;
+  opacity: var(--dialogo-opacidad-inactivo);
+  --dialogo-escala-retrato: 1.05;
+  transform: scale(var(--dialogo-escala-retrato));
+  filter:
+    drop-shadow(0 10px 24px rgba(0, 0, 0, 0.38))
+    brightness(0.78)
+    saturate(0.86)
+    contrast(0.92);
   transition:
-    opacity 0.32s ease,
-    transform 0.32s ease,
-    filter 0.32s ease;
+    opacity var(--dialogo-transicion-turno) ease,
+    transform var(--dialogo-transicion-turno) cubic-bezier(0.22, 1, 0.36, 1),
+    filter var(--dialogo-transicion-turno) ease;
 
   &--activo {
+    z-index: 4;
     opacity: 1;
-    filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
+    transform: scale(calc(var(--dialogo-escala-retrato) * var(--dialogo-escala-activo)));
+    filter:
+      drop-shadow(0 18px 40px rgba(0, 0, 0, 0.58))
+      brightness(1)
+      saturate(1)
+      contrast(1);
   }
 }
 
 .personaje-escena--npc {
   left: 0;
-  width: min(46vw, 420px);
+  justify-content: flex-start;
   transform-origin: bottom left;
-  clip-path: polygon(0 0, 64% 0, 46% 100%, 0 100%);
 
-  .personaje-imagen {
-    object-position: bottom left;
-    transform: rotate(-1.5deg) translateX(-14%);
-    transform-origin: bottom left;
+  &.personaje-escena--activo {
+    transform: scale(calc(var(--dialogo-escala-retrato) * var(--dialogo-escala-activo)));
   }
+}
+
+.personaje-escena--rol-victima,
+.personaje-escena--rol-madre-victima {
+  --dialogo-escala-retrato: 0.9;
+}
+
+.personaje-escena--rol-psicologa {
+  --dialogo-escala-retrato: 1.05;
 }
 
 .personaje-escena--psicologa {
   right: 0;
-  width: min(46vw, 420px);
+  justify-content: flex-end;
   transform-origin: bottom right;
-  clip-path: polygon(36% 0, 100% 0, 100% 100%, 54% 100%);
 
-  .personaje-imagen {
-    object-position: bottom right;
-    transform: rotate(1.5deg) translateX(14%);
-    transform-origin: bottom right;
+  &.personaje-escena--activo {
+    transform: scale(calc(var(--dialogo-escala-retrato) * var(--dialogo-escala-activo)));
   }
 }
 
 .personaje-imagen {
   display: block;
   width: auto;
-  height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-  object-position: bottom center;
+  height: 108%;
+  max-width: 118%;
+  min-width: 96%;
+  object-fit: cover;
+  object-position: center 14%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.personaje-escena--rol-victima .personaje-imagen,
+.personaje-escena--rol-madre-victima .personaje-imagen {
+  object-position: center 10%;
+  min-width: 92%;
+}
+
+.personaje-escena--rol-policia .personaje-imagen {
+  object-position: 38% 12%;
+}
+
+.personaje-escena--rol-enfermera .personaje-imagen {
+  object-position: 44% 11%;
+}
+
+.personaje-escena--rol-medico-urgencias .personaje-imagen {
+  object-position: 46% 10%;
+}
+
+.personaje-escena--rol-hermano-familiar .personaje-imagen {
+  object-position: 42% 12%;
+}
+
+.personaje-escena--rol-comisario .personaje-imagen,
+.personaje-escena--rol-trabajadora-social .personaje-imagen {
+  object-position: 48% 11%;
+}
+
+.personaje-escena--rol-psicologa .personaje-imagen {
+  object-position: 52% 10%;
+}
+
+.personaje-escena--npc .personaje-imagen {
+  margin-left: -2%;
+}
+
+.personaje-escena--psicologa .personaje-imagen {
+  margin-right: -2%;
 }
 
 .personaje-placeholder {
@@ -345,43 +421,43 @@
   color: rgba(226, 232, 240, 0.35);
 
   mat-icon {
-    font-size: clamp(96px, 16vh, 160px);
+    font-size: clamp(120px, 22vh, 200px);
     width: 1em;
     height: 1em;
   }
 }
 
-/* —— Apertura cinematográfica (~300 ms, escalonada) —— */
+/* —— Apertura / cierre (~300 ms, escalonada) —— */
 .dialogo-escena.entrando .dialogo-overlay {
   opacity: 0;
-  animation: overlay-entrada 0.22s ease both;
+  animation: overlay-entrada 0.3s ease both;
 }
 
 .dialogo-escena.entrando .personaje-escena--npc {
   opacity: 0;
-  animation: personaje-entrada-izq 0.26s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  animation: personaje-entrada-izq 0.32s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
 }
 
 .dialogo-escena.entrando .personaje-escena--psicologa {
   opacity: 0;
-  animation: personaje-entrada-der 0.26s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  animation: personaje-entrada-der 0.32s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
-.dialogo-escena.entrando .dialogo-caja {
+.dialogo-escena.entrando .dialogo-composicion {
   opacity: 0;
-  animation: caja-entrada 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  animation: composicion-entrada 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
 }
 
 .dialogo-escena.saliendo .dialogo-overlay {
-  animation: overlay-salida 0.24s ease forwards;
+  animation: overlay-salida 0.3s ease forwards;
 }
 
 .dialogo-escena.saliendo .personaje-escena {
-  animation: personaje-salida 0.22s ease forwards;
+  animation: personaje-salida 0.28s ease forwards;
 }
 
-.dialogo-escena.saliendo .dialogo-caja {
-  animation: caja-salida 0.24s ease forwards;
+.dialogo-escena.saliendo .dialogo-composicion {
+  animation: composicion-salida 0.3s ease forwards;
 }
 
 @keyframes overlay-entrada {
@@ -405,22 +481,22 @@
 @keyframes personaje-entrada-izq {
   from {
     opacity: 0;
-    transform: translateY(20px) translateX(-10px);
+    transform: translateY(18px) translateX(-10px) scale(1);
   }
   to {
-    opacity: 0.65;
-    transform: translateY(0) translateX(0);
+    opacity: var(--dialogo-opacidad-inactivo);
+    transform: translateY(0) translateX(0) scale(1);
   }
 }
 
 @keyframes personaje-entrada-der {
   from {
     opacity: 0;
-    transform: translateY(20px) translateX(10px);
+    transform: translateY(18px) translateX(10px) scale(1);
   }
   to {
-    opacity: 0.65;
-    transform: translateY(0) translateX(0);
+    opacity: var(--dialogo-opacidad-inactivo);
+    transform: translateY(0) translateX(0) scale(1);
   }
 }
 
@@ -435,40 +511,40 @@
 @keyframes personaje-entrada-izq-activo {
   from {
     opacity: 0;
-    transform: translateY(20px) translateX(-10px);
+    transform: translateY(18px) translateX(-10px) scale(1);
   }
   to {
     opacity: 1;
-    transform: translateY(0) translateX(0);
+    transform: translateY(0) translateX(0) scale(var(--dialogo-escala-activo));
   }
 }
 
 @keyframes personaje-entrada-der-activo {
   from {
     opacity: 0;
-    transform: translateY(20px) translateX(10px);
+    transform: translateY(18px) translateX(10px) scale(1);
   }
   to {
     opacity: 1;
-    transform: translateY(0) translateX(0);
+    transform: translateY(0) translateX(0) scale(var(--dialogo-escala-activo));
   }
 }
 
 @keyframes personaje-salida {
   from {
-    opacity: 0.65;
-    transform: translateY(0);
+    opacity: var(--dialogo-opacidad-inactivo);
+    transform: translateY(0) scale(1);
   }
   to {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px) scale(0.98);
   }
 }
 
-@keyframes caja-entrada {
+@keyframes composicion-entrada {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -476,93 +552,84 @@
   }
 }
 
-@keyframes caja-salida {
+@keyframes composicion-salida {
   from {
     opacity: 1;
     transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
 }
 
 @media (min-width: 1366px) and (max-width: 1599px) {
-  .personaje-escena {
-    height: clamp(240px, 38vh, 420px);
-    bottom: min(42vh, 480px);
-    max-height: calc(100% - min(44vh, 500px));
+  .dialogo-escena {
+    --dialogo-ancho-caja: min(46vw, 640px);
+    --dialogo-ancho-personaje: clamp(280px, 27vw, 400px);
+    --dialogo-altura-retrato: clamp(500px, 80vh, 94vh);
   }
 
   .dialogo-caja {
-    min-height: clamp(280px, 37vh, 360px);
-    max-height: min(44vh, 500px);
+    min-height: clamp(230px, 29vh, 310px);
+    max-height: min(39vh, 470px);
   }
 }
 
 @media (min-width: 1600px) and (max-width: 1919px) {
-  .personaje-escena {
-    height: clamp(250px, 39vh, 450px);
+  .dialogo-escena {
+    --dialogo-ancho-caja: min(44vw, 660px);
+    --dialogo-ancho-personaje: clamp(300px, 26vw, 420px);
+    --dialogo-altura-retrato: clamp(520px, 82vh, 94vh);
   }
 
   .dialogo-caja {
-    min-height: clamp(290px, 38vh, 370px);
-    max-height: min(44vh, 510px);
+    min-height: clamp(240px, 30vh, 320px);
+    max-height: min(38vh, 490px);
   }
 }
 
 @media (min-width: 1920px) {
-  .personaje-escena {
-    height: clamp(260px, 40vh, 480px);
-    max-height: calc(100% - min(46vh, 540px));
-  }
-
-  .personaje-escena--npc {
-    width: min(42vw, 440px);
-  }
-
-  .personaje-escena--psicologa {
-    width: min(42vw, 440px);
+  .dialogo-escena {
+    --dialogo-ancho-caja: min(42vw, 680px);
+    --dialogo-ancho-personaje: clamp(320px, 24vw, 440px);
+    --dialogo-altura-retrato: clamp(540px, 84vh, 96vh);
   }
 
   .dialogo-caja {
-    width: min(90%, 1000px);
-    min-height: clamp(300px, 38vh, 380px);
-    max-height: min(42vh, 540px);
+    min-height: clamp(250px, 30vh, 330px);
+    max-height: min(37vh, 500px);
   }
 }
 
 @media (max-width: 720px) {
-  .personaje-escena {
-    height: clamp(200px, 36vh, 340px);
-    bottom: min(46vh, 440px);
-    max-height: calc(100% - min(48vh, 460px));
+  .dialogo-escena {
+    --dialogo-ancho-caja: min(72vw, 520px);
+    --dialogo-ancho-personaje: clamp(120px, 22vw, 180px);
+    --dialogo-altura-retrato: clamp(320px, 58vh, 520px);
+    --dialogo-escala-activo: 1.06;
   }
 
-  .personaje-escena--npc {
-    width: min(48vw, 300px);
-    left: 0;
-  }
-
-  .personaje-escena--psicologa {
-    width: min(48vw, 300px);
-    right: 0;
+  .dialogo-composicion {
+    padding-inline: 8px;
   }
 
   .dialogo-caja {
-    width: 94%;
-    min-height: clamp(240px, 38vh, 300px);
-    max-height: min(48vh, 460px);
+    min-height: clamp(210px, 32vh, 280px);
+    max-height: min(42vh, 420px);
+    padding-inline: 12px;
   }
 }
 
 @media (max-width: 520px) {
-  .personaje-escena {
-    height: clamp(240px, 38vh, 320px);
+  .dialogo-escena {
+    --dialogo-ancho-personaje: clamp(96px, 24vw, 150px);
+    --dialogo-altura-retrato: clamp(280px, 52vh, 460px);
+    --dialogo-opacidad-inactivo: 0.42;
+    --dialogo-escala-activo: 1.05;
   }
 
-  .personaje-escena--npc,
-  .personaje-escena--psicologa {
-    width: 50vw;
+  .personaje-escena--activo {
+    opacity: 0.95;
   }
 }

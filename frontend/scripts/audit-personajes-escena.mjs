@@ -12,9 +12,14 @@ async function main() {
   const page = await browser.newPage();
 
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
-  await page.evaluate((casoId) => {
-    localStorage.setItem(`narrativa-intro-vista:${casoId}`, '1');
-  }, CASO_ID);
+  await page.evaluate(({ casoId, estudianteId }) => {
+    localStorage.setItem('simulador.access', 'audit-token');
+    localStorage.setItem(
+      'simulador.user',
+      JSON.stringify({ id: estudianteId, email: 'audit@test', nombre_completo: 'Audit', rol: 'Estudiante' }),
+    );
+    localStorage.setItem(`narrativa-intro-vista:${casoId}:${estudianteId}`, '1');
+  }, { casoId: CASO_ID, estudianteId: 1 });
 
   await page.goto(`${BASE}/estudiante/simulacion-narrativa/${CASO_ID}`, {
     waitUntil: 'networkidle',

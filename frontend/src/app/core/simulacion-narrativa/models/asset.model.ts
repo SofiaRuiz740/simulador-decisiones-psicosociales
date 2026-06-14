@@ -52,6 +52,8 @@ export interface ReferenciaVisualPersonaje {
  */
 export const ROL_VISUAL_POR_CONVERSACION: Partial<Record<string, RolVisualId>> = {
   'revisita-lucia-informe': 'victima',
+  'revisita-lucia-tras-medico': 'victima',
+  'revisita-madre-tras-ts': 'madre-victima',
   'entrevista-madre-espera': 'madre-victima',
 };
 
@@ -73,15 +75,15 @@ export const INTRO_FONDOS_REGISTRADOS: Record<IntroFondoId, string> = {
 };
 
 export const ROLES_VISUALES_REGISTRADOS: Record<RolVisualId, string> = {
-  psicologa: 'personajes/psicologa.png',
+  psicologa: 'personajes/psicologa-conversar.png',
   victima: 'personajes/victima-conversar.png',
-  'madre-victima': 'personajes/madre-victima.png',
-  'hermano-familiar': 'personajes/hermano-victima.png',
-  'medico-urgencias': 'personajes/medico-urgencias.png',
-  enfermera: 'personajes/enfermera.png',
+  'madre-victima': 'personajes/madre-victima-conversar.png',
+  'hermano-familiar': 'personajes/hermano-victima-conversar.png',
+  'medico-urgencias': 'personajes/medico-urgencias-conversar.png',
+  enfermera: 'personajes/enfermera-conversar.png',
   policia: 'personajes/policia.png',
   'trabajadora-social': 'personajes/trabajadoraSocial.png',
-  comisario: 'personajes/comisario.png',
+  comisario: 'personajes/comisario-conversar.png',
 };
 
 /**
@@ -96,13 +98,14 @@ export const RETRATOS_CONVERSAR_REGISTRADOS: Record<RolVisualId, string> = {
   'medico-urgencias': 'personajes/medico-urgencias-conversar.png',
   enfermera: 'personajes/enfermera-conversar.png',
   policia: 'personajes/policia.png',
-  'trabajadora-social': 'personajes/trabajadora-social-conversar.png',
+  'trabajadora-social': 'personajes/trabajadoraSocial-conversar.png',
   comisario: 'personajes/comisario-conversar.png',
 };
 
 /** Si no hay variante *-conversar dedicada, retrato de diálogo = retrato base del rol. */
 export const RETRATOS_CONVERSAR_FALLBACK: Partial<Record<RolVisualId, string>> = {
   policia: ROLES_VISUALES_REGISTRADOS.policia,
+  'trabajadora-social': ROLES_VISUALES_REGISTRADOS['trabajadora-social'],
 };
 
 export const RETRATOS_NEUTRAL_REGISTRADOS: Partial<Record<RolVisualId, string>> =
@@ -114,6 +117,9 @@ export const RETRATOS_EXPRESION_REGISTRADOS: Partial<
 
 /** Pista instrumental en loop para la simulación narrativa (MP3 recomendado, ≥ 2 min). */
 export const AUDIO_AMBIENTE_REGISTRADO = 'audio/ambiente-hospital.mp3';
+
+/** Pista opcional en comisaría; si no existe, se mantiene la pista hospital con modulación distinta. */
+export const AUDIO_AMBIENTE_COMISARIA_REGISTRADO = 'audio/ambiente-comisaria.mp3';
 
 /** Pista opcional durante la introducción; si no existe, se usa la pista hospital. */
 export const AUDIO_AMBIENTE_INTRO_REGISTRADO = 'audio/ambiente-intro.mp3';

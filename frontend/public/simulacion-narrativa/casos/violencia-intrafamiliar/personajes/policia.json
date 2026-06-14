@@ -8,5 +8,15 @@
     "ansiedad": 20,
     "colaboracion": 55,
     "aperturaEmocional": 25
+  },
+  "configFatiga": {
+    "limiteConversacionesUtiles": 2,
+    "mensajesAgotamiento": [
+      "Todo quedó consignado en el informe preliminar.",
+      "Por protocolo, no puedo ampliar más en este acceso.",
+      "Lo demás debe tramitarse por la vía formal.",
+      "Ya le indiqué lo esencial del parte.",
+      "Debo retomar el control del perímetro."
+    ]
   }
 }

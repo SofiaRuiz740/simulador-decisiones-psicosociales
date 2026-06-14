@@ -25,6 +25,15 @@
       (abrirConversacion)="abrirConversacion($event)"
       (abrirDocumento)="abrirDocumento($event)"
       (mensaje)="mostrarMensaje($event)" />
+
+    @if (hotspotTrasladoComisaria(); as traslado) {
+      <div class="exploracion-accion-traslado" aria-live="polite">
+        <app-hotspot-lupa
+          [hotspot]="traslado"
+          [modoDock]="true"
+          (activar)="trasladarseAComisaria()" />
+      </div>
+    }
   }
 
   @if (evidenciaAbierta(); as evidencia) {

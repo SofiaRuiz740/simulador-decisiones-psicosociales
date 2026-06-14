@@ -162,7 +162,7 @@
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "Hay datos sensibles del ingreso que conviene precisar. Hay aspectos que aún no están claros; reflexiona sobre cuál merece mayor atención.",
+      "texto": "Hay datos sensibles del ingreso que conviene precisar; reflexione sobre cuál merece mayor atención clínica.",
       "opciones": [
         {
           "id": "prep-slot-enf-critica-1",

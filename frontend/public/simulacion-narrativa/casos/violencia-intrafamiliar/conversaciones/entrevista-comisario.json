@@ -286,7 +286,7 @@
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "Hay líneas investigativas sensibles que conviene precisar. Hay aspectos que aún no están claros; reflexiona sobre cuál merece mayor atención.",
+      "texto": "Hay líneas investigativas sensibles que conviene precisar; reflexione sobre cuál merece mayor atención institucional.",
       "opciones": [
         {
           "id": "prep-slot-com-critica-1",
@@ -409,7 +409,7 @@
     {
       "id": "decision-cierre",
       "emisor": "jugador",
-      "texto": "La articulación con la comisaría requiere un cierre claro. La articulación con la comisaría requiere un cierre claro; considera cómo proceder.",
+      "texto": "La articulación con la comisaría requiere un cierre claro; considere cómo proceder.",
       "opciones": [
         {
           "id": "prep-slot-com-cierre-1",

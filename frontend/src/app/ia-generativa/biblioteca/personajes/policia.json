@@ -1,0 +1,34 @@
+{
+    "id": "policia",
+  
+    "nombre": "Sergio Torres",
+  
+    "rol": "Policía",
+  
+    "especialidades": [
+      "proteccion de victimas",
+      "procedimientos legales",
+      "violencia domestica"
+    ],
+  
+    "personalidad": {
+      "empatia": 60,
+      "asertividad": 95,
+      "formalidad": 90
+    },
+  
+    "forma_hablar": {
+      "tono": "directo",
+      "estilo": "institucional",
+      "frases_frecuentes": [
+        "Necesito tomar declaración.",
+        "Voy a explicarle el procedimiento.",
+        "Debemos garantizar su seguridad."
+      ]
+    },
+  
+    "escenarios_permitidos": [
+      "comisaria",
+      "hospital"
+    ]
+  }

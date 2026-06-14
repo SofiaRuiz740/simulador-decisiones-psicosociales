@@ -12,6 +12,7 @@ import { HotspotEscena, posicionCss } from '../models/escena-visual.model';
       [class.es-regreso]="hotspot().esRegreso"
       [class.es-evidencia]="hotspot().tipo === 'evidencia'"
       [class.es-conversacion]="hotspot().tipo === 'conversacion'"
+      [class.es-dock]="modoDock()"
       [style]="estiloPosicion()"
       [attr.aria-label]="hotspot().etiqueta"
       (click)="activar.emit()">
@@ -29,12 +30,17 @@ export class HotspotLupaComponent {
   private readonly assets = inject(AssetService);
 
   readonly hotspot = input.required<HotspotEscena>();
+  /** Acción fija en HUD: misma apariencia, etiqueta siempre visible. */
+  readonly modoDock = input(false);
 
   readonly activar = output<void>();
 
   readonly iconoUrl = computed(() => this.assets.obtenerIconoHotspot(this.hotspot().tipo));
 
   estiloPosicion(): Record<string, string> {
+    if (this.modoDock()) {
+      return { position: 'relative' };
+    }
     return {
       ...posicionCss(this.hotspot().posicion),
       position: 'absolute',

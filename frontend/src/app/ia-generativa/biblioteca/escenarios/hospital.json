@@ -1,0 +1,24 @@
+{
+    "id": "hospital",
+  
+    "nombre": "Hospital General",
+  
+    "tipo": "salud",
+  
+    "descripcion": "Servicio de urgencias con atención médica y psicosocial.",
+  
+    "personajes_permitidos": [
+      "trabajador_social",
+      "psicologo",
+      "policia",
+      "medico",
+      "enfermera",
+      "paciente"
+    ],
+  
+    "objetivos_frecuentes": [
+      "identificar señales de violencia",
+      "activar rutas de protección",
+      "realizar entrevista inicial"
+    ]
+  }

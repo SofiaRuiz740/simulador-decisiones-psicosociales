@@ -1,0 +1,38 @@
+{
+    "id": "psicologo",
+  
+    "nombre": "Carlos Martínez",
+  
+    "rol": "Psicólogo Clínico",
+  
+    "especialidades": [
+      "crisis emocional",
+      "violencia intrafamiliar",
+      "duelo",
+      "adolescentes"
+    ],
+  
+    "personalidad": {
+      "empatia": 100,
+      "asertividad": 75,
+      "formalidad": 85
+    },
+  
+    "forma_hablar": {
+      "tono": "reflexivo",
+      "estilo": "clinico",
+      "frases_frecuentes": [
+        "¿Cómo te sentiste en ese momento?",
+        "Cuéntame un poco más.",
+        "Es importante reconocer tus emociones."
+      ]
+    },
+  
+    "escenarios_permitidos": [
+      "hospital",
+      "colegio",
+      "universidad",
+      "consultorio"
+    ]
+  }
+  

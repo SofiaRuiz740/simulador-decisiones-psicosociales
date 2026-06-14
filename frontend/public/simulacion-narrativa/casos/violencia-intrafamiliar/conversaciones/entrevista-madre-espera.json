@@ -112,7 +112,7 @@
     {
       "id": "decision-episodio",
       "emisor": "jugador",
-      "texto": "Hay varias líneas para comprender el caso. Hay varias líneas para comprender el caso; organiza mentalmente qué explorar primero.",
+      "texto": "Hay varias líneas para comprender el caso; organice mentalmente qué explorar primero.",
       "opciones": [
         {
           "id": "explorar-antecedentes",
@@ -313,7 +313,7 @@
     {
       "id": "decision-cierre-madre",
       "emisor": "jugador",
-      "texto": "La entrevista llega a un punto de cierre. La entrevista llega a un cierre posible; piensa en cómo sostener lo conversado.",
+      "texto": "La entrevista llega a un cierre posible; piense en cómo sostener lo conversado.",
       "opciones": [
         {
           "id": "derivar-apoyo",
@@ -334,7 +334,7 @@
           "id": "pedir-testigo",
           "texto": "«¿Le parece bien que hable con Diego por separado para entender mejor lo ocurrido?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "cierre-madre"
+          "siguienteNodoId": "cierre-madre-dialogo"
         }
       ]
     },

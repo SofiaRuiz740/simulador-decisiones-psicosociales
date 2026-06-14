@@ -19,15 +19,15 @@ export const ESTUDIANTE_ROUTES: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'practicas/:practicaId',
-    redirectTo: (route) => `/panel-estudiante/practicas/${route.params['practicaId']}`,
-  },
-  {
     path: 'practicas/:practicaId/simulacion',
     canActivate: [estudianteAuthGuard],
     loadComponent: () =>
       import('./simulacion-narrativa/simulacion-narrativa').then((m) => m.SimulacionNarrativa),
     title: 'Simulación narrativa · Simulador',
+  },
+  {
+    path: 'practicas/:practicaId',
+    redirectTo: (route) => `/panel-estudiante/practicas/${route.params['practicaId']}`,
   },
   {
     path: 'simulacion',

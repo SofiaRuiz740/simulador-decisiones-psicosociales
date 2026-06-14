@@ -48,6 +48,7 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
 ];
 
 const MAPEO_CASO_BACKEND: Record<number, string> = {
+  1: 'violencia-intrafamiliar',
   2: 'violencia-intrafamiliar',
 };
 

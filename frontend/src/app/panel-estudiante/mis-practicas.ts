@@ -5,6 +5,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 
 import { MisPracticaEstudiante } from '../core/models/practicas.model';
+import { EstudianteSessionService } from '../core/services/estudiante-session.service';
 import { PracticasService } from '../core/services/practicas.service';
 
 @Component({
@@ -83,6 +84,7 @@ import { PracticasService } from '../core/services/practicas.service';
 })
 export class MisPracticas implements OnInit {
   private readonly servicio = inject(PracticasService);
+  private readonly session = inject(EstudianteSessionService);
   private readonly snackBar = inject(MatSnackBar);
 
   readonly loading = signal(true);
@@ -110,6 +112,7 @@ export class MisPracticas implements OnInit {
   ngOnInit(): void {
     this.servicio.misPracticas().subscribe({
       next: (rows) => {
+        this.session.sincronizarDesdeApi(rows);
         this.practicas.set(rows);
         this.loading.set(false);
       },

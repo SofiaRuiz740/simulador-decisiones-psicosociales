@@ -242,7 +242,7 @@
     {
       "id": "decision-nivel4-antecedentes",
       "emisor": "jugador",
-      "texto": "Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "texto": "El funcionario policial ofrece contexto del ingreso; revise con cuidado qué antecedentes contrastar primero con la clínica.",
       "opciones": [
         {
           "id": "prep-slot-pol-critica-1",

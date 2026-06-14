@@ -5,43 +5,57 @@
     </div>
   }
 
-  @if (fase() === 'advertencia' && config(); as cfg) {
+  @if ((fase() === 'advertencia' || saliendoAdvertencia()) && config(); as cfg) {
     <div
       class="intro-advertencia"
+      [class.saliendo]="saliendoAdvertencia()"
       role="dialog"
       aria-modal="true"
       aria-labelledby="advertencia-titulo">
       <div class="intro-advertencia-panel">
         <h2 id="advertencia-titulo" class="advertencia-titulo">{{ cfg.advertencia.titulo }}</h2>
         <p class="advertencia-texto">{{ cfg.advertencia.texto }}</p>
-        <button type="button" class="btn-aceptar" (click)="aceptarAdvertencia()">
-          {{ cfg.advertencia.botonAceptar }}
-        </button>
+        @if (!saliendoAdvertencia()) {
+          <button type="button" class="btn-aceptar" (click)="aceptarAdvertencia()">
+            {{ cfg.advertencia.botonAceptar }}
+          </button>
+        }
       </div>
     </div>
   }
 
-  @if (fase() === 'secuencia' && escenaActual(); as escena) {
-    <div class="intro-fondos" [class.transicionando]="transicionando()">
-      @if (fondoActualUrl(); as urlActual) {
-        <img
-          class="intro-fondo intro-fondo-actual"
-          [class.saliendo]="transicionando()"
-          [src]="urlActual"
-          alt="" />
-      }
-      @if (transicionando() && fondoSiguienteUrl(); as urlSiguiente) {
-        <img
-          class="intro-fondo intro-fondo-siguiente"
-          [src]="urlSiguiente"
-          alt="" />
-      }
+  @if (fase() === 'secuencia') {
+    <div
+      class="intro-fondos"
+      [class.primera-entrada]="primeraEntrada()"
+      [class.crossfade-activo]="transicionando()">
+      <img
+        class="intro-fondo capa"
+        [class.activa]="capaActiva() === 0"
+        [class.ken-burns]="capaActiva() === 0 && !transicionando() && !primeraEntrada()"
+        [src]="urlsCapas()[0]"
+        alt="" />
+      <img
+        class="intro-fondo capa"
+        [class.activa]="capaActiva() === 1"
+        [class.ken-burns]="capaActiva() === 1 && !transicionando() && !primeraEntrada()"
+        [src]="urlsCapas()[1]"
+        alt="" />
     </div>
 
     <div class="intro-vineta" aria-hidden="true"></div>
 
-    <div class="intro-texto-caja" role="region" aria-live="polite">
-      <p class="intro-texto">{{ escena.texto }}</p>
+    <div
+      class="intro-overlay-negro"
+      [class.visible]="overlayFinal()"
+      aria-hidden="true"></div>
+
+    <div
+      class="intro-texto-caja"
+      [class.transicionando]="textoTransicionando()"
+      role="region"
+      aria-live="polite">
+      <p class="intro-texto">{{ textoMostrado() }}</p>
     </div>
   }
 

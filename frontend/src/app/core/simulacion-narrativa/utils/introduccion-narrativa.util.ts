@@ -166,5 +166,14 @@ export function resolverFaseIntro(
   return 'simulacion';
 }
 
-/** Duración del crossfade entre imágenes (ms). */
-export const DURACION_CROSSFADE_MS = 700;
+/** Duración del crossfade entre imágenes de la intro (ms). */
+export const DURACION_CROSSFADE_MS = 1600;
+
+/** Fundido al pasar de la advertencia a la primera escena (ms). */
+export const DURACION_FADE_ADVERTENCIA_MS = 1100;
+
+/** Fundido al negro antes de la transición final al hospital (ms). */
+export const DURACION_FADE_SECUENCIA_FINAL_MS = 1300;
+
+/** Desvanecido del texto narrativo antes del cambio de escena (ms). */
+export const DURACION_FADE_TEXTO_SALIDA_MS = 400;

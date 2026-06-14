@@ -59,7 +59,14 @@ export class EscenaVisualComponent {
 
   readonly hotspotsVisibles = computed(() => {
     const escena = this.escena();
-    return escena.hotspots.filter((hotspot) => this.hotspotEsVisible(hotspot));
+    return escena.hotspots.filter((hotspot) => {
+      if (
+        HOTSPOTS_TRASLADO_COMISARIA.includes(hotspot.id as (typeof HOTSPOTS_TRASLADO_COMISARIA)[number])
+      ) {
+        return false;
+      }
+      return this.hotspotEsVisible(hotspot);
+    });
   });
 
   etiquetaHotspotPersonaje(hotspot: {

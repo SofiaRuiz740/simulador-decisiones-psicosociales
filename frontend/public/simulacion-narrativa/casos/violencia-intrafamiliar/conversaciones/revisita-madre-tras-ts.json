@@ -54,7 +54,7 @@
     {
       "id": "decision-enfoque-ts",
       "emisor": "jugador",
-      "texto": "Carmen regresa con inquietud tras la articulación social. Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "texto": "Carmen regresa con inquietud tras la articulación social; decida qué versión contrastar primero sin retraumatizarla.",
       "opciones": [
         {
           "id": "contrastar-antecedentes",

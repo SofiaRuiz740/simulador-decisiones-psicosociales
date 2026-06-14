@@ -60,7 +60,7 @@
     {
       "id": "decision-enfoque-hermano",
       "emisor": "jugador",
-      "texto": "Diego comparte un relato clave. Diego comparte un relato clave; la profesional considera qué aspecto investigativo profundizar.",
+      "texto": "Diego comparte un relato clave; considere qué aspecto investigativo profundizar.",
       "opciones": [
         {
           "id": "explorar-senales-previas",
@@ -140,7 +140,7 @@
     {
       "id": "decision-sobrina",
       "emisor": "jugador",
-      "texto": "El relato menciona a su sobrina Sofi. Percibe miedo en su mirada; reflexiona sobre cómo abordarlo sin presionar.",
+      "texto": "El relato menciona a su sobrina Sofi; reflexione sobre cómo abordarlo sin presionar.",
       "opciones": [
         {
           "id": "preguntar-nieta",
@@ -213,7 +213,7 @@
     {
       "id": "decision-miedo",
       "emisor": "jugador",
-      "texto": "Percibe miedo en su mirada. Percibe miedo en su mirada; reflexiona sobre cómo abordarlo sin presionar.",
+      "texto": "Diego baja la mirada al recordar la escena; reflexione sobre cómo abordar su miedo sin presionarlo.",
       "opciones": [
         {
           "id": "explorar-seguridad",
@@ -272,7 +272,7 @@
     {
       "id": "decision-afrontamiento-familiar",
       "emisor": "jugador",
-      "texto": "Diego muestra agotamiento emocional. Diego muestra agotamiento emocional; considera cómo explorar el afrontamiento familiar.",
+      "texto": "Diego muestra agotamiento emocional; considere cómo explorar el afrontamiento familiar.",
       "opciones": [
         {
           "id": "explorar-reaccion-familiar",

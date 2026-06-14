@@ -12,6 +12,10 @@
   background: #0f172a;
 }
 
+.exploracion.entrevista-activa {
+  overflow: visible;
+}
+
 
 .exploracion-carga {
   position: absolute;
@@ -101,6 +105,18 @@ app-escena-visual {
 .exploracion.entrevista-activa app-escena-visual {
   filter: blur(6px) saturate(0.92);
   transition: filter 0.3s ease;
+}
+
+.exploracion-accion-traslado {
+  position: absolute;
+  right: clamp(14px, 2.4vw, 28px);
+  bottom: clamp(18px, 3.5vh, 32px);
+  z-index: 28;
+  pointer-events: auto;
+}
+
+.exploracion.entrevista-activa .exploracion-accion-traslado {
+  display: none;
 }
 
 @media (max-width: 640px) {

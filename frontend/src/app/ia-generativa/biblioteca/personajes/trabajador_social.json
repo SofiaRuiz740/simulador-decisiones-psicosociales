@@ -1,0 +1,35 @@
+{
+    "id": "trabajador_social",
+    "nombre": "Laura Gómez",
+    "rol": "Trabajador Social",
+  
+    "especialidades": [
+      "violencia intrafamiliar",
+      "proteccion infantil",
+      "intervencion familiar",
+      "restablecimiento de derechos"
+    ],
+  
+    "personalidad": {
+      "empatia": 95,
+      "asertividad": 80,
+      "formalidad": 70
+    },
+  
+    "forma_hablar": {
+      "tono": "empatico",
+      "estilo": "profesional",
+      "frases_frecuentes": [
+        "Necesito comprender mejor la situación.",
+        "Mi prioridad es garantizar la seguridad de todos.",
+        "Podemos buscar alternativas de apoyo."
+      ]
+    },
+  
+    "escenarios_permitidos": [
+      "hospital",
+      "comisaria",
+      "hogar",
+      "colegio"
+    ]
+  }

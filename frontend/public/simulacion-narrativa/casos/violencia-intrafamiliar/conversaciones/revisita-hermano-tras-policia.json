@@ -54,7 +54,7 @@
     {
       "id": "decision-cruzar-policia",
       "emisor": "jugador",
-      "texto": "Diego percibe discrepancias con el registro policial. Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "texto": "Diego percibe discrepancias con el registro policial; decida qué versión contrastar primero con él.",
       "opciones": [
         {
           "id": "mencionar-resbalon",

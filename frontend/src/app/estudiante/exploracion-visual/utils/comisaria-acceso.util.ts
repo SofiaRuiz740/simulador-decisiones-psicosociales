@@ -2,6 +2,7 @@ import { Condicion } from '../../../core/simulacion-narrativa/models/condicion.m
 import { CasoNarrativoCompleto } from '../../../core/simulacion-narrativa/models/caso.model';
 import { EstadoPartida } from '../../../core/simulacion-narrativa/models/estado-partida.model';
 import { evaluarCondicion } from '../../../core/simulacion-narrativa/utils/condicion-evaluator';
+import { HotspotEscena } from '../models/escena-visual.model';
 
 /** Entrevistas hospitalarias obligatorias para desbloquear traslado a comisaría (sin revisitas opcionales). */
 export const CONVERSACIONES_HOSPITAL_OBLIGATORIAS = [
@@ -20,6 +21,27 @@ export const HOTSPOTS_TRASLADO_COMISARIA = [
   'ir-comisaria-estacion',
   'ir-comisaria-uci',
 ] as const;
+
+/** Escena donde se muestra el botón fijo de traslado (FASE 23C.2: entrada principal). */
+export const ESCENAS_HOSPITAL_TRASLADO_DOCK = ['entrada'] as const;
+
+export const ETIQUETA_TRASLADO_COMISARIA = 'Trasladarse a la comisaría';
+export const DESTINO_ESCENA_COMISARIA = 'exterior-comisaria';
+export const ESCENARIO_NARRATIVO_COMISARIA = 'investigacion-comisaria';
+
+export function escenaMuestraTrasladoEnDock(escenaId: string): boolean {
+  return (ESCENAS_HOSPITAL_TRASLADO_DOCK as readonly string[]).includes(escenaId);
+}
+
+export function crearHotspotTrasladoComisaria(): HotspotEscena {
+  return {
+    id: 'dock-traslado-comisaria',
+    etiqueta: ETIQUETA_TRASLADO_COMISARIA,
+    tipo: 'navegacion',
+    destinoEscenaId: DESTINO_ESCENA_COMISARIA,
+    posicion: { x: 0, y: 0, ancho: 0, alto: 0 },
+  };
+}
 
 const ETIQUETAS_ENTREVISTA: Record<(typeof CONVERSACIONES_HOSPITAL_OBLIGATORIAS)[number], string> = {
   'entrevista-policia-entrada': 'Policía',
@@ -53,6 +75,15 @@ export function requisitosTrasladoComisaria(): Condicion[] {
       tipo: 'no',
       condiciones: [
         {
+          tipo: 'conversacion_completada',
+          parametros: { conversacionId: 'cierre-investigacion' },
+        },
+      ],
+    },
+    {
+      tipo: 'no',
+      condiciones: [
+        {
           tipo: 'flag_activo',
           parametros: { clave: 'caso_completado' },
         },
@@ -69,6 +100,7 @@ export interface DiagnosticoTrasladoComisaria {
   escenariosVisitados: string[];
   escenarioActualId: string;
   comisariaYaVisitada: boolean;
+  cierreInvestigacionActivo: boolean;
   casoCompletado: boolean;
   bloqueoPrincipal: string | null;
 }
@@ -89,7 +121,8 @@ export function diagnosticarTrasladoComisaria(
     (id) => !estado.conversacionesCompletadas.includes(id),
   );
   const hospitalCompleto = conversacionesPendientes.length === 0;
-  const comisariaYaVisitada = estado.escenariosVisitados.includes('investigacion-comisaria');
+  const comisariaYaVisitada = estado.escenariosVisitados.includes(ESCENARIO_NARRATIVO_COMISARIA);
+  const cierreInvestigacionActivo = estado.conversacionesCompletadas.includes('cierre-investigacion');
   const casoCompletado = Boolean(estado.flags['caso_completado']);
 
   const requisitos = requisitosTrasladoComisaria();
@@ -103,8 +136,10 @@ export function diagnosticarTrasladoComisaria(
     bloqueoPrincipal = `Faltan entrevistas obligatorias: ${pendientes}`;
   } else if (comisariaYaVisitada) {
     bloqueoPrincipal = 'La comisaría ya fue visitada (investigacion-comisaria en escenariosVisitados)';
-  } else if (casoCompletado) {
-    bloqueoPrincipal = 'El caso ya está cerrado (flag caso_completado)';
+  } else if (cierreInvestigacionActivo || casoCompletado) {
+    bloqueoPrincipal = cierreInvestigacionActivo
+      ? 'La investigación ya fue cerrada (cierre-investigacion)'
+      : 'El caso ya está cerrado (flag caso_completado)';
   }
 
   return {
@@ -117,6 +152,7 @@ export function diagnosticarTrasladoComisaria(
     escenariosVisitados: [...estado.escenariosVisitados],
     escenarioActualId: estado.escenarioActualId,
     comisariaYaVisitada,
+    cierreInvestigacionActivo,
     casoCompletado,
     bloqueoPrincipal,
   };
@@ -155,6 +191,7 @@ export function registrarDiagnosticoComisariaEnConsola(
   console.log('Escenarios visitados:', diagnostico.escenariosVisitados);
   console.log('Escenario narrativo actual:', diagnostico.escenarioActualId);
   console.log('Comisaría ya visitada:', diagnostico.comisariaYaVisitada);
+  console.log('Cierre investigación:', diagnostico.cierreInvestigacionActivo);
   console.log('Caso completado:', diagnostico.casoCompletado);
   if (diagnostico.bloqueoPrincipal) {
     console.warn('Bloqueo:', diagnostico.bloqueoPrincipal);

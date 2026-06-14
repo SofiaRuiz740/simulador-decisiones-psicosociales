@@ -10,8 +10,16 @@ import { NarrativaFacadeService } from '../../core/simulacion-narrativa/services
 import { DialogoNarrativoComponent } from './dialogo-narrativo/dialogo-narrativo';
 import { DocumentoEvidenciaComponent } from './documento-evidencia/documento-evidencia';
 import { EscenaVisualComponent } from './escena-visual/escena-visual';
+import { HotspotLupaComponent } from './hotspot-lupa/hotspot-lupa';
 import { EscenaVisualService } from './services/escena-visual.service';
-import { diagnosticarTrasladoComisaria } from './utils/comisaria-acceso.util';
+import { escenaEsAccesible } from './utils/escena-acceso.util';
+import {
+  crearHotspotTrasladoComisaria,
+  diagnosticarTrasladoComisaria,
+  escenaMuestraTrasladoEnDock,
+  ESCENARIO_NARRATIVO_COMISARIA,
+  DESTINO_ESCENA_COMISARIA,
+} from './utils/comisaria-acceso.util';
 
 @Component({
   selector: 'app-exploracion-visual',
@@ -22,6 +30,7 @@ import { diagnosticarTrasladoComisaria } from './utils/comisaria-acceso.util';
     EscenaVisualComponent,
     DialogoNarrativoComponent,
     DocumentoEvidenciaComponent,
+    HotspotLupaComponent,
   ],
   templateUrl: './exploracion-visual.html',
   styleUrl: './exploracion-visual.scss',
@@ -43,6 +52,18 @@ export class ExploracionVisualComponent implements OnInit {
   readonly escenaActual = this.escenas.escenaActual;
   readonly tiempoNarrativo = this.facade.tiempoNarrativoFormateado;
   readonly tituloCaso = computed(() => this.facade.caso()?.manifest.titulo ?? '');
+
+  readonly hotspotTrasladoComisaria = computed(() => {
+    if (this.conversacionActivaId() || this.evidenciaAbierta()) return null;
+
+    const escena = this.escenaActual();
+    if (!escena || !escenaMuestraTrasladoEnDock(escena.id)) return null;
+
+    const diagnostico = diagnosticarTrasladoComisaria(this.facade.estado(), this.facade.caso());
+    if (!diagnostico?.hotspotVisible) return null;
+
+    return crearHotspotTrasladoComisaria();
+  });
 
   constructor() {
     effect(() => {
@@ -103,5 +124,25 @@ export class ExploracionVisualComponent implements OnInit {
 
   mostrarMensaje(mensaje: string): void {
     this.snackBar.open(mensaje, 'Entendido', { duration: 2800, panelClass: 'snackbar-discreto' });
+  }
+
+  trasladarseAComisaria(): void {
+    const destino = this.escenas.obtenerEscena(DESTINO_ESCENA_COMISARIA);
+    const estado = this.facade.estado();
+    const caso = this.facade.caso();
+
+    if (!destino || !escenaEsAccesible(destino, estado, caso)) {
+      this.mostrarMensaje(
+        'La comisaría aún no está disponible. Completa las entrevistas hospitalarias obligatorias.',
+      );
+      return;
+    }
+
+    if (!this.escenas.irAEscena(DESTINO_ESCENA_COMISARIA, estado, caso)) {
+      this.mostrarMensaje('No puedes acceder a la comisaría en este momento.');
+      return;
+    }
+
+    this.facade.establecerEscenarioNarrativo(ESCENARIO_NARRATIVO_COMISARIA);
   }
 }

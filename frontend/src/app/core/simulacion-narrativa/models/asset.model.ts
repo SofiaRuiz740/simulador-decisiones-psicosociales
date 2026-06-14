@@ -1,6 +1,6 @@
 /** Escenarios lógicos de la exploración visual → archivo real en escenarios/. */
 export type EscenarioId =
-  | 'entrada-hospital'
+  | 'entrada'
   | 'sala-espera'
   | 'pasillo-urgencias'
   | 'estacion-medica'
@@ -59,7 +59,7 @@ export const ROL_VISUAL_POR_CONVERSACION: Partial<Record<string, RolVisualId>> =
 
 /** Rutas relativas bajo /assets/simulacion-narrativa/ — nombres de archivo reales. */
 export const ESCENARIOS_REGISTRADOS: Record<EscenarioId, string> = {
-  'entrada-hospital': 'escenarios/entrada.png',
+  entrada: 'escenarios/entrada.png',
   'sala-espera': 'escenarios/salaEsperaHospital.png',
   'pasillo-urgencias': 'escenarios/pasilloUrgencias.png',
   'estacion-medica': 'escenarios/estacionMedica.png',

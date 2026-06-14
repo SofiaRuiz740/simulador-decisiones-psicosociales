@@ -7,6 +7,7 @@ import { AssetService } from '../../../core/simulacion-narrativa/services/asset.
 import { InterfazSonidoService } from '../../../core/simulacion-narrativa/services/interfaz-sonido.service';
 import { NarrativaFacadeService } from '../../../core/simulacion-narrativa/services/narrativa-facade.service';
 import { EscenaVisualService } from '../services/escena-visual.service';
+import { resolverTextoNodo } from '../../../core/simulacion-narrativa/utils/memoria-narrativa.util';
 import {
   PSICOLOGA_ENTREVISTADORA,
   nombrePersonajeVisible,
@@ -42,6 +43,8 @@ export class DialogoNarrativoComponent {
   readonly nodoPantalla = signal<NodoDialogo | null>(null);
 
   private typewriterTimer: ReturnType<typeof setTimeout> | null = null;
+  private ultimaSecuenciaTypewriter = '';
+  private conversacionTypewriterId: string | null = null;
 
   readonly conversacionCompletada = computed(() => {
     const id = this.conversacionId();
@@ -184,16 +187,57 @@ export class DialogoNarrativoComponent {
 
   constructor() {
     effect(() => {
-      const nodo = this.nodo();
-      if (nodo) {
-        this.nodoPantalla.set(nodo);
+      const convId = this.conversacionId();
+      if (convId !== this.conversacionTypewriterId) {
+        this.conversacionTypewriterId = convId;
+        this.ultimaSecuenciaTypewriter = '';
       }
     });
 
     effect(() => {
+      const nodo = this.nodo();
+      const convId = this.conversacionId();
+      const estado = this.facade.estado();
+      const caso = this.facade.caso();
+
+      if (nodo) {
+        this.nodoPantalla.set(nodo);
+        return;
+      }
+
+      if (!convId || !estado || !caso) return;
+      if (!estado.conversacionesCompletadas.includes(convId)) return;
+
+      const visitados = estado.nodosVisitadosPorConversacion[convId] ?? [];
+      const ultimoId = visitados.at(-1);
+      if (!ultimoId || this.nodoPantalla()?.id === ultimoId) return;
+
+      const conversacion = caso.conversaciones[convId];
+      const raw = conversacion?.nodos.find((item) => item.id === ultimoId);
+      if (!raw) return;
+
+      const personaje = conversacion.personajeId
+        ? caso.personajes[conversacion.personajeId]
+        : undefined;
+      this.nodoPantalla.set({
+        ...raw,
+        texto: resolverTextoNodo(raw, estado, caso, personaje),
+      });
+    });
+
+    effect(() => {
+      const pantallaId = this.nodoPantalla()?.id ?? '';
       const texto = this.textoCompleto();
-      const nodoId = this.nodo()?.id ?? '';
-      void nodoId;
+      const clave = `${pantallaId}\u0000${texto}`;
+
+      if (!texto && !pantallaId) {
+        this.textoVisible.set('');
+        this.typewriterCompleto.set(true);
+        return;
+      }
+
+      if (clave === this.ultimaSecuenciaTypewriter) return;
+      this.ultimaSecuenciaTypewriter = clave;
       this.iniciarTypewriter(texto);
     });
 

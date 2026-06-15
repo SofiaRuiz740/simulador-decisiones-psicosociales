@@ -47,10 +47,15 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
   },
 ];
 
+// 999999 = PK fijo del "Caso por defecto" sembrado por el backend
+// (ver backend/apps/casos/constants.py y seed_caso_narrativo), asociado
+// a la simulación narrativa visual "Violencia intrafamiliar" y visible
+// para cualquier docente.
 const MAPEO_CASO_BACKEND: Record<number, string> = {
   2: 'violencia-intrafamiliar',
   3: 'violencia-intrafamiliar',
   4: 'violencia-intrafamiliar',
+  999999: 'violencia-intrafamiliar',
 };
 
 export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): string {

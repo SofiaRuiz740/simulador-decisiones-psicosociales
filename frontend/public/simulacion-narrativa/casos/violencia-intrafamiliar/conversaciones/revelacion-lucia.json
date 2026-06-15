@@ -23,17 +23,17 @@
     {
       "id": "inicio-revelacion",
       "emisor": "jugador",
-      "texto": "Lucía parece más receptiva. ¿Cómo profundizas?",
+      "texto": "Lucía parece un poco más tranquila, pero sigue conteniéndose. ¿Cómo continúa la conversación?",
       "opciones": [
         {
           "id": "validar-emocion",
-          "texto": "Validar su miedo y normalizar la dificultad para hablar.",
+          "texto": "«Entiendo que cuesta hablar de esto. No tiene apuro.»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "lucia-revela"
         },
         {
           "id": "escucha-silencio",
-          "texto": "Mantener escucha activa en silencio, esperando su ritmo.",
+          "texto": "Quedarse en silencio un momento, acompañando con la mirada y esperando su ritmo.",
           "estrategiaClinica": "escucha_activa",
           "siguienteNodoId": "lucia-revela"
         }
@@ -43,7 +43,7 @@
       "id": "lucia-revela",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "A veces me empuja cuando discutimos. La última vez me dejó moretones... pero él dice que fue mi culpa.",
+      "texto": "A veces… cuando discutimos, me empuja. La última vez me dejó moretones… pero él dice que fue mi culpa, que yo lo provoqué. Yo… yo le creo, a veces.",
       "testimonio": {
         "id": "testimonio-lucia-empujon",
         "tema": "mecanismo_lesion",
@@ -56,7 +56,7 @@
     {
       "id": "cierre-revelacion",
       "emisor": "narrador",
-      "texto": "Lucía comparte información sensible. Debes decidir cómo continuar la intervención.",
+      "texto": "Lucía comparte algo que le cuesta nombrar. Las manos le tiemblan un poco. Debe decidir cómo continuar la intervención.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

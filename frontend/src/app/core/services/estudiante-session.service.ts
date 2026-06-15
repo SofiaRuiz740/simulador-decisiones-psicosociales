@@ -13,7 +13,13 @@ import { clavesIntroRelacionadas } from '../simulacion-narrativa/utils/introducc
 import {
   borrarPartidaPersistida,
   clavePartidaPersistida,
+  leerPartidaPersistida,
 } from '../simulacion-narrativa/utils/partida-persistencia.util';
+
+/** Totales de conversaciones por caso (fallback si aún no se sincronizó desde la simulación). */
+const TOTALES_CONVERSACIONES_POR_CASO: Record<string, number> = {
+  'violencia-intrafamiliar': 14,
+};
 
 const ACCESS_KEY = 'simulador.access';
 const REFRESH_KEY = 'simulador.refresh';
@@ -214,8 +220,8 @@ export class EstudianteSessionService {
     this._practicas.set([]);
   }
 
-  /** Sincroniza el listado del API con localStorage para simulación y detalle. */
-  sincronizarDesdeApi(filas: MisPracticaEstudiante[]): void {
+  /** Sincroniza el listado del API con localStorage y fusiona progreso narrativo local. */
+  sincronizarDesdeApi(filas: MisPracticaEstudiante[]): MisPracticaEstudiante[] {
     for (const row of filas) {
       const existente = this.obtenerPractica(row.practica_id);
       const activaSesion = this.practicaActiva();
@@ -237,6 +243,49 @@ export class EstudianteSessionService {
       };
       this.upsertPractica(activa, row.autorizacion_id, row.progreso_pct);
     }
+
+    return filas.map((row) => ({
+      ...row,
+      progreso_pct: Math.max(row.progreso_pct, this.progresoLocalParaPractica(row.practica_id)),
+    }));
+  }
+
+  /** Lee la partida narrativa guardada y actualiza el progreso local si corresponde. */
+  private refrescarProgresoLocalDesdePartida(practicaId: number): void {
+    const practica = this.obtenerPractica(practicaId);
+    if (!practica) return;
+
+    const estudianteId = this.estudianteId();
+    if (estudianteId == null) return;
+
+    const casoId = resolverCasoNarrativoId(practica);
+    if (!casoId) return;
+
+    const partida = leerPartidaPersistida(
+      clavePartidaPersistida({ casoId, estudianteId, practicaId }),
+    );
+    if (!partida) return;
+
+    const completadas = partida.estado.conversacionesCompletadas.length;
+    const casoCompletado = !!partida.estado.flags['caso_completado'];
+    if (completadas === 0 && !casoCompletado) return;
+
+    const totales =
+      practica.progreso.conversacionesTotales ||
+      TOTALES_CONVERSACIONES_POR_CASO[casoId] ||
+      0;
+    if (totales <= 0) return;
+
+    this.guardarProgreso(practicaId, {
+      conversacionesCompletadas: completadas,
+      conversacionesTotales: totales,
+      resultadoId: casoCompletado ? practicaId : undefined,
+    });
+  }
+
+  private progresoLocalParaPractica(practicaId: number): number {
+    this.refrescarProgresoLocalDesdePartida(practicaId);
+    return this.obtenerPractica(practicaId)?.progreso.porcentaje ?? 0;
   }
 
   private upsertPractica(

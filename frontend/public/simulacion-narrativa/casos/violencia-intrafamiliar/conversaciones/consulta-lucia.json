@@ -15,43 +15,43 @@
     {
       "id": "saludo",
       "emisor": "narrador",
-      "texto": "Lucía llega puntual, evita el contacto visual al inicio. Respira profundo antes de sentarse.",
+      "texto": "Lucía llega puntual, pero tarda en sentarse. Mira el suelo, se frota las manos y respira hondo como si le costara ubicarse.",
       "siguienteNodoId": "apertura-psicologa"
     },
     {
       "id": "saludo-confianza-alta",
       "emisor": "narrador",
-      "texto": "Lucía te reconoce y parece más tranquila. «Me alegra volver a hablar con usted», murmura al sentarse.",
+      "texto": "Lucía te reconoce y parece un poco más tranquila, aunque sigue inquieta. «Me alegra volver a hablar con usted», murmura, y añade enseguida: «aunque no sé muy bien por dónde empezar».",
       "siguienteNodoId": "apertura-psicologa"
     },
     {
       "id": "saludo-tension",
       "emisor": "narrador",
-      "texto": "Lucía llega tensa, mira hacia la puerta. «No sé si quiero seguir hablando», dice antes de sentarse.",
+      "texto": "Lucía llega tensa, mira hacia la puerta como si midiera si puede irse. «No sé si quiero seguir hablando», dice antes de sentarse, casi sin mirarte.",
       "siguienteNodoId": "apertura-psicologa"
     },
     {
       "id": "apertura-psicologa",
       "emisor": "jugador",
-      "texto": "¿Cómo deseas abordar la consulta?",
+      "texto": "Lucía está frente a usted, visiblemente agotada. ¿Cómo inicia la conversación?",
       "opciones": [
         {
           "id": "explorar-sintomas",
-          "texto": "Explorar los síntomas físicos y su relación con el estrés.",
+          "texto": "«¿Cómo se ha sentido últimamente? ¿Qué nota más en su cuerpo?»",
           "estrategiaClinica": "exploracion",
           "enfoque": "Enfoque psicosomático inicial",
           "siguienteNodoId": "lucia-sintomas"
         },
         {
           "id": "preguntar-directo-hogar",
-          "texto": "Preguntar directamente sobre la situación en el hogar.",
+          "texto": "«¿Cómo están las cosas en casa estos días?»",
           "estrategiaClinica": "confrontacion",
           "enfoque": "Exploración directa del contexto",
           "siguienteNodoId": "lucia-defensiva"
         },
         {
           "id": "psicoeducacion-confidencialidad",
-          "texto": "Explicar confidencialidad y límites de la intervención.",
+          "texto": "«Quiero contarle cómo funciona la confidencialidad aquí, para que se sienta más tranquila.»",
           "estrategiaClinica": "psicoeducacion",
           "enfoque": "Marco ético y contención",
           "siguienteNodoId": "lucia-confianza",
@@ -68,7 +68,7 @@
       "id": "lucia-sintomas",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Los dolores de cabeza empeoran cuando hay gritos en casa... pero no es para tanto.",
+      "texto": "La cabeza me duele mucho… sobre todo cuando en casa hay gritos. Pero bueno, creo que es por no dormir bien. No es para tanto, de verdad.",
       "testimonio": {
         "id": "testimonio-lucia-gritos",
         "tema": "violencia_verbal",
@@ -82,7 +82,7 @@
       "id": "lucia-defensiva",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "En casa todo está bien. Solo estoy muy cansada del trabajo y de criar sola.",
+      "texto": "En casa todo está bien… o sea, normal. Yo creo que estoy muy cansada del trabajo y de criar sola. A veces me exijo demasiado, eso es todo.",
       "testimonio": {
         "id": "testimonio-lucia-todo-bien",
         "tema": "clima_familiar",
@@ -96,7 +96,7 @@
       "id": "lucia-confianza",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Gracias por explicarme eso. La semana pasada fui a urgencias... tengo el informe aquí.",
+      "texto": "Gracias por explicarme eso… me ayuda un poco. La semana pasada fui a urgencias, no sé si eso cuenta. Tengo el informe aquí, por si sirve de algo.",
       "testimonio": {
         "id": "testimonio-lucia-urgencias",
         "tema": "mecanismo_lesion",
@@ -109,7 +109,7 @@
     {
       "id": "cierre-consulta",
       "emisor": "narrador",
-      "texto": "La sesión concluye. Tienes material para revisar y decidir los próximos pasos.",
+      "texto": "La sesión concluye. Lucía se va con la mirada baja. Tiene material para revisar y decidir los próximos pasos.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

@@ -146,8 +146,7 @@ export class PanelEstudianteInicio implements OnInit {
   ngOnInit(): void {
     this.practicasSrv.misPracticas().subscribe({
       next: (rows) => {
-        this.session.sincronizarDesdeApi(rows);
-        this.practicas.set(rows);
+        this.practicas.set(this.session.sincronizarDesdeApi(rows));
       },
     });
   }

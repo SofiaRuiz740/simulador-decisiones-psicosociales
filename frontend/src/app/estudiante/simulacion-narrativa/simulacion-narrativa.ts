@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
+import { SimulacionService } from '../../core/services/simulacion.service';
 import { FullscreenService } from '../../core/services/fullscreen.service';
 import { ResultadosNarrativosService } from '../../core/services/resultados-narrativos.service';
 import { AmbienteAudioService } from '../../core/simulacion-narrativa/services/ambiente-audio.service';
@@ -72,6 +73,7 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly session = inject(EstudianteSessionService);
+  private readonly simulacionApi = inject(SimulacionService);
   private readonly fullscreen = inject(FullscreenService);
   private readonly resultadosNarrativos = inject(ResultadosNarrativosService);
   private readonly dialog = inject(MatDialog);
@@ -167,25 +169,40 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
           ) != null
         : false;
 
-    this.facade.iniciarCaso(casoId).subscribe({
+    const registro = practicaIdVal ? this.session.obtenerPractica(practicaIdVal) : null;
+    if (!registro?.autorizacion_id) {
+      this.router.navigate(['/panel-estudiante']);
+      return;
+    }
+
+    this.simulacionApi.iniciarParticipacion(registro.autorizacion_id).subscribe({
       next: () => {
-        if (this.practicaId()) {
-          this.session.marcarEnProgreso(this.practicaId()!);
-        }
-        const faseInicial = resolverFaseIntro(casoId, estudianteId, practicaIdVal, {
-          partidaPreexistente,
+        this.facade.iniciarCaso(casoId).subscribe({
+          next: () => {
+            if (this.practicaId()) {
+              this.session.marcarEnProgreso(this.practicaId()!);
+              this.persistirProgreso();
+            }
+            const faseInicial = resolverFaseIntro(casoId, estudianteId, practicaIdVal, {
+              partidaPreexistente,
+            });
+            this.fase.set(faseInicial);
+            void this.ambiente.iniciar(faseInicial === 'intro' ? 'intro' : 'simulacion');
+          },
+          error: (err) => {
+            console.error('No se pudo iniciar el caso narrativo:', err);
+          },
         });
-        this.fase.set(faseInicial);
-        void this.ambiente.iniciar(faseInicial === 'intro' ? 'intro' : 'simulacion');
       },
       error: (err) => {
-        console.error('No se pudo iniciar el caso narrativo:', err);
+        console.error('No se pudo registrar el inicio de la práctica:', err);
+        this.router.navigate(['/panel-estudiante']);
       },
     });
   }
 
   ngOnDestroy(): void {
-    this.facade.persistirPartida(this.escenas.escenaActualId());
+    this.persistirProgreso();
     this.ambiente.detener();
     void this.fullscreen.salir();
   }

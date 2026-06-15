@@ -25,13 +25,13 @@
       "id": "apertura-ts",
       "emisor": "personaje",
       "personajeId": "trabajadora-social-comisaria",
-      "texto": "Gracias por venir. Han pasado quince días desde el ingreso; coordinamos con el hospital la articulación de seguimiento. ¿Viene a cerrar la valoración psicosocial o a definir el plan?",
+      "texto": "Gracias por venir. Han pasado quince días desde el ingreso; venimos coordinando con el hospital. ¿Viene a cerrar la valoración o a definir el plan de seguimiento?",
       "siguienteNodoId": "decision-prep-apertura"
     },
     {
       "id": "decision-prep-apertura",
       "emisor": "jugador",
-      "texto": "Antes de hablar con trabajo social, la profesional repasa cómo quiere presentarse.",
+      "texto": "La trabajadora social te recibe. Piensa cómo presentarte.",
       "opciones": [
         {
           "id": "prep-slot-ts-apertura-1",
@@ -50,7 +50,7 @@
         },
         {
           "id": "prep-slot-ts-apertura-2",
-          "texto": "«Antes de profundizar, ¿cómo está organizado el seguimiento institucional desde aquí?»",
+          "texto": "«Antes de entrar en detalle, ¿cómo está organizado el seguimiento desde aquí?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-acuse-recibo",
           "efectos": [
@@ -65,7 +65,7 @@
         },
         {
           "id": "prep-slot-ts-apertura-3",
-          "texto": "«Entiendo que ya revisaron el caso con el equipo de salud. ¿Qué información tienen disponible?»",
+          "texto": "«Entiendo que ya revisaron el caso con el hospital. ¿Qué tienen hasta ahora?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-acuse-recibo",
           "efectos": [
@@ -84,17 +84,17 @@
       "id": "ts-acuse-recibo",
       "emisor": "personaje",
       "personajeId": "trabajadora-social-comisaria",
-      "texto": "Entendido. Podemos articular red de apoyo, factores de riesgo y necesidades familiares cuando usted indique por dónde quiere comenzar.",
+      "texto": "Entendido. Podemos articular red de apoyo, factores de riesgo y necesidades familiares. Dígame por dónde quiere empezar.",
       "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
       "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "La articulación interinstitucional está abierta; organiza mentalmente cómo encuadrar la exploración inicial.",
+      "texto": "La articulación está abierta. Piensa qué preguntar primero.",
       "opciones": [
         {
           "id": "prep-slot-ts-exploracion-1",
-          "texto": "«¿Qué red de apoyo institucional pueden activar para la familia en esta etapa?»",
+          "texto": "«¿Qué apoyo institucional pueden activar para la familia en esta etapa?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-explor-red",
           "efectos": [
@@ -109,7 +109,7 @@
         },
         {
           "id": "prep-slot-ts-exploracion-2",
-          "texto": "«¿Qué seguimiento psicosocial proponen para la familia sobreviviente?»",
+          "texto": "«¿Qué seguimiento psicosocial proponen para quienes quedaron?»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "ts-explor-seguimiento",
           "efectos": [
@@ -124,7 +124,7 @@
         },
         {
           "id": "prep-slot-ts-exploracion-3",
-          "texto": "«¿Qué necesidades familiares identificaron en la primera revisión del caso?»",
+          "texto": "«¿Qué necesidades familiares identificaron en la primera revisión?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-explor-necesidades-teaser",
           "efectos": [
@@ -157,17 +157,17 @@
       "id": "ts-explor-necesidades-teaser",
       "emisor": "personaje",
       "personajeId": "trabajadora-social-comisaria",
-      "texto": "Hay duelo, miedo a represalias y dudas sobre retorno seguro al domicilio. Lucía está en recuperación parcial, fuera de UCI. Puedo ampliar según lo recogido en el hospital.",
+      "texto": "Hay duelo, miedo a represalias y dudas sobre si es seguro volver al domicilio. Lucía está en recuperación parcial, fuera de UCI. Puedo ampliar según lo recogido en el hospital.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Puede profundizar en factores de riesgo y protección. Considera qué indagar a continuación.",
+      "texto": "Lo que escuchaste deja preguntas abiertas. Piensa qué conviene profundizar.",
       "opciones": [
         {
           "id": "prep-slot-ts-profundizacion-1",
-          "texto": "«Necesito articular con ustedes la derivación interdisciplinaria y el plan de seguridad.»",
+          "texto": "«Necesito coordinar con ustedes la derivación y el plan de seguridad.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-articulacion",
           "efectos": [
@@ -189,7 +189,7 @@
         },
         {
           "id": "prep-slot-ts-profundizacion-2",
-          "texto": "«¿Qué factores de riesgo y protectores identifican en el núcleo familiar?»",
+          "texto": "«¿Qué factores de riesgo y de protección ven en la familia?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "ts-profun-factores",
           "efectos": [
@@ -204,7 +204,7 @@
         },
         {
           "id": "prep-slot-ts-profundizacion-3",
-          "texto": "«¿Qué protocolo existe para duelo de la madre de Lucía y contención del hermano?»",
+          "texto": "«¿Cómo están acompañando a la madre de Lucía y a su hermano con el duelo?»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "ts-duelo",
           "efectos": [
@@ -219,7 +219,7 @@
         },
         {
           "id": "prep-slot-ts-profundizacion-4",
-          "texto": "«¿Cómo evalúan el sistema familiar y su capacidad de afrontamiento en este momento?»",
+          "texto": "«¿Cómo ven a la familia en este momento? ¿Pueden sostener lo que viene?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "ts-evaluacion-familiar",
           "efectos": [
@@ -279,11 +279,11 @@
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "El plan de protección puede precisarse; considera cuál aspecto abordar ahora.",
+      "texto": "El plan de protección puede precisarse. Piensa qué aspecto abordar ahora.",
       "opciones": [
         {
           "id": "prep-slot-ts-critica-1",
-          "texto": "«¿Qué medidas de protección y restablecimiento de derechos contemplan para Lucía al alta?»",
+          "texto": "«¿Qué medidas de protección contemplan para Lucía al alta?»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "ts-plan-lucia",
           "efectos": [
@@ -305,7 +305,7 @@
         },
         {
           "id": "prep-slot-ts-critica-2",
-          "texto": "«¿Cómo garantizarán protección económica y evitarán que el agresor contacte a la familia en sala?»",
+          "texto": "«¿Cómo van a proteger a la familia económicamente y evitar que el agresor los contacte?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "ts-plan-familia",
           "efectos": [
@@ -327,7 +327,7 @@
         },
         {
           "id": "prep-slot-ts-critica-3",
-          "texto": "«¿Qué acompañamiento institucional existe vinculado a la menor fallecida?»",
+          "texto": "«¿Qué acompañamiento hay para la familia por la muerte de la niña?»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "ts-plan-menor",
           "efectos": [
@@ -342,7 +342,7 @@
         },
         {
           "id": "prep-slot-ts-critica-4",
-          "texto": "«¿Qué derechos consideran vulnerados en este caso y cómo los restablecen?»",
+          "texto": "«¿Qué derechos consideran vulnerados y cómo los están restableciendo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "ts-derechos-vulnerados",
           "efectos": [
@@ -364,7 +364,7 @@
         },
         {
           "id": "prep-slot-ts-critica-5",
-          "texto": "«¿Quién cuidará a Lucía en la recuperación y cuál es su situación económica?»",
+          "texto": "«¿Quién va a cuidar a Lucía en la recuperación y cómo está su situación económica?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "ts-dependientes-vulnerables",
           "efectos": [
@@ -424,7 +424,7 @@
     {
       "id": "decision-cierre-ts",
       "emisor": "jugador",
-      "texto": "Es momento de cerrar la articulación; reflexiona sobre cómo concretarla.",
+      "texto": "Es momento de cerrar la articulación. Piensa cómo concretarla.",
       "opciones": [
         {
           "id": "prep-slot-ts-cierre-1",
@@ -443,7 +443,7 @@
         },
         {
           "id": "prep-slot-ts-cierre-2",
-          "texto": "«¿Qué apoyo psicológico y psiquiátrico consideran necesarios para Lucía cuando evolucione?»",
+          "texto": "«¿Qué apoyo psicológico y psiquiátrico ven necesario para Lucía cuando evolucione?»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "ts-derivacion-clinica",
           "efectos": [
@@ -504,7 +504,7 @@
     {
       "id": "sintesis-eval-comisaria",
       "emisor": "narrador",
-      "texto": "Ha articulado con comisaría y trabajo social. Antes de cerrar, considere su criterio profesional sobre la intervención psicosocial en este escenario.",
+      "texto": "Articulaste con comisaría y trabajo social. Antes de cerrar, piensa en tu criterio profesional sobre la intervención psicosocial en este escenario.",
       "siguienteNodoId": "decision-academica-comisaria-4"
     },
     {
@@ -720,7 +720,7 @@
     {
       "id": "format-ref-d5-ts",
       "emisor": "jugador",
-      "texto": "Ha articulado el plan con trabajo social. Organiza mentalmente qué aspecto requiere seguimiento prioritario.",
+      "texto": "Articulaste el plan con trabajo social. Piensa qué aspecto requiere seguimiento prioritario.",
       "opciones": [
         {
           "id": "format-d5-a",

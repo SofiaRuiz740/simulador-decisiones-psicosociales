@@ -40,7 +40,6 @@ import {
   MapaEscenasDialogData,
 } from '../components/mapa-escenas-dialog/mapa-escenas-dialog';
 import { SalirPracticaDialogComponent } from '../components/salir-practica-dialog/salir-practica-dialog';
-import { EstudianteShellComponent } from '../estudiante-shell/estudiante-shell';
 import { ExploracionVisualComponent } from '../exploracion-visual/exploracion-visual';
 import { IntroduccionNarrativaComponent } from '../exploracion-visual/introduccion-narrativa/introduccion-narrativa';
 import { EscenaVisualService } from '../exploracion-visual/services/escena-visual.service';
@@ -58,7 +57,6 @@ type FaseSimulacion = 'cargando' | 'intro' | 'simulacion';
     MatProgressBarModule,
     BarraSimulacionComponent,
     ControlAmbienteAudioComponent,
-    EstudianteShellComponent,
     ExploracionVisualComponent,
     IntroduccionNarrativaComponent,
     LibretaPsicologoComponent,

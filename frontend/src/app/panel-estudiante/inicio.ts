@@ -45,7 +45,7 @@ import { PracticasService } from '../core/services/practicas.service';
         } @else {
           <ul class="dash-list">
             @for (p of pendientes().slice(0, 3); track p.autorizacion_id) {
-              <li>
+              <li class="dash-list__item dash-list__item--stacked">
                 <strong>{{ p.practica_nombre }}</strong>
                 <span>{{ p.caso_nombre }} · Código {{ p.codigo_acceso }}</span>
               </li>
@@ -117,6 +117,21 @@ import { PracticasService } from '../core/services/practicas.service';
       font-size: 0.84rem;
       color: var(--app-slate);
       line-height: 1.55;
+    }
+    .dash-list__item--stacked {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    .dash-list__item--stacked strong {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--app-ink);
+    }
+    .dash-list__item--stacked span {
+      font-size: 0.78rem;
+      color: var(--app-slate);
     }
   `],
 })

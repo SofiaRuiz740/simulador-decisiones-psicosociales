@@ -8,8 +8,10 @@
     <mat-progress-bar mode="indeterminate" />
   } @else {
     <div class="grid">
-      <section class="panel">
-        <div class="panel__head"><h2>Reinicio individual</h2></div>
+      <section class="panel panel--accent-purple">
+        <div class="panel__head">
+          <h2><span class="icon-circle icon-circle--purple"><mat-icon>restart_alt</mat-icon></span> Reinicio individual</h2>
+        </div>
         <div class="panel__body form-stack">
           <label>
             Práctica
@@ -37,31 +39,40 @@
 
           <label>
             Motivo (opcional)
-            <input type="text" [ngModel]="motivo()" (ngModelChange)="motivo.set($event)" />
+            <input type="text" [ngModel]="motivo()" (ngModelChange)="motivo.set($event)" placeholder="Ej. solicitud del estudiante" />
           </label>
 
-          <label>
+          <label class="confirm-field">
             Confirmación — escribe <strong>REINICIAR</strong>
-            <input type="text" [ngModel]="confirmacionIndividual()" (ngModelChange)="confirmacionIndividual.set($event)" />
+            <input
+              type="text"
+              class="confirm-input"
+              [ngModel]="confirmacionIndividual()"
+              (ngModelChange)="confirmacionIndividual.set($event)"
+              placeholder="REINICIAR" />
           </label>
 
           <button
             mat-flat-button
             color="warn"
+            class="btn-reiniciar"
             type="button"
             [disabled]="procesando()"
             (click)="reiniciarIndividual()">
+            <mat-icon>restart_alt</mat-icon>
             Reiniciar estudiante
           </button>
         </div>
       </section>
 
-      <section class="panel">
-        <div class="panel__head"><h2>Reinicio global</h2></div>
+      <section class="panel panel--accent-warn">
+        <div class="panel__head">
+          <h2><span class="icon-circle icon-circle--warn"><mat-icon>warning</mat-icon></span> Reinicio global</h2>
+        </div>
         <div class="panel__body form-stack">
           <p class="aviso">
             <mat-icon>warning</mat-icon>
-            Esta acción reinicia la práctica para <strong>todos</strong> los estudiantes autorizados.
+            <span>Reinicia el progreso de <strong>todos</strong> los estudiantes autorizados en esta práctica.</span>
           </p>
 
           <label>
@@ -74,17 +85,24 @@
             </select>
           </label>
 
-          <label>
+          <label class="confirm-field">
             Confirmación — escribe <strong>REINICIAR TODOS</strong>
-            <input type="text" [ngModel]="confirmacionGlobal()" (ngModelChange)="confirmacionGlobal.set($event)" />
+            <input
+              type="text"
+              class="confirm-input"
+              [ngModel]="confirmacionGlobal()"
+              (ngModelChange)="confirmacionGlobal.set($event)"
+              placeholder="REINICIAR TODOS" />
           </label>
 
           <button
             mat-flat-button
             color="warn"
+            class="btn-reiniciar"
             type="button"
             [disabled]="procesando()"
             (click)="reiniciarGlobal()">
+            <mat-icon>restart_alt</mat-icon>
             Reiniciar todos
           </button>
         </div>
@@ -92,33 +110,40 @@
     </div>
 
     <section class="panel">
-      <div class="panel__head"><h2>Registro de reinicios</h2></div>
+      <div class="panel__head">
+        <h2><span class="icon-circle icon-circle--muted"><mat-icon>history</mat-icon></span> Registro de reinicios</h2>
+      </div>
       <div class="panel__body">
         @if (registros().length === 0) {
-          <div class="empty-state-mockup">Aún no hay reinicios registrados.</div>
+          <div class="empty-state-mockup">
+            <mat-icon>inbox</mat-icon>
+            Aún no hay reinicios registrados.
+          </div>
         } @else {
-          <table class="tabla">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Práctica</th>
-                <th>Alcance</th>
-                <th>Docente</th>
-                <th>Afectados</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (r of registros(); track r.id) {
+          <div class="table-wrap">
+            <table>
+              <thead>
                 <tr>
-                  <td>{{ r.fecha | date:'medium' }}</td>
-                  <td>{{ r.practica_nombre }}</td>
-                  <td>{{ r.alcance_display }}</td>
-                  <td>{{ r.docente_nombre }}</td>
-                  <td>{{ r.estudiantes_afectados }}</td>
+                  <th>Fecha</th>
+                  <th>Práctica</th>
+                  <th>Alcance</th>
+                  <th>Docente</th>
+                  <th>Afectados</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (r of registros(); track r.id) {
+                  <tr>
+                    <td>{{ r.fecha | date:'medium' }}</td>
+                    <td><strong>{{ r.practica_nombre }}</strong></td>
+                    <td><span class="badge">{{ r.alcance_display }}</span></td>
+                    <td>{{ r.docente_nombre }}</td>
+                    <td>{{ r.estudiantes_afectados }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       </div>
     </section>

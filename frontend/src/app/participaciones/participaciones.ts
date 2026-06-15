@@ -6,16 +6,27 @@ import { CasoDetalle, RecursoMultimedia } from '../core/models/casos.model';
 import { SeguimientoParticipacion } from '../core/models/practicas.model';
 import { CasosService } from '../core/services/casos.service';
 import { SimulacionService } from '../core/services/simulacion.service';
+import { NarrativaFacadeService } from '../core/simulacion-narrativa/services/narrativa-facade.service';
+import { resolverFaseIntro } from '../core/simulacion-narrativa/utils/introduccion-narrativa.util';
+import { obtenerCatalogoCaso, resolverCasoNarrativoId } from '../core/utils/caso-narrativo.util';
+import { ExploracionVisualComponent } from '../estudiante/exploracion-visual/exploracion-visual';
+import { IntroduccionNarrativaComponent } from '../estudiante/exploracion-visual/introduccion-narrativa/introduccion-narrativa';
 
 @Component({
   selector: 'app-participaciones',
-  imports: [CommonModule, MatProgressBarModule],
+  imports: [
+    CommonModule,
+    MatProgressBarModule,
+    ExploracionVisualComponent,
+    IntroduccionNarrativaComponent,
+  ],
   templateUrl: './participaciones.html',
   styleUrl: './participaciones.scss',
 })
 export class Participaciones implements OnInit {
   private readonly servicio = inject(SimulacionService);
   private readonly casos = inject(CasosService);
+  private readonly facade = inject(NarrativaFacadeService);
 
   readonly tab = signal<'seguimiento' | 'simulacion'>('seguimiento');
   readonly loading = signal(true);
@@ -33,6 +44,23 @@ export class Participaciones implements OnInit {
   readonly casoSeleccionado = signal<CasoDetalle | null>(null);
   /** Loading específico para el caso del preview. */
   readonly cargandoCaso = signal(false);
+
+  /** Fase de la vista previa visual narrativa (intro/simulación). */
+  readonly fasePreviewVisual = signal<'cargando' | 'intro' | 'simulacion' | null>(null);
+
+  /** Identificador del caso narrativo visual (slug) para la fila seleccionada, si existe. */
+  readonly casoNarrativoId = computed<string>(() => {
+    const f = this.seleccionada();
+    if (!f) return '';
+    return resolverCasoNarrativoId({ caso_id: f.caso_id, caso_nombre: f.caso_nombre } as any);
+  });
+
+  /** Indica si la fila seleccionada tiene una simulación narrativa visual disponible. */
+  readonly previewVisualDisponible = computed<boolean>(() => {
+    const slug = this.casoNarrativoId();
+    if (!slug) return false;
+    return !!obtenerCatalogoCaso(slug)?.disponible;
+  });
 
   readonly tabs = [
     { id: 'seguimiento' as const, label: 'Seguimiento docente' },
@@ -82,6 +110,36 @@ export class Participaciones implements OnInit {
   verDetalle(fila: SeguimientoParticipacion): void {
     this.seleccionada.set(fila);
     this.tab.set('simulacion');
+    this.fasePreviewVisual.set(null);
+
+    const casoNarrativo = resolverCasoNarrativoId({
+      caso_id: fila.caso_id,
+      caso_nombre: fila.caso_nombre,
+    } as any);
+
+    if (casoNarrativo && obtenerCatalogoCaso(casoNarrativo)?.disponible) {
+      // Caso con simulación narrativa visual: mostramos la experiencia real
+      // del estudiante (personajes, advertencias, escenarios, diálogos) en
+      // modo solo lectura, sin afectar el progreso del estudiante.
+      this.fasePreviewVisual.set('cargando');
+      this.facade.establecerContextoPersistencia({
+        casoId: casoNarrativo,
+        estudianteId: null,
+        practicaId: null,
+      });
+      this.facade.iniciarCaso(casoNarrativo).subscribe({
+        next: () => {
+          const fase = resolverFaseIntro(casoNarrativo, null, null);
+          this.fasePreviewVisual.set(fase === 'intro' ? 'intro' : 'simulacion');
+        },
+        error: () => {
+          this.fasePreviewVisual.set(null);
+        },
+      });
+      this.casoSeleccionado.set(null);
+      return;
+    }
+
     if (!fila.caso_id) {
       this.casoSeleccionado.set(null);
       return;
@@ -99,9 +157,19 @@ export class Participaciones implements OnInit {
     });
   }
 
+  /** Avanza de la introducción narrativa a la simulación dentro de la vista previa. */
+  onIntroduccionCompletaPreview(): void {
+    this.fasePreviewVisual.set('simulacion');
+  }
+
+  onSinIntroduccionPreview(): void {
+    this.fasePreviewVisual.set('simulacion');
+  }
+
   limpiarSeleccion(): void {
     this.seleccionada.set(null);
     this.casoSeleccionado.set(null);
+    this.fasePreviewVisual.set(null);
   }
 
   /** Recursos normalizados (mismo helper que en simulación del estudiante). */

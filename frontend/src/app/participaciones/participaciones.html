@@ -93,6 +93,34 @@
         en una fila para previsualizar el caso real que está respondiendo el
         estudiante.
       </div>
+    } @else if (previewVisualDisponible()) {
+      <div class="preview-visual">
+        <header class="preview-real__head">
+          <div>
+            <h3>Vista previa de la simulación narrativa</h3>
+          </div>
+          <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">
+            Cerrar vista
+          </button>
+        </header>
+
+        @if (fasePreviewVisual() === 'cargando' || fasePreviewVisual() === null) {
+          <mat-progress-bar mode="indeterminate" />
+          <p class="muted">Cargando simulación narrativa…</p>
+        } @else {
+          <div class="preview-visual__viewport">
+            @if (fasePreviewVisual() === 'intro') {
+              <app-introduccion-narrativa
+                [casoId]="casoNarrativoId()"
+                (completada)="onIntroduccionCompletaPreview()"
+                (sinIntroduccion)="onSinIntroduccionPreview()" />
+            }
+            @if (fasePreviewVisual() === 'simulacion') {
+              <app-exploracion-visual [casoId]="casoNarrativoId()" />
+            }
+          </div>
+        }
+      </div>
     } @else if (cargandoCaso()) {
       <mat-progress-bar mode="indeterminate" />
     } @else if (!casoSeleccionado()) {

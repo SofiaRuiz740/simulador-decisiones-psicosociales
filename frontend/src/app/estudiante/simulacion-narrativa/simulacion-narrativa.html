@@ -18,13 +18,7 @@
 }
 
 @if (!error() && !cargando()) {
-  @if (fase() === 'intro') {
-    <ng-container *ngTemplateOutlet="contenidoSimulacion" />
-  } @else {
-    <app-estudiante-shell titulo="Simulación en curso">
-      <ng-container *ngTemplateOutlet="contenidoSimulacion" />
-    </app-estudiante-shell>
-  }
+  <ng-container *ngTemplateOutlet="contenidoSimulacion" />
 }
 
 <ng-template #contenidoSimulacion>

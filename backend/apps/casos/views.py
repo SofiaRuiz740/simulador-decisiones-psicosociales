@@ -1,6 +1,6 @@
 """ViewSets de la app casos: Caso, Escenario, Pregunta, Respuesta, Rubrica."""
 
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Q
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -40,7 +40,11 @@ class CasoViewSet(viewsets.ModelViewSet):
         )
         if self.request.user.rol == Usuario.Rol.ADMIN:
             return qs
-        return qs.filter(docente_creador=self.request.user)
+        # El "caso por defecto" (asociado a la simulación narrativa visual
+        # "Violencia intrafamiliar") es visible para cualquier docente,
+        # además de sus propios casos.
+        from .constants import DEFAULT_CASO_NARRATIVO_ID
+        return qs.filter(Q(docente_creador=self.request.user) | Q(pk=DEFAULT_CASO_NARRATIVO_ID))
 
     def perform_create(self, serializer):
         serializer.save(docente_creador=self.request.user)

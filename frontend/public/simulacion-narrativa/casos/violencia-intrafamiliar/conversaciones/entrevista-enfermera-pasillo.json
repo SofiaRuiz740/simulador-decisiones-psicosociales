@@ -10,17 +10,17 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Buenas. Esta noche ha sido intensa en urgencias. ¿Viene a coordinar contención o necesita orientación sobre el ingreso?",
+      "texto": "Buenas. Esta noche ha sido pesada en urgencias. ¿Viene por la paciente del trauma o necesita que la oriente con algo?",
       "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
       "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "La enfermera está disponible para orientar. Antes de profundizar, ordena mentalmente cómo quiere abrir la entrevista.",
+      "texto": "La enfermera tiene un momento. Piensa cómo abrir la conversación.",
       "opciones": [
         {
           "id": "prep-slot-enf-exploracion-1",
-          "texto": "«¿Cómo está organizado el servicio esta noche y qué restricciones hay para visitas?»",
+          "texto": "«¿Cómo está el servicio esta noche? ¿Hay restricciones para visitas?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-explor-servicio",
           "efectos": [
@@ -35,7 +35,7 @@
         },
         {
           "id": "prep-slot-enf-exploracion-2",
-          "texto": "«Intervengo en el caso de la paciente ingresada. ¿Con quién debo coordinar el acceso clínico?»",
+          "texto": "«Intervengo en el caso de la paciente ingresada. ¿Con quién coordino para verla?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-explor-coordinacion",
           "efectos": [
@@ -50,7 +50,7 @@
         },
         {
           "id": "prep-slot-enf-exploracion-3",
-          "texto": "«Antes de entrar al detalle, ¿cómo describiría la dinámica general del ingreso?»",
+          "texto": "«¿Cómo fue el ingreso, en líneas generales?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-explor-dinamica",
           "efectos": [
@@ -69,31 +69,31 @@
       "id": "enf-explor-servicio",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Hay alta demanda y familias esperando noticias. En UCI solo entra personal autorizado; si va allá, coordine antes con guardia.",
+      "texto": "Hay mucha gente esperando y poco personal. En UCI solo entra quien esté autorizado; si va para allá, avise antes en guardia.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "enf-explor-coordinacion",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Para datos clínicos precisos, el médico tratante tiene el informe. Yo puedo orientar sobre lo observado en enfermería al ingreso.",
+      "texto": "Los datos clínicos finos los tiene el médico tratante. Yo le puedo contar lo que vimos en enfermería cuando ingresó.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "enf-explor-dinamica",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Llegó una paciente en estado grave y familiares muy alterados. El pasillo estuvo tenso durante el traslado; estamos estabilizando el flujo de visitas.",
+      "texto": "Llegó una paciente muy grave y la familia venía alterada. El pasillo estuvo tenso un rato; estamos tratando de ordenar las visitas.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Puede profundizar en aspectos del ingreso. Con lo escuchado, considera qué línea conviene explorar.",
+      "texto": "Lo que escuchaste deja preguntas abiertas. Piensa qué conviene profundizar.",
       "opciones": [
         {
           "id": "prep-slot-enf-profundizacion-1",
-          "texto": "«¿Cómo está la paciente en términos generales y qué restricciones de acceso hay?»",
+          "texto": "«¿Cómo la tienen ahora y quién puede entrar al box?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-profun-estado",
           "efectos": [
@@ -108,7 +108,7 @@
         },
         {
           "id": "prep-slot-enf-profundizacion-2",
-          "texto": "«¿Cómo se comportó la familia durante el ingreso en el pasillo?»",
+          "texto": "«¿Qué pasó con la familia en el pasillo cuando ingresó?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-profun-familia",
           "efectos": [
@@ -123,7 +123,7 @@
         },
         {
           "id": "prep-slot-enf-profundizacion-3",
-          "texto": "«¿Qué observaciones relevantes quedaron registradas al ingreso?»",
+          "texto": "«¿Quedó anotado algo relevante en el ingreso?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enf-profun-observaciones-teaser",
           "efectos": [
@@ -142,7 +142,7 @@
       "id": "enf-profun-estado",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Hemodinámicamente estable, pero sedada. Glasgow bajo al ingreso. Solo personal identificado en el box; si va a UCI, lleve credencial del servicio.",
+      "texto": "Está estable hemodinámicamente, pero sedada. Glasgow bajo al ingreso. Solo entra personal identificado al box; si va a UCI, lleve credencial.",
       "siguienteNodoId": "decision-prep-info-critica"
     },
     {
@@ -156,17 +156,17 @@
       "id": "enf-profun-observaciones-teaser",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Hay anotaciones sobre lesiones visibles y sobre la versión que dio la familia. Puedo ampliar si lo necesita para su evaluación.",
+      "texto": "Hay anotaciones sobre lesiones visibles y sobre lo que dijo la familia. Si lo necesita para su evaluación, le amplío.",
       "siguienteNodoId": "decision-prep-info-critica"
     },
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "Hay datos sensibles del ingreso que conviene precisar. Hay aspectos que aún no están claros; reflexiona sobre cuál merece mayor atención.",
+      "texto": "Hay datos del ingreso que merecen atención. Piensa cuál conviene precisar primero.",
       "opciones": [
         {
           "id": "prep-slot-enf-critica-1",
-          "texto": "«¿Qué anotaron en enfermería sobre las lesiones visibles al ingreso?»",
+          "texto": "«¿Qué anotaron sobre las lesiones que vieron al ingreso?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enfermera-lesiones",
           "efectos": [
@@ -181,7 +181,7 @@
         },
         {
           "id": "prep-slot-enf-critica-2",
-          "texto": "«¿Recuerda algo más sobre la conducta de la familia en el pasillo?»",
+          "texto": "«¿Recuerda algo más de cómo se comportó la familia en el pasillo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enfermera-familia-detalle",
           "efectos": [
@@ -196,7 +196,7 @@
         },
         {
           "id": "prep-slot-enf-critica-3",
-          "texto": "«¿Qué más observó en la dinámica de urgencias esa noche?»",
+          "texto": "«¿Pasó algo más esa noche en urgencias que deba tener en cuenta?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "enfermera-dinamica-detalle",
           "efectos": [
@@ -243,17 +243,17 @@
       "id": "enfermera-dinamica-detalle",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "El ingreso fue simultáneo con otra víctima menor ya sin signos vitales. Eso activó protocolo aparte; la paciente adulta siguió ruta de trauma.",
+      "texto": "El ingreso coincidió con otra víctima menor que ya llegó sin signos vitales. Eso activó un protocolo aparte; la paciente adulta siguió por la ruta de trauma.",
       "siguienteNodoId": "decision-cierre"
     },
     {
       "id": "decision-cierre",
       "emisor": "jugador",
-      "texto": "Es momento de definir el siguiente paso clínico.",
+      "texto": "Es momento de definir tu siguiente paso.",
       "opciones": [
         {
           "id": "prep-slot-enf-cierre-1",
-          "texto": "«¿Podría facilitarme el reporte de enfermería del ingreso para revisarlo?»",
+          "texto": "«¿Me puede dejar el reporte de enfermería del ingreso para revisarlo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "cierre-enfermera-dialogo",
           "efectos": [
@@ -274,7 +274,7 @@
         },
         {
           "id": "prep-slot-enf-cierre-2",
-          "texto": "«Prefiero coordinar contención familiar antes de revisar documentos.»",
+          "texto": "«Prefiero ir primero con la familia antes de revisar papeles.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "cierre-enfermera-dialogo",
           "efectos": [
@@ -289,7 +289,7 @@
         },
         {
           "id": "prep-slot-enf-cierre-3",
-          "texto": "«Para precisar lesiones y evolución, ¿podría orientarme con el médico tratante?»",
+          "texto": "«Para entender lesiones y evolución, ¿con quién del equipo médico hablo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "cierre-enfermera-dialogo",
           "efectos": [
@@ -308,13 +308,13 @@
       "id": "cierre-enfermera-dialogo",
       "emisor": "personaje",
       "personajeId": "enfermera",
-      "texto": "Dejo el reporte en estación médica cuando esté disponible. Si necesita precisión sobre lesiones, evolución o el TCE, el médico tratante lo tiene más claro.",
+      "texto": "Dejo el reporte en estación médica cuando esté listo. Si necesita detalle sobre lesiones, evolución o el TCE, el médico tratante lo tiene más claro.",
       "siguienteNodoId": "format-ref-d1-enfermera"
     },
     {
       "id": "format-ref-d1-enfermera",
       "emisor": "jugador",
-      "texto": "La enfermera orientó sobre el ingreso. Antes de continuar, la profesional reflexiona sobre cuál debería ser el siguiente paso.",
+      "texto": "La enfermera te orientó sobre el ingreso. Antes de seguir, piensa cuál sería el paso más prudente.",
       "opciones": [
         {
           "id": "format-d1-a",
@@ -366,7 +366,7 @@
     {
       "id": "feedback-format-d1-a",
       "emisor": "narrador",
-      "texto": "El personal médico informa que la paciente aún no se encuentra en condiciones para una entrevista clínica.",
+      "texto": "El personal médico informa que la paciente aún no está en condiciones para una entrevista clínica.",
       "siguienteNodoId": "cierre-enfermera"
     },
     {
@@ -384,7 +384,7 @@
     {
       "id": "cierre-enfermera",
       "emisor": "narrador",
-      "texto": "Cierra la entrevista con enfermería. El reporte queda disponible en estación médica.",
+      "texto": "Cierras la entrevista con enfermería. El reporte queda disponible en estación médica.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

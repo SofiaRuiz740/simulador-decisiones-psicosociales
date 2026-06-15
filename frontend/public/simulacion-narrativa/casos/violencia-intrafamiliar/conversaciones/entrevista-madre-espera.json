@@ -10,17 +10,17 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Perdón… soy la mamá de Lucía. Está en UCI y nadie me explica cómo sigue… estoy destrozada. Perdí a mi nieta Sofi hace unas horas y no doy abasto.",
+      "texto": "Perdón… soy la mamá de Lucía. Está en UCI y nadie me explica cómo sigue… estoy destrozada. Perdí a mi nieta Sofi hace unas horas y no doy abasto. Las cosas en esa casa siempre fueron complicadas, pero nunca pensé que llegaría a esto.",
       "siguienteNodoId": "decision-noticia"
     },
     {
       "id": "decision-noticia",
       "emisor": "jugador",
-      "texto": "Habla como abuela en duelo y como madre preocupada por el estado de Lucía. Reflexiona sobre cómo responder.",
+      "texto": "Habla como abuela en duelo y como madre preocupada. Piense cómo responder.",
       "opciones": [
         {
           "id": "validar-duelo",
-          "texto": "«Lamento profundamente la muerte de su nieta. Comprendo lo difícil que debe ser esperar noticias de Lucía.»",
+          "texto": "«Lamento mucho la muerte de su nieta. Comprendo lo difícil que es esperar noticias de Lucía.»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "lucia-alivia",
           "modificadoresMetricas": {
@@ -53,7 +53,7 @@
         },
         {
           "id": "indagar-hechos",
-          "texto": "«Me gustaría comprender mejor qué ocurrió antes del ingreso de Lucía, si usted puede contarlo.»",
+          "texto": "«Si puede, me ayudaría entender qué pasó antes de que Lucía ingresara.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "lucia-defensiva"
         },
@@ -85,14 +85,14 @@
       "id": "lucia-alivia",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Sofi no merecía esto… En la casa de Lucía siempre había gritos. Yo pensé que algún día pasaría algo peor, pero no así… no así.",
+      "texto": "Sofi no merecía esto… En la casa de Lucía siempre había discusiones, sí, pero eran normales en parejas con hijos. Yo pensé que algún día se arreglarían… no así, Dios mío, no así.",
       "siguienteNodoId": "decision-episodio"
     },
     {
       "id": "lucia-defensiva",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "No fue a propósito… Miguel, el yerno de Lucía, nunca haría algo así a propósito. Él… él se altera, pero no es mala persona.",
+      "texto": "No fue a propósito… Miguel, el yerno de Lucía, nunca haría algo así a propósito. Él se altera, sí, pero también tenía cosas buenas. No es mala persona.",
       "testimonio": {
         "id": "testimonio-madre-minimizacion",
         "tema": "clima_familiar",
@@ -106,17 +106,17 @@
       "id": "lucia-pausa",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Perdón… no sé por dónde empezar. Tengo miedo de empeorar las cosas para Lucía si hablo de más.",
+      "texto": "Perdón… no sé por dónde empezar. Tengo miedo de empeorar las cosas para Lucía si hablo de más de la cuenta.",
       "siguienteNodoId": "decision-episodio"
     },
     {
       "id": "decision-episodio",
       "emisor": "jugador",
-      "texto": "Hay varias líneas para comprender el caso. Hay varias líneas para comprender el caso; organiza mentalmente qué explorar primero.",
+      "texto": "Hay varias líneas para seguir. Piense qué explorar primero.",
       "opciones": [
         {
           "id": "explorar-antecedentes",
-          "texto": "«Antes de continuar, quisiera entender si esta situación había ocurrido anteriormente.»",
+          "texto": "«Antes de seguir, ¿esto había pasado otras veces?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "madre-antecedentes",
           "efectos": [
@@ -138,7 +138,7 @@
         },
         {
           "id": "explorar-red-apoyo",
-          "texto": "«¿Con quién cuenta Lucía cuando las cosas se ponen difíciles en casa?»",
+          "texto": "«¿Con quién cuenta Lucía cuando las cosas se ponen difíciles?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "madre-red-apoyo",
           "efectos": [
@@ -153,7 +153,7 @@
         },
         {
           "id": "explorar-relacion-agresor",
-          "texto": "«¿Cómo describiría la relación entre Lucía y Miguel antes de esta noche?»",
+          "texto": "«¿Cómo era la relación entre Lucía y Miguel antes de esta noche?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "madre-relacion-miguel",
           "efectos": [
@@ -178,7 +178,7 @@
       "id": "madre-antecedentes",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Sí… cada semana había gritos. Una vez la empujó contra la nevera; la policía vino por ruidos, pero Lucía no quiso denunciar. Yo pensé que iría pasando.",
+      "texto": "Bueno… sí, había gritos casi cada semana. Una vez la empujó contra la nevera; la policía vino por los ruidos, pero Lucía no quiso denunciar. Yo pensé que iría pasando, que las discusiones eran normales en parejas tensas.",
       "testimonio": {
         "id": "testimonio-madre-ciclo-violencia",
         "tema": "clima_familiar",
@@ -192,43 +192,43 @@
       "id": "madre-red-apoyo",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Conmigo y con Diego… a veces con una vecina. No la dejamos sola del todo: yo vengo casi todos los días y él se queda cuando puede. Pero Miguel controlaba con quién hablaba; decía que la familia era ‘envidiosa’.",
+      "texto": "Conmigo y con Diego, a veces con una vecina. No la dejamos sola del todo: yo voy casi todos los días y él se queda cuando puede. Pero Miguel controlaba con quién hablaba; decía que la familia era ‘envidiosa’.",
       "siguienteNodoId": "decision-proteccion"
     },
     {
       "id": "madre-relacion-miguel",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Empezó bien… luego celos, control del dinero, gritos. Lucía dejó de salir con amigas; decía que ‘no era para tanto’. Yo la veía más callada cada mes. Esta noche explotó distinto.",
+      "texto": "Empezó bien… luego celos, control del dinero, más gritos. Lucía dejó de salir con amigas; decía que ‘no era para tanto’. Yo la veía más callada cada mes. Esta noche se sintió distinto, sí.",
       "siguienteNodoId": "decision-proteccion"
     },
     {
       "id": "madre-presencia",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Estábamos Lucía, Sofi, Miguel y mi hijo Diego. Yo fui a llevarles comida… llegué cuando ya gritaban. Miguel tenía los puños cerrados.",
+      "texto": "Estábamos Lucía, Sofi, Miguel y mi hijo Diego. Yo fui a llevarles comida… llegué cuando ya gritaban. Miguel tenía los puños cerrados, pero en una discusión eso pasa.",
       "siguienteNodoId": "decision-proteccion"
     },
     {
       "id": "decision-proteccion",
       "emisor": "jugador",
-      "texto": "El relato revela dinámicas familiares sensibles; considera cómo profundizar sin retraumatizar.",
+      "texto": "El relato toca temas sensibles. Piense cómo profundizar sin retraumatizar.",
       "opciones": [
         {
           "id": "explorar-roles-familia",
-          "texto": "«¿Quién convivía en el hogar de Lucía y quién presenció lo ocurrido?»",
+          "texto": "«¿Quién vivía en la casa de Lucía y quién vio lo que pasó?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "madre-convivencia"
         },
         {
           "id": "explorar-miedo",
-          "texto": "«¿A quién siente que está protegiendo con su silencio?»",
+          "texto": "«¿A quién siente que está protegiendo cuando no habla de todo?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "madre-miedo"
         },
         {
           "id": "explorar-duelo-familiar",
-          "texto": "«¿Cómo recibió la noticia sobre Sofi y cómo se siente en este momento?»",
+          "texto": "«¿Cómo recibió la noticia de Sofi y cómo se siente ahora?»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "madre-duelo-hospital",
           "efectos": [
@@ -243,7 +243,7 @@
         },
         {
           "id": "explorar-apoyo-colaboracion",
-          "texto": "«¿Está dispuesta a acompañar a Lucía y a colaborar con el equipo del hospital?»",
+          "texto": "«¿Estaría dispuesta a acompañar a Lucía y colaborar con el equipo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "madre-colaboracion-institucional",
           "efectos": [
@@ -258,7 +258,7 @@
         },
         {
           "id": "explorar-contradiccion",
-          "texto": "«He notado que las versiones familiares no coinciden del todo. ¿Le parece si lo revisamos juntas?»",
+          "texto": "«Hay cosas que todavía no comprendo entre lo que cuenta la familia. ¿Lo revisamos juntas?»",
           "estrategiaClinica": "confrontacion",
           "siguienteNodoId": "madre-contradiccion",
           "modificadoresMetricas": {
@@ -272,7 +272,7 @@
       "id": "madre-convivencia",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Lucía vivía con Miguel y Sofi. Diego pasa mucho tiempo allá. Miguel duerme en la casa casi todas las noches… aunque a veces ‘se va a enfriar’ cuando explota.",
+      "texto": "Lucía vivía con Miguel y Sofi. Diego pasa mucho tiempo allá. Miguel duerme en la casa casi todas las noches… aunque a veces ‘se va a enfriar’ cuando se altera demasiado.",
       "siguienteNodoId": "decision-cierre-madre"
     },
     {
@@ -293,7 +293,7 @@
       "id": "madre-afrontamiento-duelo",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "A veces lloro y me paralizo; otras veces me obligo a ser fuerte por Diego. No sé si podré sostener el duelo y cuidar a Lucía al mismo tiempo… pero lo intentaré.",
+      "texto": "A veces lloro y me paralizo; otras me obligo a ser fuerte por Diego. No sé si podré sostener el duelo y cuidar a Lucía al mismo tiempo… pero lo intentaré.",
       "siguienteNodoId": "decision-cierre-madre"
     },
     {
@@ -307,17 +307,17 @@
       "id": "madre-contradiccion",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Es que… cada uno recuerda distinto cuando hay miedo. Yo dije lo de la caída porque Lucía me miraba suplicando. Pero Diego vio otra cosa… eso lo sé.",
+      "texto": "Es que… cada uno recuerda distinto cuando hay miedo. Yo dije lo de la caída porque Lucía me miraba suplicando. Pero Diego vio otra cosa… eso lo sé, aunque me cueste admitirlo.",
       "siguienteNodoId": "decision-cierre-madre"
     },
     {
       "id": "decision-cierre-madre",
       "emisor": "jugador",
-      "texto": "La entrevista llega a un punto de cierre. La entrevista llega a un cierre posible; piensa en cómo sostener lo conversado.",
+      "texto": "La entrevista puede cerrarse. Piense cómo sostener lo conversado.",
       "opciones": [
         {
           "id": "derivar-apoyo",
-          "texto": "«Su testimonio puede ayudar a proteger a Lucía. Estoy aquí para acompañarla en lo que necesite.»",
+          "texto": "«Su testimonio puede ayudar a proteger a Lucía. Estoy aquí para acompañarla.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "cierre-madre-dialogo",
           "efectos": [
@@ -334,7 +334,7 @@
           "id": "pedir-testigo",
           "texto": "«¿Le parece bien que hable con Diego por separado para entender mejor lo ocurrido?»",
           "estrategiaClinica": "exploracion",
-          "siguienteNodoId": "cierre-madre"
+          "siguienteNodoId": "cierre-madre-dialogo"
         }
       ]
     },
@@ -348,7 +348,7 @@
     {
       "id": "format-ref-d2-madre",
       "emisor": "jugador",
-      "texto": "Mientras sostiene el duelo de Carmen, la psicóloga considera qué aspecto requiere mayor atención psicológica inmediata.",
+      "texto": "Mientras acompaña a Carmen en el duelo, considere qué necesita más atención ahora mismo.",
       "opciones": [
         {
           "id": "format-d2-a",
@@ -400,25 +400,25 @@
     {
       "id": "feedback-format-d2-a",
       "emisor": "narrador",
-      "texto": "Indagar detalles judiciales en este momento puede aumentar la ansiedad de quien está en duelo agudo.",
+      "texto": "Pedir detalles judiciales ahora puede subirle la ansiedad a alguien en duelo agudo.",
       "siguienteNodoId": "cierre-madre"
     },
     {
       "id": "feedback-format-d2-b",
       "emisor": "narrador",
-      "texto": "La contención del duelo facilita que la familia pueda aportar información con mayor claridad más adelante.",
+      "texto": "Contener el duelo primero facilita que la familia pueda aportar información con más claridad después.",
       "siguienteNodoId": "cierre-madre"
     },
     {
       "id": "feedback-format-d2-c",
       "emisor": "narrador",
-      "texto": "Los antecedentes penales pueden contrastarse cuando la persona esté emocionalmente más estabilizada.",
+      "texto": "Los antecedentes penales pueden revisarse cuando la persona esté un poco más estable emocionalmente.",
       "siguienteNodoId": "cierre-madre"
     },
     {
       "id": "cierre-madre",
       "emisor": "narrador",
-      "texto": "Cierra la entrevista con la madre de Lucía. La familia permanece en sala de espera.",
+      "texto": "Cierra la entrevista con la madre de Lucía. La familia sigue en sala de espera.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

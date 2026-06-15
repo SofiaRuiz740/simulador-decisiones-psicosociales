@@ -1,0 +1,99 @@
+{
+  "timestamp": "2026-06-14T18:17:17.831Z",
+  "fase": "23B",
+  "total": 13,
+  "criticas": 0,
+  "hallazgos": [
+    {
+      "conversacion": "consulta-lucia",
+      "problema": "Nodo inalcanzable desde nodoInicialId (rama huérfana)",
+      "nodo": "saludo-confianza-alta",
+      "propuesta": "Conectar desde un nodo anterior o eliminar si es legacy",
+      "severidad": "media"
+    },
+    {
+      "conversacion": "consulta-lucia",
+      "problema": "Nodo inalcanzable desde nodoInicialId (rama huérfana)",
+      "nodo": "saludo-tension",
+      "propuesta": "Conectar desde un nodo anterior o eliminar si es legacy",
+      "severidad": "media"
+    },
+    {
+      "conversacion": "entrevista-comisario",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "format-ref-d4-comisario",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-enfermera-pasillo",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "format-ref-d1-enfermera",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-hermano-espera",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-miguel",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-madre-espera",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-proteccion",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-madre-espera",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "format-ref-d2-madre",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-policia-entrada",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-cierre",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-trabajadora-social-comisaria",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-academica-comisaria-4",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "entrevista-trabajadora-social-comisaria",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-academica-comisaria-6",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "revisita-lucia-informe",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-informe",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "revisita-lucia-informe",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-cierre-lucia",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    },
+    {
+      "conversacion": "revisita-lucia-tras-medico",
+      "problema": "Prompt de jugador en tercera persona (rompe inmersión / parece salto meta-narrativo)",
+      "nodo": "decision-hora",
+      "propuesta": "Reformular en segunda persona clínica: «Debe decidir…» o voz narradora breve sin duplicar instrucción",
+      "severidad": "baja"
+    }
+  ]
+}

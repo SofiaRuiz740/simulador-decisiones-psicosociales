@@ -92,13 +92,17 @@ class ParticipacionViewSet(viewsets.GenericViewSet):
         if not _es_estudiante(request):
             raise PermissionDenied('Solo estudiantes pueden iniciar participaciones.')
 
-        autorizacion_id = request.auth.payload.get('autorizacion_id')
+        payload = getattr(request.auth, 'payload', None) or {}
+        autorizacion_id = request.data.get('autorizacion_id') or payload.get('autorizacion_id')
         if not autorizacion_id:
-            raise ValidationError('El token no contiene autorizacion_id; vuelve a acceder con tu código.')
+            raise ValidationError(
+                'Indica la autorización de la práctica o vuelve a acceder con tu código.',
+            )
 
         autorizacion: AutorizacionEstudiante = get_object_or_404(
             AutorizacionEstudiante.objects.select_related('practica__caso', 'estudiante'),
             pk=autorizacion_id,
+            estudiante__usuario=request.user,
         )
         practica = autorizacion.practica
 
@@ -158,6 +162,12 @@ class ParticipacionViewSet(viewsets.GenericViewSet):
             # Consumir la autorización de reintento.
             autorizacion.reintento_autorizado = False
             autorizacion.save(update_fields=['reintento_autorizado'])
+
+        if not creada and part.estado == Participacion.Estado.NO_INICIADA:
+            part.estado = Participacion.Estado.EN_CURSO
+            if not part.inicio:
+                part.inicio = timezone.now()
+            part.save(update_fields=['estado', 'inicio'])
 
         if not creada and part.estado == Participacion.Estado.EN_CURSO:
             if tiempo_agotado(part):

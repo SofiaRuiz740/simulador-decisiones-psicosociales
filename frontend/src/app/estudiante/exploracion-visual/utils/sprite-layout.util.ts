@@ -73,7 +73,7 @@ const PERFIL_DEFAULT: PerfilVisualEscena = {
 
 /** Perfiles calibrados para fondos ilustrados (1536×1024, cover). */
 export const PERFILES_VISUALES_ESCENA: Record<string, PerfilVisualEscena> = {
-  'entrada-hospital': {
+  entrada: {
     lineaSueloY: 88,
     factorEscala: 1.35,
     limites: { margenSuperior: 14, margenLateral: 10, piesYMin: 82, piesYMax: 94 },

@@ -18,6 +18,9 @@
   }
 
   @for (hotspot of hotspotsVisibles(); track hotspot.id) {
-    <app-hotspot-lupa [hotspot]="hotspot" (activar)="onHotspot(hotspot)" />
+    <app-hotspot-lupa
+      [hotspot]="hotspot"
+      [interactuable]="trasladoComisariaInteractuable(hotspot)"
+      (activar)="onHotspot(hotspot)" />
   }
 </section>

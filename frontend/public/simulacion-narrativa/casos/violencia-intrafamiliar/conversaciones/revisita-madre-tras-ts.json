@@ -48,13 +48,13 @@
       "id": "apertura-madre-ts",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Volvió… La señora de la comisaría me dijo que quieren entrevistarme por separado de mi hijo. ¿Qué descubrieron ustedes sobre lo de Lucía?",
+      "texto": "Volvió… La señora de la comisaría me dijo que quieren entrevistarme aparte de mi hijo. Me da nervio. ¿Qué han descubierto ustedes sobre lo de Lucía?",
       "siguienteNodoId": "decision-enfoque-ts"
     },
     {
       "id": "decision-enfoque-ts",
       "emisor": "jugador",
-      "texto": "Carmen regresa con inquietud tras la articulación social. Hay antecedentes que conviene revisar con cuidado; considera qué contrastar primero.",
+      "texto": "Carmen regresa inquieta tras hablar con trabajadora social. Piense qué contrastar sin retraumatizarla.",
       "opciones": [
         {
           "id": "contrastar-antecedentes",
@@ -64,7 +64,7 @@
         },
         {
           "id": "contrastar-version",
-          "texto": "«Usted habló de una caída; otros relatos mencionan un empujón contra Lucía.»",
+          "texto": "«Usted habló de una caída, pero otros relatos mencionan un empujón. ¿Cómo lo vivió?»",
           "estrategiaClinica": "confrontacion",
           "siguienteNodoId": "madre-version",
           "modificadoresMetricas": {
@@ -74,7 +74,7 @@
         },
         {
           "id": "explorar-proteccion",
-          "texto": "«¿Qué teme perder si se aclara la verdad?»",
+          "texto": "«¿Qué le da más miedo si se aclara lo que pasó?»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "madre-temor"
         }
@@ -84,7 +84,7 @@
       "id": "madre-antecedentes",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "La policía vino… sí, una vez por ruidos. Yo pensé que era exageración de los vecinos. No sabía que quedó tan… tan formal en un registro.",
+      "texto": "La policía vino… sí, una vez por ruidos. Yo pensé que era exageración de los vecinos, que las discusiones eran normales. No sabía que quedó tan… tan formal en un registro.",
       "testimonio": {
         "id": "testimonio-madre-antecedentes-parcial",
         "tema": "clima_familiar",
@@ -98,7 +98,7 @@
       "id": "madre-version",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "En el momento pensé que decir ‘se cayó’ protegería a Lucía de más escándalo… Mi hijo vio otra cosa y yo lo sé. Me da vergüenza haber mentido.",
+      "texto": "En el momento pensé que decir ‘se cayó’ protegería a Lucía de más escándalo… Mi hijo vio otra cosa y yo lo sé. Me da vergüenza haberlo dicho así, pero tenía miedo.",
       "testimonio": {
         "id": "testimonio-madre-admite-minimizacion",
         "tema": "mecanismo_lesion",
@@ -118,17 +118,17 @@
     {
       "id": "decision-cierre-madre-ts",
       "emisor": "jugador",
-      "texto": "La entrevista puede orientarse hacia el cierre; reflexiona sobre cómo acompañarla.",
+      "texto": "Puede orientarse hacia el cierre. Piense cómo acompañarla.",
       "opciones": [
         {
           "id": "separar-entrevistas",
-          "texto": "«Las entrevistas separadas buscan protegerla a usted y a Diego, no separarlos.»",
+          "texto": "«Las entrevistas por separado son para protegerla a usted y a Diego, no para apartarlos.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "cierre-madre-ts"
         },
         {
           "id": "invitar-correccion",
-          "texto": "«Si lo desea, puede corregir en libreta lo que dijo sobre la caída de Lucía.»",
+          "texto": "«Si quiere, puede corregir en libreta lo que dijo sobre cómo cayó Lucía.»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "cierre-madre-ts"
         }
@@ -138,7 +138,7 @@
       "id": "cierre-madre-ts",
       "emisor": "personaje",
       "personajeId": "madre-lucia",
-      "texto": "Haga lo que tenga que hacer… pero no dejen sola a Lucía allá arriba en UCI. Yo quiero decir la verdad, pero me falta valor.",
+      "texto": "Haga lo que tenga que hacer… pero no dejen sola a Lucía allá arriba en UCI. Yo quiero decir la verdad, pero me falta valor todavía.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

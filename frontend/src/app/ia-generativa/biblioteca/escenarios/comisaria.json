@@ -1,0 +1,22 @@
+{
+    "id": "comisaria",
+  
+    "nombre": "Comisaría de Familia",
+  
+    "tipo": "institucional",
+  
+    "descripcion": "Entidad encargada de medidas de protección y restablecimiento de derechos.",
+  
+    "personajes_permitidos": [
+      "trabajador_social",
+      "policia",
+      "victima",
+      "familiar"
+    ],
+  
+    "objetivos_frecuentes": [
+      "recopilar información",
+      "emitir medidas de protección",
+      "orientar a la víctima"
+    ]
+  }

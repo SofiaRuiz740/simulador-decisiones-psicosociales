@@ -25,7 +25,7 @@
     {
       "id": "saludo-revisita",
       "emisor": "narrador",
-      "texto": "El pasillo de urgencias queda atrás. En UCI la luz es tenue; el monitor marca un ritmo estable, pero la respiración aún cuesta.",
+      "texto": "El pasillo de urgencias queda atrás. En UCI la luz es tenue; el monitor marca un ritmo estable, pero Lucía respira con esfuerzo y parece no ubicar del todo el espacio.",
       "siguienteNodoId": "format-ref-d3-uci"
     },
     {
@@ -102,13 +102,13 @@
       "id": "lucia-semiconsciente",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Usted es de salud mental…? Me duele la cabeza… no entiendo bien dónde estoy.",
+      "texto": "¿Usted es de salud mental…? La cabeza me explota… no entiendo bien dónde estoy. ¿Qué hora es?",
       "siguienteNodoId": "decision-apertura-lucia"
     },
     {
       "id": "decision-apertura-lucia",
       "emisor": "jugador",
-      "texto": "Lucía está sedada y vulnerable. La profesional reflexiona sobre cómo abrir el acercamiento.",
+      "texto": "Lucía está sedada, desorientada y muy vulnerable. ¿Cómo se le acerca?",
       "opciones": [
         {
           "id": "presentar-servicio",
@@ -137,13 +137,13 @@
       "id": "lucia-acuse-recibo",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Gracias… Mi mamá y mi hermano están afuera, ¿verdad? Tengo miedo de que estén peleando otra vez.",
+      "texto": "Gracias… Mi mamá y mi hermano están afuera, ¿verdad? Tengo miedo de que estén peleando otra vez… o de que digan algo que no deben.",
       "siguienteNodoId": "decision-exploracion-inicial"
     },
     {
       "id": "decision-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "Puede explorar el contexto sin presionar. Considera por dónde continuar la exploración.",
+      "texto": "Lucía parece necesitar contención antes de hablar del episodio. ¿Por dónde continúa?",
       "opciones": [
         {
           "id": "explorar-familia-espera",
@@ -163,20 +163,20 @@
       "id": "lucia-preocupacion-familia",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Miguel siempre dice cosas horribles cuando hay visitas… y mi mamá trata de callarlo. No quiero que le digan cosas que la hagan sentir culpable.",
+      "texto": "Miguel siempre dice cosas horribles cuando hay visitas… y mi mamá trata de callarlo, como si fuera culpa de todos. No quiero que le digan cosas que la hagan sentir peor… ni que él se enoje después.",
       "siguienteNodoId": "decision-profundizacion-relacion"
     },
     {
       "id": "lucia-bienestar",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Duele todo… y estoy confundida. Antes de esto, ya venía muy agotada en casa.",
+      "texto": "Duele todo… y la cabeza no me da tregua. Estoy confundida, como si no terminara de despertar. Antes de esto, ya venía muy agotada en casa… pero yo pensaba que era yo la del problema.",
       "siguienteNodoId": "decision-profundizacion-relacion"
     },
     {
       "id": "decision-profundizacion-relacion",
       "emisor": "jugador",
-      "texto": "Puede profundizar en la dinámica de pareja sin juzgar. Considera qué indagar a continuación.",
+      "texto": "Lucía empieza a abrirse sobre su vida con Miguel. ¿Qué le gustaría entender un poco más?",
       "opciones": [
         {
           "id": "explorar-celos-control",
@@ -202,27 +202,27 @@
       "id": "lucia-celos-control",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Revisaba el celular… preguntaba dónde estaba. Si salía con mi mamá, decía que la familia me metía en la cabeza cosas contra él. Celos todo el tiempo.",
+      "texto": "Revisaba el celular… preguntaba dónde estaba todo el tiempo. Si salía con mi mamá, decía que la familia me metía en la cabeza cosas contra él. Celos… siempre. Yo trataba de no darle motivos, pero nunca alcanzaba.",
       "siguienteNodoId": "decision-info-critica-violencia"
     },
     {
       "id": "lucia-aislamiento",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Con mi hermano a veces… pero Miguel decía que no debía contarle nada. Dejé de ver a una amiga porque ‘provocaba’. Me fui quedando sola.",
+      "texto": "Con mi hermano a veces… pero Miguel decía que no debía contarle nada, que lo traicionaba. Dejé de ver a una amiga porque ‘provocaba’. Me fui quedando sola… y al final sentía que solo tenía a él.",
       "siguienteNodoId": "decision-info-critica-violencia"
     },
     {
       "id": "lucia-cambios-conducta",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Me saltaba comidas, no dormía. Sofi me preguntaba por qué lloraba en el baño. Yo le decía que era cansancio… pero era miedo.",
+      "texto": "Me saltaba comidas, no dormía. Sofi me preguntaba por qué lloraba en el baño. Yo le decía que era cansancio… pero era miedo. No quería que se asustara. A veces ni yo entendía por qué lloraba.",
       "siguienteNodoId": "decision-info-critica-violencia"
     },
     {
       "id": "decision-info-critica-violencia",
       "emisor": "jugador",
-      "texto": "Hay aspectos sensibles del vínculo que conviene precisar con cuidado; reflexiona sobre qué profundizar.",
+      "texto": "Lucía ha mencionado aspectos delicados del vínculo. ¿Cómo profundiza con cuidado?",
       "opciones": [
         {
           "id": "explorar-chantaje",
@@ -273,7 +273,7 @@
       "id": "lucia-chantaje-dependencia",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Decía que sin él no pagábamos nada… que Sofi y yo no teníamos a quién más ir. Yo le creí. Eso me paralizaba.",
+      "texto": "Decía que sin él no pagábamos nada… que Sofi y yo no teníamos a quién más ir. Yo le creí, de verdad. Eso me paralizaba. A veces pensaba: ‘tal vez tiene razón, yo no podría sola’.",
       "testimonio": {
         "id": "testimonio-lucia-dependencia-economica",
         "tema": "clima_familiar",
@@ -287,7 +287,7 @@
       "id": "lucia-miedo-miguel",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Si digo la verdad… Miguel puede hacerle daño a mi mamá o a Diego. Él siempre dice que sin él no sobrevivimos.",
+      "texto": "Si digo la verdad… Miguel puede hacerle daño a mi mamá o a Diego. Él siempre dice que sin él no sobrevivimos. Y yo… yo le tengo miedo, pero también siento que sin él me caigo.",
       "testimonio": {
         "id": "testimonio-lucia-miedo-represalias",
         "tema": "clima_familiar",
@@ -301,7 +301,7 @@
       "id": "lucia-escalada",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Gritaba, luego pedía perdón con flores… y yo pensaba ‘esta vez sí cambió’. Pero volvía. Cada vez más fuerte.",
+      "texto": "Gritaba, luego pedía perdón con flores… y yo pensaba ‘esta vez sí cambió’. Pero volvía. Cada vez más fuerte. Yo me convencía de que si yo cambiaba, él también… pero no era así.",
       "testimonio": {
         "id": "testimonio-lucia-escalada",
         "tema": "clima_familiar",
@@ -315,13 +315,13 @@
       "id": "lucia-semiconsciente-hija",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Mi hija…? No la veo… ¿Dónde está Sofi?",
+      "texto": "¿Mi hija…? No la veo… ¿Dónde está Sofi? Dígame… por favor…",
       "siguienteNodoId": "decision-noticia-hija"
     },
     {
       "id": "decision-noticia-hija",
       "emisor": "jugador",
-      "texto": "Lucía pregunta por su hija. Reflexiona sobre cómo responder.",
+      "texto": "Lucía pregunta por su hija con urgencia. ¿Cómo responde?",
       "opciones": [
         {
           "id": "informar-con-contencion",
@@ -377,27 +377,27 @@
       "id": "lucia-duelo",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "No… no puede ser… Yo trataba de protegerla… Dios mío…",
+      "texto": "No… no puede ser… Yo trataba de protegerla… Dios mío… ¿Por qué no pude? Fue culpa mía… tenía que haber hecho algo más…",
       "siguienteNodoId": "decision-estabilizacion"
     },
     {
       "id": "lucia-suspira",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Estoy muy cansada… la cabeza me arde… ¿Por qué duele tanto?",
+      "texto": "Estoy muy cansada… la cabeza me arde… no puedo pensar. ¿Por qué duele tanto? ¿Sofi…? ¿Dónde está Sofi?",
       "siguienteNodoId": "decision-estabilizacion"
     },
     {
       "id": "lucia-sospecha",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Por qué no me responde sobre mi hija? ¿Pasó algo malo?",
+      "texto": "¿Por qué no me responde sobre mi hija? ¿Pasó algo malo? Dígame… por favor… tengo miedo de lo que ya sé.",
       "siguienteNodoId": "decision-estabilizacion"
     },
     {
       "id": "decision-estabilizacion",
       "emisor": "jugador",
-      "texto": "Lucía está agotada y vulnerable; reflexiona sobre cómo sostenerla en este momento.",
+      "texto": "Lucía está agotada y muy vulnerable. ¿Cómo la sostiene en este momento?",
       "opciones": [
         {
           "id": "validar-dolor",
@@ -426,13 +426,13 @@
       "id": "lucia-pausa-respira",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Gracias… no puedo pensar con claridad. Mi mamá y mi hermano están afuera… ¿Están bien?",
+      "texto": "Gracias… no puedo pensar con claridad, todo se me mezcla. Mi mamá y mi hermano están afuera… ¿Están bien? Tengo miedo de que Miguel… no sé, de que pase algo.",
       "siguienteNodoId": "decision-informe"
     },
     {
       "id": "decision-informe",
       "emisor": "jugador",
-      "texto": "Ya revisó el informe de urgencias. Considera cómo abordarlo con ella.",
+      "texto": "Ya revisó el informe de urgencias. ¿Cómo se lo aborda con ella?",
       "opciones": [
         {
           "id": "explorar-con-empatia",
@@ -471,27 +471,27 @@
       "id": "lucia-respuesta-empatia",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Él empujó… yo traté de cubrirme con los brazos. La niña gritaba… y luego todo se volvió negro.",
+      "texto": "Él empujó… yo traté de cubrirme con los brazos. La niña gritaba… y luego todo se volvió negro. No recuerdo bien después… solo el ruido.",
       "siguienteNodoId": "decision-cierre-lucia"
     },
     {
       "id": "lucia-respuesta-hechos",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Recuerdo sus manos en mi pecho… empujándome. Caí de lado. Antes dije que resbalé porque él me miraba.",
+      "texto": "Recuerdo sus manos en mi pecho… empujándome. Caí de lado. Antes dije que resbalé porque él me miraba… y yo tenía miedo. No sé por qué mentí, o sí lo sé…",
       "siguienteNodoId": "decision-cierre-lucia"
     },
     {
       "id": "lucia-respuesta-confrontacion",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Está bien… no resbalé. Me empujó cuando me interpuse por la niña. Tengo terror de lo que pueda hacer si sale libre.",
+      "texto": "Está bien… no resbalé. Me empujó cuando me interpuse por la niña. Tengo terror de lo que pueda hacer si sale libre. Pero también siento que sin él no sé qué hacer…",
       "siguienteNodoId": "decision-cierre-lucia"
     },
     {
       "id": "decision-cierre-lucia",
       "emisor": "jugador",
-      "texto": "El acercamiento clínico llega a un punto sensible; considera cómo cerrarlo con cuidado.",
+      "texto": "El acercamiento llega a un punto sensible. ¿Cómo cierra con cuidado?",
       "opciones": [
         {
           "id": "plan-seguridad",
@@ -743,7 +743,7 @@
       "id": "cierre-revisita",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Él empujó… yo traté de cubrirme… No quiero que le pase algo a mi familia por hablar. Cuando salga de aquí… no sé qué va a pasar.",
+      "texto": "Él empujó… yo traté de cubrirme… No quiero que le pase algo a mi familia por hablar. Cuando salga de aquí… no sé qué va a pasar. A veces pienso que sin él no puedo… y eso me da más miedo.",
       "testimonio": {
         "id": "testimonio-lucia-revisita-empujon",
         "tema": "mecanismo_lesion",

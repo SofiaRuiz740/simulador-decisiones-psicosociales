@@ -63,10 +63,16 @@ export function partidaPersistidaValidaParaCaso(
   return !!partida && partida.estado.casoId === casoId;
 }
 
+/** IDs de escena visual renombrados — compatibilidad con partidas guardadas. */
+const ALIAS_ESCENA_VISUAL: Record<string, string> = {
+  'entrada-hospital': 'entrada',
+};
+
 export function escenaVisualPersistidaValida(
   escenaVisualId: string | null | undefined,
   escenasIds: string[],
 ): string | null {
   if (!escenaVisualId) return null;
-  return escenasIds.includes(escenaVisualId) ? escenaVisualId : null;
+  const normalizada = ALIAS_ESCENA_VISUAL[escenaVisualId] ?? escenaVisualId;
+  return escenasIds.includes(normalizada) ? normalizada : null;
 }

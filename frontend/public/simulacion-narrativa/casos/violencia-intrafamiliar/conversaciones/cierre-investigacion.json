@@ -18,19 +18,19 @@
     {
       "id": "conclusion-1",
       "emisor": "narrador",
-      "texto": "Cierra el expediente sobre la mesa. Recorrió el hospital y la comisaría; reunió testimonios, evidencias clínicas y antecedentes que no terminan de coincidir.",
+      "texto": "Cierras el expediente sobre la mesa. Recorriste el hospital y la comisaría; reuniste testimonios, evidencias clínicas y antecedentes que no terminan de coincidir.",
       "siguienteNodoId": "conclusion-2"
     },
     {
       "id": "conclusion-2",
       "emisor": "narrador",
-      "texto": "El cuadro apunta a violencia intrafamiliar sostenida, minimización familiar y riesgo persistente para quienes sobrevivieron al episodio. Sus decisiones quedaron registradas en la libreta clínica.",
+      "texto": "El cuadro apunta a violencia intrafamiliar sostenida, minimización familiar y riesgo que sigue presente para quienes sobrevivieron. Tus decisiones quedaron registradas en la libreta clínica.",
       "siguienteNodoId": "conclusion-3"
     },
     {
       "id": "conclusion-3",
       "emisor": "narrador",
-      "texto": "La investigación psicosocial concluye aquí. Revise su libreta, contraste versiones y reflexione sobre las estrategias que utilizó antes de cerrar la práctica.",
+      "texto": "La investigación psicosocial concluye aquí. Revisa tu libreta, contrasta versiones y reflexiona sobre las estrategias que usaste antes de cerrar la práctica.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

@@ -40,6 +40,45 @@
   &.es-evidencia .hotspot-icono {
     color: #e8dcc8;
   }
+
+  &.es-bloqueado {
+    cursor: not-allowed;
+
+    .hotspot-icono {
+      opacity: 0.55;
+    }
+
+    .hotspot-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      transform: none;
+
+      .hotspot-icono {
+        filter: drop-shadow(0 2px 8px rgba(15, 23, 42, 0.5));
+      }
+    }
+  }
+
+  &.es-dock {
+    flex-direction: column;
+    align-items: center;
+
+    .hotspot-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      transform: scale(1.14);
+    }
+  }
 }
 
 .hotspot-icono {

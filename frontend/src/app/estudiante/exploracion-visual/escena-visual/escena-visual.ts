@@ -14,8 +14,11 @@ import { etiquetaInteraccionPersonaje } from '../utils/presentacion-personaje.ut
 import { escenaEsAccesible, hotspotEsAccesible } from '../utils/escena-acceso.util';
 import {
   HOTSPOTS_TRASLADO_COMISARIA,
+  puedeTrasladarseAComisaria,
   registrarDiagnosticoComisariaEnConsola,
 } from '../utils/comisaria-acceso.util';
+
+const HOTSPOT_TRASLADO_ENTRADA_ID = 'ir-comisaria';
 
 @Component({
   selector: 'app-escena-visual',
@@ -59,7 +62,17 @@ export class EscenaVisualComponent {
 
   readonly hotspotsVisibles = computed(() => {
     const escena = this.escena();
-    return escena.hotspots.filter((hotspot) => this.hotspotEsVisible(hotspot));
+    return escena.hotspots.filter((hotspot) => {
+      if (hotspot.id === HOTSPOT_TRASLADO_ENTRADA_ID && escena.id === 'entrada') {
+        return this.mostrarTrasladoComisariaEnEntrada();
+      }
+      if (
+        HOTSPOTS_TRASLADO_COMISARIA.includes(hotspot.id as (typeof HOTSPOTS_TRASLADO_COMISARIA)[number])
+      ) {
+        return false;
+      }
+      return this.hotspotEsVisible(hotspot);
+    });
   });
 
   etiquetaHotspotPersonaje(hotspot: {
@@ -90,14 +103,44 @@ export class EscenaVisualComponent {
     this.iniciarConversacion(conversacionId, modoAcercamiento);
   }
 
+  trasladoComisariaInteractuable(hotspot: HotspotEscena): boolean {
+    if (hotspot.id !== HOTSPOT_TRASLADO_ENTRADA_ID || this.escena().id !== 'entrada') {
+      return true;
+    }
+
+    return puedeTrasladarseAComisaria(this.facade.estado(), this.facade.caso());
+  }
+
   onHotspot(hotspot: HotspotEscena): void {
+    if (
+      hotspot.id === HOTSPOT_TRASLADO_ENTRADA_ID &&
+      this.escena().id === 'entrada' &&
+      !this.trasladoComisariaInteractuable(hotspot)
+    ) {
+      this.mensaje.emit(
+        'Esta ubicación aún no está disponible. Completa la evaluación hospitalaria primero.',
+      );
+      return;
+    }
     switch (hotspot.tipo) {
       case 'navegacion':
         if (hotspot.destinoEscenaId) {
           const destino = this.escenas.obtenerEscena(hotspot.destinoEscenaId);
           const estado = this.facade.estado();
           const caso = this.facade.caso();
-          if (destino && !escenaEsAccesible(destino, estado, caso)) {
+          const esTrasladoEntradaComisaria =
+            hotspot.id === HOTSPOT_TRASLADO_ENTRADA_ID &&
+            this.escena().id === 'entrada' &&
+            hotspot.destinoEscenaId === 'exterior-comisaria';
+
+          if (esTrasladoEntradaComisaria) {
+            if (!puedeTrasladarseAComisaria(estado, caso)) {
+              this.mensaje.emit(
+                'Esta ubicación aún no está disponible. Completa la evaluación hospitalaria primero.',
+              );
+              return;
+            }
+          } else if (destino && !escenaEsAccesible(destino, estado, caso)) {
             this.mensaje.emit(
               'Esta ubicación aún no está disponible. Completa la evaluación hospitalaria primero.',
             );
@@ -185,6 +228,20 @@ export class EscenaVisualComponent {
     }
 
     this.abrirConversacion.emit({ conversacionId, modoAcercamiento });
+  }
+
+  /** Spot «Trasladarse a la comisaría»: solo en entrada, siempre visible hasta cerrar el caso. */
+  private mostrarTrasladoComisariaEnEntrada(): boolean {
+    const estado = this.facade.estado();
+    const caso = this.facade.caso();
+    if (!estado) return false;
+
+    registrarDiagnosticoComisariaEnConsola('entrada', HOTSPOT_TRASLADO_ENTRADA_ID, estado, caso);
+
+    if (estado.conversacionesCompletadas.includes('cierre-investigacion')) return false;
+    if (estado.flags['caso_completado']) return false;
+
+    return true;
   }
 
   private hotspotEsVisible(hotspot: HotspotEscena): boolean {

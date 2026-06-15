@@ -50,12 +50,11 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
 // 999999 = PK fijo del "Caso por defecto" sembrado por el backend
 // (ver backend/apps/casos/constants.py y seed_caso_narrativo), asociado
 // a la simulación narrativa visual "Violencia intrafamiliar" y visible
-// para cualquier docente.
+// para cualquier docente. Es el ÚNICO caso que debe activar esta
+// simulación visual completa: cualquier otro caso creado por un docente
+// (aunque tenga un nombre parecido, ej. "Pelea de parejas — golpes
+// físicos — caso piloto") usa la vista previa genérica de texto.
 const MAPEO_CASO_BACKEND: Record<number, string> = {
-  1: 'violencia-intrafamiliar',
-  2: 'violencia-intrafamiliar',
-  3: 'violencia-intrafamiliar',
-  4: 'violencia-intrafamiliar',
   999999: 'violencia-intrafamiliar',
 };
 
@@ -73,10 +72,12 @@ export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): str
     return MAPEO_CASO_BACKEND[practica.caso_id];
   }
 
-  // Si el caso (creado por un docente o el "Caso por defecto") no está en el
-  // mapeo explícito de IDs, intentamos resolver por nombre: si el nombre del
-  // caso coincide con el título de alguna práctica narrativa disponible en el
-  // catálogo, usamos esa simulación visual.
+  // El listado "Mis prácticas" del estudiante no siempre trae el `caso_id`
+  // real (puede llegar en 0). En ese caso, resolvemos por nombre: solo el
+  // caso base "Urgencia vital — violencia intrafamiliar" coincide con el
+  // título "Violencia intrafamiliar" del catálogo; otros casos creados por
+  // docentes (ej. "Pelea de parejas — golpes físicos — caso piloto") no
+  // contienen esa frase y no activan la simulación visual.
   const nombre = normalizar(practica.caso_nombre ?? '');
   if (nombre) {
     const coincidencia = CATALOGO_CASOS_NARRATIVOS.find(

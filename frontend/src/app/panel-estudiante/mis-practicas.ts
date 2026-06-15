@@ -66,7 +66,12 @@ import { PracticasService } from '../core/services/practicas.service';
                             Continuar
                           </a>
                         } @else if (p.estado === 'NO_INICIADA') {
-                          <a class="btn-ghost" [routerLink]="['/panel-estudiante/practicas', p.practica_id]">Comenzar</a>
+                          <a
+                            class="btn-ghost"
+                            [routerLink]="['/estudiante/practicas', p.practica_id, 'simulacion']"
+                            [title]="'Código: ' + p.codigo_acceso">
+                            Comenzar
+                          </a>
                         } @else {
                           <a class="btn-ghost" routerLink="/resultados" title="Ver resultados">Resultados</a>
                         }

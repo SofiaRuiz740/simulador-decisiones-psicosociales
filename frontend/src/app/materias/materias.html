@@ -65,8 +65,8 @@
               @for (m of filtradas(); track m.id) {
                 <tr>
                   <td><strong>{{ m.nombre }}</strong></td>
-                  <td>{{ m.programa?.trim() || '—' }}</td>
-                  <td>{{ m.periodo?.trim() || '—' }}</td>
+                  <td>{{ m.programa.trim() || '—' }}</td>
+                  <td>{{ m.periodo.trim() || '—' }}</td>
                   <td>{{ m.grupos_count }}</td>
                   <td>{{ m.estudiantes_count }}</td>
                   <td>

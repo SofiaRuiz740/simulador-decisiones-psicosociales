@@ -2,8 +2,10 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { AuthService } from '../core/auth/auth.service';
 import { Resultado } from '../core/models/practicas.model';
 import { SimulacionService } from '../core/services/simulacion.service';
+import { UxService } from '../core/services/ux.service';
 
 @Component({
   selector: 'app-resultado',
@@ -15,6 +17,8 @@ export class ResultadoEstudiante implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly servicio = inject(SimulacionService);
+  private readonly auth = inject(AuthService);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly resultado = signal<Resultado | null>(null);
@@ -75,7 +79,16 @@ export class ResultadoEstudiante implements OnInit {
     });
   }
 
-  salir() {
-    this.router.navigate(['/panel-estudiante']);
+  async salir(): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Cerrar sesión',
+      mensaje: 'Vas a salir del simulador. Para volver a entrar necesitarás el código de acceso que te envió el docente.',
+      variant: 'info',
+      textoConfirmar: 'Cerrar sesión',
+      icono: 'logout',
+    });
+    if (!ok) return;
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 }

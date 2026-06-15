@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Condicion } from '../../../core/simulacion-narrativa/models/condicion.model';
 import { CasoNarrativoCompleto } from '../../../core/simulacion-narrativa/models/caso.model';
 import { EstadoPartida } from '../../../core/simulacion-narrativa/models/estado-partida.model';
@@ -217,6 +218,11 @@ export function registrarDiagnosticoComisariaEnConsola(
   if (clave === ultimoLogComisaria) return;
   ultimoLogComisaria = clave;
 
+  // Diagnóstico solo en desarrollo. En producción no contaminamos la consola
+  // del estudiante con datos internos de la mecánica narrativa.
+  if (environment.production) return;
+
+  /* eslint-disable no-console */
   console.groupCollapsed(
     `[FASE-21A comisaría] ${escenaId} / ${hotspotId} → ${diagnostico.hotspotVisible ? 'VISIBLE' : 'OCULTO'}`,
   );
@@ -231,6 +237,7 @@ export function registrarDiagnosticoComisariaEnConsola(
     console.warn('Bloqueo:', diagnostico.bloqueoPrincipal);
   }
   console.groupEnd();
+  /* eslint-enable no-console */
 }
 
 let ultimoLogComisaria: string | null = null;

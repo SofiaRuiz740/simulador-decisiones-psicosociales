@@ -170,10 +170,25 @@ export class Simulacion implements OnInit, OnDestroy {
   responder(pregunta: Pregunta, respuesta: Respuesta) {
     const p = this.participacion();
     if (!p) return;
+    // Optimistic update: pintamos la selección al instante.
     const m = new Map(this.seleccion());
+    const previa = m.get(pregunta.id);
     m.set(pregunta.id, respuesta.id);
     this.seleccion.set(m);
-    this.servicio.responder(p.id, pregunta.id, respuesta.id).subscribe();
+    this.servicio.responder(p.id, pregunta.id, respuesta.id).subscribe({
+      error: () => {
+        // Revertimos al estado anterior y avisamos al estudiante.
+        const m2 = new Map(this.seleccion());
+        if (previa === undefined) m2.delete(pregunta.id);
+        else m2.set(pregunta.id, previa);
+        this.seleccion.set(m2);
+        this.snackBar.open(
+          'No se pudo guardar tu respuesta. Revisa tu conexión y vuelve a intentarlo.',
+          'OK',
+          { duration: 4500 },
+        );
+      },
+    });
   }
 
   seleccionDe(pregunta: Pregunta): number | undefined {

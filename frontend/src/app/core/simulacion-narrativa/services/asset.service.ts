@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+import { environment } from '../../../../environments/environment';
 import {
   BASE_ASSETS_SIMULACION,
   ESCENARIOS_REGISTRADOS,
@@ -24,7 +25,7 @@ export class AssetService {
   obtenerEscenario(id: EscenarioId | string): string {
     const ruta = ESCENARIOS_REGISTRADOS[id as EscenarioId];
     if (!ruta) {
-      console.warn(`[AssetService] Escenario no registrado: "${id}"`);
+      this.warn(`[AssetService] Escenario no registrado: "${id}"`);
       return '';
     }
     return this.resolverUrl(ruta);
@@ -33,7 +34,7 @@ export class AssetService {
   obtenerIntroFondo(id: IntroFondoId): string {
     const ruta = INTRO_FONDOS_REGISTRADOS[id];
     if (!ruta) {
-      console.warn(`[AssetService] Fondo de intro no registrado: "${id}"`);
+      this.warn(`[AssetService] Fondo de intro no registrado: "${id}"`);
       return '';
     }
     return this.resolverUrl(ruta);
@@ -47,7 +48,7 @@ export class AssetService {
   obtenerPersonajePorRol(rol: RolVisualId | string): string {
     const ruta = ROLES_VISUALES_REGISTRADOS[rol as RolVisualId];
     if (!ruta) {
-      console.warn(`[AssetService] Rol visual no registrado: "${rol}"`);
+      this.warn(`[AssetService] Rol visual no registrado: "${rol}"`);
       return '';
     }
     return this.resolverUrl(ruta);
@@ -67,13 +68,13 @@ export class AssetService {
     const rutaFallback =
       RETRATOS_CONVERSAR_FALLBACK[rolId] ?? ROLES_VISUALES_REGISTRADOS[rolId];
     if (rutaFallback) {
-      console.warn(
+      this.warn(
         `[AssetService] Retrato conversar no registrado para "${rol}" — usando retrato base`,
       );
       return this.resolverUrl(rutaFallback);
     }
 
-    console.warn(`[AssetService] Retrato conversar no registrado: "${rol}"`);
+    this.warn(`[AssetService] Retrato conversar no registrado: "${rol}"`);
     return '';
   }
 
@@ -91,7 +92,7 @@ export class AssetService {
     if (ref.personajeId && ROLES_VISUALES_REGISTRADOS[ref.personajeId as RolVisualId]) {
       return this.obtenerRetratoConversacion(ref.personajeId);
     }
-    console.warn(
+    this.warn(
       `[AssetService] Sin retrato conversar para personajeId "${ref.personajeId ?? ''}"`,
     );
     return '';
@@ -107,7 +108,7 @@ export class AssetService {
     if (ref.personajeId) {
       return this.obtenerPersonajeLegacy(ref.personajeId);
     }
-    console.warn('[AssetService] Referencia visual sin rolVisual ni personajeId');
+    this.warn('[AssetService] Referencia visual sin rolVisual ni personajeId');
     return '';
   }
 
@@ -123,7 +124,7 @@ export class AssetService {
 
     const ruta = RETRATOS_EXPRESION_REGISTRADOS[rolId]?.[expresion];
     if (!ruta) {
-      console.warn(
+      this.warn(
         `[AssetService] Retrato "${expresion}" no registrado para rol: "${rol}" — usando conversar`,
       );
       return this.obtenerRetratoConversacion(rolId);
@@ -163,7 +164,7 @@ export class AssetService {
   obtenerIcono(id: IconoId): string {
     const ruta = ICONOS_REGISTRADOS[id];
     if (!ruta) {
-      console.warn(`[AssetService] Icono no registrado: "${id}"`);
+      this.warn(`[AssetService] Icono no registrado: "${id}"`);
       return '';
     }
     return this.resolverUrl(ruta);
@@ -187,7 +188,7 @@ export class AssetService {
     if (ruta) {
       return this.resolverUrl(ruta);
     }
-    console.warn(
+    this.warn(
       `[AssetService] personajeId "${id}" sin rolVisual y sin registro visual explícito`,
     );
     return '';
@@ -200,7 +201,7 @@ export class AssetService {
       }
       return this.obtenerRetratoPorRol(id, expresion);
     }
-    console.warn(
+    this.warn(
       `[AssetService] personajeId "${id}" sin rolVisual y sin retrato registrado`,
     );
     return '';
@@ -208,5 +209,13 @@ export class AssetService {
 
   private resolverUrl(rutaRelativa: string): string {
     return `${BASE_ASSETS_SIMULACION}/${rutaRelativa}`;
+  }
+
+  /** Logger de fallback / avisos visuales. Silencioso en producción. */
+  private warn(msg: string): void {
+    if (!environment.production) {
+      // eslint-disable-next-line no-console
+      console.warn(msg);
+    }
   }
 }

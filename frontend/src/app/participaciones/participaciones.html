@@ -134,12 +134,6 @@
         <header class="preview-real__head">
           <div>
             <h3>Vista previa del caso: {{ c.nombre }}</h3>
-            @if (resumenSeleccion(); as r) {
-              <p class="muted">
-                {{ r.estudiante }} · {{ r.practica }} · {{ r.escenarios }} escenario(s) · {{ r.preguntas }} pregunta(s).
-                Solo lectura: ningún cambio aquí afecta la participación del estudiante.
-              </p>
-            }
           </div>
           <button type="button" class="btn-ghost" (click)="limpiarSeleccion()">
             Cerrar vista
@@ -151,10 +145,6 @@
             Este caso aún no tiene escenarios cargados.
           </div>
         } @else {
-          <p class="muted preview-real__nota">
-            Esta es la experiencia real que verá el estudiante: pantalla de advertencia,
-            narrativa con efecto de máquina de escribir y preguntas con opciones de respuesta.
-          </p>
           <app-simulacion-presentacion-preview
             [caso]="c"
             [nombrePractica]="resumenSeleccion()?.practica ?? ''" />

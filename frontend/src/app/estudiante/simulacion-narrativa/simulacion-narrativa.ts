@@ -318,6 +318,13 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       hipotesis_formuladas: resumen.totalHipotesis,
       estado_final: 'completada',
       resumen_pedagogico: resumen,
-    }).subscribe();
+    }).subscribe({
+      error: (err) => {
+        // No bloqueamos la navegación: el estudiante ya finalizó la simulación
+        // y los datos quedan en localStorage por el facade. Solo logueamos
+        // para que el docente pueda investigar si no llegó al servidor.
+        console.error('No se pudo guardar el resultado narrativo en backend:', err);
+      },
+    });
   }
 }

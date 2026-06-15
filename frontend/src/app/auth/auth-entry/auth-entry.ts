@@ -9,7 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, throwError } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
@@ -25,7 +25,7 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
 
 @Component({
   selector: 'app-auth-entry',
-  imports: [CommonModule, ReactiveFormsModule, MatProgressBarModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, MatProgressBarModule],
   templateUrl: './auth-entry.html',
   styleUrl: './auth-entry.scss',
 })
@@ -128,6 +128,7 @@ export class AuthEntry implements OnInit {
 
     this.auth.registroDocente(this.mapToApi(v)).subscribe({
       next: () => {
+        this.loading.set(false);
         this.router.navigateByUrl(this.auth.dashboardDeRol(this.auth.rol()));
       },
       error: (err: HttpErrorResponse) => {

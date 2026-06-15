@@ -5,7 +5,7 @@
  */
 export const environment = {
   production: true,
-  apiUrl: '/api',
+  apiUrl: 'https://simulador-decisiones-psicosociales.onrender.com/api',
   appName: 'Simulador de Decisiones Psicosociales',
   /** Ruta pública a los datos JSON de la simulación narrativa. */
   simulacionNarrativaDataUrl: '/simulacion-narrativa',

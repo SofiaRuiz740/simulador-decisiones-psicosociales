@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { SolicitudReapertura } from '../core/models/practicas.model';
 import { PracticasService } from '../core/services/practicas.service';
+import { UxService } from '../core/services/ux.service';
 
 @Component({
   selector: 'app-solicitudes-reapertura',
@@ -17,6 +18,7 @@ import { PracticasService } from '../core/services/practicas.service';
 export class SolicitudesReaperturaPage implements OnInit {
   private readonly practicas = inject(PracticasService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   readonly loading = signal(true);
   readonly procesando = signal<number | null>(null);
@@ -64,8 +66,18 @@ export class SolicitudesReaperturaPage implements OnInit {
     });
   }
 
-  rechazar(sol: SolicitudReapertura): void {
-    const mensaje = window.prompt('Mensaje opcional para el estudiante:') ?? '';
+  async rechazar(sol: SolicitudReapertura): Promise<void> {
+    const mensaje = await this.ux.askInput({
+      titulo: 'Rechazar solicitud',
+      mensaje: 'Puedes incluir un mensaje breve para el estudiante explicando el motivo.',
+      label: 'Mensaje (opcional)',
+      placeholder: 'Ej: La práctica ya cerró y no puede reabrirse.',
+      icono: 'cancel',
+      multiline: true,
+      rows: 3,
+      maxlength: 300,
+    });
+    if (mensaje === null) return; // canceló
     this.procesando.set(sol.id);
     this.practicas.rechazarSolicitudReapertura(sol.id, mensaje).subscribe({
       next: () => {

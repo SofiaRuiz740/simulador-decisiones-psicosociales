@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../core/auth/auth.service';
@@ -9,13 +11,17 @@ import { PracticasService } from '../core/services/practicas.service';
 
 @Component({
   selector: 'app-panel-estudiante-inicio',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatProgressBarModule, MatSnackBarModule],
   template: `
     <section class="module page">
       <header class="hero-glass">
         <h1>Hola, <em>{{ nombre() }}</em></h1>
         <p class="hero-glass__meta">Panel del estudiante</p>
       </header>
+
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      }
 
       <section class="metrics metrics--compact">
         <article class="metric metric--accent">
@@ -140,7 +146,9 @@ export class PanelEstudianteInicio implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly practicasSrv = inject(PracticasService);
   private readonly session = inject(EstudianteSessionService);
+  private readonly snackBar = inject(MatSnackBar);
 
+  readonly loading = signal(true);
   readonly practicas = signal<MisPracticaEstudiante[]>([]);
 
   readonly pendientes = computed(() =>
@@ -159,9 +167,19 @@ export class PanelEstudianteInicio implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loading.set(true);
     this.practicasSrv.misPracticas().subscribe({
       next: (rows) => {
         this.practicas.set(this.session.sincronizarDesdeApi(rows));
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.snackBar.open(
+          'No pudimos cargar tus prácticas. Revisa tu conexión.',
+          'OK',
+          { duration: 3500 },
+        );
       },
     });
   }

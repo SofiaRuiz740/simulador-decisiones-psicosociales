@@ -12,6 +12,7 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { UxService } from '../../core/services/ux.service';
 import { NotaEstudianteLibreta } from '../../core/simulacion-narrativa/models/libreta.model';
 import { MetricaPersonaje } from '../../core/simulacion-narrativa/models/metricas-personaje.model';
 import { NarrativaFacadeService } from '../../core/simulacion-narrativa/services/narrativa-facade.service';
@@ -51,6 +52,7 @@ export class LibretaPsicologoComponent {
   private readonly facade = inject(NarrativaFacadeService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly ux = inject(UxService);
 
   @ViewChild('panel') panel?: MatSidenav;
 
@@ -199,8 +201,15 @@ export class LibretaPsicologoComponent {
     );
   }
 
-  eliminarNota(notaId: string): void {
-    if (!confirm('¿Eliminar esta nota de la libreta?')) return;
+  async eliminarNota(notaId: string): Promise<void> {
+    const ok = await this.ux.confirm({
+      titulo: 'Eliminar nota',
+      mensaje: '¿Quieres eliminar esta nota de la libreta? No se puede deshacer.',
+      variant: 'danger',
+      textoConfirmar: 'Eliminar',
+      icono: 'delete_outline',
+    });
+    if (!ok) return;
     this.facade.eliminarNotaLibreta(notaId);
     this.snackBar.open('Nota eliminada.', 'OK', { duration: 2000 });
   }

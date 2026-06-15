@@ -10,7 +10,6 @@ import { NarrativaFacadeService } from '../../core/simulacion-narrativa/services
 import { DialogoNarrativoComponent } from './dialogo-narrativo/dialogo-narrativo';
 import { DocumentoEvidenciaComponent } from './documento-evidencia/documento-evidencia';
 import { EscenaVisualComponent } from './escena-visual/escena-visual';
-import { HotspotLupaComponent } from './hotspot-lupa/hotspot-lupa';
 import { EscenaVisualService } from './services/escena-visual.service';
 import { escenaEsAccesible } from './utils/escena-acceso.util';
 import {
@@ -30,7 +29,6 @@ import {
     EscenaVisualComponent,
     DialogoNarrativoComponent,
     DocumentoEvidenciaComponent,
-    HotspotLupaComponent,
   ],
   templateUrl: './exploracion-visual.html',
   styleUrl: './exploracion-visual.scss',

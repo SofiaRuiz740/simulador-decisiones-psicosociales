@@ -25,13 +25,13 @@
       "id": "apertura-comisario",
       "emisor": "personaje",
       "personajeId": "comisario",
-      "texto": "Buenas. Han pasado quince días desde el ingreso en urgencias. Me informaron que viene con documentación actualizada del caso. ¿En qué puedo orientarle?",
+      "texto": "Buenas. Han pasado quince días desde el ingreso en urgencias. Me dijeron que trae documentación del hospital. ¿En qué la puedo orientar?",
       "siguienteNodoId": "decision-prep-apertura"
     },
     {
       "id": "decision-prep-apertura",
       "emisor": "jugador",
-      "texto": "Antes de hablar con el comisario, la profesional repasa cómo quiere presentarse.",
+      "texto": "El comisario te espera. Piensa cómo presentarte.",
       "opciones": [
         {
           "id": "prep-slot-com-apertura-1",
@@ -50,7 +50,7 @@
         },
         {
           "id": "prep-slot-com-apertura-2",
-          "texto": "«Antes de profundizar, ¿podría orientarme sobre el procedimiento institucional aquí?»",
+          "texto": "«Antes de entrar en detalle, ¿me orienta cómo funciona el trámite aquí?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-acuse-recibo",
           "efectos": [
@@ -65,7 +65,7 @@
         },
         {
           "id": "prep-slot-com-apertura-3",
-          "texto": "«Entiendo que ya hubo contacto con el hospital. ¿Qué información tiene disponible por ahora?»",
+          "texto": "«Entiendo que ya hubo contacto con el hospital. ¿Qué tienen hasta ahora?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-acuse-recibo",
           "efectos": [
@@ -84,17 +84,17 @@
       "id": "comisario-acuse-recibo",
       "emisor": "personaje",
       "personajeId": "comisario",
-      "texto": "Entendido. El expediente lleva quince días en consolidación y ya recibimos evolución clínica parcial. Puedo orientarle sobre el procedimiento cuando indique por dónde comenzar.",
+      "texto": "Entendido. El expediente lleva quince días en consolidación y ya recibimos evolución clínica parcial. Dígame por dónde quiere empezar.",
       "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
       "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "La conversación está abierta; organiza mentalmente qué indagar sobre el estado actual del proceso.",
+      "texto": "La conversación está abierta. Piensa qué preguntar sobre el estado del proceso.",
       "opciones": [
         {
           "id": "prep-slot-com-exploracion-1",
-          "texto": "«¿Cuál es el procedimiento institucional para casos con sospecha de violencia intrafamiliar?»",
+          "texto": "«¿Cómo se maneja aquí un caso con sospecha de violencia intrafamiliar?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "com-explor-procedimiento",
           "efectos": [
@@ -109,7 +109,7 @@
         },
         {
           "id": "prep-slot-com-exploracion-2",
-          "texto": "«¿Qué medidas de protección pueden activarse desde la comisaría en esta etapa?»",
+          "texto": "«¿Qué medidas de protección se pueden activar en esta etapa?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "com-explor-medidas-teaser",
           "efectos": [
@@ -124,7 +124,7 @@
         },
         {
           "id": "prep-slot-com-exploracion-3",
-          "texto": "«¿Qué información policial previa existe vinculada a este domicilio?»",
+          "texto": "«¿Hay antecedentes policiales en ese domicilio?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "com-explor-antecedentes-teaser",
           "efectos": [
@@ -143,31 +143,31 @@
       "id": "com-explor-procedimiento",
       "emisor": "personaje",
       "personajeId": "comisario",
-      "texto": "Recibimos el aviso del hospital aquella noche y abrimos expediente. Desde entonces hemos recibido informes clínicos de evolución parcial.",
+      "texto": "Recibimos el aviso del hospital aquella noche y abrimos expediente. Desde entonces hemos ido recibiendo informes clínicos de evolución.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "com-explor-medidas-teaser",
       "emisor": "personaje",
       "personajeId": "comisario",
-      "texto": "Hay rutas conforme a la Ley 1257. Ya se activaron medidas provisionales; puedo detallar el estado actual si lo requiere.",
+      "texto": "Hay rutas conforme a la Ley 1257. Ya se activaron medidas provisionales; si lo necesita, le detallo el estado actual.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "com-explor-antecedentes-teaser",
       "emisor": "personaje",
       "personajeId": "comisario",
-      "texto": "Existen intervenciones previas en la misma vivienda, documentadas antes del episodio. Puedo ampliar si necesita contrastarlas con lo recogido en el hospital.",
+      "texto": "Hay intervenciones previas en la misma vivienda, documentadas antes del episodio. Puedo ampliar si quiere cruzarlas con lo del hospital.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Puede profundizar en medidas activadas y antecedentes revisados. Considera qué indagar a continuación.",
+      "texto": "Lo que escuchaste suena incompleto. Piensa qué conviene profundizar.",
       "opciones": [
         {
           "id": "prep-slot-com-profundizacion-1",
-          "texto": "«Necesito contrastar las versiones del núcleo familiar con los registros policiales previos.»",
+          "texto": "«Quiero contrastar lo que dijo la familia con los registros policiales previos.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-contraste",
           "efectos": [
@@ -182,7 +182,7 @@
         },
         {
           "id": "prep-slot-com-profundizacion-2",
-          "texto": "«Necesito valorar el nivel de riesgo actual para determinar qué medidas de protección son prioritarias, en el marco de la Ley 1257.»",
+          "texto": "«Necesito saber el riesgo actual para definir qué medidas de protección son urgentes, en el marco de la Ley 1257.»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "comisario-proteccion",
           "efectos": [
@@ -211,7 +211,7 @@
         },
         {
           "id": "prep-slot-com-profundizacion-3",
-          "texto": "«Desde salud mental reuní testimonios y evidencias clínicas que quiero cruzar con su expediente.»",
+          "texto": "«Desde salud mental reuní testimonios y evidencias que quiero cruzar con su expediente.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-hallazgos",
           "efectos": [
@@ -226,7 +226,7 @@
         },
         {
           "id": "prep-slot-com-profundizacion-4",
-          "texto": "«¿Sería pertinente proponer mediación familiar para facilitar el diálogo?»",
+          "texto": "«¿Sería posible proponer una mediación familiar para facilitar el diálogo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-no-mediacion",
           "efectos": [
@@ -286,11 +286,11 @@
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "Hay líneas investigativas sensibles que conviene precisar; reflexione sobre cuál merece mayor atención institucional.",
+      "texto": "Quedan líneas sensibles por revisar. Piensa cuál conviene abordar ahora.",
       "opciones": [
         {
           "id": "prep-slot-com-critica-1",
-          "texto": "«¿Hay indicios de escalamiento reciente en la conducta de Miguel Álvarez?»",
+          "texto": "«¿Hay señales de que Miguel Álvarez venía empeorando en las últimas semanas?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "comisario-agresor",
           "efectos": [
@@ -312,7 +312,7 @@
         },
         {
           "id": "prep-slot-com-critica-2",
-          "texto": "«¿Podría orientarme sobre los partes previos y si hubo denuncia formal?»",
+          "texto": "«¿Qué consta en los partes previos? ¿Lucía llegó a denunciar formalmente?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "comisario-partes",
           "efectos": [
@@ -342,7 +342,7 @@
         },
         {
           "id": "prep-slot-com-critica-4",
-          "texto": "«¿Qué antecedentes de control, amenazas o violencia previa constan en el expediente?»",
+          "texto": "«¿Qué antecedentes de control, amenazas o violencia previa hay en el expediente?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "comisario-riesgo-acumulativo",
           "efectos": [
@@ -409,11 +409,11 @@
     {
       "id": "decision-cierre",
       "emisor": "jugador",
-      "texto": "La articulación con la comisaría requiere un cierre claro; considere cómo proceder.",
+      "texto": "Es momento de cerrar la articulación con la comisaría.",
       "opciones": [
         {
           "id": "prep-slot-com-cierre-1",
-          "texto": "«Puedo ofrecer una síntesis clínica de los testimonios convergentes sobre el empujón.»",
+          "texto": "«Puedo ofrecer una síntesis de los testimonios que convergen sobre el empujón.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "cierre-comisario-dialogo",
           "efectos": [
@@ -428,7 +428,7 @@
         },
         {
           "id": "prep-slot-com-cierre-2",
-          "texto": "«¿Podemos activar las rutas institucionales pertinentes y dejar constancia para la libreta?»",
+          "texto": "«¿Podemos activar las rutas que correspondan y dejar constancia para la libreta?»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "cierre-comisario-dialogo",
           "efectos": [
@@ -482,7 +482,7 @@
     {
       "id": "format-ref-d4-comisario",
       "emisor": "jugador",
-      "texto": "Tras articular con la comisaría, la profesional reflexiona sobre cuál debe ser la prioridad institucional en este punto.",
+      "texto": "Tras articular con la comisaría, piensa cuál debe ser la prioridad institucional en este punto.",
       "opciones": [
         {
           "id": "format-d4-a",
@@ -552,7 +552,7 @@
     {
       "id": "cierre-comisario",
       "emisor": "narrador",
-      "texto": "Cierra la entrevista con el comisario. El expediente queda en consolidación.",
+      "texto": "Cierras la entrevista con el comisario. El expediente sigue en consolidación.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

@@ -344,7 +344,16 @@
 }
 
 .personaje-escena--rol-victima {
-  --dialogo-escala-retrato: 1.05;
+  --dialogo-escala-retrato: 1.04;
+}
+
+.personaje-escena--rol-victima .personaje-imagen {
+  width: auto;
+  height: auto;
+  max-height: 44%;
+  max-width: 48%;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 .personaje-escena--rol-madre-victima {
@@ -385,42 +394,67 @@
   user-select: none;
 }
 
-.personaje-escena--rol-victima .personaje-imagen,
-.personaje-escena--rol-madre-victima .personaje-imagen {
+.personaje-escena--rol-victima .personaje-imagen {
   object-position: center bottom;
 }
 
-.personaje-escena--rol-policia .personaje-imagen {
-  object-position: 38% bottom;
+/* Encuadre lateral (referencia: victima-conversar) — NPC izquierda */
+.personaje-escena--npc:not(.personaje-escena--rol-victima) {
+  padding-left: clamp(10px, 1.4vw, 24px);
+}
+
+.personaje-escena--npc:not(.personaje-escena--rol-victima) .personaje-imagen {
+  margin-left: -16%;
+}
+
+.personaje-escena--rol-madre-victima .personaje-imagen {
+  object-position: 32% bottom;
 }
 
 .personaje-escena--rol-enfermera .personaje-imagen {
-  object-position: 44% bottom;
+  object-position: 36% bottom;
 }
 
 .personaje-escena--rol-medico-urgencias .personaje-imagen {
-  object-position: 46% bottom;
+  object-position: 38% bottom;
 }
 
 .personaje-escena--rol-hermano-familiar .personaje-imagen {
-  object-position: 42% bottom;
+  object-position: 34% bottom;
 }
 
 .personaje-escena--rol-comisario .personaje-imagen,
 .personaje-escena--rol-trabajadora-social .personaje-imagen {
-  object-position: 48% bottom;
+  object-position: 40% bottom;
+}
+
+.personaje-escena--rol-policia .personaje-imagen {
+  object-position: 36% bottom;
+}
+
+/* Encuadre lateral — psicóloga derecha (simétrico a victima-conversar) */
+.personaje-escena--psicologa {
+  padding-right: clamp(10px, 1.4vw, 24px);
 }
 
 .personaje-escena--rol-psicologa .personaje-imagen {
-  object-position: 52% bottom;
+  object-position: 58% bottom;
 }
 
-.personaje-escena--npc .personaje-imagen {
-  margin-left: -8%;
+/* Lucía (PNG vertical): anular margen negativo del NPC y mantenerla dentro del marco */
+.personaje-escena--npc.personaje-escena--rol-victima {
+  padding-left: clamp(10px, 1.4vw, 24px);
+}
+
+.personaje-escena--npc.personaje-escena--rol-victima .personaje-imagen {
+  margin-left: 0;
+  max-height: 44%;
+  max-width: 48%;
+  object-position: 54% bottom;
 }
 
 .personaje-escena--psicologa .personaje-imagen {
-  margin-right: -8%;
+  margin-right: -16%;
 }
 
 .personaje-placeholder {

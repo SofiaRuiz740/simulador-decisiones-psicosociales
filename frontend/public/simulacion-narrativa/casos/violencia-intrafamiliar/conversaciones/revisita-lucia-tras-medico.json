@@ -47,20 +47,20 @@
     {
       "id": "apertura-contraste",
       "emisor": "narrador",
-      "texto": "Lucía abre los ojos un momento. El monitor sigue estable, pero su voz apenas alcanza un susurro.",
+      "texto": "Lucía abre los ojos un momento, como si volviera de muy lejos. El monitor sigue estable, pero su voz apenas alcanza un susurro y parece no terminar de ubicar la habitación.",
       "siguienteNodoId": "lucia-recibe-medico"
     },
     {
       "id": "lucia-recibe-medico",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "¿Usted habló con el médico…? Dígame la verdad: ¿qué dice el informe de mis brazos?",
+      "texto": "¿Usted habló con el médico…? Dígame la verdad, por favor: ¿qué dice el informe de mis brazos? Yo dije una cosa… pero no estoy segura de por qué.",
       "siguienteNodoId": "decision-contraste-medico"
     },
     {
       "id": "decision-contraste-medico",
       "emisor": "jugador",
-      "texto": "Lucía pregunta directamente por el informe; la profesional reflexiona sobre cómo responder.",
+      "texto": "Lucía pregunta directamente por el informe. ¿Cómo responde?",
       "opciones": [
         {
           "id": "mencionar-defensa",
@@ -90,7 +90,7 @@
       "id": "lucia-miedo-declaracion",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Mi mamá… repitió lo del resbalón en la ambulancia. Miguel me miraba como diciendo ‘no digas más’. Yo seguí el juego.",
+      "texto": "Mi mamá… repitió lo del resbalón en la ambulancia. Miguel me miraba como diciendo ‘no digas más’. Yo seguí el juego… porque tenía miedo. Después me odio por eso.",
       "testimonio": {
         "id": "testimonio-lucia-presion-declaracion",
         "tema": "mecanismo_lesion",
@@ -104,13 +104,13 @@
       "id": "lucia-admite-presion",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "No resbalé… me empujó cuando me puse delante de la niña. Pero dije otra cosa porque tenía miedo de lo que él haría después.",
+      "texto": "No resbalé… me empujó cuando me puse delante de la niña. Pero dije otra cosa porque tenía miedo de lo que él haría después. A veces pienso que yo lo provoqué… no sé.",
       "siguienteNodoId": "decision-hora"
     },
     {
       "id": "decision-hora",
       "emisor": "jugador",
-      "texto": "La cronología del episodio aún puede precisarse; considera cómo indagar.",
+      "texto": "Lucía ha hablado del episodio, pero la cronología aún está confusa. ¿Cómo indaga?",
       "opciones": [
         {
           "id": "preguntar-hora",
@@ -130,7 +130,7 @@
       "id": "lucia-hora",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Después de la cena… como diez y cuarto, diez y media. Todo fue muy rápido; luego ya estaba aquí.",
+      "texto": "Después de la cena… como diez y cuarto, diez y media. Todo fue muy rápido; luego ya estaba aquí. Hay partes que no las tengo claras.",
       "testimonio": {
         "id": "testimonio-lucia-hora-2230",
         "tema": "cronologia_episodio",
@@ -144,7 +144,7 @@
       "id": "lucia-hora-contraste",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Diego tiene mejor memoria que yo ahora… yo diría más tarde, casi las once, cuando ya gritábamos fuerte. El reloj lo vi en la cocina, pero la cabeza me duele.",
+      "texto": "Diego tiene mejor memoria que yo ahora… yo diría más tarde, casi las once, cuando ya gritábamos fuerte. El reloj lo vi en la cocina, pero la cabeza me duele y ya no estoy segura.",
       "testimonio": {
         "id": "testimonio-lucia-hora-2245",
         "tema": "cronologia_episodio",
@@ -158,7 +158,7 @@
       "id": "cierre-revisita-medico",
       "emisor": "personaje",
       "personajeId": "lucia",
-      "texto": "Gracias por no forzarme del todo… Necesito que quede claro que traté de proteger a mi hija. Lo demás… lo diré cuando pueda respirar.",
+      "texto": "Gracias por no forzarme del todo… Necesito que quede claro que traté de proteger a mi hija. Lo demás… lo diré cuando pueda respirar. Ahora solo siento miedo y cansancio.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

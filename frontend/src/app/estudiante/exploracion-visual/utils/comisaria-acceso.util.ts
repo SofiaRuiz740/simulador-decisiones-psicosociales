@@ -1,7 +1,6 @@
 import { Condicion } from '../../../core/simulacion-narrativa/models/condicion.model';
 import { CasoNarrativoCompleto } from '../../../core/simulacion-narrativa/models/caso.model';
 import { EstadoPartida } from '../../../core/simulacion-narrativa/models/estado-partida.model';
-import { evaluarCondicion } from '../../../core/simulacion-narrativa/utils/condicion-evaluator';
 import { HotspotEscena } from '../models/escena-visual.model';
 
 /** Entrevistas hospitalarias obligatorias para desbloquear traslado a comisaría (sin revisitas opcionales). */
@@ -13,6 +12,39 @@ export const CONVERSACIONES_HOSPITAL_OBLIGATORIAS = [
   'entrevista-medico-urgencias',
   'revisita-lucia-informe',
 ] as const;
+
+/** Núcleo clínico del hospital (información real del caso antes de la comisaría). */
+export const CONVERSACIONES_NUCLEO_TRASLADO = [
+  'entrevista-policia-entrada',
+  'entrevista-madre-espera',
+  'entrevista-hermano-espera',
+  'entrevista-enfermera-pasillo',
+  'entrevista-medico-urgencias',
+] as const;
+
+/** Cualquiera acredita el acercamiento documentado a la paciente en UCI. */
+export const CONVERSACIONES_LUCIA_UCI_TRASLADO = [
+  'revisita-lucia-informe',
+  'revisita-lucia-tras-medico',
+] as const;
+
+export function puedeTrasladarseAComisaria(
+  estado: EstadoPartida | null | undefined,
+  _caso?: CasoNarrativoCompleto | null,
+): boolean {
+  if (!estado) return false;
+  if (estado.conversacionesCompletadas.includes('cierre-investigacion')) return false;
+  if (estado.flags['caso_completado']) return false;
+
+  const nucleoCompleto = CONVERSACIONES_NUCLEO_TRASLADO.every((id) =>
+    estado.conversacionesCompletadas.includes(id),
+  );
+  if (!nucleoCompleto) return false;
+
+  return CONVERSACIONES_LUCIA_UCI_TRASLADO.some((id) =>
+    estado.conversacionesCompletadas.includes(id),
+  );
+}
 
 export const HOTSPOTS_TRASLADO_COMISARIA = [
   'ir-comisaria',
@@ -120,22 +152,24 @@ export function diagnosticarTrasladoComisaria(
   const conversacionesPendientes = CONVERSACIONES_HOSPITAL_OBLIGATORIAS.filter(
     (id) => !estado.conversacionesCompletadas.includes(id),
   );
-  const hospitalCompleto = conversacionesPendientes.length === 0;
+  const hospitalCompleto = puedeTrasladarseAComisaria(estado, caso);
   const comisariaYaVisitada = estado.escenariosVisitados.includes(ESCENARIO_NARRATIVO_COMISARIA);
   const cierreInvestigacionActivo = estado.conversacionesCompletadas.includes('cierre-investigacion');
   const casoCompletado = Boolean(estado.flags['caso_completado']);
 
-  const requisitos = requisitosTrasladoComisaria();
-  const hotspotVisible = requisitos.every((c) => evaluarCondicion(c, estado, caso));
+  const hotspotVisible = hospitalCompleto;
 
   let bloqueoPrincipal: string | null = null;
   if (!hospitalCompleto) {
-    const pendientes = conversacionesPendientes
-      .map((id) => ETIQUETAS_ENTREVISTA[id] ?? id)
-      .join(', ');
-    bloqueoPrincipal = `Faltan entrevistas obligatorias: ${pendientes}`;
-  } else if (comisariaYaVisitada) {
-    bloqueoPrincipal = 'La comisaría ya fue visitada (investigacion-comisaria en escenariosVisitados)';
+    const pendientesNucleo = CONVERSACIONES_NUCLEO_TRASLADO.filter(
+      (id) => !estado.conversacionesCompletadas.includes(id),
+    ).map((id) => ETIQUETAS_ENTREVISTA[id as (typeof CONVERSACIONES_HOSPITAL_OBLIGATORIAS)[number]] ?? id);
+    const faltaLucia = !CONVERSACIONES_LUCIA_UCI_TRASLADO.some((id) =>
+      estado.conversacionesCompletadas.includes(id),
+    );
+    const partes = [...pendientesNucleo];
+    if (faltaLucia) partes.push('Lucía (UCI)');
+    bloqueoPrincipal = `Faltan entrevistas obligatorias: ${partes.join(', ')}`;
   } else if (cierreInvestigacionActivo || casoCompletado) {
     bloqueoPrincipal = cierreInvestigacionActivo
       ? 'La investigación ya fue cerrada (cierre-investigacion)'

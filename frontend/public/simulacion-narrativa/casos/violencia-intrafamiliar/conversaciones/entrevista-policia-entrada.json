@@ -10,17 +10,17 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Buenas noches. Estamos en el acceso de urgencias. ¿Viene usted en representación del servicio de salud mental?",
+      "texto": "Buenas noches. Estamos en el acceso de urgencias. ¿Viene por la paciente que ingresó esta noche?",
       "siguienteNodoId": "decision-identificacion"
     },
     {
       "id": "decision-identificacion",
       "emisor": "jugador",
-      "texto": "Antes de hablar con el funcionario, la profesional repasa cómo quiere presentarse.",
+      "texto": "El funcionario te mira, esperando que te identifiques.",
       "opciones": [
         {
           "id": "prep-slot-pol-apertura-1",
-          "texto": "«Soy psicóloga del hospital. Intervengo en el caso de la paciente ingresada esta noche.»",
+          "texto": "«Soy psicóloga del hospital. Vengo por la paciente que ingresó esta noche.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "policia-acuse-recibo",
           "efectos": [
@@ -35,7 +35,7 @@
         },
         {
           "id": "prep-slot-pol-apertura-2",
-          "texto": "«Antes de avanzar, ¿podría confirmarme el procedimiento para acceder a antecedentes del ingreso?»",
+          "texto": "«Buenas noches. ¿Me orienta cómo puedo acceder a la información del ingreso?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "policia-acuse-recibo",
           "efectos": [
@@ -54,17 +54,17 @@
       "id": "policia-acuse-recibo",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Entendido. El ingreso sigue en trámite de registro. Puedo orientarle sobre el procedimiento cuando usted indique por dónde quiere comenzar.",
+      "texto": "De acuerdo. El ingreso sigue en trámite. Dígame qué necesita y le voy orientando.",
       "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
       "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "La conversación acaba de abrirse. Organiza mentalmente qué indagar sobre la llegada al hospital esta noche.",
+      "texto": "La conversación acaba de abrirse. Piensa qué preguntar primero sobre lo ocurrido esta noche.",
       "opciones": [
         {
           "id": "prep-slot-pol-exploracion-1",
-          "texto": "«Necesito comprender el marco institucional de esta intervención antes de profundizar.»",
+          "texto": "«¿Qué tienen registrado hasta ahora del ingreso?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-explor-marco",
           "efectos": [
@@ -79,7 +79,7 @@
         },
         {
           "id": "prep-slot-pol-exploracion-2",
-          "texto": "«Mi intervención es clínica. ¿Con quién debo coordinar el acceso a la familia?»",
+          "texto": "«Voy a hablar con la familia. ¿Sabe quién está aquí en el hospital?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-explor-coordinacion",
           "efectos": [
@@ -94,7 +94,7 @@
         },
         {
           "id": "prep-slot-pol-exploracion-3",
-          "texto": "«¿Qué información general tiene disponible sobre el traslado de esta noche?»",
+          "texto": "«¿Cómo llegó la paciente al hospital?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-explor-general",
           "efectos": [
@@ -113,31 +113,31 @@
       "id": "pol-explor-marco",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Hay un registro preliminar en curso desde hace unas horas. Todavía no tenemos consolidado todo el traslado.",
+      "texto": "Hay un parte abierto desde hace un par de horas. Aún no tenemos todo el traslado cerrado.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "pol-explor-coordinacion",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "La madre y un hermano están en sala de espera. Aún no hemos unificado quién acompañó todo el trayecto.",
+      "texto": "La mamá y un hermano están en sala de espera. Todavía no está claro quién estuvo todo el trayecto con ella.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "pol-explor-general",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Ingresó esta noche una paciente adulta en estado grave. Acaba de llegar; aún consolidamos quién acompañó el traslado.",
+      "texto": "Ingresó una mujer adulta, muy mal. Acaba de llegar; estamos ordenando quién la acompañó.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Observa lo ocurrido en acceso y pasillo; organiza mentalmente qué conviene revisar.",
+      "texto": "Lo que escuchaste suena incompleto. Piensa qué conviene precisar sobre la llegada y lo que pasó en acceso.",
       "opciones": [
         {
           "id": "prep-slot-pol-profundizacion-1",
-          "texto": "«¿Cómo fue el arribo al hospital y quién acompañó el traslado?»",
+          "texto": "«¿A qué hora llegó y quién venía con ella en la ambulancia?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-profun-llegada",
           "efectos": [
@@ -152,7 +152,7 @@
         },
         {
           "id": "prep-slot-pol-profundizacion-3",
-          "texto": "«¿Qué conductas observaron en acceso o en el pasillo al ingreso?»",
+          "texto": "«¿Pasó algo raro en el acceso o en el pasillo cuando ingresó?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-profun-comportamiento",
           "efectos": [
@@ -184,11 +184,11 @@
     {
       "id": "decision-nivel3-vecinos",
       "emisor": "jugador",
-      "texto": "Conviene contrastar lo observado con los avisos recibidos. Considera qué indagar sobre vecinos y alertas.",
+      "texto": "Conviene contrastar lo que viste con lo que se reportó antes del traslado.",
       "opciones": [
         {
           "id": "prep-slot-pol-vecinos-1",
-          "texto": "«¿Qué información recibieron en la llamada o alerta inicial?»",
+          "texto": "«¿Qué les dijeron en la primera llamada de emergencia?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-profun-llamada",
           "efectos": [
@@ -203,7 +203,7 @@
         },
         {
           "id": "prep-slot-pol-vecinos-2",
-          "texto": "«¿Qué relataron los vecinos sobre lo ocurrido antes del traslado?»",
+          "texto": "«¿Los vecinos comentaron algo sobre lo que pasó en la casa?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "pol-n3-relato-vecinos",
           "efectos": [
@@ -222,7 +222,7 @@
       "id": "pol-profun-llamada",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "El primer aviso hablaba de forcejeo en vivienda. Los paramédicos ampliaron al llegar, pero la familia aún no unifica la versión.",
+      "texto": "El primer aviso hablaba de forcejeo en la vivienda. Los paramédicos ampliaron al llegar, pero la familia aún no pone de acuerdo la versión.",
       "siguienteNodoId": "decision-nivel4-antecedentes"
     },
     {
@@ -242,11 +242,11 @@
     {
       "id": "decision-nivel4-antecedentes",
       "emisor": "jugador",
-      "texto": "El funcionario policial ofrece contexto del ingreso; revise con cuidado qué antecedentes contrastar primero con la clínica.",
+      "texto": "El funcionario ya dio pistas. Piensa qué antecedente conviene contrastar con lo clínico.",
       "opciones": [
         {
           "id": "prep-slot-pol-critica-1",
-          "texto": "«¿Existen denuncias o intervenciones policiales previas en ese domicilio?»",
+          "texto": "«¿Han ido antes a esa casa por algún problema?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "policia-antecedentes",
           "efectos": [
@@ -261,7 +261,7 @@
         },
         {
           "id": "prep-slot-pol-critica-2",
-          "texto": "«¿Dónde fue visto por última vez el agresor presunto?»",
+          "texto": "«¿Dónde quedó el yerno? ¿Sabe si sigue cerca del hospital?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "policia-paradero",
           "efectos": [
@@ -276,7 +276,7 @@
         },
         {
           "id": "prep-slot-pol-critica-3",
-          "texto": "«¿Qué versión dieron los familiares al momento del traslado?»",
+          "texto": "«¿Qué dijeron los familiares cuando llegó la ambulancia?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "policia-version",
           "efectos": [
@@ -308,11 +308,11 @@
     {
       "id": "decision-nivel5-escalamiento",
       "emisor": "jugador",
-      "texto": "Conviene valorar si el patrón sugiere escalamiento previo; reflexiona sobre qué precisar.",
+      "texto": "Los antecedentes sugieren un patrón. Piensa qué más necesitas saber.",
       "opciones": [
         {
           "id": "prep-slot-pol-escalamiento-1",
-          "texto": "«¿Qué elementos sugieren que la violencia venía intensificándose?»",
+          "texto": "«¿Esto venía empeorando con el tiempo?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "policia-cronologia-vecinos",
           "efectos": [
@@ -358,11 +358,11 @@
     {
       "id": "decision-cierre",
       "emisor": "jugador",
-      "texto": "La información policial puede cruzarse con la clínica; piensa en cómo cerrar este contacto.",
+      "texto": "Ya tienes varias piezas. Piensa cómo cerrar este contacto.",
       "opciones": [
         {
           "id": "prep-slot-pol-cierre-1",
-          "texto": "«¿Podría facilitarme acceso al registro preliminar para contrastarlo con la historia clínica?»",
+          "texto": "«¿Me puede facilitar el parte preliminar para cruzarlo con la historia clínica?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "cierre-policia",
           "efectos": [
@@ -377,7 +377,7 @@
         },
         {
           "id": "prep-slot-pol-cierre-2",
-          "texto": "«Gracias. Prefiero continuar la evaluación clínica antes de revisar el registro formal.»",
+          "texto": "«Gracias. Prefiero seguir con la evaluación clínica y vuelvo al parte después.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "cierre-policia",
           "efectos": [
@@ -392,7 +392,7 @@
         },
         {
           "id": "prep-slot-pol-cierre-3",
-          "texto": "«¿Podrían mantener alerta si el agresor intenta reingresar al hospital?»",
+          "texto": "«¿Pueden avisarnos si el yerno intenta volver a entrar al hospital?»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "cierre-policia",
           "modificadoresMetricas": {
@@ -414,7 +414,7 @@
       "id": "cierre-policia",
       "emisor": "personaje",
       "personajeId": "policia",
-      "texto": "Queda anotado. Si surge nuevo riesgo, avísenos de inmediato. La familia sigue adentro; el equipo médico tiene el registro del ingreso por si necesita contrastar versiones.",
+      "texto": "Queda anotado. Si surge algo nuevo, avísenos. La familia sigue adentro; el médico tiene el registro del ingreso por si necesita contrastar versiones.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

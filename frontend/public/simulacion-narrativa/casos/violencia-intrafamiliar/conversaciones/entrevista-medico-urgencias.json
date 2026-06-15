@@ -10,17 +10,17 @@
       "id": "apertura",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Buenas. Estoy con la paciente de trauma ingresada esta noche. ¿Viene por la valoración psicosocial del caso?",
+      "texto": "Buenas. Estoy con la paciente de trauma de esta noche. ¿Viene por la valoración psicosocial?",
       "siguienteNodoId": "decision-prep-exploracion-inicial"
     },
     {
       "id": "decision-prep-exploracion-inicial",
       "emisor": "jugador",
-      "texto": "El médico puede orientar sobre el caso. Antes de profundizar, ordena mentalmente cómo quiere encuadrar la entrevista.",
+      "texto": "El médico puede orientarte. Piensa cómo abrir la conversación.",
       "opciones": [
         {
           "id": "prep-slot-med-exploracion-1",
-          "texto": "«Sí. ¿Podría orientarme sobre el estado general actual de la paciente?»",
+          "texto": "«Sí. ¿Cómo la tienen ahora, en términos generales?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-explor-estado",
           "efectos": [
@@ -35,7 +35,7 @@
         },
         {
           "id": "prep-slot-med-exploracion-2",
-          "texto": "«¿Quién acompañó el ingreso y cómo fue la coordinación con enfermería?»",
+          "texto": "«¿Quién vino con ella al ingreso? ¿Hubo algún problema en el pasillo?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-explor-ingreso",
           "efectos": [
@@ -50,7 +50,7 @@
         },
         {
           "id": "prep-slot-med-exploracion-3",
-          "texto": "«Antes de profundizar, ¿qué aspectos clínicos considera prioritarios para mi evaluación?»",
+          "texto": "«Antes de entrar en detalle, ¿qué debería tener presente para mi evaluación?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-explor-prioridades",
           "efectos": [
@@ -76,24 +76,24 @@
       "id": "med-explor-ingreso",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Ingresó con familiares; el agresor presunto no estaba al traslado. Enfermería documentó altercados en el pasillo durante el ingreso.",
+      "texto": "Ingresó con familiares; el yerno no venía en el traslado. Enfermería anotó altercados en el pasillo durante el ingreso.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "med-explor-prioridades",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Conviene contrastar el relato familiar con los hallazgos del examen físico y la evolución. También hay un ingreso simultáneo de una menor que activó otra ruta.",
+      "texto": "Conviene contrastar lo que dice la familia con lo que encontramos en el examen. También hubo otro ingreso simultáneo que activó otra ruta.",
       "siguienteNodoId": "decision-prep-profundizacion"
     },
     {
       "id": "decision-prep-profundizacion",
       "emisor": "jugador",
-      "texto": "Puede profundizar en hallazgos y evolución. Con lo clínico disponible, considera qué indagar.",
+      "texto": "Lo clínico puede dar pistas importantes. Piensa qué preguntar.",
       "opciones": [
         {
           "id": "prep-slot-med-profundizacion-1",
-          "texto": "«¿Qué hallazgos clínicos destacaría del examen inicial?»",
+          "texto": "«¿Qué encontraron en el examen inicial?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-profun-hallazgos",
           "efectos": [
@@ -108,7 +108,7 @@
         },
         {
           "id": "prep-slot-med-profundizacion-2",
-          "texto": "«¿Cómo ha sido la evolución desde el ingreso?»",
+          "texto": "«¿Cómo ha evolucionado desde que ingresó?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "med-profun-evolucion",
           "efectos": [
@@ -123,7 +123,7 @@
         },
         {
           "id": "prep-slot-med-profundizacion-3",
-          "texto": "«¿Qué riesgos observa en el cuadro actual de la paciente?»",
+          "texto": "«¿Qué riesgos ve en el cuadro actual?»",
           "estrategiaClinica": "evaluacion_riesgo",
           "siguienteNodoId": "med-profun-riesgos",
           "efectos": [
@@ -142,7 +142,7 @@
       "id": "med-profun-hallazgos",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Hay contusión temporo-parietal y hematomas en antebrazos compatibles con defensa. Aún no tenemos todos los detalles del examen completo.",
+      "texto": "Hay contusión temporo-parietal y hematomas en antebrazos compatibles con defensa. Aún no tenemos cerrado el examen completo.",
       "siguienteNodoId": "decision-nivel4-interdisciplinar"
     },
     {
@@ -162,11 +162,11 @@
     {
       "id": "decision-nivel4-interdisciplinar",
       "emisor": "jugador",
-      "texto": "Conviene articular equipos antes de cerrar la entrevista clínica; organiza qué coordinar.",
+      "texto": "Antes de cerrar, conviene saber con quién articular.",
       "opciones": [
         {
           "id": "prep-slot-med-interdisciplinar-1",
-          "texto": "«¿Qué equipos deben articularse en casos como este?»",
+          "texto": "«¿Con qué equipos suelen trabajar en casos como este?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-n4-interdisciplinar",
           "efectos": [
@@ -185,17 +185,17 @@
       "id": "med-n4-interdisciplinar",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Coordinamos con psicología, trabajo social y psiquiatría si la evolución lo requiere. Salud mental puede sostener el abordaje cuando la paciente estabilice.",
+      "texto": "Coordinamos con psicología, trabajo social y psiquiatría si hace falta. Salud mental puede sostener el abordaje cuando la paciente estabilice.",
       "siguienteNodoId": "decision-prep-info-critica"
     },
     {
       "id": "decision-prep-info-critica",
       "emisor": "jugador",
-      "texto": "Hay discrepancias y datos sensibles que conviene precisar; reflexiona sobre qué profundizar.",
+      "texto": "Hay cosas que no cuadran. Piensa qué conviene precisar.",
       "opciones": [
         {
           "id": "prep-slot-med-critica-1",
-          "texto": "«¿Por qué cree que la familia insistió en hablar de una caída accidental?»",
+          "texto": "«¿Por qué cree que la familia hablaba de una caída accidental?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "medico-minimizacion",
           "efectos": [
@@ -210,7 +210,7 @@
         },
         {
           "id": "prep-slot-med-critica-2",
-          "texto": "«¿Podría orientarme sobre lo consignado en la historia clínica de urgencias?»",
+          "texto": "«¿Qué quedó consignado en la historia de urgencias?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "medico-nota",
           "efectos": [
@@ -225,7 +225,7 @@
         },
         {
           "id": "prep-slot-med-critica-3",
-          "texto": "«¿El informe menciona a la menor fallecida en el mismo episodio?»",
+          "texto": "«¿El informe menciona a la menor que ingresó esa noche?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "medico-menor",
           "efectos": [
@@ -285,11 +285,11 @@
     {
       "id": "decision-nivel5-normativo",
       "emisor": "jugador",
-      "texto": "Antes de cerrar, conviene precisar el marco normativo e institucional del caso.",
+      "texto": "Antes de cerrar, conviene aclarar qué ruta institucional aplica.",
       "opciones": [
         {
           "id": "prep-slot-med-normativo-1",
-          "texto": "«¿Qué marco normativo aplica y cómo se articula la ruta institucional?»",
+          "texto": "«¿Qué norma rige estos casos y cómo se activa la ruta en el hospital?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "med-marco-normativo",
           "efectos": [
@@ -321,11 +321,11 @@
     {
       "id": "decision-cierre",
       "emisor": "jugador",
-      "texto": "Es momento de definir la coordinación institucional.",
+      "texto": "Es momento de definir la coordinación con el equipo médico.",
       "opciones": [
         {
           "id": "prep-slot-med-cierre-1",
-          "texto": "«Considero necesario activar el protocolo de sospecha de violencia intrafamiliar.»",
+          "texto": "«Creo que hay que activar el protocolo de sospecha de violencia intrafamiliar.»",
           "estrategiaClinica": "planificacion_seguridad",
           "siguienteNodoId": "cierre-medico",
           "efectos": [
@@ -361,7 +361,7 @@
         },
         {
           "id": "prep-slot-med-cierre-2",
-          "texto": "«Prefiero completar la valoración psicosocial antes de activar rutas formales.»",
+          "texto": "«Prefiero terminar mi valoración psicosocial antes de activar rutas formales.»",
           "estrategiaClinica": "contencion_emocional",
           "siguienteNodoId": "cierre-medico",
           "efectos": [
@@ -376,7 +376,7 @@
         },
         {
           "id": "prep-slot-med-cierre-3",
-          "texto": "«Doctor, me preocupa que el protocolo no se haya activado al ingreso. ¿Qué ocurrió?»",
+          "texto": "«Doctor, me preocupa que el protocolo no se haya activado al ingreso. ¿Qué pasó?»",
           "estrategiaClinica": "confrontacion",
           "siguienteNodoId": "medico-respuesta-protocolo",
           "modificadoresMetricas": {
@@ -398,14 +398,14 @@
       "id": "medico-respuesta-protocolo",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "Priorizamos estabilización. La sospecha quedó registrada; activar formalmente depende también de salud mental y trabajo social. Usted puede impulsarlo.",
+      "texto": "Primero estabilizamos. La sospecha quedó registrada; activar formalmente depende también de salud mental y trabajo social. Usted puede impulsarlo.",
       "siguienteNodoId": "cierre-medico"
     },
     {
       "id": "cierre-medico",
       "emisor": "personaje",
       "personajeId": "medico-urgencias",
-      "texto": "El informe completo está en estación médica. Estos casos exigen coordinación institucional: cuando la paciente estabilice, conviene escucharla con el informe revisado, contrastar versiones y activar la red interdisciplinaria.",
+      "texto": "El informe completo está en estación médica. Estos casos exigen coordinación: cuando la paciente estabilice, conviene escucharla con el informe revisado, contrastar versiones y activar la red interdisciplinaria.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

@@ -146,54 +146,18 @@
           </button>
         </header>
 
-        @if (c.contexto_historia) {
-          <div class="preview-real__contexto">
-            <strong>Contexto</strong>
-            <p>{{ c.contexto_historia }}</p>
-          </div>
-        }
-
         @if (c.escenarios.length === 0) {
           <div class="empty-state-mockup empty-state-mockup--compact">
             Este caso aún no tiene escenarios cargados.
           </div>
-        }
-
-        @for (esc of c.escenarios; track esc.id) {
-          <article class="preview-real__esc">
-            <header>
-              <span class="badge">Escenario {{ esc.orden }}</span>
-              <h4>{{ esc.titulo }}</h4>
-            </header>
-            @if (esc.narrativa) {
-              <p class="preview-real__narrativa">{{ esc.narrativa }}</p>
-            }
-
-            @if (recursosVisibles(esc.recursos_multimedia).length) {
-              <div class="preview-real__medios">
-                @for (r of recursosVisibles(esc.recursos_multimedia); track $index) {
-                  <span class="preview-real__media-pill">
-                    {{ r.tipo === 'imagen' ? '🖼️' : r.tipo === 'audio' ? '🔊' : '🎬' }}
-                    {{ r.titulo || r.url }}
-                  </span>
-                }
-              </div>
-            }
-
-            @for (preg of esc.preguntas; track preg.id; let pi = $index) {
-              <section class="preview-real__pregunta">
-                <p><strong>P{{ pi + 1 }}.</strong> {{ preg.enunciado }}</p>
-                <ul class="preview-real__respuestas">
-                  @for (resp of preg.respuestas; track resp.id) {
-                    <li [class.correcta]="resp.es_correcta">
-                      {{ resp.texto }}
-                      @if (resp.es_correcta) { <span class="check">✓ correcta</span> }
-                    </li>
-                  }
-                </ul>
-              </section>
-            }
-          </article>
+        } @else {
+          <p class="muted preview-real__nota">
+            Esta es la experiencia real que verá el estudiante: pantalla de advertencia,
+            narrativa con efecto de máquina de escribir y preguntas con opciones de respuesta.
+          </p>
+          <app-simulacion-presentacion-preview
+            [caso]="c"
+            [nombrePractica]="resumenSeleccion()?.practica ?? ''" />
         }
       </div>
     }

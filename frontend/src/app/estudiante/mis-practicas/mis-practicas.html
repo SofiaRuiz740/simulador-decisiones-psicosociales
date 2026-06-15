@@ -48,7 +48,7 @@
                     <td><span class="badge" [class]="badgeClass(p.progreso.estado)">{{ etiquetaEstado(p.progreso.estado) }}</span></td>
                     <td class="col-actions">
                       @if (p.progreso.estado === 'en_progreso') {
-                        <a class="btn-ghost" [routerLink]="['/estudiante/practicas', p.id, 'simulacion']">Continuar</a>
+                        <a class="btn-ghost" [routerLink]="['/estudiante/practicas', p.id, rutaSimulacion(p)]">Continuar</a>
                       } @else if (p.progreso.estado === 'completada' && p.progreso.resultadoId) {
                         <a class="btn-ghost" [routerLink]="['/estudiante/resultado', p.progreso.resultadoId]">Resultado</a>
                       } @else {

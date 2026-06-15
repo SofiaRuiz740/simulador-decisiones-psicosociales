@@ -11,6 +11,7 @@ import { resolverFaseIntro } from '../core/simulacion-narrativa/utils/introducci
 import { obtenerCatalogoCaso, resolverCasoNarrativoId } from '../core/utils/caso-narrativo.util';
 import { ExploracionVisualComponent } from '../estudiante/exploracion-visual/exploracion-visual';
 import { IntroduccionNarrativaComponent } from '../estudiante/exploracion-visual/introduccion-narrativa/introduccion-narrativa';
+import { SimulacionPresentacionPreviewComponent } from '../shared/components/simulacion-presentacion-preview/simulacion-presentacion-preview';
 
 @Component({
   selector: 'app-participaciones',
@@ -19,6 +20,7 @@ import { IntroduccionNarrativaComponent } from '../estudiante/exploracion-visual
     MatProgressBarModule,
     ExploracionVisualComponent,
     IntroduccionNarrativaComponent,
+    SimulacionPresentacionPreviewComponent,
   ],
   templateUrl: './participaciones.html',
   styleUrl: './participaciones.scss',

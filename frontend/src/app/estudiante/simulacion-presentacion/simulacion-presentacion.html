@@ -1,0 +1,110 @@
+<div class="presentacion">
+
+  @switch (fase()) {
+
+    @case ('cargando') {
+      <div class="estado-centro">
+        <mat-progress-bar mode="indeterminate" />
+        <p>Preparando tu práctica…</p>
+      </div>
+    }
+
+    @case ('error') {
+      <div class="estado-centro">
+        <mat-icon class="estado-icono" aria-hidden="true">error_outline</mat-icon>
+        <p>{{ errorMensaje() }}</p>
+        <a routerLink="/panel-estudiante" class="btn-volver">Volver a Mis prácticas</a>
+      </div>
+    }
+
+    @case ('advertencia') {
+      <div class="pantalla-advertencia" role="dialog" aria-modal="true" aria-labelledby="advertencia-titulo">
+        <div class="panel-advertencia">
+          <h2 id="advertencia-titulo" class="advertencia-titulo">Antes de comenzar</h2>
+          <p class="advertencia-texto">
+            Estás a punto de iniciar la práctica <strong>{{ nombrePractica() }}</strong>.
+            A continuación se presentará el contexto del caso y, después de cada escenario,
+            encontrarás preguntas para poner en práctica tu análisis psicosocial.
+          </p>
+          <p class="advertencia-texto">
+            Lee con calma cada fragmento de texto: puedes hacer clic sobre él para mostrarlo
+            completo de inmediato. Una vez selecciones una respuesta, no podrás cambiarla.
+          </p>
+          <button type="button" class="btn-aceptar" (click)="aceptarAdvertencia()">
+            Comenzar
+          </button>
+        </div>
+      </div>
+    }
+
+    @case ('contenido') {
+      <header class="presentacion__barra">
+        <div class="presentacion__info">
+          <span class="presentacion__caso">{{ nombreCaso() }}</span>
+          <span class="presentacion__practica">{{ nombrePractica() }}</span>
+        </div>
+        <div class="presentacion__progreso">
+          <mat-progress-bar mode="determinate" [value]="progreso()" />
+        </div>
+        <button type="button" class="btn-salir" (click)="confirmarSalida()" aria-label="Salir">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </header>
+
+      <div class="presentacion__viewport">
+        @if (itemActual(); as item) {
+          <div class="caja-contenido" [class.es-pregunta]="item.tipo === 'pregunta'">
+            @if (item.tipo === 'narrativa') {
+              <h3 class="caja-titulo">{{ item.titulo }}</h3>
+            }
+
+            <p class="caja-texto" (click)="completarTypewriter()">
+              <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
+              @if (!typewriterCompleto()) {
+                <span class="cursor-typewriter" aria-hidden="true"></span>
+              }
+            </p>
+
+            @if (item.tipo === 'pregunta' && typewriterCompleto()) {
+              <div class="opciones">
+                @for (respuesta of item.pregunta.respuestas; track respuesta.id) {
+                  <button
+                    type="button"
+                    class="btn-opcion"
+                    [class.seleccionada]="esRespuestaSeleccionada(respuesta)"
+                    [disabled]="respuestaSeleccionadaActual() != null && !esRespuestaSeleccionada(respuesta)"
+                    (click)="seleccionarRespuesta(item.pregunta, respuesta)">
+                    {{ respuesta.texto }}
+                  </button>
+                }
+              </div>
+            }
+
+            <div class="caja-acciones">
+              <button
+                type="button"
+                class="btn-continuar"
+                [disabled]="!puedeContinuar()"
+                (click)="siguiente()">
+                {{ esUltimoItem() ? 'Finalizar' : 'Continuar' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('final') {
+      <div class="estado-centro">
+        <mat-icon class="estado-icono estado-icono--exito" aria-hidden="true">task_alt</mat-icon>
+        <h2>¡Práctica completada!</h2>
+        <p>Tus respuestas fueron registradas correctamente.</p>
+        <div class="acciones-final">
+          <a routerLink="/estudiante/resultados" class="btn-aceptar">Ver resultados</a>
+          <a routerLink="/panel-estudiante" class="btn-volver">Volver al panel</a>
+        </div>
+      </div>
+    }
+  }
+
+</div>

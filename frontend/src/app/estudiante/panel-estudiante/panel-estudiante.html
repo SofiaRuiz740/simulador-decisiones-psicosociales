@@ -65,7 +65,7 @@
               <div class="list-row__side">
                 <span class="badge badge--en-curso">En curso</span>
                 <div class="actions actions--end">
-                  <a class="btn-primary" [routerLink]="['/estudiante/practicas', enCurso()[0].id, 'simulacion']">
+                  <a class="btn-primary" [routerLink]="['/estudiante/practicas', enCurso()[0].id, rutaSimulacion(enCurso()[0])]">
                     Continuar simulación
                   </a>
                 </div>

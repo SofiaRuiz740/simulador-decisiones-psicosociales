@@ -2,8 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
-import { EstadoPracticaEstudiante } from '../../core/models/estudiante-session.model';
+import { EstadoPracticaEstudiante, PracticaEstudianteActiva } from '../../core/models/estudiante-session.model';
 import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
+import { resolverCasoNarrativoId } from '../../core/utils/caso-narrativo.util';
 import { EstudianteShellComponent } from '../estudiante-shell/estudiante-shell';
 
 @Component({
@@ -35,6 +36,12 @@ export class PanelEstudianteComponent {
     if (this.completadas().length > 0) return 'Resultados';
     return 'Mis prácticas';
   });
+
+  rutaSimulacion(p: PracticaEstudianteActiva): string {
+    return resolverCasoNarrativoId(p) === 'violencia-intrafamiliar'
+      ? 'simulacion'
+      : 'simulacion-presentacion';
+  }
 
   abrirPractica(practicaId: number): void {
     this.session.seleccionarPractica(practicaId);

@@ -1,0 +1,95 @@
+<div class="presentacion-preview">
+
+  @switch (fase()) {
+
+    @case ('vacio') {
+      <div class="estado-centro">
+        <mat-icon class="estado-icono" aria-hidden="true">visibility_off</mat-icon>
+        <p>Este caso aún no tiene escenarios o preguntas configurados.</p>
+      </div>
+    }
+
+    @case ('advertencia') {
+      <div class="pantalla-advertencia" role="dialog" aria-modal="true" aria-labelledby="advertencia-titulo">
+        <div class="panel-advertencia">
+          <h2 id="advertencia-titulo" class="advertencia-titulo">Antes de comenzar</h2>
+          <p class="advertencia-texto">
+            Así verá el estudiante el inicio de <strong>{{ nombrePractica() || 'la práctica' }}</strong>.
+            A continuación se presentará el contexto del caso y, después de cada escenario,
+            encontrarás preguntas para poner en práctica tu análisis psicosocial.
+          </p>
+          <p class="advertencia-texto">
+            Lee con calma cada fragmento de texto: puedes hacer clic sobre él para mostrarlo
+            completo de inmediato. Una vez selecciones una respuesta, no podrás cambiarla.
+          </p>
+          <button type="button" class="btn-aceptar" (click)="aceptarAdvertencia()">
+            Comenzar
+          </button>
+        </div>
+      </div>
+    }
+
+    @case ('contenido') {
+      <header class="presentacion-preview__barra">
+        <div class="presentacion-preview__progreso">
+          <mat-progress-bar mode="determinate" [value]="progreso()" />
+        </div>
+        <button type="button" class="btn-reiniciar" (click)="reiniciar()" aria-label="Reiniciar vista previa">
+          <mat-icon aria-hidden="true">restart_alt</mat-icon>
+        </button>
+      </header>
+
+      <div class="presentacion-preview__viewport">
+        @if (itemActual(); as item) {
+          <div class="caja-contenido" [class.es-pregunta]="item.tipo === 'pregunta'">
+            @if (item.tipo === 'narrativa') {
+              <h3 class="caja-titulo">{{ item.titulo }}</h3>
+            }
+
+            <p class="caja-texto" (click)="completarTypewriter()">
+              <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
+              @if (!typewriterCompleto()) {
+                <span class="cursor-typewriter" aria-hidden="true"></span>
+              }
+            </p>
+
+            @if (item.tipo === 'pregunta' && typewriterCompleto()) {
+              <div class="opciones">
+                @for (respuesta of item.pregunta.respuestas; track respuesta.id) {
+                  <button
+                    type="button"
+                    class="btn-opcion"
+                    [class.seleccionada]="esRespuestaSeleccionada(respuesta)"
+                    [disabled]="respuestaSeleccionadaActual() != null && !esRespuestaSeleccionada(respuesta)"
+                    (click)="seleccionarRespuesta(item.pregunta, respuesta)">
+                    {{ respuesta.texto }}
+                  </button>
+                }
+              </div>
+            }
+
+            <div class="caja-acciones">
+              <button
+                type="button"
+                class="btn-continuar"
+                [disabled]="!puedeContinuar()"
+                (click)="siguiente()">
+                {{ esUltimoItem() ? 'Finalizar' : 'Continuar' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('final') {
+      <div class="estado-centro">
+        <mat-icon class="estado-icono estado-icono--exito" aria-hidden="true">task_alt</mat-icon>
+        <h2>Fin de la vista previa</h2>
+        <p>Así finaliza la práctica para el estudiante. Sus respuestas reales no se ven afectadas.</p>
+        <button type="button" class="btn-aceptar" (click)="reiniciar()">Ver de nuevo</button>
+      </div>
+    }
+  }
+
+</div>

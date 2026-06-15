@@ -136,6 +136,10 @@ export class SimulacionNarrativa implements OnInit, OnDestroy {
       this.practicaId.set(practicaId);
       this.session.seleccionarPractica(practicaId);
       const casoNarrativo = resolverCasoNarrativoId(registro);
+      if (casoNarrativo !== 'violencia-intrafamiliar') {
+        this.router.navigate(['/estudiante/practicas', practicaId, 'simulacion-presentacion']);
+        return;
+      }
       this.casoId.set(casoNarrativo);
     } else if (casoParam) {
       this.casoId.set(casoParam);

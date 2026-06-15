@@ -2,8 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
-import { EstadoPracticaEstudiante } from '../../core/models/estudiante-session.model';
+import { EstadoPracticaEstudiante, PracticaEstudianteActiva } from '../../core/models/estudiante-session.model';
 import { EstudianteSessionService } from '../../core/services/estudiante-session.service';
+import { resolverCasoNarrativoId } from '../../core/utils/caso-narrativo.util';
 import { EstudianteShellComponent } from '../estudiante-shell/estudiante-shell';
 
 type VistaPracticas = 'todas' | 'pendientes' | 'curso' | 'completadas';
@@ -67,6 +68,12 @@ export class MisPracticasComponent {
       default:
         return 'badge badge--pendiente';
     }
+  }
+
+  rutaSimulacion(p: PracticaEstudianteActiva): string {
+    return resolverCasoNarrativoId(p) === 'violencia-intrafamiliar'
+      ? 'simulacion'
+      : 'simulacion-presentacion';
   }
 
   abrirPractica(practicaId: number): void {

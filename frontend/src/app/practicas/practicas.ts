@@ -34,6 +34,7 @@ import { UxService } from '../core/services/ux.service';
 
 import { mockupDialog } from '../shared/constants/dialog-config';
 import { PracticaFormDialog } from './dialogs/practica-form-dialog';
+import { PracticaReagendarDialog } from './dialogs/practica-reagendar-dialog';
 
 
 
@@ -464,6 +465,18 @@ export class Practicas implements OnInit {
   }
 
 
+
+  reagendar(p: Practica, ev?: Event): void {
+    ev?.preventDefault();
+    ev?.stopPropagation();
+
+    this.dialog.open(PracticaReagendarDialog, {
+      ...mockupDialog('540px'),
+      data: { practica: p },
+    }).afterClosed().subscribe((actualizada) => {
+      if (actualizada) this.cargar();
+    });
+  }
 
   async eliminar(p: Practica, ev: Event): Promise<void> {
 

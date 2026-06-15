@@ -123,7 +123,11 @@ export class PracticaInfoComponent implements OnInit {
   iniciarSimulacion(): void {
     const p = this.practica();
     if (!p || !this.puedeIniciar()) return;
-    this.router.navigate(['/estudiante/practicas', p.id, 'simulacion']);
+    if (this.casoNarrativoId() === 'violencia-intrafamiliar') {
+      this.router.navigate(['/estudiante/practicas', p.id, 'simulacion']);
+    } else {
+      this.router.navigate(['/estudiante/practicas', p.id, 'simulacion-presentacion']);
+    }
   }
 
   solicitarNuevoIntento(): void {

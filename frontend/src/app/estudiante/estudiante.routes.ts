@@ -26,6 +26,15 @@ export const ESTUDIANTE_ROUTES: Routes = [
     title: 'Simulación narrativa · Simulador',
   },
   {
+    path: 'practicas/:practicaId/simulacion-presentacion',
+    canActivate: [estudianteAuthGuard],
+    loadComponent: () =>
+      import('./simulacion-presentacion/simulacion-presentacion').then(
+        (m) => m.SimulacionPresentacion,
+      ),
+    title: 'Simulación · Simulador',
+  },
+  {
     path: 'practicas/:practicaId',
     redirectTo: (route) => `/panel-estudiante/practicas/${route.params['practicaId']}`,
   },

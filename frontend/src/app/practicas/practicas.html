@@ -65,6 +65,7 @@
                     <td class="col-actions">
                       <div class="actions actions--end">
                         <a class="btn-ghost" [routerLink]="['/practicas', p.id]">Abrir</a>
+                        <button type="button" class="btn-ghost" (click)="reagendar(p, $event)">Reagendar</button>
                         <button type="button" class="btn-ghost" (click)="eliminar(p, $event)">Eliminar</button>
                       </div>
                     </td>

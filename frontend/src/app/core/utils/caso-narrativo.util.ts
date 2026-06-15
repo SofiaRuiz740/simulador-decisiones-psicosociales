@@ -54,12 +54,37 @@ export const CATALOGO_CASOS_NARRATIVOS: CasoNarrativoCatalogo[] = [
 const MAPEO_CASO_BACKEND: Record<number, string> = {
   1: 'violencia-intrafamiliar',
   2: 'violencia-intrafamiliar',
+  3: 'violencia-intrafamiliar',
+  4: 'violencia-intrafamiliar',
   999999: 'violencia-intrafamiliar',
 };
+
+/** Quita acentos y normaliza para comparar nombres de forma flexible. */
+function normalizar(texto: string): string {
+  return texto
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim();
+}
 
 export function resolverCasoNarrativoId(practica: PracticaEstudianteActiva): string {
   if (MAPEO_CASO_BACKEND[practica.caso_id]) {
     return MAPEO_CASO_BACKEND[practica.caso_id];
+  }
+
+  // Si el caso (creado por un docente o el "Caso por defecto") no está en el
+  // mapeo explícito de IDs, intentamos resolver por nombre: si el nombre del
+  // caso coincide con el título de alguna práctica narrativa disponible en el
+  // catálogo, usamos esa simulación visual.
+  const nombre = normalizar(practica.caso_nombre ?? '');
+  if (nombre) {
+    const coincidencia = CATALOGO_CASOS_NARRATIVOS.find(
+      (c) => c.disponible && nombre.includes(normalizar(c.tituloPractica)),
+    );
+    if (coincidencia) {
+      return coincidencia.slug;
+    }
   }
 
   return '';

@@ -112,8 +112,7 @@ export class MisPracticas implements OnInit {
   ngOnInit(): void {
     this.servicio.misPracticas().subscribe({
       next: (rows) => {
-        this.session.sincronizarDesdeApi(rows);
-        this.practicas.set(rows);
+        this.practicas.set(this.session.sincronizarDesdeApi(rows));
         this.loading.set(false);
       },
       error: () => {

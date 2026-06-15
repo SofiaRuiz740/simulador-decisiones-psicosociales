@@ -16,8 +16,9 @@ export class SimulacionService {
   private readonly http = inject(HttpClient);
   private readonly api = environment.apiUrl;
 
-  iniciarParticipacion() {
-    return this.http.post<Participacion>(`${this.api}/participaciones/iniciar/`, {});
+  iniciarParticipacion(autorizacionId?: number) {
+    const body = autorizacionId ? { autorizacion_id: autorizacionId } : {};
+    return this.http.post<Participacion>(`${this.api}/participaciones/iniciar/`, body);
   }
   obtenerParticipacion(id: number) {
     return this.http.get<Participacion>(`${this.api}/participaciones/${id}/`);

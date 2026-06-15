@@ -48,29 +48,29 @@
       "id": "apertura-hermano-policia",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "¿Habló con la policía?… Escuché que anotaron otra versión distinta a la mía.",
+      "texto": "¿Habló con la policía?… Escuché que anotaron otra cosa, distinta a lo que yo dije. No estoy seguro si fue mi culpa por no hablar claro.",
       "siguienteNodoId": "decision-cruzar-policia"
     },
     {
       "id": "decision-cruzar-policia",
       "emisor": "jugador",
-      "texto": "Diego percibe discrepancias con el registro policial; decida qué versión contrastar primero con él.",
+      "texto": "Diego nota que hay versiones distintas. Piense qué contrastar primero con él.",
       "opciones": [
         {
           "id": "mencionar-resbalon",
-          "texto": "«En el ingreso dijeron que Lucía resbaló. Usted habló de un empujón.»",
+          "texto": "«En el ingreso dijeron que Lucía resbaló, y usted habló de un empujón. ¿Qué pasó ahí?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "hermano-explica-resbalon"
         },
         {
           "id": "mencionar-antecedentes",
-          "texto": "«Hay partes previos en ese domicilio. ¿Lo sabían?»",
+          "texto": "«Me contaron que hubo partes previos en esa casa. ¿Usted lo sabía?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "hermano-antecedentes"
         },
         {
           "id": "mencionar-hora",
-          "texto": "«Usted dijo diez y media; vecinos hablaron de casi las once.»",
+          "texto": "«Usted dijo diez y media; algunos vecinos hablaron de casi las once.»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "hermano-hora"
         }
@@ -80,7 +80,7 @@
       "id": "hermano-explica-resbalon",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Mi mamá lo dijo primero… yo bajé la cabeza. Vi el empujón, pero en el pasillo del hospital nadie quería pelear con Miguel.",
+      "texto": "Mi mamá lo dijo primero… yo bajé la cabeza. Vi el empujón, eso no lo dudo, pero en el pasillo del hospital nadie quería armar más problemas con Miguel. Tal vez debí hablar más fuerte.",
       "testimonio": {
         "id": "testimonio-hermano-coherencia-empujon",
         "tema": "mecanismo_lesion",
@@ -94,7 +94,7 @@
       "id": "hermano-antecedentes",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Yo sabía que la policía había venido antes… una vez por gritos, otra por golpes en la pared. Lucía no quería denunciar. Mi mamá decía que era ‘asunto de pareja’.",
+      "texto": "Yo sabía que la policía había venido antes… una vez por gritos, otra por golpes en la pared. Lucía no quería denunciar. Mi mamá decía que era ‘asunto de pareja’. Yo tampoco insistí mucho.",
       "testimonio": {
         "id": "testimonio-hermano-antecedentes-conocidos",
         "tema": "clima_familiar",
@@ -108,7 +108,7 @@
       "id": "hermano-hora",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Yo miré el celular cuando empezó… 10:32. Puede que afuera hayan oído gritos más tarde, cuando ya estábamos en el pasillo y Sofi…",
+      "texto": "Yo miré el celular cuando empezó… 10:32. Puede que afuera hayan oído gritos más tarde, cuando ya estábamos en el pasillo y Sofi… Esa parte la tengo clara.",
       "testimonio": {
         "id": "testimonio-hermano-hora-2232",
         "tema": "cronologia_episodio",
@@ -121,17 +121,17 @@
     {
       "id": "decision-compromiso-policia",
       "emisor": "jugador",
-      "texto": "El cruce de versiones abre un espacio de cierre; reflexiona sobre cómo sostenerlo.",
+      "texto": "El cruce de versiones abre un espacio para cerrar. Piense cómo sostenerlo.",
       "opciones": [
         {
           "id": "validar-valentia",
-          "texto": "«Su relato corrige la minimización del ingreso. Eso tiene valor clínico.»",
+          "texto": "«Gracias por aclarar lo del ingreso. Eso ayuda mucho.»",
           "estrategiaClinica": "validacion_emocional",
           "siguienteNodoId": "cierre-hermano-policia"
         },
         {
           "id": "explorar-percepcion",
-          "texto": "«¿Cree que Miguel percibió el episodio como un ‘forcejeo mutuo’?»",
+          "texto": "«¿Cree que Miguel vio el episodio como un forcejeo entre los dos?»",
           "estrategiaClinica": "exploracion",
           "siguienteNodoId": "hermano-percepcion-miguel"
         }
@@ -141,7 +141,7 @@
       "id": "hermano-percepcion-miguel",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Él siempre dice que ella ‘exageró’ y que se tropezó sola. Yo vi sus manos en el pecho de mi hermana; eso no es tropezar.",
+      "texto": "Él siempre dice que ella ‘exageró’ y que se tropezó sola. Yo vi sus manos en el pecho de mi hermana; eso no es tropezar. Mi mamá piensa diferente, pero yo lo vi.",
       "testimonio": {
         "id": "testimonio-hermano-percepcion-agresion",
         "tema": "percepcion_agresion",
@@ -155,7 +155,7 @@
       "id": "cierre-hermano-policia",
       "emisor": "personaje",
       "personajeId": "hermano",
-      "texto": "Si va a usar esto… que sirva para que no vuelva cerca de Lucía. Yo firmo lo que haga falta cuando me lo pidan.",
+      "texto": "Si van a usar esto… que sea para que no vuelva cerca de Lucía. Yo firmo lo que haga falta cuando me lo pidan.",
       "efectosAlMostrar": [
         {
           "tipo": "completar_conversacion",

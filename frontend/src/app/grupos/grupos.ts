@@ -6,6 +6,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Grupo } from '../core/models/academico.model';
+import { AuthService } from '../core/auth/auth.service';
+import { Rol } from '../core/models/usuario.model';
 import { AcademicoService } from '../core/services/academico.service';
 import { UxService } from '../core/services/ux.service';
 import { mockupDialog } from '../shared/constants/dialog-config';
@@ -28,6 +30,10 @@ export class Grupos implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly ux = inject(UxService);
+  private readonly auth = inject(AuthService);
+
+  /** Solo el docente puede crear/editar/eliminar grupos. */
+  readonly esAdmin = computed(() => this.auth.rol() === Rol.Admin);
 
   readonly loading = signal(true);
   readonly grupos = signal<Grupo[]>([]);

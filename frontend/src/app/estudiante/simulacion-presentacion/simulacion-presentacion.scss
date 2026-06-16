@@ -158,18 +158,55 @@
   }
 }
 
-// --- Contenido centrado, sin personajes ---
+// --- Viewport principal ---
 .presentacion__viewport {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 24px;
+  padding: 16px 24px 28px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
+// --- Escena: personaje + caja de contenido en fila ---
+.presentacion__escena {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1080px;
+}
+
+// --- Personaje ---
+.personaje-wrap {
+  flex-shrink: 0;
+  width: clamp(180px, 26vw, 320px);
+  align-self: flex-end;
+  pointer-events: none;
+  user-select: none;
+
+  @media (max-width: 680px) {
+    display: none;
+  }
+}
+
+.personaje-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 12px 32px rgba(155, 114, 243, 0.32));
+  animation: personaje-entrada 0.55s ease both;
+}
+
+// --- Caja de contenido ---
 .caja-contenido {
-  width: min(640px, 100%);
+  flex: 1;
+  min-width: 0;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -324,5 +361,22 @@
 @keyframes cursor-parpadeo {
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes personaje-entrada {
+  0% {
+    opacity: 0;
+    transform: translateX(-18px);
+    filter: drop-shadow(0 12px 32px rgba(155, 114, 243, 0)) blur(4px);
+  }
+  60% {
+    opacity: 1;
+    filter: drop-shadow(0 12px 32px rgba(155, 114, 243, 0.32)) blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: drop-shadow(0 12px 32px rgba(155, 114, 243, 0.32)) blur(0px);
   }
 }

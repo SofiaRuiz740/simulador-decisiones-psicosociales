@@ -16,6 +16,8 @@ import { Router, RouterLink } from '@angular/router';
 
 
 
+import { AuthService } from '../core/auth/auth.service';
+import { Rol } from '../core/models/usuario.model';
 import { CasoListItem, EstadoCaso } from '../core/models/casos.model';
 
 import { EstadoPractica, Practica, AutorizacionListItem, SeguimientoParticipacion } from '../core/models/practicas.model';
@@ -87,8 +89,10 @@ export class Practicas implements OnInit {
   private readonly router = inject(Router);
 
   private readonly ux = inject(UxService);
+  private readonly auth = inject(AuthService);
 
-
+  /** El admin solo puede ver prácticas, no crearlas. */
+  readonly esAdmin = computed(() => this.auth.rol() === Rol.Admin);
 
   readonly loading = signal(true);
 
@@ -144,7 +148,7 @@ export class Practicas implements OnInit {
 
 
 
-  readonly tabs = [
+  readonly tabsBase = [
 
     { id: 'agenda', label: 'Agenda' },
 
@@ -160,7 +164,12 @@ export class Practicas implements OnInit {
 
   ];
 
-
+  /** El admin no puede crear prácticas, así que le ocultamos ese tab. */
+  readonly tabs = computed(() =>
+    this.esAdmin()
+      ? this.tabsBase.filter((t) => t.id !== 'nueva')
+      : this.tabsBase,
+  );
 
 
 

@@ -28,6 +28,18 @@ type ItemContenido = ItemNarrativa | ItemPregunta;
 
 const TYPEWRITER_MS = 22;
 
+/** Personajes disponibles — se rotan cíclicamente por ítem (8 imágenes). */
+const PERSONAJES = [
+  'assets/estudiantes/chica1.png',
+  'assets/estudiantes/chico1.png',
+  'assets/estudiantes/chica2.png',
+  'assets/estudiantes/chico2.png',
+  'assets/estudiantes/chica3.png',
+  'assets/estudiantes/chico3.png',
+  'assets/estudiantes/chica4.png',
+  'assets/estudiantes/chico4.png',
+] as const;
+
 @Component({
   selector: 'app-simulacion-presentacion',
   imports: [RouterLink, MatIconModule, MatProgressBarModule],
@@ -85,6 +97,16 @@ export class SimulacionPresentacion implements OnInit, OnDestroy {
   });
 
   readonly esUltimoItem = computed(() => this.indiceActual() >= this.items().length - 1);
+
+  /**
+   * Devuelve un array de un solo elemento con {idx, src} del personaje actual.
+   * Usar con @for + track idx para que Angular recree el elemento en cada paso
+   * y la animación CSS se reproduzca desde el inicio.
+   */
+  readonly personajeFrame = computed(() => [{
+    idx: this.indiceActual(),
+    src: PERSONAJES[this.indiceActual() % PERSONAJES.length],
+  }]);
 
   ngOnInit(): void {
     const practicaParam = this.route.snapshot.paramMap.get('practicaId');

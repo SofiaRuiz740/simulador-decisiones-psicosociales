@@ -31,7 +31,9 @@
         <div class="toolbar__filters">
           <input type="search" placeholder="Buscar…" [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" />
         </div>
-        <button type="button" class="btn-primary" (click)="crear()">Crear grupo</button>
+        @if (!esAdmin()) {
+          <button type="button" class="btn-primary" (click)="crear()">Crear grupo</button>
+        }
       </div>
     </div>
 
@@ -58,8 +60,10 @@
                 <span class="badge badge--activo">Activo</span>
                 <div class="list-row__count">{{ g.estudiantes_count }}<span>est.</span></div>
                 <div class="actions actions--end">
-                  <button type="button" class="btn-ghost" (click)="editar(g, $event)">Editar</button>
-                  <button type="button" class="btn-ghost" (click)="eliminar(g, $event)">Eliminar</button>
+                  @if (!esAdmin()) {
+                    <button type="button" class="btn-ghost" (click)="editar(g, $event)">Editar</button>
+                    <button type="button" class="btn-ghost" (click)="eliminar(g, $event)">Eliminar</button>
+                  }
                   <button type="button" class="btn-ghost" (click)="expandir(g); $event.stopPropagation()">
                     {{ grupoExpandidoId() === g.id ? 'Ocultar' : 'Integrantes' }}
                   </button>
@@ -77,12 +81,16 @@
                       <li>
                         <strong>{{ e.nombre_completo }}</strong>
                         <span>{{ e.correo }}</span>
+                        @if (!esAdmin()) {
                         <button type="button" class="btn-ghost" (click)="removerEstudiante(e.id)">Quitar</button>
+                      }
                       </li>
                     }
                   </ul>
                 }
-                <button type="button" class="btn-secondary" (click)="agregarEstudiantes()">Agregar estudiantes</button>
+                @if (!esAdmin()) {
+                  <button type="button" class="btn-secondary" (click)="agregarEstudiantes()">Agregar estudiantes</button>
+                }
               </div>
             }
           }

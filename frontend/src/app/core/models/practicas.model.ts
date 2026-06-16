@@ -198,9 +198,31 @@ export interface DetallePreguntaResultado {
   pregunta_id: number;
   enunciado: string;
   peso: number;
+  /** Si false: pregunta narrativa/exploratoria, no afecta nota (req. 3). */
+  calificable?: boolean;
+  /** Competencia asociada (criterio de rúbrica). */
+  competencia_id?: string;
+  competencia_nombre?: string;
+  escenario_orden?: number;
+  pregunta_orden?: number;
   respondida: boolean;
+  /** True si la respuesta del estudiante fue correcta. */
+  es_acertada?: boolean;
   respuesta_elegida: Respuesta | null;
   respuestas_correctas: Respuesta[];
+  /** Retroalimentación pedagógica por competencia (req. 4 y 6). */
+  retroalimentacion_competencia?: string;
+}
+
+/** Resumen agregado por competencia para el panel estudiante (req. 6). */
+export interface CompetenciaResumen {
+  id: string;
+  nombre: string;
+  acertadas: number;
+  total: number;
+  porcentaje: number;
+  /** Solo presente si el estudiante no alcanzó el 100% en esa competencia. */
+  retroalimentacion?: string;
 }
 
 export interface DesgloseCriterio {
@@ -237,6 +259,8 @@ export interface Resultado {
   nota_final: string;
   aprobado: boolean;
   nota_aprobacion: number;
+  /** Escala máxima de la nota (típicamente 100 o 5). */
+  escala_maxima?: number;
   rubrica_descripcion: string;
   desglose_criterios: DesgloseCriterio[];
   feedback_docente: string;
@@ -244,6 +268,8 @@ export interface Resultado {
   fecha_calculo: string;
   fecha_actualizacion: string;
   detalle_preguntas: DetallePreguntaResultado[];
+  /** Resumen agregado por competencia (req. 6). */
+  competencias?: CompetenciaResumen[];
 }
 
 export interface SolicitudReapertura {

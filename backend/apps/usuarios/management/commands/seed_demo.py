@@ -296,7 +296,7 @@ CASOS = [
         'programa': 'Derecho',
         'asignatura': 'Resolución de Conflictos',
         'tiempo_min': 25,
-        'docente': 'carlos.molina',
+        'docente': 'hernan.ramirez',
         'criterios': [
             ('comunicacion_asertiva', 'Comunicación asertiva',
              'Se recomienda fortalecer la apertura del diálogo formal con los '
@@ -370,7 +370,7 @@ CASOS = [
         'programa': 'Licenciatura en Educación',
         'asignatura': 'Convivencia Universitaria',
         'tiempo_min': 25,
-        'docente': 'paola.salazar',
+        'docente': 'marcela.gutierrez',
         'criterios': [
             ('identificacion_violencia', 'Identificación de violencia digital',
              'Conviene reforzar el reconocimiento temprano de signos de '
@@ -512,7 +512,7 @@ CASOS = [
         'programa': 'Comunicación Social',
         'asignatura': 'Ética Profesional',
         'tiempo_min': 30,
-        'docente': 'carlos.molina',
+        'docente': 'marcela.gutierrez',
         'criterios': [
             ('responsabilidad_profesional', 'Responsabilidad profesional',
              'Se recomienda fortalecer la postura ética independiente '
@@ -823,25 +823,35 @@ class Command(BaseCommand):
     # -- pasos -------------------------------------------------------------
 
     def _reset(self):
+        """Borra los datos demo en orden seguro respetando los on_delete.
+
+        Orden:
+        1. Prácticas (caso es PROTECT, hay que borrar Practicas antes que Casos).
+        2. Casos.
+        3. Grupos.
+        4. Materias del docente demo.
+        5. Estudiantes con correo del dominio demo.
+        6. Docentes demo (estudiante_creador es PROTECT, por eso borramos
+           estudiantes antes que docentes).
+        7. Admin universidad demo (NO el admin de la plataforma).
+        """
         self.stdout.write(self.style.WARNING('>>> --reset: limpiando datos demo previos'))
-        # Borra solo objetos relacionados con docentes demo.
-        docente_emails = [d['email'] for d in DOCENTES]
-        docentes_qs = Usuario.objects.filter(email__in=docente_emails)
-        # Casos del demo: por nombre exacto.
-        nombres_casos = [c['nombre'] for c in CASOS]
-        Caso.objects.filter(nombre__in=nombres_casos).delete()
-        # Prácticas del demo.
+        # 1. Prácticas.
         nombres_practicas = [p[0] for p in PRACTICAS]
         Practica.objects.filter(nombre__in=nombres_practicas).delete()
-        # Grupos.
+        # 2. Casos (ya sin prácticas que los referencien).
+        nombres_casos = [c['nombre'] for c in CASOS]
+        Caso.objects.filter(nombre__in=nombres_casos).delete()
+        # 3. Grupos.
         nombres_grupos = [g[0] for g in GRUPOS]
         Grupo.objects.filter(nombre__in=nombres_grupos).delete()
-        # Materias y estudiantes (por dominio del correo).
+        # 4. Materias y estudiantes.
+        docente_emails = [d['email'] for d in DOCENTES]
+        docentes_qs = Usuario.objects.filter(email__in=docente_emails)
         Materia.objects.filter(docente__in=docentes_qs).delete()
         Estudiante.objects.filter(correo__iendswith=DOMINIO).delete()
-        # Por último los docentes demo.
+        # 5. Docentes y admin universidad (no toca el admin de plataforma).
         docentes_qs.delete()
-        # Admin universidad demo (NO el admin de la plataforma).
         Usuario.objects.filter(email=f'admin.universidad@{DOMINIO}').delete()
 
     def _admin_universidad(self) -> Usuario:

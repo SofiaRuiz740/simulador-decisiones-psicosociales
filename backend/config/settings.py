@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'anymail',
 ]
 
 # Apps de dominio del proyecto. Orden: usuarios primero (define AUTH_USER_MODEL).
@@ -199,17 +200,28 @@ CORS_ALLOW_CREDENTIALS = True
 
 # =========================================================
 # Correo (invitaciones RF28, resultados RF42)
+# Si BREVO_API_KEY está definida, usa la API HTTP de Brevo (anymail)
+# en lugar de SMTP — necesario en Render que bloquea puertos SMTP.
 # =========================================================
-_email_host = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_BACKEND = config(
-    'EMAIL_BACKEND',
-    default='django.core.mail.backends.smtp.EmailBackend',
-)
-EMAIL_HOST = _email_host
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='') or EMAIL_HOST_USER or 'no-reply@simulador.local'
+_brevo_api_key = config('BREVO_API_KEY', default='')
+
+if _brevo_api_key:
+    EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
+    ANYMAIL = {
+        'SENDINBLUE_API_KEY': _brevo_api_key,
+    }
+else:
+    _email_host = config('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_BACKEND = config(
+        'EMAIL_BACKEND',
+        default='django.core.mail.backends.smtp.EmailBackend',
+    )
+    EMAIL_HOST = _email_host
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='') or config('EMAIL_HOST_USER', default='') or 'no-reply@simulador.local'
 EMAIL_USE_DOCENTE_FROM = config('EMAIL_USE_DOCENTE_FROM', default=True, cast=bool)
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:4200')

@@ -43,3 +43,8 @@ python-docx>=1.1,<2.0
 # IA generativa (proveedor OpenAI por defecto; opcional Anthropic)
 # =========================================================
 openai>=1.0,<2.0
+
+# =========================================================
+# Email transaccional vía API HTTP (evita bloqueo SMTP en Render)
+# =========================================================
+django-anymail[sendinblue]>=10.0,<12.0

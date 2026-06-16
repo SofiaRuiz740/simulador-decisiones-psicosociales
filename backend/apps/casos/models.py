@@ -89,11 +89,23 @@ class Pregunta(models.Model):
         help_text='Peso relativo en la rúbrica del caso.',
     )
     criterio_rubrica_id = models.CharField(
-        'criterio de rúbrica',
+        'criterio de rúbrica (competencia)',
         max_length=40,
         blank=True,
         default='',
-        help_text='ID del criterio (en Rubrica.criterios) al que aporta esta pregunta.',
+        help_text=(
+            'ID del criterio en Rubrica.criterios al que aporta esta pregunta. '
+            'Actúa como la "competencia" asociada (RF + req. adicional 4).'
+        ),
+    )
+    calificable = models.BooleanField(
+        'calificable',
+        default=True,
+        help_text=(
+            'Si es False (preguntas narrativas, exploratorias o de contexto): '
+            'no afecta la nota ni el puntaje, pero sigue mostrándose en la '
+            'simulación. Default True para no romper preguntas existentes.'
+        ),
     )
 
     class Meta:

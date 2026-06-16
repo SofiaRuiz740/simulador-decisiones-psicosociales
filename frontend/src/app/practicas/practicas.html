@@ -5,7 +5,7 @@
   </header>
 
   <nav class="tabs" aria-label="Secciones prácticas">
-    @for (t of tabs; track t.id) {
+    @for (t of tabs(); track t.id) {
       <button type="button" class="tab" [class.active]="tab() === t.id" (click)="tab.set(t.id)">{{ t.label }}</button>
     }
   </nav>

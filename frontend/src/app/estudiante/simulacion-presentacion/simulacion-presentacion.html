@@ -52,45 +52,57 @@
       </header>
 
       <div class="presentacion__viewport">
-        @if (itemActual(); as item) {
-          <div class="caja-contenido" [class.es-pregunta]="item.tipo === 'pregunta'">
-            @if (item.tipo === 'narrativa') {
-              <h3 class="caja-titulo">{{ item.titulo }}</h3>
-            }
+        <div class="presentacion__escena">
 
-            <p class="caja-texto" (click)="completarTypewriter()">
-              <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
-              @if (!typewriterCompleto()) {
-                <span class="cursor-typewriter" aria-hidden="true"></span>
-              }
-            </p>
-
-            @if (item.tipo === 'pregunta' && typewriterCompleto()) {
-              <div class="opciones">
-                @for (respuesta of item.pregunta.respuestas; track respuesta.id) {
-                  <button
-                    type="button"
-                    class="btn-opcion"
-                    [class.seleccionada]="esRespuestaSeleccionada(respuesta)"
-                    [disabled]="respuestaSeleccionadaActual() != null && !esRespuestaSeleccionada(respuesta)"
-                    (click)="seleccionarRespuesta(item.pregunta, respuesta)">
-                    {{ respuesta.texto }}
-                  </button>
-                }
-              </div>
-            }
-
-            <div class="caja-acciones">
-              <button
-                type="button"
-                class="btn-continuar"
-                [disabled]="!puedeContinuar()"
-                (click)="siguiente()">
-                {{ esUltimoItem() ? 'Finalizar' : 'Continuar' }}
-              </button>
+          <!-- Personaje: se recrea en cada ítem para reproducir la animación -->
+          @for (frame of personajeFrame(); track frame.idx) {
+            <div class="personaje-wrap" aria-hidden="true">
+              <img [src]="frame.src" class="personaje-img" alt="" />
             </div>
-          </div>
-        }
+          }
+
+          <!-- Contenido del ítem -->
+          @if (itemActual(); as item) {
+            <div class="caja-contenido" [class.es-pregunta]="item.tipo === 'pregunta'">
+              @if (item.tipo === 'narrativa') {
+                <h3 class="caja-titulo">{{ item.titulo }}</h3>
+              }
+
+              <p class="caja-texto" (click)="completarTypewriter()">
+                <span class="comillas">«</span>{{ textoVisible() }}<span class="comillas">»</span>
+                @if (!typewriterCompleto()) {
+                  <span class="cursor-typewriter" aria-hidden="true"></span>
+                }
+              </p>
+
+              @if (item.tipo === 'pregunta' && typewriterCompleto()) {
+                <div class="opciones">
+                  @for (respuesta of item.pregunta.respuestas; track respuesta.id) {
+                    <button
+                      type="button"
+                      class="btn-opcion"
+                      [class.seleccionada]="esRespuestaSeleccionada(respuesta)"
+                      [disabled]="respuestaSeleccionadaActual() != null && !esRespuestaSeleccionada(respuesta)"
+                      (click)="seleccionarRespuesta(item.pregunta, respuesta)">
+                      {{ respuesta.texto }}
+                    </button>
+                  }
+                </div>
+              }
+
+              <div class="caja-acciones">
+                <button
+                  type="button"
+                  class="btn-continuar"
+                  [disabled]="!puedeContinuar()"
+                  (click)="siguiente()">
+                  {{ esUltimoItem() ? 'Finalizar' : 'Continuar' }}
+                </button>
+              </div>
+            </div>
+          }
+
+        </div>
       </div>
     }
 

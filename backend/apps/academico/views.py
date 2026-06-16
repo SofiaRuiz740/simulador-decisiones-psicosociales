@@ -75,9 +75,10 @@ class EstudianteViewSet(viewsets.ModelViewSet):
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
 
-        if request.user.rol != Usuario.Rol.DOCENTE:
+        roles_permitidos = (Usuario.Rol.DOCENTE, Usuario.Rol.ADMIN)
+        if request.user.rol not in roles_permitidos:
             raise ValidationError(
-                'Solo los docentes pueden vincular estudiantes a su lista.',
+                'Solo los docentes y administradores pueden agregar estudiantes.',
             )
 
         estudiante, creado = Estudiante.objects.get_or_create(
@@ -89,8 +90,9 @@ class EstudianteViewSet(viewsets.ModelViewSet):
             },
         )
 
-        # Vincula al docente actual (no falla si ya estaba vinculado).
-        estudiante.docentes.add(request.user)
+        # Vincula al usuario actual solo si es docente (el admin no necesita la relación M2N).
+        if request.user.rol == Usuario.Rol.DOCENTE:
+            estudiante.docentes.add(request.user)
 
         salida = EstudianteSerializer(estudiante).data
         salida['_creado'] = creado  # marker informativo: true=nuevo, false=ya existía
@@ -99,17 +101,18 @@ class EstudianteViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='vincular')
     def vincular(self, request, pk=None):
         """Vincula este estudiante al docente actual (no requiere desvinculación previa)."""
-        if request.user.rol != Usuario.Rol.DOCENTE:
-            raise ValidationError('Solo los docentes pueden vincular estudiantes.')
+        if request.user.rol not in (Usuario.Rol.DOCENTE, Usuario.Rol.ADMIN):
+            raise ValidationError('Solo los docentes y administradores pueden vincular estudiantes.')
         estudiante = get_object_or_404(Estudiante, pk=pk)
-        estudiante.docentes.add(request.user)
+        if request.user.rol == Usuario.Rol.DOCENTE:
+            estudiante.docentes.add(request.user)
         return Response(EstudianteSerializer(estudiante).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['delete'], url_path='desvincular')
     def desvincular(self, request, pk=None):
         """Desvincula este estudiante del docente actual (no borra el estudiante)."""
-        if request.user.rol != Usuario.Rol.DOCENTE:
-            raise ValidationError('Solo los docentes pueden desvincular estudiantes.')
+        if request.user.rol not in (Usuario.Rol.DOCENTE, Usuario.Rol.ADMIN):
+            raise ValidationError('Solo los docentes y administradores pueden desvincular estudiantes.')
         estudiante = get_object_or_404(Estudiante, pk=pk)
         estudiante.docentes.remove(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)

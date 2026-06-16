@@ -42,3 +42,7 @@ class ResultadoViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewset
         resultado.feedback_docente = ser.validated_data['feedback_docente']
         resultado.save(update_fields=['feedback_docente', 'fecha_actualizacion'])
         return Response(ResultadoSerializer(resultado).data)
+
+    # Nota: NO duplicamos endpoint /detalle/ — `ResultadoSerializer` ya expone
+    # `detalle_preguntas` y `competencias` con toda la info pregunta-por-pregunta
+    # y resumen formativo (req. adicionales 5 y 6).

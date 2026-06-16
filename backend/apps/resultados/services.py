@@ -99,7 +99,18 @@ def notificar_resultado_estudiante(resultado: Resultado) -> tuple[bool, str | No
 
 
 def calcular_resultado(participacion: Participacion) -> Resultado:
-    """Calcula y persiste el Resultado de la participación."""
+    """Calcula y persiste el Resultado de la participación.
+
+    Reglas (requisitos adicionales 2 y 3):
+    - Las preguntas con `calificable=False` (narrativas / exploratorias /
+      contexto) NO afectan la nota ni el puntaje, pero sí se muestran en
+      el desglose para que el docente vea la respuesta del estudiante.
+    - Fórmula única y centralizada:
+        porcentaje = (correctas_calificables / total_calificables) * 100
+        nota_final = porcentaje * escala_maxima / 100
+      Si la rúbrica define criterios con pesos válidos (suma 100), se
+      ponderan por criterio respetando la misma exclusión de no-calificables.
+    """
     caso = participacion.practica.caso
     preguntas = list(Pregunta.objects.filter(escenario__caso=caso))
 
@@ -110,16 +121,20 @@ def calcular_resultado(participacion: Participacion) -> Resultado:
         ).select_related('respuesta_elegida')
     }
 
+    # Sólo se cuentan las preguntas calificables. Las no-calificables se
+    # registran después en el desglose para el panel docente.
+    preguntas_cal = [p for p in preguntas if p.calificable]
+
     correctas = 0
     incorrectas = 0
     no_respondidas = 0
     peso_obtenido = 0
-    peso_total = sum(p.peso for p in preguntas)
+    peso_total = sum(p.peso for p in preguntas_cal)
 
-    # Acumular por criterio cuando las preguntas lo tengan asignado.
+    # Acumular por criterio (competencia) cuando las preguntas lo tengan asignado.
     por_criterio: dict[str, dict[str, int]] = {}
 
-    for p in preguntas:
+    for p in preguntas_cal:
         rs = seleccionadas.get(p.id)
         cid = (p.criterio_rubrica_id or '').strip()
         if cid:
@@ -163,7 +178,7 @@ def calcular_resultado(participacion: Participacion) -> Resultado:
             porcentaje = (Decimal(po) / Decimal(pt) * Decimal(100)) if pt > 0 else Decimal(0)
             nota_pct += (porcentaje * peso_criterio / Decimal(100))
             nivel = _nivel_alcanzado(float(porcentaje), c.get('niveles', []))
-            desglose.append({
+            entrada = {
                 'criterio_id': cid,
                 'nombre': c.get('nombre', ''),
                 'peso': int(peso_criterio),
@@ -171,9 +186,18 @@ def calcular_resultado(participacion: Participacion) -> Resultado:
                 'peso_obtenido': po,
                 'porcentaje': float(porcentaje.quantize(Decimal('0.01'))),
                 'nivel_alcanzado': nivel,
-            })
+            }
+            # Retroalimentación formativa por competencia (req. 4): si la
+            # rúbrica define `retroalimentacion` por criterio y el estudiante
+            # no alcanzó el 100% en ese criterio, la incluimos para el panel
+            # del estudiante.
+            retro_cri = (c.get('retroalimentacion') or '').strip()
+            if retro_cri and porcentaje < Decimal('100'):
+                entrada['retroalimentacion'] = retro_cri
+            desglose.append(entrada)
         nota = (nota_pct * Decimal(escala) / Decimal(100)).quantize(Decimal('0.01'))
     else:
+        # Fórmula plana centralizada (req. 2).
         if peso_total > 0:
             nota = (Decimal(peso_obtenido) / Decimal(peso_total) * Decimal(escala)).quantize(Decimal('0.01'))
 

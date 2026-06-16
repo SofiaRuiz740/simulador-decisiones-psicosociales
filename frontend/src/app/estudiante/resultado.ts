@@ -22,10 +22,13 @@ export class ResultadoEstudiante implements OnInit {
 
   readonly loading = signal(true);
   readonly resultado = signal<Resultado | null>(null);
+  /** Porcentaje de aciertos (req. 6). Usa correctas/calificables, no la nota. */
   readonly porcentaje = computed(() => {
     const r = this.resultado();
     if (!r) return 0;
-    return Math.round(Number(r.nota_final));
+    const calificables = (r.correctas ?? 0) + (r.incorrectas ?? 0) + (r.no_respondidas ?? 0);
+    if (calificables === 0) return 0;
+    return Math.round((r.correctas / calificables) * 100);
   });
 
   readonly tierEmoji = computed(() => {

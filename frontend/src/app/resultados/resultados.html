@@ -173,6 +173,7 @@
                 <thead>
                   <tr>
                     <th>Pregunta</th>
+                    <th>Competencia</th>
                     <th>Seleccionada</th>
                     <th>Correcta</th>
                     <th>Estado</th>
@@ -182,21 +183,29 @@
                 </thead>
                 <tbody>
                   @for (d of r.detalle_preguntas; track d.pregunta_id) {
-                    <tr>
-                      <td>{{ d.enunciado }}</td>
+                    <tr [class.row-muted]="d.calificable === false">
+                      <td>
+                        {{ d.enunciado }}
+                        @if (d.calificable === false) {
+                          <span class="badge badge--neutral" style="margin-left:6px">No calificable</span>
+                        }
+                      </td>
+                      <td>{{ d.competencia_nombre || '—' }}</td>
                       <td>{{ d.respuesta_elegida?.texto || '—' }}</td>
-                      <td>{{ d.respuestas_correctas[0]?.texto || '—' }}</td>
+                      <td>{{ d.calificable === false ? '—' : (d.respuestas_correctas[0]?.texto || '—') }}</td>
                       <td>
                         @if (!d.respondida) {
                           <span class="badge">Sin responder</span>
+                        } @else if (d.calificable === false) {
+                          <span class="badge">Narrativa</span>
                         } @else if (esAcertada(d)) {
                           <span class="badge badge--aprobado">Acertada</span>
                         } @else {
                           <span class="badge badge--pendiente">Fallida</span>
                         }
                       </td>
-                      <td>{{ d.respuesta_elegida?.retroalimentacion || '—' }}</td>
-                      <td>{{ d.peso }}</td>
+                      <td>{{ d.respuesta_elegida?.retroalimentacion || d.retroalimentacion_competencia || '—' }}</td>
+                      <td>{{ d.calificable === false ? '—' : d.peso }}</td>
                     </tr>
                   }
                 </tbody>

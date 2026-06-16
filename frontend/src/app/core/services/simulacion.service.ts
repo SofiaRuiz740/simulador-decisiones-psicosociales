@@ -56,6 +56,8 @@ export class SimulacionService {
     return this.http.get<Paginated<Resultado>>(`${this.api}/resultados/?page=${page}`);
   }
   obtenerResultado(id: number) {
+    // Devuelve detalle_preguntas + competencias (req. adicionales 5 y 6)
+    // sin necesidad de un endpoint extra.
     return this.http.get<Resultado>(`${this.api}/resultados/${id}/`);
   }
   guardarFeedback(id: number, feedback_docente: string) {

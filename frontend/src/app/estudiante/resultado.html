@@ -16,7 +16,7 @@
       <span class="result-emoji">{{ tierEmoji() }}</span>
       <div class="result-score" [style.--pct]="porcentaje() + '%'">
         <strong>{{ r.nota_final }}</strong>
-        <span>/ 100</span>
+        <span>/ {{ r.escala_maxima || 100 }}</span>
       </div>
       <span class="badge" [class.badge--validado]="r.aprobado" [class.badge--pendiente]="!r.aprobado">
         {{ r.aprobado ? 'Aprobado' : 'No aprobado' }} · mínimo {{ r.nota_aprobacion }}
@@ -43,11 +43,44 @@
       </article>
     </section>
 
+    @if (r.competencias && r.competencias.length > 0) {
+      <section class="panel">
+        <div class="panel__toolbar">
+          <div class="toolbar">
+            <h2 class="panel-title">Competencias a fortalecer</h2>
+          </div>
+        </div>
+        <div class="panel__body panel__body--padded">
+          @for (c of r.competencias; track c.id) {
+            <article class="criterio-row"
+                     [class.criterio-row--ok]="c.porcentaje >= 100"
+                     [class.criterio-row--alert]="c.porcentaje < 100">
+              <div class="criterio-row__head">
+                <strong>{{ c.nombre || c.id }}</strong>
+                <span class="badge"
+                      [class.badge--validado]="c.porcentaje >= 100"
+                      [class.badge--pendiente]="c.porcentaje < 100">
+                  {{ c.acertadas }} / {{ c.total }}
+                </span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar__fill" [style.width.%]="c.porcentaje"></div>
+              </div>
+              <p class="criterio-row__meta">{{ c.porcentaje | number:'1.0-0' }}% de aciertos en esta competencia.</p>
+              @if (c.retroalimentacion) {
+                <p class="criterio-row__desc">{{ c.retroalimentacion }}</p>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+
     @if (r.desglose_criterios && r.desglose_criterios.length > 0) {
       <section class="panel">
         <div class="panel__toolbar">
           <div class="toolbar">
-            <h2 class="panel-title">Desempeño por criterio</h2>
+            <h2 class="panel-title">Desempeño por criterio (rúbrica)</h2>
           </div>
         </div>
         <div class="panel__body panel__body--padded">
@@ -93,11 +126,22 @@
       </div>
       <div class="panel__body panel__body--padded">
         @for (d of r.detalle_preguntas; track d.pregunta_id; let i = $index) {
-          <article class="preg-result" [class.preg-result--ok]="d.respondida && d.respuesta_elegida?.es_correcta"
-            [class.preg-result--fail]="d.respondida && d.respuesta_elegida && !d.respuesta_elegida.es_correcta">
+          <article class="preg-result"
+                   [class.preg-result--ok]="d.respondida && d.respuesta_elegida?.es_correcta"
+                   [class.preg-result--fail]="d.respondida && d.respuesta_elegida && !d.respuesta_elegida.es_correcta"
+                   [class.preg-result--narrativa]="d.calificable === false">
             <header class="preg-result__head">
               <span class="preg-result__num">{{ i + 1 }}</span>
               <h3>{{ d.enunciado }}</h3>
+              <!-- Etiqueta visible: competencia + si la pregunta no es calificable -->
+              <div class="preg-result__tags">
+                @if (d.calificable === false) {
+                  <span class="badge badge--neutral">No calificable</span>
+                }
+                @if (d.competencia_nombre) {
+                  <span class="badge badge--accent">{{ d.competencia_nombre }}</span>
+                }
+              </div>
             </header>
 
             @if (!d.respondida) {
@@ -109,7 +153,7 @@
               @if (resp.retroalimentacion) {
                 <div class="surface surface--flat retro-box">{{ resp.retroalimentacion }}</div>
               }
-              @if (!resp.es_correcta && d.respuestas_correctas.length > 0) {
+              @if (!resp.es_correcta && d.calificable !== false && d.respuestas_correctas.length > 0) {
                 <div class="correctas-list">
                   <strong>Respuesta(s) correcta(s):</strong>
                   <ul>
@@ -119,7 +163,7 @@
                   </ul>
                 </div>
               }
-            } @else if (d.respuestas_correctas.length > 0) {
+            } @else if (d.calificable !== false && d.respuestas_correctas.length > 0) {
               <div class="correctas-list">
                 <strong>Respuesta(s) correcta(s):</strong>
                 <ul>
@@ -127,6 +171,13 @@
                     <li>{{ c.texto }}</li>
                   }
                 </ul>
+              </div>
+            }
+
+            <!-- Retroalimentación pedagógica por competencia (req. 4 y 6) -->
+            @if (d.retroalimentacion_competencia) {
+              <div class="surface surface--flat retro-box retro-box--competencia">
+                <strong>Para fortalecer:</strong> {{ d.retroalimentacion_competencia }}
               </div>
             }
           </article>

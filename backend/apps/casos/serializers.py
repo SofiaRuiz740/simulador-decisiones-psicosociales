@@ -22,7 +22,7 @@ class PreguntaSerializer(serializers.ModelSerializer):
         model = Pregunta
         fields = (
             'id', 'escenario', 'orden', 'enunciado', 'peso',
-            'criterio_rubrica_id', 'respuestas',
+            'criterio_rubrica_id', 'calificable', 'respuestas',
         )
         read_only_fields = ('id', 'respuestas')
 

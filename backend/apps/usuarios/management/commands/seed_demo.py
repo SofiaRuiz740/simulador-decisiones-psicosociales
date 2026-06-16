@@ -894,19 +894,29 @@ class Command(BaseCommand):
         return out
 
     def _estudiantes(self, docente_default: Usuario) -> list[Estudiante]:
+        """Crea/actualiza estudiantes. Preserva docente_creador si ya existía."""
         out: list[Estudiante] = []
-        for first, last, semestre, programa in ESTUDIANTES:
+        for i, (first, last, _semestre, _programa) in enumerate(ESTUDIANTES, start=1):
             correo = _correo_estudiante(first, last)
-            est, _ = Estudiante.objects.update_or_create(
+            # Identificación determinística (no depende de hash() aleatorio).
+            identificacion = f'UNI-DEMO-{i:04d}'
+            est, created = Estudiante.objects.get_or_create(
                 correo=correo,
                 defaults={
                     'first_name': first,
                     'last_name': last,
-                    'identificacion': f'UNI-{abs(hash(correo)) % 999999:06d}',
+                    'identificacion': identificacion,
                     'docente_creador': docente_default,
                     'activo': True,
                 },
             )
+            if not created:
+                # Actualiza solo campos seguros, NO docente_creador.
+                est.first_name = first
+                est.last_name = last
+                est.identificacion = identificacion
+                est.activo = True
+                est.save(update_fields=['first_name', 'last_name', 'identificacion', 'activo'])
             out.append(est)
         return out
 
@@ -1075,8 +1085,11 @@ class Command(BaseCommand):
             # códigos UNI-XXX-NNN. Borramos en lote, no por instancia (más rápido).
             practica.autorizaciones.all().delete()
 
-            # Asigna 4 estudiantes por práctica, rotando.
-            seleccion = estudiantes[(idx - 1) * 2 % len(estudiantes):][:4] or estudiantes[:4]
+            # Asigna 4 estudiantes por práctica, rotando con wrap-around
+            # para que siempre haya exactamente 4 (incluso en la práctica 10).
+            n_est = len(estudiantes)
+            start = ((idx - 1) * 2) % n_est
+            seleccion = [estudiantes[(start + k) % n_est] for k in range(4)]
             sufijo_uni = _sufijo_codigo(asignatura_pref)
             for j, est in enumerate(seleccion, start=1):
                 est.docentes.add(docente)
@@ -1124,22 +1137,24 @@ class Command(BaseCommand):
                     'estado': Participacion.Estado.FINALIZADA,
                 },
             )
-            # Genera respuestas: las 2 primeras correctas, una incorrecta para
-            # variedad. Esto provoca diversidad de notas en los resultados.
-            preguntas = list(
-                auth.practica.caso.escenarios.all().order_by('orden').values_list('id', flat=True)
-            )
-            from apps.casos.models import Pregunta as PreguntaM, Respuesta as RespuestaM
-            preg_ids = list(PreguntaM.objects.filter(
+            # Solo respondemos preguntas calificables. La lógica genera
+            # diversidad de notas: estudiante i acierta en las primeras (i%n + 1)
+            # preguntas calificables.
+            preg_ids = list(Pregunta.objects.filter(
                 escenario__caso=auth.practica.caso, calificable=True,
-            ).values_list('id', flat=True))
+            ).order_by('escenario__orden', 'orden').values_list('id', flat=True))
+            if not preg_ids:
+                continue
+            limite_acierto = i % len(preg_ids)
             for k, pid in enumerate(preg_ids):
-                respuestas = list(RespuestaM.objects.filter(pregunta_id=pid))
+                respuestas = list(Respuesta.objects.filter(pregunta_id=pid))
                 if not respuestas:
                     continue
-                # Lógica: el estudiante i acierta en (i%3 + 1) de las primeras preguntas.
-                acierta = (k <= i % len(preg_ids))
-                escogida = next((r for r in respuestas if r.es_correcta), respuestas[0]) if acierta else respuestas[-1]
+                acierta = k <= limite_acierto
+                if acierta:
+                    escogida = next((r for r in respuestas if r.es_correcta), respuestas[0])
+                else:
+                    escogida = next((r for r in respuestas if not r.es_correcta), respuestas[-1])
                 RespuestaSeleccionada.objects.get_or_create(
                     participacion=part,
                     pregunta_id=pid,
@@ -1148,11 +1163,34 @@ class Command(BaseCommand):
             calcular_resultado(part)
 
 
+_ASCII_TABLE = str.maketrans('ÁÉÍÓÚÑÜ', 'AEIOUNU')
+
+
 def _sufijo_codigo(asignatura: str) -> str:
-    """Mapea asignatura a 3 letras para el código UNI-XXX-NNN."""
-    palabras = asignatura.upper().split()
+    """Mapea asignatura a 3 letras ASCII para el código UNI-XXX-NNN.
+
+    Garantiza caracteres ASCII (sin acentos) para que los códigos sean
+    portables en URLs, copy-paste y correos. Mapeo fijo para asignaturas
+    conocidas y fallback genérico para el resto.
+    """
+    fijos = {
+        'Psicología Social': 'PSI',
+        'Ética Profesional': 'ETI',
+        'Convivencia Universitaria': 'CON',
+        'Proyecto de Vida Universitario': 'PVU',
+        'Habilidades Socioemocionales': 'HSE',
+        'Resolución de Conflictos': 'RDC',
+        'Intervención Psicosocial': 'IPS',
+        'Responsabilidad Social Universitaria': 'RSU',
+        'Bienestar Universitario': 'BIE',
+        'Toma de Decisiones Éticas': 'TDE',
+    }
+    if asignatura in fijos:
+        return fijos[asignatura]
+    palabras = asignatura.upper().translate(_ASCII_TABLE).split()
     if not palabras:
         return 'GEN'
     if len(palabras) == 1:
-        return palabras[0][:3]
-    return (palabras[0][:1] + palabras[1][:1] + (palabras[2][:1] if len(palabras) > 2 else 'I')).ljust(3, 'X')
+        return palabras[0][:3].ljust(3, 'X')
+    extra = palabras[2][:1] if len(palabras) > 2 else 'I'
+    return (palabras[0][:1] + palabras[1][:1] + extra).ljust(3, 'X')
